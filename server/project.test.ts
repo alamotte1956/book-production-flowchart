@@ -188,6 +188,28 @@ describe("project router", () => {
     // Project 1 belongs to user 1, not user 999
     await expect(caller.project.get({ projectId: 1 })).rejects.toThrow("Project not found");
   });
+
+  it("duplicates a project with (Copy) suffix", async () => {
+    const ctx = createAuthContext(1);
+    const caller = appRouter.createCaller(ctx);
+
+    const list = await caller.project.list();
+    const original = list[0];
+
+    const copy = await caller.project.duplicate({ projectId: original.id });
+    expect(copy).toBeDefined();
+    expect(copy.title).toBe(`${original.title} (Copy)`);
+    expect(copy.author).toBe(original.author);
+    expect(copy.genre).toBe(original.genre);
+    expect(copy.id).not.toBe(original.id);
+  });
+
+  it("rejects duplicate of another user's project", async () => {
+    const ctx = createAuthContext(999);
+    const caller = appRouter.createCaller(ctx);
+
+    await expect(caller.project.duplicate({ projectId: 1 })).rejects.toThrow("Project not found");
+  });
 });
 
 describe("step router", () => {

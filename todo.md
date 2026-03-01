@@ -33,3 +33,9 @@
 - [x] Landing page polish — improve project list page design and UX
 - [x] Fix auth redirect (show login prompt instead of 'Project not found' when unauthenticated)
 - [x] Full testing and checkpoint
+
+## Phase 7: Duplicate Project Feature
+- [x] Add backend `project.duplicate` tRPC endpoint (copies title, author, genre, notes into new project)
+- [x] Add "Duplicate" button to project cards on the Home page
+- [x] Add "Duplicate" button to the project tracker header
+- [x] Write vitest tests for the duplicate endpoint

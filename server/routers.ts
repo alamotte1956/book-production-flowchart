@@ -70,6 +70,22 @@ export const appRouter = router({
         await deleteProject(input.projectId);
         return { success: true };
       }),
+
+    duplicate: protectedProcedure
+      .input(z.object({ projectId: z.number() }))
+      .mutation(async ({ ctx, input }) => {
+        const source = await getProjectById(input.projectId);
+        if (!source || source.userId !== ctx.user.id) {
+          throw new Error("Project not found");
+        }
+        return createProject({
+          userId: ctx.user.id,
+          title: `${source.title} (Copy)`,
+          author: source.author,
+          genre: source.genre,
+          notes: source.notes,
+        });
+      }),
   }),
 
   step: router({

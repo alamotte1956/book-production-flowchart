@@ -10,7 +10,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Progress } from "@/components/ui/progress";
 import {
   BookOpen, Plus, Trash2, ArrowRight, Loader2,
-  Upload, CheckCircle2, SkipForward, Clock, Sparkles,
+  Upload, CheckCircle2, SkipForward, Clock, Sparkles, Copy,
 } from "lucide-react";
 import { useState, useMemo } from "react";
 import { useLocation } from "wouter";
@@ -49,6 +49,12 @@ export default function Home() {
   const utils = trpc.useUtils();
   const deleteMutation = trpc.project.delete.useMutation({
     onSuccess: () => { utils.project.list.invalidate(); },
+  });
+  const duplicateMutation = trpc.project.duplicate.useMutation({
+    onSuccess: (newProject) => {
+      utils.project.list.invalidate();
+      navigate(`/project/${newProject.id}`);
+    },
   });
 
   // Not logged in — show landing
@@ -309,18 +315,32 @@ export default function Home() {
                         <h3 className="font-serif text-xl text-[#3a2a1a] truncate group-hover:text-[#5c3d2e] transition-colors">{project.title}</h3>
                         {project.author && <p className="text-sm text-[#8b7b6b] mt-1">by {project.author}</p>}
                       </div>
-                      <Button
-                        variant="ghost" size="icon"
-                        className="text-[#a89880] hover:text-red-600 opacity-0 group-hover:opacity-100 transition-opacity shrink-0"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          if (confirm("Delete this project and all its files?")) {
-                            deleteMutation.mutate({ projectId: project.id });
-                          }
-                        }}
-                      >
-                        <Trash2 size={16} />
-                      </Button>
+                      <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity shrink-0">
+                        <Button
+                          variant="ghost" size="icon"
+                          className="text-[#a89880] hover:text-[#c9a96e]"
+                          title="Duplicate project"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            duplicateMutation.mutate({ projectId: project.id });
+                          }}
+                        >
+                          <Copy size={16} />
+                        </Button>
+                        <Button
+                          variant="ghost" size="icon"
+                          className="text-[#a89880] hover:text-red-600"
+                          title="Delete project"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            if (confirm("Delete this project and all its files?")) {
+                              deleteMutation.mutate({ projectId: project.id });
+                            }
+                          }}
+                        >
+                          <Trash2 size={16} />
+                        </Button>
+                      </div>
                     </div>
                     {project.genre && (
                       <span className="inline-block mt-2 text-xs px-2.5 py-1 rounded-full bg-[#f0e8d8] text-[#8b7b6b]">

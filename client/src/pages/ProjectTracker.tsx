@@ -15,7 +15,7 @@ import {
   CheckSquare, MessageSquare, Type, LayoutGrid, Eye, RefreshCw, ShieldCheck,
   ClipboardCheck, Barcode, Printer, Palette, BookCopy, Microscope,
   Warehouse, Truck, Megaphone, Headphones, TrendingUp, Globe,
-  Calendar, AlertTriangle, Clock, Download, ChevronsDown, ChevronsUp,
+  Calendar, AlertTriangle, Clock, Download, ChevronsDown, ChevronsUp, Copy,
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 import { useState, useMemo, useCallback, useRef } from "react";
@@ -508,6 +508,14 @@ export default function ProjectTracker() {
   const { isAuthenticated, loading: authLoading } = useAuth();
   const [printMode, setPrintMode] = useState(false);
 
+  const duplicateMutation = trpc.project.duplicate.useMutation({
+    onSuccess: (newProject) => {
+      toast.success(`Duplicated as "${newProject.title}"`);
+      navigate(`/project/${newProject.id}`);
+    },
+    onError: () => toast.error("Failed to duplicate project"),
+  });
+
   const { data, isLoading, error } = trpc.project.get.useQuery(
     { projectId },
     { enabled: isAuthenticated && projectId > 0 }
@@ -627,6 +635,21 @@ export default function ProjectTracker() {
                 </Button>
               </TooltipTrigger>
               <TooltipContent>{printMode ? "Collapse all steps" : "Expand all steps"}</TooltipContent>
+            </Tooltip>
+
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button
+                  variant="ghost" size="sm"
+                  className="text-[#c9a96e]/70 hover:text-[#c9a96e] hover:bg-[#c9a96e]/10"
+                  onClick={() => duplicateMutation.mutate({ projectId })}
+                  disabled={duplicateMutation.isPending}
+                >
+                  {duplicateMutation.isPending ? <Loader2 size={16} className="animate-spin" /> : <Copy size={16} />}
+                  <span className="ml-1.5 text-xs hidden sm:inline">Duplicate</span>
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>Create a copy of this project</TooltipContent>
             </Tooltip>
 
             <Tooltip>
