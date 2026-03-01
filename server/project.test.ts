@@ -10,8 +10,10 @@ vi.mock("./db", () => {
   const projects: any[] = [];
   const stepStatuses: any[] = [];
   const uploadedFiles: any[] = [];
+  const dueDates: any[] = [];
   let fileIdCounter = 1;
   let stepStatusIdCounter = 1;
+  let dueDateIdCounter = 1;
 
   return {
     createProject: vi.fn(async (data: any) => {
@@ -68,6 +70,29 @@ vi.mock("./db", () => {
     deleteUploadedFile: vi.fn(async (fileId: number) => {
       const idx = uploadedFiles.findIndex((f) => f.id === fileId);
       if (idx >= 0) uploadedFiles.splice(idx, 1);
+    }),
+    getDueDatesByProject: vi.fn(async (projectId: number) => {
+      return dueDates.filter((d) => d.projectId === projectId);
+    }),
+    upsertPhaseDueDate: vi.fn(async (projectId: number, phaseId: string, dueDate: number) => {
+      const existing = dueDates.find((d) => d.projectId === projectId && d.phaseId === phaseId);
+      if (existing) {
+        existing.dueDate = dueDate;
+        return existing;
+      }
+      const entry = {
+        id: dueDateIdCounter++,
+        projectId,
+        phaseId,
+        dueDate,
+        updatedAt: new Date(),
+      };
+      dueDates.push(entry);
+      return entry;
+    }),
+    deletePhaseDueDate: vi.fn(async (projectId: number, phaseId: string) => {
+      const idx = dueDates.findIndex((d) => d.projectId === projectId && d.phaseId === phaseId);
+      if (idx >= 0) dueDates.splice(idx, 1);
     }),
   };
 });
@@ -134,7 +159,7 @@ describe("project router", () => {
     expect(list.length).toBeGreaterThanOrEqual(1);
   });
 
-  it("gets a project with statuses and files", async () => {
+  it("gets a project with statuses, files, and dueDates", async () => {
     const ctx = createAuthContext(1);
     const caller = appRouter.createCaller(ctx);
 
@@ -146,6 +171,7 @@ describe("project router", () => {
     expect(result.project.title).toBe("My First Book");
     expect(Array.isArray(result.statuses)).toBe(true);
     expect(Array.isArray(result.files)).toBe(true);
+    expect(Array.isArray(result.dueDates)).toBe(true);
   });
 
   it("rejects unauthenticated access to project.list", async () => {
@@ -214,6 +240,68 @@ describe("step router", () => {
     });
 
     expect(result.status).toBe("pending");
+  });
+});
+
+describe("dueDate router", () => {
+  it("sets a due date for a phase", async () => {
+    const ctx = createAuthContext(1);
+    const caller = appRouter.createCaller(ctx);
+
+    const list = await caller.project.list();
+    const projectId = list[0].id;
+    const futureDate = Date.now() + 30 * 24 * 60 * 60 * 1000; // 30 days from now
+
+    const result = await caller.dueDate.set({
+      projectId,
+      phaseId: "concept",
+      dueDate: futureDate,
+    });
+
+    expect(result).toBeDefined();
+    expect(result.phaseId).toBe("concept");
+    expect(result.dueDate).toBe(futureDate);
+  });
+
+  it("updates an existing due date", async () => {
+    const ctx = createAuthContext(1);
+    const caller = appRouter.createCaller(ctx);
+
+    const list = await caller.project.list();
+    const projectId = list[0].id;
+    const newDate = Date.now() + 60 * 24 * 60 * 60 * 1000; // 60 days from now
+
+    const result = await caller.dueDate.set({
+      projectId,
+      phaseId: "concept",
+      dueDate: newDate,
+    });
+
+    expect(result.dueDate).toBe(newDate);
+  });
+
+  it("removes a due date", async () => {
+    const ctx = createAuthContext(1);
+    const caller = appRouter.createCaller(ctx);
+
+    const list = await caller.project.list();
+    const projectId = list[0].id;
+
+    const result = await caller.dueDate.remove({
+      projectId,
+      phaseId: "concept",
+    });
+
+    expect(result.success).toBe(true);
+  });
+
+  it("rejects due date set for another user's project", async () => {
+    const ctx = createAuthContext(999);
+    const caller = appRouter.createCaller(ctx);
+
+    await expect(
+      caller.dueDate.set({ projectId: 1, phaseId: "concept", dueDate: Date.now() })
+    ).rejects.toThrow("Project not found");
   });
 });
 

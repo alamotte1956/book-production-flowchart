@@ -37,8 +37,6 @@ export type InsertProject = typeof projects.$inferInsert;
 
 /**
  * Tracks the status of each step within a project.
- * stepId matches the step.id from the flowchart data (e.g., "idea", "writing", "self-edit").
- * status: pending (not started), complete (done), skipped (user chose to skip).
  */
 export const stepStatuses = mysqlTable("step_statuses", {
   id: int("id").autoincrement().primaryKey(),
@@ -55,7 +53,6 @@ export type InsertStepStatus = typeof stepStatuses.$inferInsert;
 
 /**
  * Files uploaded to a specific input slot within a step.
- * inputName identifies which input within the step (e.g., "Market Research", "Query Letter").
  */
 export const uploadedFiles = mysqlTable("uploaded_files", {
   id: int("id").autoincrement().primaryKey(),
@@ -72,3 +69,19 @@ export const uploadedFiles = mysqlTable("uploaded_files", {
 
 export type UploadedFile = typeof uploadedFiles.$inferSelect;
 export type InsertUploadedFile = typeof uploadedFiles.$inferInsert;
+
+/**
+ * Due dates per phase within a project.
+ * phaseId matches the phase.id from the flowchart data (e.g., "concept", "acquisitions").
+ * dueDate is stored as a bigint (Unix timestamp in ms) for timezone-safe handling.
+ */
+export const phaseDueDates = mysqlTable("phase_due_dates", {
+  id: int("id").autoincrement().primaryKey(),
+  projectId: int("projectId").notNull(),
+  phaseId: varchar("phaseId", { length: 64 }).notNull(),
+  dueDate: bigint("dueDate", { mode: "number" }).notNull(), // Unix timestamp ms
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type PhaseDueDate = typeof phaseDueDates.$inferSelect;
+export type InsertPhaseDueDate = typeof phaseDueDates.$inferInsert;

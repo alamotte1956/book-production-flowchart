@@ -25,4 +25,11 @@
 - [x] Test progress tracking accuracy (vitest)
 
 ## Phase 5: Skill
-- [ ] Package the workflow as a reusable skill
+- [x] Package the workflow as a reusable skill
+
+## Phase 6: Enhancements
+- [x] Export/print view — button to expand all steps and generate printable project summary
+- [x] Due dates per phase — optional target dates with on-schedule tracking indicator
+- [x] Landing page polish — improve project list page design and UX
+- [x] Fix auth redirect (show login prompt instead of 'Project not found' when unauthenticated)
+- [x] Full testing and checkpoint

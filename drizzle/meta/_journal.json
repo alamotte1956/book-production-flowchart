@@ -15,6 +15,13 @@
       "when": 1772403495764,
       "tag": "0001_certain_doctor_strange",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "5",
+      "when": 1772405424586,
+      "tag": "0002_many_moira_mactaggert",
+      "breakpoints": true
     }
   ]
 }

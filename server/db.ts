@@ -5,6 +5,7 @@ import {
   projects, InsertProject, Project,
   stepStatuses, InsertStepStatus, StepStatus,
   uploadedFiles, InsertUploadedFile, UploadedFile,
+  phaseDueDates, InsertPhaseDueDate, PhaseDueDate,
 } from "../drizzle/schema";
 import { ENV } from './_core/env';
 
@@ -204,4 +205,45 @@ export async function deleteUploadedFile(fileId: number): Promise<void> {
   const db = await getDb();
   if (!db) throw new Error("Database not available");
   await db.delete(uploadedFiles).where(eq(uploadedFiles.id, fileId));
+}
+
+// ─── Phase due date helpers ────────────────────────────────────
+
+export async function getDueDatesByProject(projectId: number): Promise<PhaseDueDate[]> {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  return db.select().from(phaseDueDates).where(eq(phaseDueDates.projectId, projectId));
+}
+
+export async function upsertPhaseDueDate(
+  projectId: number,
+  phaseId: string,
+  dueDate: number
+): Promise<PhaseDueDate> {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  const existing = await db.select().from(phaseDueDates)
+    .where(and(eq(phaseDueDates.projectId, projectId), eq(phaseDueDates.phaseId, phaseId)))
+    .limit(1);
+
+  if (existing.length > 0) {
+    await db.update(phaseDueDates)
+      .set({ dueDate })
+      .where(eq(phaseDueDates.id, existing[0].id));
+    const [updated] = await db.select().from(phaseDueDates).where(eq(phaseDueDates.id, existing[0].id));
+    return updated;
+  } else {
+    const [result] = await db.insert(phaseDueDates).values({ projectId, phaseId, dueDate }).$returningId();
+    const [created] = await db.select().from(phaseDueDates).where(eq(phaseDueDates.id, result.id));
+    return created;
+  }
+}
+
+export async function deletePhaseDueDate(projectId: number, phaseId: string): Promise<void> {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  await db.delete(phaseDueDates).where(
+    and(eq(phaseDueDates.projectId, projectId), eq(phaseDueDates.phaseId, phaseId))
+  );
 }

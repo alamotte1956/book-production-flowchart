@@ -8,6 +8,7 @@ import {
   createProject, getProjectsByUser, getProjectById, deleteProject,
   getStepStatusesByProject, upsertStepStatus,
   getFilesByProject, createUploadedFile, deleteUploadedFile,
+  getDueDatesByProject, upsertPhaseDueDate, deletePhaseDueDate,
 } from "./db";
 import { storagePut } from "./storage";
 
@@ -34,11 +35,12 @@ export const appRouter = router({
         if (!project || project.userId !== ctx.user.id) {
           throw new Error("Project not found");
         }
-        const [statuses, files] = await Promise.all([
+        const [statuses, files, dueDates] = await Promise.all([
           getStepStatusesByProject(input.projectId),
           getFilesByProject(input.projectId),
+          getDueDatesByProject(input.projectId),
         ]);
-        return { project, statuses, files };
+        return { project, statuses, files, dueDates };
       }),
 
     create: protectedProcedure
@@ -96,7 +98,7 @@ export const appRouter = router({
         fileName: z.string(),
         mimeType: z.string().optional(),
         fileSize: z.number().optional(),
-        fileBase64: z.string(), // base64-encoded file content
+        fileBase64: z.string(),
       }))
       .mutation(async ({ ctx, input }) => {
         const project = await getProjectById(input.projectId);
@@ -129,6 +131,36 @@ export const appRouter = router({
           throw new Error("Project not found");
         }
         await deleteUploadedFile(input.fileId);
+        return { success: true };
+      }),
+  }),
+
+  dueDate: router({
+    set: protectedProcedure
+      .input(z.object({
+        projectId: z.number(),
+        phaseId: z.string(),
+        dueDate: z.number(), // Unix timestamp ms
+      }))
+      .mutation(async ({ ctx, input }) => {
+        const project = await getProjectById(input.projectId);
+        if (!project || project.userId !== ctx.user.id) {
+          throw new Error("Project not found");
+        }
+        return upsertPhaseDueDate(input.projectId, input.phaseId, input.dueDate);
+      }),
+
+    remove: protectedProcedure
+      .input(z.object({
+        projectId: z.number(),
+        phaseId: z.string(),
+      }))
+      .mutation(async ({ ctx, input }) => {
+        const project = await getProjectById(input.projectId);
+        if (!project || project.userId !== ctx.user.id) {
+          throw new Error("Project not found");
+        }
+        await deletePhaseDueDate(input.projectId, input.phaseId);
         return { success: true };
       }),
   }),
