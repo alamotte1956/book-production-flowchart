@@ -452,3 +452,10 @@
 
 ## Phase 48: Company Tagline
 - [x] Add "From Manuscript to Masterpiece" tagline below hero title on landing page (gold serif, spaced uppercase, glow)
+
+## Phase 49: Tagline Update & Footer
+- [ ] Update tagline to "Manuscript to Masterpiece"
+- [ ] Add professional footer with website (createdesignpublish.net) and contact email, no social icons
+
+## Phase 50: Gold Hero Title
+- [x] Change hero title "Create Design Publish LLC" to all-gold letters (#f5d98a with glow)

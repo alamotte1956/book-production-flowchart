@@ -282,18 +282,18 @@ export default function Home() {
               <h1
                 className="font-serif text-4xl md:text-6xl lg:text-7xl leading-tight tracking-tight whitespace-nowrap"
                 style={{
-                  color: "#ffffff",
-                  textShadow: "0 0 60px rgba(255,255,255,0.5), 0 0 120px rgba(201,169,110,0.35), 0 3px 6px rgba(0,0,0,0.6)",
+                  color: "#f5d98a",
+                  textShadow: "0 0 60px rgba(245,217,138,0.55), 0 0 120px rgba(201,169,110,0.4), 0 3px 6px rgba(0,0,0,0.6)",
                   letterSpacing: "0.02em",
                 }}
               >
-                Create Design{" "}<span style={{ color: "#f5d98a", textShadow: "0 0 40px rgba(245,217,138,0.6)" }}>Publish LLC</span>
+                Create Design Publish LLC
               </h1>
               <p
                 className="mt-4 font-serif text-xl md:text-2xl tracking-widest uppercase"
                 style={{ color: "#c9a96e", letterSpacing: "0.18em", textShadow: "0 0 20px rgba(201,169,110,0.4)" }}
               >
-                From Manuscript to Masterpiece
+                Manuscript to Masterpiece
               </p>
               <p className="mt-5 font-sans text-lg md:text-xl text-[#d4c8b4] max-w-xl mx-auto leading-relaxed">
                 A creator, designer, and publisher's dream platform. Track every step of your book's production — from first idea to finished volume.
