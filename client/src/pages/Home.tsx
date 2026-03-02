@@ -29,10 +29,31 @@ const features = [
   { icon: Clock, title: "Set Due Dates", desc: "Add target dates per phase and get alerts when deadlines approach." },
 ];
 
+const PAGE_TITLE = "Book Production Tracker — The Bookmaker's Journey";
+const PAGE_DESCRIPTION = "Track every step of your book's production — from manuscript to published title — with file uploads, due dates, AI typesetting, and a Gantt timeline.";
+const PAGE_KEYWORDS = "book production tracker, publishing workflow, manuscript tracker, book publishing steps, editorial process, book project management, publishing timeline, author tools, AI typesetting";
+
+function setMetaTag(name: string, content: string) {
+  let el = document.querySelector<HTMLMetaElement>(`meta[name="${name}"]`);
+  if (!el) {
+    el = document.createElement("meta");
+    el.setAttribute("name", name);
+    document.head.appendChild(el);
+  }
+  el.setAttribute("content", content);
+}
+
 export default function Home() {
   const { user, isAuthenticated, loading: authLoading } = useAuth();
   const [, navigate] = useLocation();
   const [open, setOpen] = useState(false);
+
+  // SEO: set title and meta tags for the landing page
+  useEffect(() => {
+    document.title = PAGE_TITLE;
+    setMetaTag("description", PAGE_DESCRIPTION);
+    setMetaTag("keywords", PAGE_KEYWORDS);
+  }, []);
   const [title, setTitle] = useState("");
   const [author, setAuthor] = useState("");
   const [genre, setGenre] = useState("");
