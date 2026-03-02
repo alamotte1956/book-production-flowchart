@@ -358,3 +358,9 @@
 - [x] Add publicDomain and ukRestriction fields to BibleTranslation type
 - [x] Group translations in Bible Studio UI: Public Domain / Licensed / Custom
 - [x] Show Public Domain, UK Restriction, and Licensed badges on translation cards
+
+## Phase 34: Chromium Path Fix
+- [x] Find the correct Chromium binary path in the sandbox (/usr/lib/chromium-browser/chromium-browser)
+- [x] Update executablePath in server/typesettingPipeline.ts from shell wrapper to actual binary
+- [x] Verified: puppeteer launches successfully and generates a PDF with the new path
+- [x] All 181 tests pass after the fix

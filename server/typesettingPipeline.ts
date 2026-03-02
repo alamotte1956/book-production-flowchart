@@ -367,8 +367,12 @@ export function generateBookHtml(
 // ─── Step 3: PDF Rendering via Puppeteer ─────────────────────────────────────
 
 export async function renderToPdf(html: string, trim: TrimSize): Promise<Buffer> {
+  // /usr/bin/chromium-browser is a shell wrapper; puppeteer-core v24+ requires the actual binary
+  const chromiumPath =
+    process.env.CHROMIUM_PATH ||
+    "/usr/lib/chromium-browser/chromium-browser";
   const browser = await puppeteer.launch({
-    executablePath: "/usr/bin/chromium-browser",
+    executablePath: chromiumPath,
     args: [
       "--no-sandbox",
       "--disable-setuid-sandbox",
