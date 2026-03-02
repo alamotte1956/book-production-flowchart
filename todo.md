@@ -106,3 +106,12 @@
 - [x] Project Tracker: convert Complete/Skip/Pending buttons to a status dropdown per step
 - [x] Auto-Produce: add output format dropdown (Both PDF+EPUB / PDF only / EPUB only)
 - [x] Timeline page: due-date status is a visual indicator only (no user decision needed — kept as-is)
+
+## Phase 17: Genre-Based Step Filtering
+- [x] Design genre-to-step relevance map (which steps are irrelevant for which genres)
+- [x] Add getIrrelevantStepIds(genre) + getFilterReason() helpers to shared/genreFilter.ts
+- [x] Project Tracker: auto-hide irrelevant steps when project has a genre set
+- [x] Add genre filter info banner in tracker header when filtering is active
+- [x] Add "N steps hidden for [genre] — click to show" toggle per phase with animated reveal
+- [x] Hidden steps shown at 50% opacity with "Not needed for [genre]" badge and tooltip
+- [x] Write 43 vitest tests for genre filtering helper (genre sets, step hiding, reasons, edge cases)

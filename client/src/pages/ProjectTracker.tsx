@@ -23,6 +23,7 @@ import { useState, useMemo, useCallback, useRef } from "react";
 import { useLocation, useParams } from "wouter";
 import { getLoginUrl } from "@/const";
 import { motion, AnimatePresence } from "framer-motion";
+import { getIrrelevantStepIds, getFilterReason } from "@shared/genreFilter";
 
 // Icon map for dynamic rendering
 const iconMap: Record<string, LucideIcon> = {
@@ -457,7 +458,7 @@ function DueDatePicker({
 // ─── Phase Section Component ────────────────────────────────────
 
 function PhaseSection({
-  phase, projectId, statusMap, fileMap, dueDateMap, globalOffset, printMode,
+  phase, projectId, statusMap, fileMap, dueDateMap, globalOffset, printMode, hiddenStepIds, genre,
 }: {
   phase: Phase;
   projectId: number;
@@ -466,12 +467,19 @@ function PhaseSection({
   dueDateMap: DueDateMap;
   globalOffset: number;
   printMode?: boolean;
+  hiddenStepIds: Set<string>;
+  genre: string | null | undefined;
 }) {
-  const completedInPhase = phase.steps.filter(
+  const [showHidden, setShowHidden] = useState(false);
+
+  const visibleSteps = phase.steps.filter(s => !hiddenStepIds.has(s.id));
+  const filteredSteps = phase.steps.filter(s => hiddenStepIds.has(s.id));
+
+  const completedInPhase = visibleSteps.filter(
     (s) => statusMap[s.id]?.status === "complete" || statusMap[s.id]?.status === "skipped"
   ).length;
-  const pct = phase.steps.length > 0 ? Math.round((completedInPhase / phase.steps.length) * 100) : 0;
-  const phaseComplete = completedInPhase === phase.steps.length;
+  const pct = visibleSteps.length > 0 ? Math.round((completedInPhase / visibleSteps.length) * 100) : 0;
+  const phaseComplete = visibleSteps.length > 0 && completedInPhase === visibleSteps.length;
 
   return (
     <section id={`phase-${phase.id}`} className="scroll-mt-20 print:break-before-page">
@@ -508,7 +516,7 @@ function PhaseSection({
       </div>
 
       <div className="space-y-3 border-l-2 pl-4" style={{ borderColor: `${phase.accentColor}30` }}>
-        {phase.steps.map((step, idx) => (
+        {visibleSteps.map((step, idx) => (
           <StepCard
             key={step.id}
             step={step} phase={phase} projectId={projectId}
@@ -516,6 +524,60 @@ function PhaseSection({
             fileMap={fileMap} globalIndex={globalOffset + idx} printMode={printMode}
           />
         ))}
+
+        {/* Hidden steps toggle */}
+        {filteredSteps.length > 0 && !printMode && (
+          <div className="mt-1">
+            <button
+              onClick={() => setShowHidden(v => !v)}
+              className="flex items-center gap-2 text-xs text-[#a89880] hover:text-[#8b7b6b] transition-colors py-1.5 px-2 rounded-md hover:bg-[#f0e8d8]/60"
+            >
+              <Eye size={13} className={showHidden ? "opacity-100" : "opacity-50"} />
+              {showHidden
+                ? `Hide ${filteredSteps.length} step${filteredSteps.length !== 1 ? "s" : ""} not needed for ${genre}`
+                : `${filteredSteps.length} step${filteredSteps.length !== 1 ? "s" : ""} hidden for ${genre} — click to show`}
+              <ChevronDown size={12} className={`transition-transform ${showHidden ? "rotate-180" : ""}`} />
+            </button>
+
+            <AnimatePresence>
+              {showHidden && (
+                <motion.div
+                  initial={{ height: 0, opacity: 0 }}
+                  animate={{ height: "auto", opacity: 1 }}
+                  exit={{ height: 0, opacity: 0 }}
+                  transition={{ duration: 0.2 }}
+                  className="overflow-hidden space-y-2 mt-2"
+                >
+                  {filteredSteps.map((step, idx) => (
+                    <div key={step.id} className="opacity-50 relative">
+                      <div className="absolute -left-4 top-0 bottom-0 w-0.5 bg-gray-200" />
+                      <div className="mb-1 flex items-center gap-2 px-1">
+                        <span className="text-[10px] bg-gray-100 text-gray-400 px-2 py-0.5 rounded-full border border-gray-200">
+                          Not needed for {genre}
+                        </span>
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <span className="cursor-help">
+                              <AlertTriangle size={11} className="text-gray-300" />
+                            </span>
+                          </TooltipTrigger>
+                          <TooltipContent className="max-w-xs text-xs">
+                            {getFilterReason(step.id, genre ?? "")}
+                          </TooltipContent>
+                        </Tooltip>
+                      </div>
+                      <StepCard
+                        step={step} phase={phase} projectId={projectId}
+                        stepStatus={statusMap[step.id] || { status: "pending", notes: null }}
+                        fileMap={fileMap} globalIndex={globalOffset + visibleSteps.length + idx} printMode={printMode}
+                      />
+                    </div>
+                  ))}
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </div>
+        )}
       </div>
     </section>
   );
@@ -621,6 +683,12 @@ export default function ProjectTracker() {
   }
 
   const { project } = data;
+
+  // Genre-based step filtering
+  const hiddenStepIds = useMemo(
+    () => getIrrelevantStepIds(project.genre),
+    [project.genre]
+  );
 
   let stepOffset = 0;
 
@@ -779,6 +847,19 @@ export default function ProjectTracker() {
         );
       })()}
 
+      {/* Genre filter info banner */}
+      {hiddenStepIds.size > 0 && !printMode && (
+        <div className="bg-[#f5ede4] border-b border-[#d4b896]/50 print:hidden">
+          <div className="max-w-6xl mx-auto px-6 py-2.5 flex items-center gap-3">
+            <Eye size={14} className="text-[#8b5e3c] shrink-0" />
+            <p className="text-xs text-[#5c3d2e] flex-1">
+              <strong>{hiddenStepIds.size} step{hiddenStepIds.size !== 1 ? "s" : ""}</strong> not typically needed for{" "}
+              <strong>{project.genre}</strong> are hidden. Look for the "click to show" toggle within each phase.
+            </p>
+          </div>
+        </div>
+      )}
+
       {/* Overdue alert banner */}
       {overduePhases.length > 0 && !printMode && (
         <div className="bg-red-50 border-b border-red-200 print:hidden">
@@ -835,6 +916,8 @@ export default function ProjectTracker() {
                 phase={phase} projectId={projectId}
                 statusMap={statusMap} fileMap={fileMap} dueDateMap={dueDateMap}
                 globalOffset={currentOffset} printMode={printMode}
+                hiddenStepIds={hiddenStepIds}
+                genre={project.genre}
               />
             );
           })}
