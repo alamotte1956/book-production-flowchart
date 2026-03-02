@@ -459,3 +459,12 @@
 
 ## Phase 50: Gold Hero Title
 - [x] Change hero title "Create Design Publish LLC" to all-gold letters (#f5d98a with glow)
+
+## Phase 51: Sign In / Create Account
+- [x] Add getSignUpUrl() helper to const.ts (type=signUp)
+- [x] Add sticky top nav bar to landing page with Sign In and Create Account buttons
+- [x] Replace single hero CTA with Create Free Account + Sign In button pair
+- [x] Add id=tools-section anchor for nav scroll link
+- [x] Update bottom CTA section with dual Create Account / Sign In buttons
+- [x] Add proper footer with logo, website, email, copyright
+- [x] Add account dropdown menu in dashboard header (user name, Guide link, Sign Out)

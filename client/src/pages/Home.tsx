@@ -4,7 +4,7 @@
  * Unauthenticated: Artisan storybook landing page
  */
 import { useAuth } from "@/_core/hooks/useAuth";
-import { getLoginUrl } from "@/const";
+import { getLoginUrl, getSignUpUrl } from "@/const";
 import { trpc } from "@/lib/trpc";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -18,8 +18,12 @@ import {
   BookOpen, Plus, Trash2, ArrowRight, Loader2,
   Upload, CheckCircle2, SkipForward, Clock, Sparkles, Copy,
   Layers, BookMarked, Ruler, Zap, BarChart3, Library,
-  ChevronRight, ChevronDown, Calendar, Star, TrendingUp, FileText, HelpCircle,
+  ChevronRight, ChevronDown, Calendar, Star, TrendingUp, FileText, HelpCircle, LogOut, User,
 } from "lucide-react";
+import {
+  DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel,
+  DropdownMenuSeparator, DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { useState, useEffect } from "react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useLocation } from "wouter";
@@ -206,7 +210,7 @@ const TOOLS = [
 ];
 
 export default function Home() {
-  const { user, isAuthenticated, loading: authLoading } = useAuth();
+  const { user, isAuthenticated, loading: authLoading, logout } = useAuth();
   const [, navigate] = useLocation();
   const [open, setOpen] = useState(false);
 
@@ -264,8 +268,46 @@ export default function Home() {
   if (!authLoading && !isAuthenticated) {
     return (
       <div className="min-h-screen bg-[#faf6ef]">
+        {/* Sticky top navigation */}
+        <nav className="fixed top-0 left-0 right-0 z-50 bg-[#1a1008]/90 backdrop-blur-sm border-b border-[#c9a96e]/15">
+          <div className="max-w-6xl mx-auto px-6 py-3 flex items-center justify-between">
+            <div className="flex items-center gap-2.5">
+              <img
+                src="https://d2xsxph8kpxj0f.cloudfront.net/310519663211654017/kGjPju6hKCvCsjZhgUHyqj/cdp-logo-icon-VKK59tkJo7q6tVURkrEnnJ.webp"
+                alt="Create Design Publish LLC"
+                className="w-8 h-8 rounded-md object-cover"
+              />
+              <span className="font-serif text-[#f5d98a] text-sm tracking-wide hidden sm:block">Create Design Publish LLC</span>
+            </div>
+            <div className="flex items-center gap-3">
+              <button
+                onClick={() => document.getElementById('features')?.scrollIntoView({ behavior: 'smooth' })}
+                className="text-xs text-[#c9a96e]/70 hover:text-[#c9a96e] transition-colors hidden md:block px-3 py-1.5"
+              >
+                Features
+              </button>
+              <button
+                onClick={() => document.getElementById('tools-section')?.scrollIntoView({ behavior: 'smooth' })}
+                className="text-xs text-[#c9a96e]/70 hover:text-[#c9a96e] transition-colors hidden md:block px-3 py-1.5"
+              >
+                Tools
+              </button>
+              <a href={getLoginUrl()}>
+                <button className="text-xs text-[#f5efe0] hover:text-white transition-colors px-4 py-1.5 rounded-md border border-[#c9a96e]/30 hover:border-[#c9a96e]/60">
+                  Sign In
+                </button>
+              </a>
+              <a href={getSignUpUrl()}>
+                <button className="text-xs bg-[#c9a96e] hover:bg-[#b8944f] text-[#1a1008] font-semibold px-4 py-1.5 rounded-md transition-colors">
+                  Create Account
+                </button>
+              </a>
+            </div>
+          </div>
+        </nav>
+
         {/* Hero */}
-        <div className="relative h-[75vh] min-h-[550px] flex items-center justify-center overflow-hidden">
+        <div className="relative h-[75vh] min-h-[550px] flex items-center justify-center overflow-hidden pt-14">
           <img src={HERO_URL} alt="Bookmaker's workshop" className="absolute inset-0 w-full h-full object-cover" />
           <div className="absolute inset-0 bg-gradient-to-b from-[#1a1008]/70 via-[#1a1008]/40 to-[#1a1008]/80" />
           <div className="relative z-10 text-center px-6 max-w-3xl">
@@ -306,12 +348,19 @@ export default function Home() {
                 <span><strong className="text-3xl text-[#f5efe0]">8</strong> Pro Tools</span>
               </div>
               <div className="mt-10 flex flex-col items-center gap-6">
-                <a href={getLoginUrl()}>
-                  <Button size="lg" className="bg-[#c9a96e] hover:bg-[#b8944f] text-[#2a1a0a] font-semibold text-base px-10 py-6 rounded-lg shadow-lg shadow-[#c9a96e]/20">
-                    Start Your Project
-                    <ArrowRight className="ml-2" size={18} />
-                  </Button>
-                </a>
+                <div className="flex flex-col sm:flex-row items-center gap-4">
+                  <a href={getSignUpUrl()}>
+                    <Button size="lg" className="bg-[#c9a96e] hover:bg-[#b8944f] text-[#2a1a0a] font-semibold text-base px-10 py-6 rounded-lg shadow-lg shadow-[#c9a96e]/20">
+                      Create Free Account
+                      <ArrowRight className="ml-2" size={18} />
+                    </Button>
+                  </a>
+                  <a href={getLoginUrl()}>
+                    <Button size="lg" variant="outline" className="border-[#c9a96e]/50 text-[#f5efe0] hover:bg-[#c9a96e]/10 hover:border-[#c9a96e] font-semibold text-base px-8 py-6 rounded-lg bg-transparent">
+                      Sign In
+                    </Button>
+                  </a>
+                </div>
                 <button
                   onClick={() => document.getElementById('features')?.scrollIntoView({ behavior: 'smooth' })}
                   className="flex flex-col items-center gap-1 text-[#c9a96e]/70 hover:text-[#c9a96e] transition-colors group"
@@ -352,7 +401,7 @@ export default function Home() {
         </div>
 
         {/* Tool showcase */}
-        <div className="bg-[#2a1a0a] py-20">
+        <div id="tools-section" className="bg-[#2a1a0a] py-20">
           <div className="max-w-5xl mx-auto px-6">
             <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.6 }} className="text-center mb-14">
               <h2 className="font-serif text-3xl md:text-4xl text-[#f5efe0]">8 Professional Publishing Tools</h2>
@@ -433,27 +482,47 @@ export default function Home() {
         </div>
 
         {/* CTA */}
-        <div className="py-20 text-center px-6">
+        <div className="py-20 text-center px-6 bg-[#faf6ef]">
           <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.6 }}>
             <Sparkles size={32} className="mx-auto text-[#c9a96e] mb-4" />
             <h2 className="font-serif text-3xl text-[#3a2a1a] mb-3">Ready to Begin?</h2>
-            <p className="text-[#8b7b6b] max-w-md mx-auto mb-8">Create your first project and start tracking your book from manuscript to shelf.</p>
-            <a href={getLoginUrl()}>
-              <Button size="lg" className="bg-[#c9a96e] hover:bg-[#b8944f] text-[#2a1a0a] font-semibold text-base px-10 py-6 rounded-lg">
-                Get Started Free <ArrowRight className="ml-2" size={18} />
-              </Button>
-            </a>
+            <p className="text-[#8b7b6b] max-w-md mx-auto mb-8">Create your free account and start tracking your book from manuscript to shelf.</p>
+            <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+              <a href={getSignUpUrl()}>
+                <Button size="lg" className="bg-[#c9a96e] hover:bg-[#b8944f] text-[#2a1a0a] font-semibold text-base px-10 py-6 rounded-lg">
+                  Create Free Account <ArrowRight className="ml-2" size={18} />
+                </Button>
+              </a>
+              <a href={getLoginUrl()}>
+                <Button size="lg" variant="outline" className="border-[#c9a96e]/50 text-[#5c3d2e] hover:bg-[#f0e8d8] hover:border-[#c9a96e] font-semibold text-base px-8 py-6 rounded-lg">
+                  Already have an account? Sign In
+                </Button>
+              </a>
+            </div>
           </motion.div>
         </div>
 
-        <footer className="py-12 bg-[#2a1a0a] text-center border-t border-[#c9a96e]/10">
-          <div className="flex items-center justify-center gap-3 mb-4">
-            <div className="h-px w-12 bg-[#c9a96e]/20" />
-            <BookOpen size={16} className="text-[#c9a96e]/40" />
-            <div className="h-px w-12 bg-[#c9a96e]/20" />
+        <footer className="py-12 bg-[#2a1a0a] border-t border-[#c9a96e]/10">
+          <div className="max-w-5xl mx-auto px-6">
+            <div className="flex flex-col md:flex-row items-center justify-between gap-6">
+              <div className="flex items-center gap-3">
+                <img
+                  src="https://d2xsxph8kpxj0f.cloudfront.net/310519663211654017/kGjPju6hKCvCsjZhgUHyqj/cdp-logo-icon-VKK59tkJo7q6tVURkrEnnJ.webp"
+                  alt="Create Design Publish LLC"
+                  className="w-8 h-8 rounded-md object-cover"
+                />
+                <div>
+                  <p className="font-serif text-[#f5d98a] text-sm">Create Design Publish LLC</p>
+                  <p className="text-[10px] text-[#c9a96e]/40 uppercase tracking-widest">Manuscript to Masterpiece</p>
+                </div>
+              </div>
+              <div className="flex flex-col items-center md:items-end gap-1 text-center md:text-right">
+                <a href="https://createdesignpublish.net" className="text-xs text-[#c9a96e]/50 hover:text-[#c9a96e] transition-colors">createdesignpublish.net</a>
+                <a href="mailto:contact@createdesignpublish.net" className="text-xs text-[#c9a96e]/50 hover:text-[#c9a96e] transition-colors">contact@createdesignpublish.net</a>
+                <p className="text-[10px] text-[#c9a96e]/25 mt-1">&copy; {new Date().getFullYear()} Create Design Publish LLC. All rights reserved.</p>
+              </div>
+            </div>
           </div>
-          <p className="font-serif text-lg text-[#c9a96e]/50 italic">"A book is a dream that you hold in your hand."</p>
-          <p className="text-xs text-[#c9a96e]/25 mt-2">— Neil Gaiman</p>
         </footer>
       </div>
     );
@@ -535,11 +604,39 @@ export default function Home() {
           </nav>
 
           <div className="flex items-center gap-3">
-            <div className="w-8 h-8 rounded-full bg-[#c9a96e]/20 flex items-center justify-center" title={user?.name || user?.email || "Account"}>
-              <span className="text-sm font-bold text-[#c9a96e]">
-                {(user?.name || user?.email || "?")[0].toUpperCase()}
-              </span>
-            </div>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <button className="w-8 h-8 rounded-full bg-[#c9a96e]/20 hover:bg-[#c9a96e]/30 flex items-center justify-center transition-colors outline-none" aria-label="Account menu">
+                  <span className="text-sm font-bold text-[#c9a96e]">
+                    {(user?.name || user?.email || "?")[0].toUpperCase()}
+                  </span>
+                </button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="w-52 bg-[#2a1a0a] border-[#c9a96e]/20 text-[#f5efe0]">
+                <DropdownMenuLabel className="text-[#c9a96e]/70 text-xs">
+                  <div className="flex items-center gap-2">
+                    <User size={13} />
+                    <span className="truncate">{user?.name || user?.email || "Account"}</span>
+                  </div>
+                </DropdownMenuLabel>
+                <DropdownMenuSeparator className="bg-[#c9a96e]/15" />
+                <DropdownMenuItem
+                  className="text-xs text-[#f5efe0] hover:bg-[#c9a96e]/10 focus:bg-[#c9a96e]/10 cursor-pointer"
+                  onClick={() => navigate("/guide")}
+                >
+                  <HelpCircle size={13} className="mr-2 text-[#c9a96e]/60" />
+                  User Guide
+                </DropdownMenuItem>
+                <DropdownMenuSeparator className="bg-[#c9a96e]/15" />
+                <DropdownMenuItem
+                  className="text-xs text-red-400 hover:bg-red-900/20 focus:bg-red-900/20 cursor-pointer"
+                  onClick={() => logout()}
+                >
+                  <LogOut size={13} className="mr-2" />
+                  Sign Out
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
           </div>
         </div>
       </header>
