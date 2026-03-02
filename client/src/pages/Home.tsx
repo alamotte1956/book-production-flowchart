@@ -333,8 +333,13 @@ export default function Home() {
                 Create Design Publish LLC
               </h1>
               <p
-                className="mt-4 font-serif text-xl md:text-2xl tracking-widest uppercase"
-                style={{ color: "#c9a96e", letterSpacing: "0.18em", textShadow: "0 0 20px rgba(201,169,110,0.4)" }}
+                className="mt-4 font-serif text-2xl md:text-3xl tracking-widest uppercase"
+                style={{
+                  color: "transparent",
+                  WebkitTextStroke: "1.5px #c9a96e",
+                  letterSpacing: "0.2em",
+                  textShadow: "0 0 30px rgba(201,169,110,0.25)",
+                }}
               >
                 Manuscript to Masterpiece
               </p>
