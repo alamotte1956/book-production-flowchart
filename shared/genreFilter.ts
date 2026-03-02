@@ -45,6 +45,7 @@ export const NONFICTION_GENRES = new Set([
   "Memoir / Autobiography",
   "Self-Help / Personal Development",
   "Business / Finance",
+  "Bible / Scripture",
 ]);
 
 /** All genres that belong to the Academic track */
@@ -83,6 +84,13 @@ export function getIrrelevantStepIds(genre: string | null | undefined): Set<stri
     if (genre === "Narrative Nonfiction" || genre === "Memoir / Autobiography") {
       hidden.add("indexing");
     }
+
+    // Bible / Scripture: the acquisitions path is typically direct-to-publisher or self-published;
+    // agent query and standard audio production are not typical
+    if (genre === "Bible / Scripture") {
+      hidden.add("proposal");
+      hidden.add("review");
+    }
   }
 
   if (ACADEMIC_GENRES.has(genre)) {
@@ -116,9 +124,11 @@ export function getFilterReason(stepId: string, genre: string): string {
     },
     proposal: {
       "Academic / Textbook": "Academic publishers use peer review submissions, not agent queries.",
+      "Bible / Scripture": "Bible and Scripture titles are typically published directly or through religious publishers, not via agent queries.",
     },
     review: {
       "Academic / Textbook": "Academic publishers use peer review submissions, not agent queries.",
+      "Bible / Scripture": "Bible and Scripture titles are typically published directly or through religious publishers, not via agent review.",
     },
   };
 

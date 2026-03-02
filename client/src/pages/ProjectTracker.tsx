@@ -462,7 +462,7 @@ const GENRES = [
   "Fantasy", "Romance", "Historical Fiction", "Horror", "Young Adult", "Middle Grade",
   "Children's", "Narrative Nonfiction", "Memoir / Autobiography",
   "Self-Help / Personal Development", "Business / Finance", "Academic / Textbook",
-  "Poetry", "Graphic Novel", "Short Story Collection", "Other",
+  "Poetry", "Graphic Novel", "Short Story Collection", "Bible / Scripture", "Other",
 ];
 
 // ─── Inline Genre Editor ─────────────────────────────────────────────────────

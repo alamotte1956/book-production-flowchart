@@ -151,7 +151,37 @@ describe("getFilterReason", () => {
   });
 });
 
-// ─── Genre set membership ─────────────────────────────────────────────────
+describe("Bible / Scripture filtering", () => {
+  it("hides 'proposal' for Bible / Scripture", () => {
+    const hidden = getIrrelevantStepIds("Bible / Scripture");
+    expect(hidden.has("proposal")).toBe(true);
+  });
+
+  it("hides 'review' for Bible / Scripture", () => {
+    const hidden = getIrrelevantStepIds("Bible / Scripture");
+    expect(hidden.has("review")).toBe(true);
+  });
+
+  it("does NOT hide 'indexing' for Bible / Scripture", () => {
+    const hidden = getIrrelevantStepIds("Bible / Scripture");
+    expect(hidden.has("indexing")).toBe(false);
+  });
+
+  it("does NOT hide 'digital' for Bible / Scripture", () => {
+    const hidden = getIrrelevantStepIds("Bible / Scripture");
+    expect(hidden.has("digital")).toBe(false);
+  });
+
+  it("returns a specific reason for proposal + Bible / Scripture", () => {
+    const reason = getFilterReason("proposal", "Bible / Scripture");
+    expect(reason).toContain("religious");
+  });
+
+  it("returns a specific reason for review + Bible / Scripture", () => {
+    const reason = getFilterReason("review", "Bible / Scripture");
+    expect(reason).toContain("religious");
+  });
+});
 
 describe("Genre sets", () => {
   it("FICTION_GENRES contains expected genres", () => {
@@ -163,6 +193,7 @@ describe("Genre sets", () => {
   it("NONFICTION_GENRES contains expected genres", () => {
     expect(NONFICTION_GENRES.has("Narrative Nonfiction")).toBe(true);
     expect(NONFICTION_GENRES.has("Business / Finance")).toBe(true);
+    expect(NONFICTION_GENRES.has("Bible / Scripture")).toBe(true);
   });
 
   it("ACADEMIC_GENRES contains expected genres", () => {

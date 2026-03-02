@@ -43,6 +43,7 @@ const GENRES = [
   "Poetry",
   "Graphic Novel",
   "Short Story Collection",
+  "Bible / Scripture",
   "Other",
 ];
 

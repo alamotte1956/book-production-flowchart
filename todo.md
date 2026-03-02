@@ -129,3 +129,10 @@
 - [ ] Add TitleEditor inline popover component (text input, min 1 char validation)
 - [ ] Add AuthorEditor inline popover component (optional text input)
 - [ ] Both editors show edit hint on hover and save with Enter key support
+
+## Phase 20: Add Bible / Scripture Genre
+- [x] Add "Bible / Scripture" to GENRES list in Home.tsx (Create Project dialog)
+- [x] Add "Bible / Scripture" to GENRES list in ProjectTracker.tsx (GenreEditor)
+- [x] Added to NONFICTION_GENRES; hides 'proposal' and 'review' steps (direct-to-publisher path)
+- [x] Added filter reason text for proposal and review steps
+- [x] 6 new vitest tests; total now 89 passing
