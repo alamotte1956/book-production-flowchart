@@ -19,7 +19,7 @@ import {
   Calendar, AlertTriangle, Clock, Download, ChevronsDown, ChevronsUp, Copy, BarChart2, Wand2,
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
-import { useState, useMemo, useCallback, useRef } from "react";
+import { useState, useMemo, useCallback, useRef, useEffect } from "react";
 import { useLocation, useParams } from "wouter";
 import { getLoginUrl } from "@/const";
 import { motion, AnimatePresence } from "framer-motion";
@@ -455,6 +455,88 @@ function DueDatePicker({
   );
 }
 
+// ─── Genre list (shared with Create Project dialog on Home.tsx) ──────────────
+
+const GENRES = [
+  "Literary Fiction", "Commercial Fiction", "Mystery / Thriller", "Science Fiction",
+  "Fantasy", "Romance", "Historical Fiction", "Horror", "Young Adult", "Middle Grade",
+  "Children's", "Narrative Nonfiction", "Memoir / Autobiography",
+  "Self-Help / Personal Development", "Business / Finance", "Academic / Textbook",
+  "Poetry", "Graphic Novel", "Short Story Collection", "Other",
+];
+
+// ─── Inline Genre Editor ─────────────────────────────────────────────────────
+
+function GenreEditor({ projectId, currentGenre }: { projectId: number; currentGenre: string | null | undefined }) {
+  const [open, setOpen] = useState(false);
+  const [localGenre, setLocalGenre] = useState(currentGenre ?? "");
+  const utils = trpc.useUtils();
+
+  // Keep local state in sync if the query re-fetches
+  useEffect(() => { setLocalGenre(currentGenre ?? ""); }, [currentGenre]);
+
+  const updateGenre = trpc.project.updateGenre.useMutation({
+    onSuccess: () => {
+      utils.project.get.invalidate({ projectId });
+      toast.success("Genre updated");
+      setOpen(false);
+    },
+    onError: () => toast.error("Failed to update genre"),
+  });
+
+  const handleSave = () => {
+    updateGenre.mutate({ projectId, genre: localGenre || null });
+  };
+
+  return (
+    <Popover open={open} onOpenChange={setOpen}>
+      <PopoverTrigger asChild>
+        <button className="flex items-center gap-1 hover:text-[#c9a96e] transition-colors group print:hidden">
+          {currentGenre ? (
+            <>
+              <span>• {currentGenre}</span>
+              <span className="opacity-0 group-hover:opacity-100 transition-opacity text-[#c9a96e]/60 text-[10px] ml-0.5">(edit)</span>
+            </>
+          ) : (
+            <span className="text-[#c9a96e]/40 hover:text-[#c9a96e]/70 italic">+ Add genre</span>
+          )}
+        </button>
+      </PopoverTrigger>
+      <PopoverContent className="w-64 p-3" align="start">
+        <p className="text-xs font-semibold text-[#3a2a1a] mb-2">Edit Genre</p>
+        <Select
+          value={localGenre}
+          onValueChange={setLocalGenre}
+        >
+          <SelectTrigger className="h-8 text-xs">
+            <SelectValue placeholder="Select a genre" />
+          </SelectTrigger>
+          <SelectContent>
+            {GENRES.map((g) => (
+              <SelectItem key={g} value={g} className="text-xs">{g}</SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+        <div className="flex gap-2 mt-3">
+          <Button
+            size="sm" className="flex-1 h-7 text-xs"
+            onClick={handleSave}
+            disabled={updateGenre.isPending}
+          >
+            {updateGenre.isPending ? <Loader2 size={12} className="animate-spin" /> : "Save"}
+          </Button>
+          <Button
+            size="sm" variant="ghost" className="h-7 text-xs"
+            onClick={() => { setLocalGenre(currentGenre ?? ""); setOpen(false); }}
+          >
+            Cancel
+          </Button>
+        </div>
+      </PopoverContent>
+    </Popover>
+  );
+}
+
 // ─── Phase Section Component ────────────────────────────────────
 
 function PhaseSection({
@@ -708,7 +790,8 @@ export default function ProjectTracker() {
             <h1 className="font-serif text-xl truncate">{project.title}</h1>
             <div className="flex items-center gap-3 text-xs text-[#c9a96e]/70 print:text-[#8b7b6b]">
               {project.author && <span>by {project.author}</span>}
-              {project.genre && <span>• {project.genre}</span>}
+              {/* Inline genre editor */}
+              <GenreEditor projectId={projectId} currentGenre={project.genre} />
             </div>
           </div>
 

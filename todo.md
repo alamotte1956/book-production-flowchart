@@ -115,3 +115,10 @@
 - [x] Add "N steps hidden for [genre] — click to show" toggle per phase with animated reveal
 - [x] Hidden steps shown at 50% opacity with "Not needed for [genre]" badge and tooltip
 - [x] Write 43 vitest tests for genre filtering helper (genre sets, step hiding, reasons, edge cases)
+
+## Phase 18: Edit Genre from Tracker Header
+- [x] Add updateProjectGenre() helper to server/db.ts
+- [x] Add project.updateGenre tRPC mutation to server/routers.ts
+- [x] Add GenreEditor inline popover component in tracker header with genre dropdown
+- [x] Genre display shows "(edit)" hint on hover; shows "+ Add genre" when no genre is set
+- [x] On save: invalidates project query so filtering re-applies immediately, shows toast

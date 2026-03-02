@@ -254,6 +254,17 @@ export async function updateProjectDeadline(
   return updated;
 }
 
+export async function updateProjectGenre(
+  projectId: number,
+  genre: string | null
+): Promise<Project> {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  await db.update(projects).set({ genre }).where(eq(projects.id, projectId));
+  const [updated] = await db.select().from(projects).where(eq(projects.id, projectId));
+  return updated;
+}
+
 // ─── Phase due date helpers ────────────────────────────────────
 
 export async function getDueDatesByProject(projectId: number): Promise<PhaseDueDate[]> {

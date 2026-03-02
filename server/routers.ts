@@ -9,7 +9,7 @@ import {
   getStepStatusesByProject, upsertStepStatus, upsertStepDates,
   getFilesByProject, createUploadedFile, deleteUploadedFile,
   getDueDatesByProject, upsertPhaseDueDate, deletePhaseDueDate,
-  updateProjectDeadline,
+  updateProjectDeadline, updateProjectGenre,
   createProductionJob, getProductionJobsByProject, getProductionJobById, updateProductionJob,
 } from "./db";
 import { parseManuscript } from "./manuscriptParser";
@@ -90,6 +90,19 @@ export const appRouter = router({
           genre: source.genre,
           notes: source.notes,
         });
+      }),
+
+    updateGenre: protectedProcedure
+      .input(z.object({
+        projectId: z.number(),
+        genre: z.string().max(128).nullable(),
+      }))
+      .mutation(async ({ ctx, input }) => {
+        const project = await getProjectById(input.projectId);
+        if (!project || project.userId !== ctx.user.id) {
+          throw new Error("Project not found");
+        }
+        return updateProjectGenre(input.projectId, input.genre);
       }),
   }),
 
