@@ -374,3 +374,14 @@
 - [x] Add Copy Error button to clipboard
 - [x] Add collapsible Technical Details panel with diagnostic monospace table
 - [x] Add contextual troubleshooting tip in the technical details panel
+
+## Phase 36: Retry Count Limit
+- [x] Add retryCount column (default 0) to production_jobs table in drizzle/schema.ts
+- [x] Run pnpm db:push to migrate the database (migration 0007 applied)
+- [x] Update autoProduce.retry mutation to check retryCount < 3 before allowing retry
+- [x] Increment retryCount on the new job when retrying
+- [x] Return retryCount in autoProduce.status query (flows through full job object)
+- [x] Disable Retry button in UI when retryCount >= 3
+- [x] Show "Max retries reached" message with instructions to upload a new file
+- [x] Show current retry attempt number (e.g. "Retry Job (2 of 3)") on Retry button
+- [x] Show Retry Attempts row in Technical Details diagnostic panel

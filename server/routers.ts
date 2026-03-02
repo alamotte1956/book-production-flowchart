@@ -656,7 +656,12 @@ export const appRouter = router({
         if (originalJob.status !== "error") throw new Error("Only failed jobs can be retried");
         if (!originalJob.manuscriptFileKey) throw new Error("Original manuscript file not found in storage");
 
-        // Create a new job re-using the same S3 manuscript key
+        const MAX_RETRIES = 3;
+        if (originalJob.retryCount >= MAX_RETRIES) {
+          throw new Error(`Maximum retry limit reached (${MAX_RETRIES} attempts). Please upload a new manuscript file to start a fresh job.`);
+        }
+
+        // Create a new job re-using the same S3 manuscript key, carrying the incremented retry count
         const newJob = await createProductionJob({
           projectId: originalJob.projectId,
           status: "queued",
@@ -664,6 +669,7 @@ export const appRouter = router({
           styleId: originalJob.styleId,
           manuscriptFileName: originalJob.manuscriptFileName,
           manuscriptFileKey: originalJob.manuscriptFileKey,
+          retryCount: originalJob.retryCount + 1,
         });
 
         // Fire-and-forget pipeline
