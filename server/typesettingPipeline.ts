@@ -1,0 +1,410 @@
+/**
+ * AI Typesetting Pipeline
+ * 1. Uses LLM to detect chapters and structure the manuscript
+ * 2. Generates press-ready HTML from the structured content
+ * 3. Renders to PDF via Puppeteer and EPUB via epub-gen-memory
+ */
+import puppeteer from "puppeteer-core";
+import { invokeLLM } from "./_core/llm";
+import { getTrimSize, getTypesettingStyle, type TrimSize, type TypesettingStyle } from "./typesettingStyles";
+
+export type Chapter = {
+  number: number;
+  title: string;
+  body: string; // HTML-safe text
+};
+
+export type ParsedBook = {
+  title: string;
+  author: string;
+  chapters: Chapter[];
+  frontmatter?: string;
+  backmatter?: string;
+};
+
+export type ProduceOptions = {
+  trimSizeId: string;
+  styleId: string;
+  title: string;
+  author: string;
+};
+
+export type ProduceResult = {
+  pdfBuffer: Buffer;
+  epubBuffer: Buffer;
+  chapterCount: number;
+  wordCount: number;
+};
+
+// ─── Step 1: LLM Chapter Detection ──────────────────────────────────────────
+
+export async function detectChapters(
+  rawText: string,
+  title: string,
+  author: string
+): Promise<ParsedBook> {
+  // Truncate very long manuscripts to avoid token limits — process in chunks if needed
+  const MAX_CHARS = 80000;
+  const truncated = rawText.length > MAX_CHARS
+    ? rawText.slice(0, MAX_CHARS) + "\n\n[... manuscript continues ...]"
+    : rawText;
+
+  const response = await invokeLLM({
+    messages: [
+      {
+        role: "system",
+        content: `You are a professional book typesetter. Your job is to parse a raw manuscript and extract its structure.
+Identify chapters by looking for patterns like "Chapter 1", "CHAPTER ONE", "Part I", numbered sections, or clear thematic breaks.
+Return a JSON object with this exact structure:
+{
+  "title": "Book title (use provided title if not found in text)",
+  "author": "Author name (use provided author if not found in text)",
+  "frontmatter": "Any preface, foreword, introduction text (plain text, may be empty string)",
+  "chapters": [
+    {
+      "number": 1,
+      "title": "Chapter title or 'Chapter 1' if untitled",
+      "body": "Full chapter text as plain text paragraphs separated by double newlines"
+    }
+  ],
+  "backmatter": "Any epilogue, afterword, acknowledgements (plain text, may be empty string)"
+}
+Preserve all paragraph breaks. Do not summarize or shorten any text. Return ONLY valid JSON.`,
+      },
+      {
+        role: "user",
+        content: `Title: ${title}\nAuthor: ${author}\n\nManuscript:\n\n${truncated}`,
+      },
+    ],
+    response_format: { type: "json_object" },
+    max_tokens: 32768,
+  });
+
+  const content = response.choices[0]?.message?.content;
+  if (typeof content !== "string") throw new Error("LLM returned no content");
+
+  try {
+    const parsed = JSON.parse(content) as ParsedBook;
+    if (!parsed.chapters || parsed.chapters.length === 0) {
+      // Fallback: treat entire text as a single chapter
+      return {
+        title,
+        author,
+        chapters: [{ number: 1, title: "Full Text", body: rawText }],
+      };
+    }
+    return parsed;
+  } catch {
+    // Fallback: treat entire text as a single chapter
+    return {
+      title,
+      author,
+      chapters: [{ number: 1, title: "Full Text", body: rawText }],
+    };
+  }
+}
+
+// ─── Step 2: HTML Generation ─────────────────────────────────────────────────
+
+function escapeHtml(text: string): string {
+  return text
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;");
+}
+
+function textToHtmlParagraphs(text: string, dropCap: boolean, isFirst: boolean): string {
+  const paragraphs = text.split(/\n{2,}/).filter(p => p.trim().length > 0);
+  return paragraphs.map((p, i) => {
+    const escaped = escapeHtml(p.trim().replace(/\n/g, " "));
+    if (dropCap && isFirst && i === 0) {
+      const firstChar = escaped[0] ?? "";
+      const rest = escaped.slice(1);
+      return `<p class="drop-cap"><span class="drop-cap-letter">${firstChar}</span>${rest}</p>`;
+    }
+    return `<p>${escaped}</p>`;
+  }).join("\n");
+}
+
+export function generateBookHtml(
+  book: ParsedBook,
+  trim: TrimSize,
+  style: TypesettingStyle
+): string {
+  const DPI = 96;
+  const pageW = trim.widthIn * DPI;
+  const pageH = trim.heightIn * DPI;
+  const marginTop = trim.marginTopIn * DPI;
+  const marginBottom = trim.marginBottomIn * DPI;
+  const marginInside = trim.marginInsideIn * DPI;
+  const marginOutside = trim.marginOutsideIn * DPI;
+
+  const chapters = book.chapters.map((ch, idx) => {
+    const isFirst = idx === 0;
+    const bodyHtml = textToHtmlParagraphs(ch.body, style.dropCap, isFirst);
+    const breakClass = style.chapterBreakStyle === "page-break" ? "page-break" : "large-space";
+    return `
+    <section class="chapter ${breakClass}" id="chapter-${ch.number}">
+      <div class="chapter-heading">
+        <div class="chapter-number">Chapter ${ch.number}</div>
+        ${ch.title && ch.title !== `Chapter ${ch.number}` ? `<h1 class="chapter-title">${escapeHtml(ch.title)}</h1>` : ""}
+      </div>
+      <div class="chapter-body">
+        ${bodyHtml}
+      </div>
+    </section>`;
+  }).join("\n");
+
+  const frontmatterHtml = book.frontmatter?.trim()
+    ? `<section class="frontmatter page-break">
+        <div class="chapter-body">${textToHtmlParagraphs(book.frontmatter, false, false)}</div>
+      </section>`
+    : "";
+
+  const backmatterHtml = book.backmatter?.trim()
+    ? `<section class="backmatter page-break">
+        <div class="chapter-heading"><h1 class="chapter-title">Acknowledgements</h1></div>
+        <div class="chapter-body">${textToHtmlParagraphs(book.backmatter, false, false)}</div>
+      </section>`
+    : "";
+
+  return `<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>${escapeHtml(book.title)}</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="${style.googleFontsUrl}" rel="stylesheet" />
+  <style>
+    @page {
+      size: ${trim.widthIn}in ${trim.heightIn}in;
+      margin-top: ${trim.marginTopIn}in;
+      margin-bottom: ${trim.marginBottomIn}in;
+      margin-left: ${trim.marginInsideIn}in;
+      margin-right: ${trim.marginOutsideIn}in;
+    }
+    @page :left {
+      margin-left: ${trim.marginOutsideIn}in;
+      margin-right: ${trim.marginInsideIn}in;
+    }
+    @page :right {
+      margin-left: ${trim.marginInsideIn}in;
+      margin-right: ${trim.marginOutsideIn}in;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body {
+      width: ${trim.widthIn}in;
+      font-family: ${style.fontFamily};
+      font-size: ${style.fontSize}pt;
+      line-height: ${style.lineHeight};
+      color: ${style.bodyColor};
+      background: #ffffff;
+    }
+    .title-page {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: ${trim.heightIn - trim.marginTopIn - trim.marginBottomIn}in;
+      text-align: center;
+      page-break-after: always;
+    }
+    .title-page h1 {
+      font-family: ${style.chapterHeadingFont};
+      font-size: ${style.chapterHeadingSize * 1.6}pt;
+      color: ${style.headingColor};
+      margin-bottom: 0.5in;
+      font-weight: 600;
+    }
+    .title-page .author {
+      font-size: ${style.fontSize + 2}pt;
+      color: ${style.bodyColor};
+      font-style: italic;
+    }
+    .page-break { page-break-before: always; }
+    .large-space { margin-top: 2in; }
+    .chapter { padding-bottom: 0.5in; }
+    .chapter-heading {
+      text-align: center;
+      margin-bottom: 0.4in;
+      padding-top: 0.5in;
+    }
+    .chapter-number {
+      font-family: ${style.chapterHeadingFont};
+      font-size: ${style.fontSize + 1}pt;
+      text-transform: uppercase;
+      letter-spacing: 0.15em;
+      color: ${style.headingColor};
+      margin-bottom: 0.1in;
+    }
+    .chapter-title {
+      font-family: ${style.chapterHeadingFont};
+      font-size: ${style.chapterHeadingSize}pt;
+      font-weight: 600;
+      color: ${style.headingColor};
+      line-height: 1.25;
+    }
+    .chapter-body p {
+      text-indent: 1.5em;
+      margin-bottom: 0;
+      text-align: justify;
+      hyphens: auto;
+      orphans: 2;
+      widows: 2;
+    }
+    .chapter-body p:first-child {
+      text-indent: 0;
+    }
+    .drop-cap { text-indent: 0 !important; }
+    .drop-cap-letter {
+      float: left;
+      font-family: ${style.chapterHeadingFont};
+      font-size: ${style.chapterHeadingSize * 2.2}pt;
+      line-height: 0.75;
+      padding-right: 0.05in;
+      padding-top: 0.05in;
+      color: ${style.headingColor};
+      font-weight: 600;
+    }
+    .frontmatter, .backmatter { padding-bottom: 0.5in; }
+  </style>
+</head>
+<body>
+  <!-- Title Page -->
+  <div class="title-page">
+    <h1>${escapeHtml(book.title)}</h1>
+    <div class="author">${escapeHtml(book.author)}</div>
+  </div>
+
+  ${frontmatterHtml}
+  ${chapters}
+  ${backmatterHtml}
+</body>
+</html>`;
+}
+
+// ─── Step 3: PDF Rendering via Puppeteer ─────────────────────────────────────
+
+export async function renderToPdf(html: string, trim: TrimSize): Promise<Buffer> {
+  const browser = await puppeteer.launch({
+    executablePath: "/usr/bin/chromium-browser",
+    args: [
+      "--no-sandbox",
+      "--disable-setuid-sandbox",
+      "--disable-dev-shm-usage",
+      "--disable-gpu",
+      "--font-render-hinting=none",
+    ],
+    headless: true,
+  });
+
+  try {
+    const page = await browser.newPage();
+    await page.setContent(html, { waitUntil: "networkidle0", timeout: 60000 });
+
+    // Wait for fonts to load
+    await page.evaluateHandle("document.fonts.ready");
+
+    const pdfBuffer = await page.pdf({
+      width: `${trim.widthIn}in`,
+      height: `${trim.heightIn}in`,
+      printBackground: true,
+      margin: {
+        top: `${trim.marginTopIn}in`,
+        bottom: `${trim.marginBottomIn}in`,
+        left: `${trim.marginInsideIn}in`,
+        right: `${trim.marginOutsideIn}in`,
+      },
+      displayHeaderFooter: true,
+      headerTemplate: `<div style="font-size:8pt;font-family:serif;width:100%;text-align:center;color:#555;padding:0 ${trim.marginInsideIn}in;"></div>`,
+      footerTemplate: `<div style="font-size:8pt;font-family:serif;width:100%;text-align:center;color:#555;padding:0 ${trim.marginInsideIn}in;"><span class="pageNumber"></span></div>`,
+    });
+
+    return Buffer.from(pdfBuffer);
+  } finally {
+    await browser.close();
+  }
+}
+
+// ─── Step 4: EPUB Generation ─────────────────────────────────────────────────
+
+export async function renderToEpub(book: ParsedBook, style: TypesettingStyle): Promise<Buffer> {
+  // Dynamic import to avoid issues with ESM
+  const { default: Epub } = await import("epub-gen-memory");
+
+  const content: Array<{ title?: string; content: string }> = book.chapters.map(ch => ({
+    title: ch.title || `Chapter ${ch.number}`,
+    content: `<div>${ch.body.split(/\n{2,}/).map(p =>
+      `<p style="text-indent:1.5em;margin:0;text-align:justify;">${escapeHtml(p.trim().replace(/\n/g, " "))}</p>`
+    ).join("")}</div>`,
+  }));
+
+  if (book.frontmatter?.trim()) {
+    content.unshift({
+      title: "Introduction",
+      content: `<div>${book.frontmatter.split(/\n{2,}/).map(p =>
+        `<p style="text-indent:1.5em;margin:0;">${escapeHtml(p.trim())}</p>`
+      ).join("")}</div>`,
+    });
+  }
+
+  if (book.backmatter?.trim()) {
+    content.push({
+      title: "Acknowledgements",
+      content: `<div>${book.backmatter.split(/\n{2,}/).map(p =>
+        `<p style="text-indent:1.5em;margin:0;">${escapeHtml(p.trim())}</p>`
+      ).join("")}</div>`,
+    });
+  }
+
+  const epubBuffer = await Epub(
+    {
+      title: book.title,
+      author: book.author,
+      lang: "en",
+      css: `
+        body { font-family: ${style.fontFamily}; font-size: 1em; line-height: ${style.lineHeight}; color: ${style.bodyColor}; }
+        h1 { font-family: ${style.chapterHeadingFont}; font-size: 1.5em; color: ${style.headingColor}; text-align: center; margin: 1em 0; }
+        p { text-indent: 1.5em; margin: 0; text-align: justify; }
+      `,
+    },
+    content
+  );
+
+  return Buffer.from(epubBuffer);
+}
+
+// ─── Main Pipeline Entry Point ────────────────────────────────────────────────
+
+export async function produceBook(
+  rawText: string,
+  options: ProduceOptions
+): Promise<ProduceResult> {
+  const trim = getTrimSize(options.trimSizeId);
+  const style = getTypesettingStyle(options.styleId);
+
+  // Step 1: Parse chapters with AI
+  const book = await detectChapters(rawText, options.title, options.author);
+
+  // Step 2: Generate HTML
+  const html = generateBookHtml(book, trim, style);
+
+  // Step 3: Render PDF and EPUB in parallel
+  const [pdfBuffer, epubBuffer] = await Promise.all([
+    renderToPdf(html, trim),
+    renderToEpub(book, style),
+  ]);
+
+  const wordCount = book.chapters.reduce(
+    (acc, ch) => acc + ch.body.split(/\s+/).filter(Boolean).length,
+    0
+  );
+
+  return {
+    pdfBuffer,
+    epubBuffer,
+    chapterCount: book.chapters.length,
+    wordCount,
+  };
+}

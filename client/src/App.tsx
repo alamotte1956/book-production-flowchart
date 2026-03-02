@@ -8,6 +8,7 @@ import Home from "./pages/Home";
 import ProjectTracker from "./pages/ProjectTracker";
 import Resources from "./pages/Resources";
 import Timeline from "./pages/Timeline";
+import AutoProduce from "./pages/AutoProduce";
 
 function Router() {
   return (
@@ -16,6 +17,7 @@ function Router() {
       <Route path={"/project/:id"} component={ProjectTracker} />
       <Route path={"/resources"} component={Resources} />
       <Route path={"/timeline/:id"} component={Timeline} />
+      <Route path={"/auto-produce/:id"} component={AutoProduce} />
       <Route path={"/404"} component={NotFound} />
       <Route component={NotFound} />
     </Switch>

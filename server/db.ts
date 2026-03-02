@@ -6,6 +6,7 @@ import {
   stepStatuses, InsertStepStatus, StepStatus,
   uploadedFiles, InsertUploadedFile, UploadedFile,
   phaseDueDates, InsertPhaseDueDate, PhaseDueDate,
+  productionJobs, InsertProductionJob, ProductionJob,
 } from "../drizzle/schema";
 import { ENV } from './_core/env';
 
@@ -292,4 +293,40 @@ export async function deletePhaseDueDate(projectId: number, phaseId: string): Pr
   await db.delete(phaseDueDates).where(
     and(eq(phaseDueDates.projectId, projectId), eq(phaseDueDates.phaseId, phaseId))
   );
+}
+
+// ─── Production Job helpers ────────────────────────────────────
+
+export async function createProductionJob(
+  data: Omit<InsertProductionJob, "id" | "createdAt" | "updatedAt">
+): Promise<ProductionJob> {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  const [result] = await db.insert(productionJobs).values(data).$returningId();
+  const [job] = await db.select().from(productionJobs).where(eq(productionJobs.id, result.id));
+  return job;
+}
+
+export async function getProductionJobsByProject(projectId: number): Promise<ProductionJob[]> {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  return db.select().from(productionJobs).where(eq(productionJobs.projectId, projectId));
+}
+
+export async function getProductionJobById(jobId: number): Promise<ProductionJob | undefined> {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  const [job] = await db.select().from(productionJobs).where(eq(productionJobs.id, jobId)).limit(1);
+  return job;
+}
+
+export async function updateProductionJob(
+  jobId: number,
+  data: Partial<Omit<InsertProductionJob, "id" | "createdAt" | "projectId">>
+): Promise<ProductionJob> {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  await db.update(productionJobs).set(data).where(eq(productionJobs.id, jobId));
+  const [updated] = await db.select().from(productionJobs).where(eq(productionJobs.id, jobId));
+  return updated;
 }

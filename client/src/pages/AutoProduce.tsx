@@ -1,0 +1,485 @@
+/**
+ * Auto-Produce Page
+ * Upload a manuscript, choose trim size and style, and let AI produce
+ * a press-ready interior PDF and EPUB ebook.
+ */
+import { useState, useRef, useCallback, useEffect } from "react";
+import { useParams, useLocation } from "wouter";
+import { trpc } from "@/lib/trpc";
+import { useAuth } from "@/_core/hooks/useAuth";
+import { getLoginUrl } from "@/const";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Progress } from "@/components/ui/progress";
+import { toast } from "sonner";
+import {
+  ArrowLeft, Upload, FileText, Wand2, Download, AlertCircle,
+  CheckCircle2, Clock, Loader2, BookOpen, FileDown, Sparkles,
+} from "lucide-react";
+
+const MAX_FILE_SIZE_MB = 15;
+const ACCEPTED_TYPES = [
+  "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+  "application/pdf",
+  "text/plain",
+];
+const ACCEPTED_EXT = ".docx,.pdf,.txt";
+
+function fileToBase64(file: File): Promise<string> {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => {
+      const result = reader.result as string;
+      resolve(result.split(",")[1] ?? "");
+    };
+    reader.onerror = reject;
+    reader.readAsDataURL(file);
+  });
+}
+
+function statusLabel(status: string) {
+  switch (status) {
+    case "queued": return "Queued";
+    case "processing": return "Processing";
+    case "complete": return "Complete";
+    case "error": return "Failed";
+    default: return status;
+  }
+}
+
+function statusColor(status: string): "default" | "secondary" | "destructive" | "outline" {
+  switch (status) {
+    case "complete": return "default";
+    case "error": return "destructive";
+    case "processing": return "secondary";
+    default: return "outline";
+  }
+}
+
+function progressPercent(status: string) {
+  switch (status) {
+    case "queued": return 10;
+    case "processing": return 60;
+    case "complete": return 100;
+    case "error": return 100;
+    default: return 0;
+  }
+}
+
+// ─── Job Status Card ─────────────────────────────────────────────────────────
+
+function JobCard({ jobId, projectId }: { jobId: number; projectId: number }) {
+  const [enabled, setEnabled] = useState(true);
+  const { data: job } = trpc.autoProduce.status.useQuery(
+    { jobId },
+    {
+      refetchInterval: enabled ? 3000 : false,
+      enabled,
+    }
+  );
+
+  useEffect(() => {
+    if (job?.status === "complete" || job?.status === "error") {
+      setEnabled(false);
+    }
+  }, [job?.status]);
+
+  if (!job) return null;
+
+  const pct = progressPercent(job.status);
+  const isActive = job.status === "queued" || job.status === "processing";
+
+  return (
+    <Card className="border border-[#d4b896]/40 bg-[#fdf9f3]">
+      <CardHeader className="pb-3">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            {isActive ? (
+              <Loader2 className="w-4 h-4 text-[#8b5e3c] animate-spin" />
+            ) : job.status === "complete" ? (
+              <CheckCircle2 className="w-4 h-4 text-green-600" />
+            ) : (
+              <AlertCircle className="w-4 h-4 text-red-500" />
+            )}
+            <CardTitle className="text-sm font-semibold text-[#3d2b1f]">
+              {job.manuscriptFileName ?? "Manuscript"}
+            </CardTitle>
+          </div>
+          <Badge variant={statusColor(job.status)} className="text-xs">
+            {statusLabel(job.status)}
+          </Badge>
+        </div>
+        <div className="flex gap-4 text-xs text-[#8b7b6b] mt-1">
+          <span>Trim: <strong>{job.trimSizeId}</strong></span>
+          <span>Style: <strong>{job.styleId}</strong></span>
+          {job.wordCount ? <span>{job.wordCount.toLocaleString()} words</span> : null}
+          {job.chapterCount ? <span>{job.chapterCount} chapters</span> : null}
+        </div>
+      </CardHeader>
+      <CardContent className="space-y-3">
+        <div>
+          <div className="flex justify-between text-xs text-[#8b7b6b] mb-1">
+            <span>{isActive ? "AI is typesetting your manuscript…" : job.status === "complete" ? "Production complete" : "Production failed"}</span>
+            <span>{pct}%</span>
+          </div>
+          <Progress value={pct} className="h-2" />
+        </div>
+
+        {job.status === "error" && job.errorMessage && (
+          <div className="rounded-md bg-red-50 border border-red-200 p-3 text-xs text-red-700">
+            <strong>Error:</strong> {job.errorMessage}
+          </div>
+        )}
+
+        {job.status === "complete" && (
+          <div className="flex gap-3 pt-1">
+            {job.pdfUrl && (
+              <a
+                href={job.pdfUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex-1"
+              >
+                <Button variant="default" size="sm" className="w-full bg-[#8b5e3c] hover:bg-[#7a4f30] text-white gap-2">
+                  <FileDown className="w-4 h-4" />
+                  Download Interior PDF
+                </Button>
+              </a>
+            )}
+            {job.epubUrl && (
+              <a
+                href={job.epubUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex-1"
+              >
+                <Button variant="outline" size="sm" className="w-full border-[#8b5e3c] text-[#8b5e3c] hover:bg-[#f5ede4] gap-2">
+                  <BookOpen className="w-4 h-4" />
+                  Download EPUB
+                </Button>
+              </a>
+            )}
+          </div>
+        )}
+
+        <p className="text-xs text-[#b09880]">
+          Started {new Date(job.createdAt).toLocaleString()}
+        </p>
+      </CardContent>
+    </Card>
+  );
+}
+
+// ─── Main Page ────────────────────────────────────────────────────────────────
+
+export default function AutoProduce() {
+  const params = useParams<{ id: string }>();
+  const projectId = parseInt(params.id ?? "0", 10);
+  const [, navigate] = useLocation();
+  const { isAuthenticated, loading: authLoading } = useAuth();
+
+  const { data: options } = trpc.autoProduce.options.useQuery();
+  const { data: jobs, refetch: refetchJobs } = trpc.autoProduce.list.useQuery(
+    { projectId },
+    { enabled: isAuthenticated && projectId > 0 }
+  );
+  const { data: projectData } = trpc.project.get.useQuery(
+    { projectId },
+    { enabled: isAuthenticated && projectId > 0 }
+  );
+
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [trimSizeId, setTrimSizeId] = useState("");
+  const [styleId, setStyleId] = useState("");
+  const [isDragging, setIsDragging] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const startMutation = trpc.autoProduce.start.useMutation({
+    onSuccess: () => {
+      setSelectedFile(null);
+      setTrimSizeId("");
+      setStyleId("");
+      refetchJobs();
+      toast.success("Production job started! The AI is now typesetting your manuscript.");
+    },
+    onError: (err) => {
+      toast.error(`Failed to start: ${err.message}`);
+    },
+  });
+
+  const handleFileSelect = useCallback((file: File) => {
+    if (file.size > MAX_FILE_SIZE_MB * 1024 * 1024) {
+      toast.error(`File too large. Maximum size is ${MAX_FILE_SIZE_MB}MB.`);
+      return;
+    }
+    if (!ACCEPTED_TYPES.includes(file.type) && !file.name.match(/\.(docx|pdf|txt)$/i)) {
+      toast.error("Unsupported file type. Please upload a .docx, .pdf, or .txt file.");
+      return;
+    }
+    setSelectedFile(file);
+  }, []);
+
+  const handleDrop = useCallback((e: React.DragEvent) => {
+    e.preventDefault();
+    setIsDragging(false);
+    const file = e.dataTransfer.files[0];
+    if (file) handleFileSelect(file);
+  }, [handleFileSelect]);
+
+  const handleSubmit = async () => {
+    if (!selectedFile || !trimSizeId || !styleId) return;
+    setIsSubmitting(true);
+    try {
+      const fileBase64 = await fileToBase64(selectedFile);
+      await startMutation.mutateAsync({
+        projectId,
+        trimSizeId,
+        styleId,
+        fileName: selectedFile.name,
+        mimeType: selectedFile.type || "text/plain",
+        fileBase64,
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  if (authLoading) {
+    return (
+      <div className="min-h-screen bg-[#faf6ef] flex items-center justify-center">
+        <Loader2 className="w-8 h-8 animate-spin text-[#8b5e3c]" />
+      </div>
+    );
+  }
+
+  if (!isAuthenticated) {
+    return (
+      <div className="min-h-screen bg-[#faf6ef] flex items-center justify-center">
+        <div className="text-center space-y-4">
+          <p className="text-[#5c3d2e] font-serif text-xl">Please sign in to use Auto-Produce.</p>
+          <Button onClick={() => window.location.href = getLoginUrl()} className="bg-[#8b5e3c] hover:bg-[#7a4f30] text-white">
+            Sign In
+          </Button>
+        </div>
+      </div>
+    );
+  }
+
+  const project = projectData?.project;
+  const canSubmit = selectedFile && trimSizeId && styleId && !isSubmitting;
+
+  return (
+    <div className="min-h-screen bg-[#faf6ef]">
+      {/* Header */}
+      <header className="bg-[#1a1008] text-[#f5ede4] px-6 py-4 shadow-lg">
+        <div className="max-w-5xl mx-auto flex items-center justify-between">
+          <div className="flex items-center gap-4">
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => navigate(`/project/${projectId}`)}
+              className="text-[#c9a96e] hover:text-[#f5ede4] hover:bg-[#2a1f10] gap-2 px-2"
+            >
+              <ArrowLeft className="w-4 h-4" />
+              Back to Tracker
+            </Button>
+            <div className="h-5 w-px bg-[#4a3828]" />
+            <div>
+              <div className="flex items-center gap-2">
+                <Sparkles className="w-4 h-4 text-[#c9a96e]" />
+                <h1 className="font-serif text-lg font-semibold text-[#f5ede4]">Auto-Produce</h1>
+              </div>
+              {project && (
+                <p className="text-xs text-[#a08060] mt-0.5">{project.title}</p>
+              )}
+            </div>
+          </div>
+          <div className="text-xs text-[#a08060]">
+            AI-powered typesetting
+          </div>
+        </div>
+      </header>
+
+      <main className="max-w-5xl mx-auto px-6 py-10 space-y-10">
+        {/* Intro */}
+        <div className="text-center space-y-3">
+          <div className="inline-flex items-center gap-2 bg-[#f5ede4] border border-[#d4b896]/50 rounded-full px-4 py-1.5 text-sm text-[#8b5e3c] font-medium">
+            <Wand2 className="w-4 h-4" />
+            AI Typesetting Pipeline
+          </div>
+          <h2 className="font-serif text-3xl text-[#3d2b1f]">Upload your manuscript</h2>
+          <p className="text-[#8b7b6b] max-w-xl mx-auto text-sm leading-relaxed">
+            Upload your manuscript in Word, PDF, or plain text format. The AI will detect chapters,
+            apply professional typesetting, and produce a press-ready interior PDF and an EPUB ebook.
+          </p>
+        </div>
+
+        {/* Upload Form */}
+        <Card className="border border-[#d4b896]/40 bg-white shadow-sm">
+          <CardHeader>
+            <CardTitle className="font-serif text-[#3d2b1f] text-xl">New Production Run</CardTitle>
+            <CardDescription className="text-[#8b7b6b]">
+              Configure your trim size and style, then upload your manuscript to begin.
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-6">
+            {/* Configuration row */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div className="space-y-1.5">
+                <label className="text-sm font-medium text-[#5c3d2e]">Trim Size</label>
+                <Select value={trimSizeId} onValueChange={setTrimSizeId}>
+                  <SelectTrigger className="border-[#d4b896]/60 bg-[#fdf9f3] text-[#3d2b1f]">
+                    <SelectValue placeholder="Select trim size…" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {options?.trimSizes.map(t => (
+                      <SelectItem key={t.id} value={t.id}>
+                        {t.label} ({t.widthIn}" × {t.heightIn}")
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="space-y-1.5">
+                <label className="text-sm font-medium text-[#5c3d2e]">Typesetting Style</label>
+                <Select value={styleId} onValueChange={setStyleId}>
+                  <SelectTrigger className="border-[#d4b896]/60 bg-[#fdf9f3] text-[#3d2b1f]">
+                    <SelectValue placeholder="Select style…" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {options?.styles.map(s => (
+                      <SelectItem key={s.id} value={s.id}>{s.label}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+
+            {/* Drop zone */}
+            <div
+              className={`border-2 border-dashed rounded-lg p-8 text-center cursor-pointer transition-colors ${
+                isDragging
+                  ? "border-[#8b5e3c] bg-[#f5ede4]"
+                  : selectedFile
+                  ? "border-green-400 bg-green-50"
+                  : "border-[#d4b896]/60 bg-[#fdf9f3] hover:border-[#8b5e3c]/50 hover:bg-[#f5ede4]/50"
+              }`}
+              onDragOver={(e) => { e.preventDefault(); setIsDragging(true); }}
+              onDragLeave={() => setIsDragging(false)}
+              onDrop={handleDrop}
+              onClick={() => fileInputRef.current?.click()}
+            >
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept={ACCEPTED_EXT}
+                className="hidden"
+                onChange={(e) => {
+                  const file = e.target.files?.[0];
+                  if (file) handleFileSelect(file);
+                }}
+              />
+              {selectedFile ? (
+                <div className="space-y-2">
+                  <CheckCircle2 className="w-10 h-10 text-green-500 mx-auto" />
+                  <p className="font-medium text-green-700">{selectedFile.name}</p>
+                  <p className="text-xs text-green-600">
+                    {(selectedFile.size / 1024 / 1024).toFixed(2)} MB — click to change
+                  </p>
+                </div>
+              ) : (
+                <div className="space-y-3">
+                  <Upload className="w-10 h-10 text-[#c9a96e] mx-auto" />
+                  <div>
+                    <p className="font-medium text-[#5c3d2e]">Drop your manuscript here</p>
+                    <p className="text-xs text-[#8b7b6b] mt-1">or click to browse — .docx, .pdf, .txt (max {MAX_FILE_SIZE_MB}MB)</p>
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* Submit */}
+            <Button
+              onClick={handleSubmit}
+              disabled={!canSubmit}
+              className="w-full bg-[#8b5e3c] hover:bg-[#7a4f30] text-white font-medium py-5 gap-2 disabled:opacity-50"
+            >
+              {isSubmitting ? (
+                <>
+                  <Loader2 className="w-4 h-4 animate-spin" />
+                  Starting production…
+                </>
+              ) : (
+                <>
+                  <Wand2 className="w-4 h-4" />
+                  Start AI Production
+                </>
+              )}
+            </Button>
+
+            {(!trimSizeId || !styleId || !selectedFile) && (
+              <p className="text-xs text-center text-[#b09880]">
+                {!selectedFile ? "Upload a manuscript file" : !trimSizeId ? "Select a trim size" : "Select a typesetting style"} to continue
+              </p>
+            )}
+          </CardContent>
+        </Card>
+
+        {/* Previous Jobs */}
+        {jobs && jobs.length > 0 && (
+          <div className="space-y-4">
+            <div className="flex items-center gap-3">
+              <Clock className="w-4 h-4 text-[#8b7b6b]" />
+              <h3 className="font-serif text-lg text-[#3d2b1f]">Production History</h3>
+              <span className="text-xs text-[#b09880]">({jobs.length} run{jobs.length !== 1 ? "s" : ""})</span>
+            </div>
+            <div className="space-y-3">
+              {[...jobs].reverse().map(job => (
+                <JobCard key={job.id} jobId={job.id} projectId={projectId} />
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* Empty state */}
+        {jobs && jobs.length === 0 && (
+          <div className="text-center py-12 text-[#b09880]">
+            <FileText className="w-12 h-12 mx-auto mb-3 opacity-30" />
+            <p className="text-sm">No production runs yet. Upload your manuscript above to get started.</p>
+          </div>
+        )}
+
+        {/* What the AI does */}
+        <Card className="border border-[#d4b896]/30 bg-[#fdf9f3]">
+          <CardHeader>
+            <CardTitle className="font-serif text-[#3d2b1f] text-base flex items-center gap-2">
+              <Sparkles className="w-4 h-4 text-[#c9a96e]" />
+              What the AI does
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+              {[
+                { icon: FileText, step: "1. Parse", desc: "Extracts text from your .docx, .pdf, or .txt file" },
+                { icon: Wand2, step: "2. Structure", desc: "AI detects chapters, frontmatter, and backmatter" },
+                { icon: BookOpen, step: "3. Typeset", desc: "Applies professional layout with your chosen style" },
+                { icon: Download, step: "4. Output", desc: "Renders press-ready interior PDF and EPUB ebook" },
+              ].map(({ icon: Icon, step, desc }) => (
+                <div key={step} className="text-center space-y-2">
+                  <div className="w-10 h-10 rounded-full bg-[#f5ede4] border border-[#d4b896]/40 flex items-center justify-center mx-auto">
+                    <Icon className="w-4 h-4 text-[#8b5e3c]" />
+                  </div>
+                  <p className="text-xs font-semibold text-[#5c3d2e]">{step}</p>
+                  <p className="text-xs text-[#8b7b6b] leading-relaxed">{desc}</p>
+                </div>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+      </main>
+    </div>
+  );
+}

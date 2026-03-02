@@ -90,3 +90,29 @@ export const phaseDueDates = mysqlTable("phase_due_dates", {
 
 export type PhaseDueDate = typeof phaseDueDates.$inferSelect;
 export type InsertPhaseDueDate = typeof phaseDueDates.$inferInsert;
+
+/**
+ * Auto-Produce jobs — tracks each AI typesetting run for a project.
+ * Stores the output PDF and EPUB S3 URLs once complete.
+ */
+export const productionJobs = mysqlTable("production_jobs", {
+  id: int("id").autoincrement().primaryKey(),
+  projectId: int("projectId").notNull(),
+  status: mysqlEnum("status", ["queued", "processing", "complete", "error"]).default("queued").notNull(),
+  trimSizeId: varchar("trimSizeId", { length: 32 }).notNull(),
+  styleId: varchar("styleId", { length: 64 }).notNull(),
+  manuscriptFileName: varchar("manuscriptFileName", { length: 512 }),
+  manuscriptFileKey: varchar("manuscriptFileKey", { length: 512 }),
+  wordCount: int("wordCount"),
+  chapterCount: int("chapterCount"),
+  pdfUrl: text("pdfUrl"),
+  epubUrl: text("epubUrl"),
+  pdfKey: varchar("pdfKey", { length: 512 }),
+  epubKey: varchar("epubKey", { length: 512 }),
+  errorMessage: text("errorMessage"),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type ProductionJob = typeof productionJobs.$inferSelect;
+export type InsertProductionJob = typeof productionJobs.$inferInsert;

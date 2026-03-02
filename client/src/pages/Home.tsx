@@ -12,7 +12,7 @@ import {
   BookOpen, Plus, Trash2, ArrowRight, Loader2,
   Upload, CheckCircle2, SkipForward, Clock, Sparkles, Copy,
 } from "lucide-react";
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { useLocation } from "wouter";
 import { motion } from "framer-motion";
 import { phases } from "@/data/flowchartData";

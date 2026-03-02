@@ -67,3 +67,24 @@
 - [x] Add schedule risk warnings (overdue/due-soon/on-track) per step
 - [x] Add Timeline button to project tracker header
 - [x] Write vitest tests for step.setDates and project_deadline.set (23 total pass)
+
+## Phase 12: SEO Fixes
+- [x] Set page title to 30–60 characters via document.title
+- [x] Add meta description (50–160 characters)
+- [x] Add meta keywords tag
+
+## Phase 13: Auto-Produce AI Mode
+- [x] Install mammoth (docx parsing), pdf-parse (PDF text extraction) dependencies
+- [x] Install puppeteer-core for PDF rendering, epub-gen-memory for EPUB
+- [x] Add manuscript upload and parsing server endpoint
+- [x] Build LLM chapter-detection and typesetting pipeline
+- [x] Generate styled HTML from manuscript using chosen style template
+- [x] Render press-ready PDF (correct margins, running headers, page numbers)
+- [x] Generate EPUB from structured manuscript content
+- [x] Store PDF and EPUB in S3 and save references in DB
+- [x] Add Auto-Produce page at /auto-produce/:id
+- [x] Build upload + configuration UI (trim size dropdown, style picker, drag-and-drop)
+- [x] Build job status polling with progress indicator
+- [x] Build download section for PDF and EPUB outputs
+- [x] Add Auto-Produce button to project tracker header
+- [x] Write vitest tests for autoProduce router (29 total tests pass)

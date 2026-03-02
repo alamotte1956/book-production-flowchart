@@ -10,7 +10,11 @@ import {
   getFilesByProject, createUploadedFile, deleteUploadedFile,
   getDueDatesByProject, upsertPhaseDueDate, deletePhaseDueDate,
   updateProjectDeadline,
+  createProductionJob, getProductionJobsByProject, getProductionJobById, updateProductionJob,
 } from "./db";
+import { parseManuscript } from "./manuscriptParser";
+import { produceBook } from "./typesettingPipeline";
+import { TYPESETTING_STYLES, TRIM_SIZES } from "./typesettingStyles";
 import { storagePut } from "./storage";
 
 export const appRouter = router({
@@ -209,6 +213,123 @@ export const appRouter = router({
         }
         await deletePhaseDueDate(input.projectId, input.phaseId);
         return { success: true };
+      }),
+  }),
+
+  autoProduce: router({
+    // Return available trim sizes and styles for the UI dropdowns
+    options: publicProcedure.query(() => ({
+      trimSizes: TRIM_SIZES,
+      styles: TYPESETTING_STYLES,
+    })),
+
+    // List all production jobs for a project
+    list: protectedProcedure
+      .input(z.object({ projectId: z.number() }))
+      .query(async ({ ctx, input }) => {
+        const project = await getProjectById(input.projectId);
+        if (!project || project.userId !== ctx.user.id) {
+          throw new Error("Project not found");
+        }
+        return getProductionJobsByProject(input.projectId);
+      }),
+
+    // Get a single job's status
+    status: protectedProcedure
+      .input(z.object({ jobId: z.number() }))
+      .query(async ({ ctx, input }) => {
+        const job = await getProductionJobById(input.jobId);
+        if (!job) throw new Error("Job not found");
+        // Verify ownership via project
+        const project = await getProjectById(job.projectId);
+        if (!project || project.userId !== ctx.user.id) throw new Error("Not authorized");
+        return job;
+      }),
+
+    // Upload manuscript and start the AI production pipeline
+    start: protectedProcedure
+      .input(z.object({
+        projectId: z.number(),
+        trimSizeId: z.string(),
+        styleId: z.string(),
+        fileName: z.string(),
+        mimeType: z.string(),
+        fileBase64: z.string(),
+      }))
+      .mutation(async ({ ctx, input }) => {
+        const project = await getProjectById(input.projectId);
+        if (!project || project.userId !== ctx.user.id) {
+          throw new Error("Project not found");
+        }
+
+        // Upload the manuscript to S3
+        const buffer = Buffer.from(input.fileBase64, "base64");
+        const suffix = nanoid(8);
+        const manuscriptKey = `manuscripts/${input.projectId}/${suffix}-${input.fileName}`;
+        await storagePut(manuscriptKey, buffer, input.mimeType);
+
+        // Create the job record
+        const job = await createProductionJob({
+          projectId: input.projectId,
+          status: "queued",
+          trimSizeId: input.trimSizeId,
+          styleId: input.styleId,
+          manuscriptFileName: input.fileName,
+          manuscriptFileKey: manuscriptKey,
+        });
+
+        // Run the pipeline asynchronously (fire and forget with error capture)
+        (async () => {
+          try {
+            await updateProductionJob(job.id, { status: "processing" });
+
+            // Step 1: Extract raw text from the manuscript file
+            const parsed = await parseManuscript(buffer, input.mimeType, input.fileName);
+
+            await updateProductionJob(job.id, { wordCount: parsed.wordCount });
+
+            // Step 2: Run the full AI typesetting pipeline (chapter detection + PDF + EPUB)
+            const { pdfBuffer, epubBuffer, chapterCount, wordCount } = await produceBook(
+              parsed.text,
+              {
+                trimSizeId: input.trimSizeId,
+                styleId: input.styleId,
+                title: project.title,
+                author: project.author ?? "Unknown Author",
+              }
+            );
+
+            await updateProductionJob(job.id, {
+              wordCount,
+              chapterCount,
+            });
+
+            // Upload PDF
+            const pdfKey = `output/${input.projectId}/${job.id}-interior.pdf`;
+            const { url: pdfUrl } = await storagePut(pdfKey, pdfBuffer, "application/pdf");
+
+            // Upload EPUB
+            const epubKey = `output/${input.projectId}/${job.id}-ebook.epub`;
+            const { url: epubUrl } = await storagePut(epubKey, epubBuffer, "application/epub+zip");
+
+            await updateProductionJob(job.id, {
+              status: "complete",
+              pdfUrl,
+              pdfKey,
+              epubUrl,
+              epubKey,
+            });
+          } catch (err: unknown) {
+            const msg = err instanceof Error ? err.message : String(err);
+            console.error(`[AutoProduce] Job ${job.id} failed:`, msg);
+            await updateProductionJob(job.id, {
+              status: "error",
+              errorMessage: msg,
+            });
+          }
+        })();
+
+        return { jobId: job.id, status: "queued" };
       }),
   }),
 });

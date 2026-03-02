@@ -15,7 +15,7 @@ import {
   CheckSquare, MessageSquare, Type, LayoutGrid, Eye, RefreshCw, ShieldCheck,
   ClipboardCheck, Barcode, Printer, Palette, BookCopy, Microscope,
   Warehouse, Truck, Megaphone, Headphones, TrendingUp, Globe,
-  Calendar, AlertTriangle, Clock, Download, ChevronsDown, ChevronsUp, Copy, BarChart2,
+  Calendar, AlertTriangle, Clock, Download, ChevronsDown, ChevronsUp, Copy, BarChart2, Wand2,
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 import { useState, useMemo, useCallback, useRef } from "react";
@@ -676,7 +676,21 @@ export default function ProjectTracker() {
                   <span className="ml-1.5 text-xs hidden sm:inline">Timeline</span>
                 </Button>
               </TooltipTrigger>
-              <TooltipContent>View Gantt timeline & dashboard</TooltipContent>
+              <TooltipContent>View Gantt timeline &amp; dashboard</TooltipContent>
+            </Tooltip>
+
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button
+                  variant="ghost" size="sm"
+                  className="text-[#f5c842]/80 hover:text-[#f5c842] hover:bg-[#f5c842]/10 border border-[#f5c842]/20"
+                  onClick={() => navigate(`/auto-produce/${projectId}`)}
+                >
+                  <Wand2 size={16} />
+                  <span className="ml-1.5 text-xs hidden sm:inline">Auto-Produce</span>
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>AI-powered manuscript typesetting → PDF &amp; EPUB</TooltipContent>
             </Tooltip>
 
             <Tooltip>

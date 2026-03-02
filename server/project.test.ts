@@ -120,8 +120,58 @@ vi.mock("./db", () => {
       if (project) project.productionDeadline = productionDeadline;
       return project;
     }),
+
+    // Production job mocks
+    createProductionJob: vi.fn(async (data: any) => {
+      const job = {
+        id: 1,
+        ...data,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      };
+      return job;
+    }),
+    getProductionJobsByProject: vi.fn(async (_projectId: number) => []),
+    getProductionJobById: vi.fn(async (jobId: number) => ({
+      id: jobId,
+      projectId: 1,
+      status: "queued",
+      trimSizeId: "6x9",
+      styleId: "literary-fiction",
+      manuscriptFileName: "test.txt",
+      manuscriptFileKey: "manuscripts/1/test.txt",
+      wordCount: null,
+      chapterCount: null,
+      pdfUrl: null,
+      pdfKey: null,
+      epubUrl: null,
+      epubKey: null,
+      errorMessage: null,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    })),
+    updateProductionJob: vi.fn(async (_jobId: number, _data: any) => {}),
   };
 });
+
+// Mock the manuscript parser
+vi.mock("./manuscriptParser", () => ({
+  parseManuscript: vi.fn(async () => ({
+    text: "Chapter 1\n\nOnce upon a time...",
+    wordCount: 5,
+    format: "txt",
+  })),
+}));
+
+// Mock the typesetting pipeline
+vi.mock("./typesettingPipeline", () => ({
+  produceBook: vi.fn(async () => ({
+    pdfBuffer: Buffer.from("fake-pdf"),
+    epubBuffer: Buffer.from("fake-epub"),
+    chapterCount: 1,
+    wordCount: 5,
+  })),
+}));
 
 // Mock the storage module
 vi.mock("./storage", () => ({
@@ -494,5 +544,94 @@ describe("project_deadline router", () => {
     await expect(
       caller.project_deadline.set({ projectId: 1, productionDeadline: Date.now() })
     ).rejects.toThrow("Project not found");
+  });
+});
+
+// ─── autoProduce Tests ────────────────────────────────────────────────────────
+
+describe("autoProduce.options", () => {
+  it("returns available trim sizes and styles", async () => {
+    const ctx = createUnauthContext();
+    const caller = appRouter.createCaller(ctx);
+    const result = await caller.autoProduce.options();
+    expect(result.trimSizes).toBeDefined();
+    expect(result.styles).toBeDefined();
+    expect(result.trimSizes.length).toBeGreaterThan(0);
+    expect(result.styles.length).toBeGreaterThan(0);
+  });
+});
+
+describe("autoProduce.list", () => {
+  it("returns empty list for a project with no jobs", async () => {
+    const ctx = createAuthContext(1);
+    const caller = appRouter.createCaller(ctx);
+    const project = await caller.project.create({ title: "Auto Test Book" });
+    const jobs = await caller.autoProduce.list({ projectId: project.id });
+    expect(Array.isArray(jobs)).toBe(true);
+    expect(jobs.length).toBe(0);
+  });
+
+  it("throws when project belongs to another user", async () => {
+    const ctx1 = createAuthContext(1);
+    const ctx2 = createAuthContext(2);
+    const caller1 = appRouter.createCaller(ctx1);
+    const caller2 = appRouter.createCaller(ctx2);
+    const project = await caller1.project.create({ title: "Private Book" });
+    await expect(caller2.autoProduce.list({ projectId: project.id })).rejects.toThrow("Project not found");
+  });
+});
+
+describe("autoProduce.start", () => {
+  it("queues a production job and returns jobId", async () => {
+    const ctx = createAuthContext(1);
+    const caller = appRouter.createCaller(ctx);
+    const project = await caller.project.create({ title: "My Novel", author: "Jane Doe" });
+    const result = await caller.autoProduce.start({
+      projectId: project.id,
+      trimSizeId: "6x9",
+      styleId: "literary-fiction",
+      fileName: "manuscript.txt",
+      mimeType: "text/plain",
+      fileBase64: Buffer.from("Chapter 1\n\nHello world.").toString("base64"),
+    });
+    expect(result.jobId).toBeDefined();
+    expect(result.status).toBe("queued");
+  });
+
+  it("throws when project belongs to another user", async () => {
+    const ctx1 = createAuthContext(1);
+    const ctx2 = createAuthContext(2);
+    const caller1 = appRouter.createCaller(ctx1);
+    const caller2 = appRouter.createCaller(ctx2);
+    const project = await caller1.project.create({ title: "Owned Book" });
+    await expect(
+      caller2.autoProduce.start({
+        projectId: project.id,
+        trimSizeId: "6x9",
+        styleId: "literary-fiction",
+        fileName: "test.txt",
+        mimeType: "text/plain",
+        fileBase64: Buffer.from("hello").toString("base64"),
+      })
+    ).rejects.toThrow("Project not found");
+  });
+});
+
+describe("autoProduce.status", () => {
+  it("returns job status by jobId", async () => {
+    const ctx = createAuthContext(1);
+    const caller = appRouter.createCaller(ctx);
+    const project = await caller.project.create({ title: "Status Test" });
+    const { jobId } = await caller.autoProduce.start({
+      projectId: project.id,
+      trimSizeId: "6x9",
+      styleId: "literary-fiction",
+      fileName: "test.txt",
+      mimeType: "text/plain",
+      fileBase64: Buffer.from("hello").toString("base64"),
+    });
+    const job = await caller.autoProduce.status({ jobId });
+    expect(job.id).toBe(jobId);
+    expect(job.trimSizeId).toBe("6x9");
   });
 });
