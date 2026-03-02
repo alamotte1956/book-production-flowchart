@@ -279,8 +279,16 @@ export default function Home() {
                 />
                 <div className="h-px w-16 bg-[#c9a96e]/60" />
               </div>
-              <h1 className="font-serif text-5xl md:text-7xl text-[#f5efe0] leading-tight tracking-tight">
-                Create Design<br /><span className="text-[#c9a96e]">Publish LLC</span>
+              <h1
+                className="font-serif text-6xl md:text-8xl leading-tight tracking-tight"
+                style={{
+                  color: "#ffffff",
+                  textShadow: "0 0 60px rgba(255,255,255,0.5), 0 0 120px rgba(201,169,110,0.35), 0 3px 6px rgba(0,0,0,0.6)",
+                  letterSpacing: "0.02em",
+                }}
+              >
+                Create Design<br />
+                <span style={{ color: "#f5d98a", textShadow: "0 0 40px rgba(245,217,138,0.6)" }}>Publish LLC</span>
               </h1>
               <p className="mt-6 font-sans text-lg md:text-xl text-[#d4c8b4] max-w-xl mx-auto leading-relaxed">
                 A creator, designer, and publisher's dream platform. Track every step of your book's production — from first idea to finished volume.

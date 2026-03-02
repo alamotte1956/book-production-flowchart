@@ -439,3 +439,6 @@
 - [x] Make User Guide hero title letters brighter (pure white, text-white) and larger (text-5xl md:text-6xl)
 - [x] Add /guide route to App.tsx
 - [x] Add Guide link to dashboard nav bar with HelpCircle icon
+
+## Phase 45: Landing Page Company Name
+- [x] Add "Create Design Publish LLC" prominently to the landing page hero (text-6xl/text-8xl, pure white with glow, gold "Publish LLC")
