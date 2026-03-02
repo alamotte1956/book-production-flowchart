@@ -19,6 +19,18 @@ import { storagePut } from "./storage";
 import { generateIdml } from "./idmlGenerator";
 import { invokeLLM } from "./_core/llm";
 
+// ─── Error classification helper (module scope so it's shared by start + retry) ──
+const classifyError = (err: unknown, fileName: string, wordCount?: number | null): "format_unsupported" | "parse_empty" | "pipeline_error" | "unknown" => {
+  const msg = (err instanceof Error ? err.message : String(err)).toLowerCase();
+  const ext = (fileName ?? "").split(".").pop()?.toLowerCase() ?? "";
+  const unsupportedExts = ["pages", "odt", "wps", "wpd", "numbers", "key", "pub", "indd", "qxp", "xps", "psd", "ai"];
+  if (unsupportedExts.includes(ext)) return "format_unsupported";
+  if (msg.includes("unsupported") || msg.includes("cannot parse") || msg.includes("invalid file") || msg.includes("unrecognized")) return "format_unsupported";
+  if (wordCount === 0 || msg.includes("no text") || msg.includes("empty") || msg.includes("no content")) return "parse_empty";
+  if (msg.includes("pipeline") || msg.includes("typeset") || msg.includes("pdf") || msg.includes("epub") || msg.includes("chromium") || msg.includes("browser")) return "pipeline_error";
+  return "unknown";
+};
+
 export const appRouter = router({
   system: systemRouter,
   auth: router({
@@ -578,6 +590,12 @@ export const appRouter = router({
             // Step 1: Extract raw text from the manuscript file
             const parsed = await parseManuscript(buffer, input.mimeType, input.fileName);
 
+            // Classify empty-parse early so the error type is set even if pipeline continues
+            if (parsed.wordCount === 0) {
+              await updateProductionJob(job.id, { wordCount: 0, status: "error", errorMessage: "No readable text was extracted from the manuscript. The file may be empty, image-only, or in an unsupported format.", errorType: "parse_empty" });
+              return;
+            }
+
             await updateProductionJob(job.id, { wordCount: parsed.wordCount });
 
             // Step 2: Run the full AI typesetting pipeline (chapter detection + PDF + EPUB + IDML)
@@ -635,9 +653,12 @@ export const appRouter = router({
           } catch (err: unknown) {
             const msg = err instanceof Error ? err.message : String(err);
             console.error(`[AutoProduce] Job ${job.id} failed:`, msg);
+            const currentJob = await getProductionJobById(job.id);
+            const errorType = classifyError(err, input.fileName, currentJob?.wordCount);
             await updateProductionJob(job.id, {
               status: "error",
               errorMessage: msg,
+              errorType,
             });
           }
         })();
@@ -716,7 +737,9 @@ export const appRouter = router({
           } catch (err: unknown) {
             const msg = err instanceof Error ? err.message : String(err);
             console.error(`[AutoProduce] Retry job ${newJob.id} failed:`, msg);
-            await updateProductionJob(newJob.id, { status: "error", errorMessage: msg });
+            const currentRetryJob = await getProductionJobById(newJob.id);
+            const retryErrorType = classifyError(err, originalJob.manuscriptFileName ?? "", currentRetryJob?.wordCount);
+            await updateProductionJob(newJob.id, { status: "error", errorMessage: msg, errorType: retryErrorType });
           }
         })();
 
@@ -761,6 +784,48 @@ export const appRouter = router({
 
         const content = response.choices?.[0]?.message?.content ?? "";
         return { content, type: input.type };
+      }),
+  }),
+
+  // ─── Guided Prompts ───────────────────────────────────────────────────────
+  prompts: router({
+    /**
+     * Returns the ProjectPromptContext for a given project so the client
+     * can compute next-step suggestions using the shared prompt engine.
+     */
+    getContext: protectedProcedure
+      .input(z.object({ projectId: z.number() }))
+      .query(async ({ ctx, input }) => {
+        const project = await getProjectById(input.projectId);
+        if (!project || project.userId !== ctx.user.id) throw new Error("Not found");
+
+        const steps = await getStepStatusesByProject(input.projectId);
+        const jobs = await getProductionJobsByProject(input.projectId);
+        const dueDates = await getDueDatesByProject(input.projectId);
+
+        const completedStepCount = steps.filter(s => s.status === "complete").length;
+        const totalStepCount = steps.length;
+        const hasCompletedJob = jobs.some(j => j.status === "complete");
+        const failedJob = jobs.find(j => j.status === "error");
+        const hasManuscript = jobs.length > 0;
+
+        return {
+          hasProjects: true,
+          projectId: input.projectId,
+          projectTitle: project.title,
+          hasBibleSpecs: !!(project.bibleEditionType || project.bibleTranslation),
+          hasSpineCalc: false, // Spine calc is client-side only; default false
+          hasCoverSpec: false, // Cover spec is client-side only; default false
+          hasIsbn: false,      // ISBN is client-side only; default false
+          hasManuscript,
+          hasCompletedJob,
+          hasFailedJob: !!failedJob,
+          failedJobId: failedJob?.id,
+          completedStepCount,
+          totalStepCount,
+          hasTimeline: dueDates.length > 0,
+          overallPhase: hasCompletedJob ? "distribution" : hasManuscript ? "production" : project.bibleEditionType ? "design" : "setup",
+        };
       }),
   }),
 });

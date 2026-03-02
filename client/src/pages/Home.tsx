@@ -25,6 +25,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { useLocation } from "wouter";
 import { motion } from "framer-motion";
 import { phases } from "@/data/flowchartData";
+import WhatsNext from "@/components/WhatsNext";
+import { getNextPrompts } from "@shared/prompts";
 
 const HERO_URL = "https://d2xsxph8kpxj0f.cloudfront.net/310519663211654017/kGjPju6hKCvCsjZhgUHyqj/hero-banner-cxQRR1jXLBmcXxFPJoqxWN.webp";
 
@@ -430,6 +432,34 @@ export default function Home() {
 
   const projectList = projectsQuery.data ?? [];
 
+  // ─── Compute "What's Next?" prompts ──────────────────────────────────────────
+  // Use the first project for context; if no projects, show the create-project prompt
+  const firstProject = projectList[0];
+  const promptContextQuery = trpc.prompts.getContext.useQuery(
+    { projectId: firstProject?.id ?? 0 },
+    { enabled: isAuthenticated && !!firstProject }
+  );
+
+  const whatsNextPrompts = getNextPrompts(
+    (promptContextQuery.data
+      ? { ...promptContextQuery.data, overallPhase: promptContextQuery.data.overallPhase as "setup" | "design" | "production" | "distribution" | "complete" }
+      : {
+          hasProjects: projectList.length > 0,
+          hasBibleSpecs: false,
+          hasSpineCalc: false,
+          hasCoverSpec: false,
+          hasIsbn: false,
+          hasManuscript: false,
+          hasCompletedJob: false,
+          hasFailedJob: false,
+          completedStepCount: 0,
+          totalStepCount: 0,
+          hasTimeline: false,
+          overallPhase: "setup" as const,
+        }
+    )
+  );
+
   // ─── Authenticated Publisher Command Center ──────────────────────────────────
   return (
     <div className="min-h-screen bg-[#f5f0e8]">
@@ -568,6 +598,16 @@ export default function Home() {
             ))}
           </div>
         </section>
+
+        {/* What's Next panel */}
+        {whatsNextPrompts.length > 0 && (
+          <section className="mb-10">
+            <WhatsNext
+              prompts={whatsNextPrompts}
+              title={firstProject ? `What's Next for "${firstProject.title}"?` : "What's Next?"}
+            />
+          </section>
+        )}
 
         {/* Projects section */}
         <section>

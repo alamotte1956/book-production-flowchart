@@ -1,0 +1,1 @@
+ALTER TABLE `production_jobs` ADD `errorType` enum('format_unsupported','parse_empty','pipeline_error','unknown') DEFAULT 'unknown';

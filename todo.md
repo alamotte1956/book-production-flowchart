@@ -385,3 +385,24 @@
 - [x] Show "Max retries reached" message with instructions to upload a new file
 - [x] Show current retry attempt number (e.g. "Retry Job (2 of 3)") on Retry button
 - [x] Show Retry Attempts row in Technical Details diagnostic panel
+
+## Phase 37: Automatic Format Conversion Suggestions
+- [ ] Add errorType field to production_jobs table (enum: format_unsupported, parse_empty, pipeline_error, unknown)
+- [ ] Run pnpm db:push to migrate the database
+- [ ] Classify error type in the start and retry mutations when job fails
+- [ ] Return errorType in the status query
+- [ ] Show format conversion tip in error panel when errorType is format_unsupported or parse_empty
+- [ ] List recommended conversion tools (LibreOffice, Word, Google Docs, Pandoc) in the tip
+- [ ] Show the detected file extension in the tip message
+
+## Phase 38: Guided "What's Next?" Prompt System
+- [x] Fix classifyError scope bug (moved to module scope in routers.ts)
+- [x] Create shared/prompts.ts with contextual prompt rules engine
+- [x] Build WhatsNext React component with step cards and action buttons
+- [x] Add WhatsNext panel to Home dashboard (based on project state via trpc.prompts.getContext)
+- [x] Add prompts.getContext tRPC query to server/routers.ts
+- [ ] Add WhatsNext sidebar to project tracker page
+- [ ] Add contextual next-step banner to Auto-Produce page after job completes
+- [ ] Add contextual next-step banner to Bible Design Studio after spec export
+- [ ] Add contextual next-step banner to Spine Calculator after calculation
+- [ ] Add contextual next-step banner to Cover Designer after spec export
