@@ -18,7 +18,7 @@ import {
   BookOpen, Plus, Trash2, ArrowRight, Loader2,
   Upload, CheckCircle2, SkipForward, Clock, Sparkles, Copy,
   Layers, BookMarked, Ruler, Zap, BarChart3, Library,
-  ChevronRight, ChevronDown, Calendar, Star, TrendingUp, FileText, HelpCircle, LogOut, User,
+  ChevronRight, ChevronDown, Calendar, Star, TrendingUp, FileText, HelpCircle, LogOut, User, Menu, X,
 } from "lucide-react";
 import {
   DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel,
@@ -213,6 +213,7 @@ export default function Home() {
   const { user, isAuthenticated, loading: authLoading, logout } = useAuth();
   const [, navigate] = useLocation();
   const [open, setOpen] = useState(false);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   useEffect(() => {
     document.title = PAGE_TITLE;
@@ -565,6 +566,90 @@ export default function Home() {
   // ─── Authenticated Publisher Command Center ──────────────────────────────────
   return (
     <div className="min-h-screen bg-[#f5f0e8]">
+      {/* Mobile menu backdrop */}
+      {mobileMenuOpen && (
+        <div
+          className="fixed inset-0 z-40 bg-black/60 md:hidden"
+          onClick={() => setMobileMenuOpen(false)}
+        />
+      )}
+
+      {/* Mobile slide-out drawer */}
+      <div
+        className={`fixed top-0 right-0 h-full w-72 z-50 bg-[#1a1008] border-l border-[#c9a96e]/15 transform transition-transform duration-300 ease-in-out md:hidden ${
+          mobileMenuOpen ? "translate-x-0" : "translate-x-full"
+        }`}
+      >
+        {/* Drawer header */}
+        <div className="flex items-center justify-between px-5 py-4 border-b border-[#c9a96e]/10">
+          <div className="flex items-center gap-2.5">
+            <img
+              src="https://d2xsxph8kpxj0f.cloudfront.net/310519663211654017/kGjPju6hKCvCsjZhgUHyqj/cdp-logo-icon-VKK59tkJo7q6tVURkrEnnJ.webp"
+              alt="Create Design Publish LLC"
+              className="w-7 h-7 rounded-md object-cover"
+            />
+            <span className="font-serif text-[#f5d98a] text-sm">Menu</span>
+          </div>
+          <button
+            onClick={() => setMobileMenuOpen(false)}
+            className="w-8 h-8 flex items-center justify-center rounded-md text-[#c9a96e]/60 hover:text-[#c9a96e] hover:bg-[#c9a96e]/10 transition-colors"
+            aria-label="Close menu"
+          >
+            <X size={18} />
+          </button>
+        </div>
+
+        {/* Drawer user info */}
+        <div className="px-5 py-4 border-b border-[#c9a96e]/10">
+          <div className="flex items-center gap-3">
+            <div className="w-9 h-9 rounded-full bg-[#c9a96e]/20 flex items-center justify-center shrink-0">
+              <span className="text-sm font-bold text-[#c9a96e]">
+                {(user?.name || user?.email || "?")[0].toUpperCase()}
+              </span>
+            </div>
+            <div className="min-w-0">
+              <p className="text-sm text-[#f5efe0] font-medium truncate">{user?.name || "Account"}</p>
+              <p className="text-xs text-[#c9a96e]/40 truncate">{user?.email || ""}</p>
+            </div>
+          </div>
+        </div>
+
+        {/* Drawer nav links */}
+        <nav className="px-3 py-4 flex flex-col gap-1">
+          {[
+            { label: "Bible Design Studio", path: "/bible-studio", icon: BookOpen, badge: "Bible" },
+            { label: "Spine Calculator", path: "/spine-calculator", icon: Ruler, badge: "Print" },
+            { label: "Cover Designer", path: "/cover-designer", icon: Layers, badge: "Design" },
+            { label: "ISBN & Metadata", path: "/isbn-manager", icon: BookMarked, badge: "Meta" },
+            { label: "Resources Hub", path: "/resources", icon: Library, badge: "Ref" },
+            { label: "User Guide", path: "/guide", icon: HelpCircle, badge: null },
+          ].map(item => (
+            <button
+              key={item.path}
+              onClick={() => { navigate(item.path); setMobileMenuOpen(false); }}
+              className="flex items-center gap-3 w-full text-left px-3 py-3 rounded-lg text-[#c9a96e]/70 hover:text-[#f5efe0] hover:bg-[#c9a96e]/10 transition-all group"
+            >
+              <item.icon size={16} className="shrink-0 text-[#c9a96e]/50 group-hover:text-[#c9a96e]" />
+              <span className="text-sm flex-1">{item.label}</span>
+              {item.badge && (
+                <span className="text-[10px] px-1.5 py-0.5 rounded bg-[#c9a96e]/10 text-[#c9a96e]/60 font-medium">{item.badge}</span>
+              )}
+            </button>
+          ))}
+        </nav>
+
+        {/* Drawer sign out */}
+        <div className="absolute bottom-0 left-0 right-0 px-3 py-4 border-t border-[#c9a96e]/10">
+          <button
+            onClick={() => { logout(); setMobileMenuOpen(false); }}
+            className="flex items-center gap-3 w-full px-3 py-3 rounded-lg text-red-400/70 hover:text-red-400 hover:bg-red-900/15 transition-all"
+          >
+            <LogOut size={16} className="shrink-0" />
+            <span className="text-sm">Sign Out</span>
+          </button>
+        </div>
+      </div>
+
       {/* Command Center Header */}
       <header className="bg-[#1e1108] text-[#f5efe0] border-b border-[#c9a96e]/10">
         <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
@@ -577,12 +662,12 @@ export default function Home() {
               />
               <div>
                 <h1 className="font-serif text-lg leading-tight text-[#f5efe0]">Create Design Publish LLC</h1>
-                <p className="text-[10px] text-[#c9a96e]/50 uppercase tracking-widest">Create Design Publish LLC</p>
+                <p className="text-[10px] text-[#c9a96e]/50 uppercase tracking-widest hidden sm:block">Publisher Command Center</p>
               </div>
             </div>
           </div>
 
-          {/* Quick nav */}
+          {/* Desktop quick nav */}
           <nav className="hidden md:flex items-center gap-1">
             {[
               { label: "Bible Studio", path: "/bible-studio", icon: BookOpen },
@@ -603,7 +688,8 @@ export default function Home() {
             ))}
           </nav>
 
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2">
+            {/* Desktop account dropdown */}
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <button className="w-8 h-8 rounded-full bg-[#c9a96e]/20 hover:bg-[#c9a96e]/30 flex items-center justify-center transition-colors outline-none" aria-label="Account menu">
@@ -637,6 +723,15 @@ export default function Home() {
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
+
+            {/* Mobile hamburger button */}
+            <button
+              className="md:hidden w-8 h-8 flex items-center justify-center rounded-md text-[#c9a96e]/70 hover:text-[#c9a96e] hover:bg-[#c9a96e]/10 transition-colors"
+              onClick={() => setMobileMenuOpen(true)}
+              aria-label="Open menu"
+            >
+              <Menu size={18} />
+            </button>
           </div>
         </div>
       </header>

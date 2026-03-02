@@ -468,3 +468,9 @@
 - [x] Update bottom CTA section with dual Create Account / Sign In buttons
 - [x] Add proper footer with logo, website, email, copyright
 - [x] Add account dropdown menu in dashboard header (user name, Guide link, Sign Out)
+
+## Phase 52: Mobile Hamburger Menu
+- [x] Add hamburger icon button (visible only on mobile) to dashboard header
+- [x] Build slide-out drawer with all nav links (Bible Studio, Spine Calc, Cover Designer, ISBN, Resources, Guide)
+- [x] Add close button and backdrop overlay to the drawer
+- [x] Drawer closes on nav link click and backdrop click
