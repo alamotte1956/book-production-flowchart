@@ -1,6 +1,6 @@
 import { useAuth } from "@/_core/hooks/useAuth";
 import { trpc } from "@/lib/trpc";
-import { phases, type Phase, type Step, type StepInput } from "@/data/flowchartData";
+import { phases, biblePhases, type Phase, type Step, type StepInput } from "@/data/flowchartData";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
@@ -713,8 +713,26 @@ export default function ProjectTracker() {
     return map;
   }, [data?.dueDates]);
 
+  // Bible projects get 3 extra phases (Text Prep, Reference Apparatus, Pre-Press)
+  // MUST be declared first so totalSteps and overduePhases can use it
+  const allPhases = useMemo(
+    () => data?.project?.genre === "Bible / Scripture"
+      ? [...phases, ...biblePhases]
+      : phases,
+    [data?.project?.genre]
+  );
+
+  // Genre-based step filtering — MUST be above early returns to satisfy Rules of Hooks
+  const hiddenStepIds = useMemo(
+    () => getIrrelevantStepIds(data?.project?.genre),
+    [data?.project?.genre]
+  );
+
   // Progress stats
-  const totalSteps = phases.reduce((acc, p) => acc + p.steps.length, 0);
+  const totalSteps = useMemo(
+    () => allPhases.reduce((acc, p) => acc + p.steps.length, 0),
+    [allPhases]
+  );
   const completedSteps = Object.values(statusMap).filter(
     (s) => s.status === "complete" || s.status === "skipped"
   ).length;
@@ -722,19 +740,13 @@ export default function ProjectTracker() {
 
   // Due date summary
   const overduePhases = useMemo(() => {
-    return phases.filter((p) => {
+    return allPhases.filter((p) => {
       const dd = dueDateMap[p.id];
       if (!dd) return false;
       const done = p.steps.filter(s => statusMap[s.id]?.status === "complete" || statusMap[s.id]?.status === "skipped").length;
       return done < p.steps.length && dd < Date.now();
     });
-  }, [dueDateMap, statusMap]);
-
-  // Genre-based step filtering — MUST be above early returns to satisfy Rules of Hooks
-  const hiddenStepIds = useMemo(
-    () => getIrrelevantStepIds(data?.project?.genre),
-    [data?.project?.genre]
-  );
+  }, [allPhases, dueDateMap, statusMap]);
 
   if (authLoading || isLoading) {
     return (
@@ -961,7 +973,7 @@ export default function ProjectTracker() {
         <aside className="hidden lg:block w-52 shrink-0 print:hidden">
           <nav className="sticky top-24 space-y-1">
             <p className="text-xs font-bold uppercase tracking-wider text-[#a89880] mb-3">Chapters</p>
-            {phases.map((phase) => {
+            {allPhases.map((phase) => {
               const done = phase.steps.filter(
                 (s) => statusMap[s.id]?.status === "complete" || statusMap[s.id]?.status === "skipped"
               ).length;
@@ -990,7 +1002,7 @@ export default function ProjectTracker() {
 
         {/* Main content — left-aligned */}
         <main className="flex-1 min-w-0 space-y-10">
-          {phases.map((phase) => {
+          {allPhases.map((phase) => {
             const currentOffset = stepOffset;
             stepOffset += phase.steps.length;
             return (

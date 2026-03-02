@@ -557,4 +557,239 @@ export const phases: Phase[] = [
   },
 ];
 
+/**
+ * Bible-specific production phases.
+ * These are shown in the Project Tracker only when the project genre is "Bible / Scripture".
+ * They are stored separately so the genre filter can inject them into the phase list.
+ */
+export const biblePhases: Phase[] = [
+  {
+    id: "bible-text-prep",
+    number: 10,
+    title: "Bible Text Preparation",
+    subtitle: "Versification, markup, and textual integrity",
+    color: "text-[#2c1a00]",
+    bgColor: "bg-[#fdf5ec]",
+    borderColor: "border-[#c9a96e]",
+    accentColor: "#c9a96e",
+    steps: [
+      {
+        id: "bible-versification",
+        title: "Versification & Text Verification",
+        description: "Every verse is verified against the authoritative source text. Chapter and verse numbers are confirmed, variant readings are noted, and the digital text is validated against the printed critical edition.",
+        inputs: [
+          { name: "Source Text", description: "Authoritative digital text file (USFM, OSIS, or plain text)" },
+          { name: "Critical Apparatus", description: "Manuscript variants and textual notes from the translation committee" },
+          { name: "Versification Schema", description: "KJV, RSV, or custom versification map for the translation" },
+          { name: "Spell-Check Dictionary", description: "Translation-specific proper nouns and archaic spellings" },
+        ],
+        icon: "BookCheck",
+        resourceSection: "bible",
+        estimatedDays: 14,
+      },
+      {
+        id: "bible-red-letter",
+        title: "Red-Letter Tagging",
+        description: "Words spoken by Jesus Christ are identified and tagged in the source text. This requires careful theological review to determine scope — direct speech only, or also narrated speech and Old Testament quotations.",
+        inputs: [
+          { name: "Verified Text File", description: "Post-versification text ready for markup" },
+          { name: "Red-Letter Scope Decision", description: "Publisher decision on which words qualify as red-letter" },
+          { name: "Theological Review", description: "Scholar review of ambiguous passages and indirect speech" },
+        ],
+        icon: "Highlighter",
+        resourceSection: "bible",
+        estimatedDays: 7,
+      },
+      {
+        id: "bible-poetry-markup",
+        title: "Poetry & Stanza Formatting",
+        description: "Poetic books (Psalms, Proverbs, Song of Solomon, Lamentations, and poetic passages throughout) are formatted in stanza layout with correct indentation, parallelism, and line breaks.",
+        inputs: [
+          { name: "Tagged Text File", description: "Text with verse and red-letter markup applied" },
+          { name: "Poetry Identification List", description: "All poetic passages flagged for stanza formatting" },
+          { name: "Indentation Guide", description: "Rules for primary and secondary line indentation" },
+        ],
+        icon: "AlignLeft",
+        resourceSection: "bible",
+        estimatedDays: 10,
+      },
+      {
+        id: "bible-section-headings",
+        title: "Section Headings & Pericopes",
+        description: "Descriptive headings are placed at the beginning of each narrative unit (pericope). Headings are reviewed for theological neutrality, accuracy, and consistency with the translation's style.",
+        inputs: [
+          { name: "Formatted Text File", description: "Text with poetry markup applied" },
+          { name: "Section Heading List", description: "Approved headings from the translation committee or editorial team" },
+          { name: "Style Guide", description: "Rules for heading capitalization, length, and placement" },
+        ],
+        icon: "Heading",
+        resourceSection: "bible",
+        estimatedDays: 7,
+      },
+    ],
+  },
+  {
+    id: "bible-reference-apparatus",
+    number: 11,
+    title: "Reference Apparatus",
+    subtitle: "Cross-references, concordance, footnotes, and maps",
+    color: "text-[#1a3a5c]",
+    bgColor: "bg-[#f0f4f8]",
+    borderColor: "border-[#1a3a5c]",
+    accentColor: "#1a3a5c",
+    steps: [
+      {
+        id: "bible-cross-refs",
+        title: "Cross-Reference System",
+        description: "Thousands of cross-reference links are verified, formatted, and positioned — either as footnotes at the bottom of each page or in a center column between the two text columns. Each reference is checked for accuracy.",
+        inputs: [
+          { name: "Cross-Reference Database", description: "Complete list of verse-to-verse references (e.g., Treasury of Scripture Knowledge)" },
+          { name: "Layout Decision", description: "Footnote style vs. center-column style" },
+          { name: "Abbreviation List", description: "Standard book abbreviations used in the reference system" },
+        ],
+        icon: "Link",
+        resourceSection: "bible",
+        estimatedDays: 21,
+      },
+      {
+        id: "bible-footnotes",
+        title: "Textual Footnotes & Variant Notes",
+        description: "Manuscript variants, alternate translations, and explanatory notes are formatted as footnotes. Each note is keyed to its verse and reviewed for accuracy and brevity.",
+        inputs: [
+          { name: "Translation Notes", description: "Footnote content from the translation committee" },
+          { name: "Variant Readings", description: "Significant manuscript variants to be noted" },
+          { name: "Footnote Style Guide", description: "Format rules for footnote markers and content" },
+        ],
+        icon: "FileText",
+        resourceSection: "bible",
+        estimatedDays: 14,
+      },
+      {
+        id: "bible-concordance",
+        title: "Concordance Compilation",
+        description: "An alphabetical index of significant words with their verse references is compiled, reviewed, and typeset. Strong's numbers may be included for study editions.",
+        inputs: [
+          { name: "Word Frequency Analysis", description: "Computer-generated word list from the full text" },
+          { name: "Inclusion/Exclusion List", description: "Words to include or exclude from the concordance" },
+          { name: "Strong's Numbers", description: "Hebrew/Greek lexicon numbers for study editions" },
+        ],
+        icon: "List",
+        resourceSection: "bible",
+        estimatedDays: 21,
+      },
+      {
+        id: "bible-maps",
+        title: "Maps, Charts & Illustrations",
+        description: "Biblical maps, timelines, and charts are commissioned or licensed, sized to the trim, and positioned in the text or in a color insert. All place names are verified against the text.",
+        inputs: [
+          { name: "Map Files", description: "High-resolution map artwork (EPS or TIFF at 300 DPI minimum)" },
+          { name: "Place Name Verification", description: "Confirmed spelling of all geographic names" },
+          { name: "Color Profile", description: "CMYK color profile for press-ready output" },
+        ],
+        icon: "Map",
+        resourceSection: "bible",
+        estimatedDays: 14,
+      },
+      {
+        id: "bible-book-intros",
+        title: "Book Introductions & Study Notes",
+        description: "Introductory essays for each book of the Bible are written, edited, and typeset. Study notes (for study editions) are positioned alongside the relevant verses.",
+        inputs: [
+          { name: "Introduction Manuscripts", description: "Authored introductory essays for each Bible book" },
+          { name: "Study Note Content", description: "Verse-by-verse study notes from scholars" },
+          { name: "Editorial Review", description: "Theological and stylistic review of all supplementary content" },
+        ],
+        icon: "BookOpen",
+        resourceSection: "bible",
+        estimatedDays: 30,
+      },
+    ],
+  },
+  {
+    id: "bible-prepress",
+    number: 12,
+    title: "Bible Pre-Press Specifications",
+    subtitle: "Paper, binding, finishing, and press-ready file preparation",
+    color: "text-[#3d2b1f]",
+    bgColor: "bg-[#faf6ef]",
+    borderColor: "border-[#8b5e3c]",
+    accentColor: "#8b5e3c",
+    steps: [
+      {
+        id: "bible-paper-spec",
+        title: "Paper Specification & Ordering",
+        description: "Bible paper (India paper, thin offset) is specified by weight, opacity, and PPI. Orders are placed with the paper merchant well in advance of the press date, as Bible paper has long lead times.",
+        inputs: [
+          { name: "Paper Type", description: "Weight (24lb, 28lb, 40lb), opacity, and color (white or cream)" },
+          { name: "Page Count", description: "Final page count for calculating paper quantity" },
+          { name: "Press Sheet Size", description: "Signature size and imposition layout" },
+          { name: "Lead Time", description: "Paper merchant delivery schedule (often 8–16 weeks for India paper)" },
+        ],
+        icon: "Layers",
+        resourceSection: "bible",
+        estimatedDays: 7,
+      },
+      {
+        id: "bible-spine-calc",
+        title: "Spine Width Calculation",
+        description: "The spine width is calculated precisely using the final page count and paper PPI. Cover boards and binding material thickness are added. The cover file is adjusted to the exact spine width.",
+        inputs: [
+          { name: "Final Page Count", description: "Confirmed page count after all content is typeset" },
+          { name: "Paper PPI", description: "Pages per inch for the specified paper stock" },
+          { name: "Cover Board Thickness", description: "Thickness of binder's boards for hardcover editions" },
+          { name: "Binding Material", description: "Leather, cloth, or paper cover material thickness" },
+        ],
+        icon: "Ruler",
+        resourceSection: "bible",
+        estimatedDays: 2,
+      },
+      {
+        id: "bible-cover-design",
+        title: "Cover & Case Design",
+        description: "The cover is designed to the exact trim and spine dimensions. For leather editions, the case design includes the spine lettering, cover embossing, and ribbon marker attachment points.",
+        inputs: [
+          { name: "Spine Width", description: "Calculated spine width in inches and millimeters" },
+          { name: "Cover Artwork", description: "Front cover design files at full bleed" },
+          { name: "Spine Text", description: "Title, translation, and publisher name for spine" },
+          { name: "Finishing Specs", description: "Foil stamping, embossing, gilding, and ribbon specs" },
+        ],
+        icon: "PenTool",
+        resourceSection: "bible",
+        estimatedDays: 14,
+      },
+      {
+        id: "bible-preflight",
+        title: "Pre-Flight & Press-Ready Output",
+        description: "All files are pre-flighted for press: fonts embedded, images at 300 DPI, color mode CMYK, bleed and trim marks set. A final PDF/X-1a or PDF/X-4 file is generated for the printer.",
+        inputs: [
+          { name: "Interior PDF", description: "Typeset interior at correct trim size with all fonts embedded" },
+          { name: "Cover PDF", description: "Cover file with correct spine width, bleed, and color profile" },
+          { name: "Pre-Flight Report", description: "Acrobat or Pitstop pre-flight check results" },
+          { name: "Printer Specifications", description: "Printer's file requirements and color profile" },
+        ],
+        icon: "CheckCircle",
+        resourceSection: "bible",
+        estimatedDays: 5,
+      },
+      {
+        id: "bible-binding-spec",
+        title: "Binding & Finishing Specification",
+        description: "The complete binding specification is written for the bindery: Smyth-sewn or adhesive, signature size, headband color, ribbon color, gilding specification, and thumb-index die size.",
+        inputs: [
+          { name: "Binding Method", description: "Smyth-sewn, case-bound, limp leather, or perfect bound" },
+          { name: "Headband Spec", description: "Color and style of headband and tailband" },
+          { name: "Ribbon Spec", description: "Width, color, and number of ribbon markers" },
+          { name: "Gilding Spec", description: "Gold, silver, or red gilding on page edges" },
+          { name: "Thumb Index Die", description: "Die size and book list for thumb-index cutting" },
+        ],
+        icon: "Bookmark",
+        resourceSection: "bible",
+        estimatedDays: 3,
+      },
+    ],
+  },
+];
+
 export const totalSteps = phases.reduce((acc, phase) => acc + phase.steps.length, 0);
+export const totalBibleSteps = biblePhases.reduce((acc, phase) => acc + phase.steps.length, 0);
+

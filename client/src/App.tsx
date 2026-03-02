@@ -9,6 +9,8 @@ import ProjectTracker from "./pages/ProjectTracker";
 import Resources from "./pages/Resources";
 import Timeline from "./pages/Timeline";
 import AutoProduce from "./pages/AutoProduce";
+import BibleStudio from "./pages/BibleStudio";
+import SpineCalculator from "./pages/SpineCalculator";
 
 function Router() {
   return (
@@ -18,6 +20,8 @@ function Router() {
       <Route path={"/resources"} component={Resources} />
       <Route path={"/timeline/:id"} component={Timeline} />
       <Route path={"/auto-produce/:id"} component={AutoProduce} />
+      <Route path={"/bible-studio"} component={BibleStudio} />
+      <Route path={"/spine-calculator"} component={SpineCalculator} />
       <Route path={"/404"} component={NotFound} />
       <Route component={NotFound} />
     </Switch>

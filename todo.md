@@ -143,3 +143,118 @@
 - [x] generateBookHtml uses scripture renderer when doubleColumn+verseNumbers are set; column-count:2 CSS injected
 - [x] Preview endpoint: scripture shows Genesis 1 sample text, double-column layout, verse superscripts, "Holy Bible" running header
 - [x] 8 new vitest tests for scripture style; total now 97 passing
+
+## Phase 22: Auto-Select Scripture Style by Genre
+- [ ] Auto-Produce page: when project genre is "Bible / Scripture", pre-select "scripture" style on load
+- [ ] Show a subtle info note explaining why the style was pre-selected
+- [ ] Allow user to override the pre-selection manually
+
+## Phase 23: Comprehensive Bible Publishing System
+
+### 23a — Bible Trim Sizes & Typesetting Styles
+- [ ] Add all standard Bible trim sizes: Compact (4.25×6.5), Standard (5.25×8), Wide Margin (6.5×9.25), Pew (5.5×8.5), Large Print (6×9), Giant Print (7×10), Reference (6.25×9.25), Journaling (6×9 wide margin), Children's (7×9)
+- [ ] Add Bible typesetting style variants: Double Column Standard, Double Column Red Letter, Single Column Narrative, Wide Margin Study, Journaling (ruled margins), Large Print, Children's Illustrated, Pew/Devotional
+- [ ] Add paper type field: India/Bible paper (24lb), Thin Offset (28lb), Standard Offset (50lb), Cream Offset
+
+### 23b — Bible Edition Types
+- [ ] Add Bible edition type to project creation: Standard, Study, Journaling, Pew, Large Print, Giant Print, Children's, Red Letter, Reference, Devotional, Parallel
+- [ ] Auto-configure trim size and style based on edition type selection
+- [ ] Add translation/version field: KJV, NIV, ESV, NKJV, NLT, NASB, CSB, AMP, MSG, Custom
+
+### 23c — Bible-Specific Production Steps
+- [ ] Add Bible-specific phase: Text Preparation (versification check, red-letter tagging, poetry formatting, section headings)
+- [ ] Add Bible-specific phase: Reference Apparatus (cross-references, concordance, footnotes, maps, index)
+- [ ] Add Bible-specific phase: Special Features (study notes, devotional content, journaling lines, illustrations)
+- [ ] Add Bible-specific phase: Pre-Press Specifications (paper spec, binding spec, gilding, ribbon marker, thumb index)
+- [ ] Genre filter: when genre is Bible/Scripture, show Bible-specific phases and hide general fiction/nonfiction phases
+
+### 23d — Auto-Produce Bible Options
+- [ ] Add red-letter toggle (words of Christ rendered in red/crimson)
+- [ ] Add cross-reference column toggle (center-column or footnote style)
+- [ ] Add section headings toggle
+- [ ] Add poetry formatting toggle (Psalms/Proverbs in stanza format)
+- [ ] Add verse-per-line toggle (each verse on its own line vs prose run-on)
+- [ ] Add margin style dropdown: Standard, Wide (1.5in), Journaling (2.5in ruled), Study (2in)
+- [ ] Add column layout dropdown: Double Column, Single Column Narrative, Single Column with Wide Margin
+
+### 23e — Bible Spine Width Calculator
+- [ ] Add a Bible Spine Calculator tool/page: inputs are page count, paper type (PPI), and cover material
+- [ ] Calculate spine width = page count / PPI + cover boards
+- [ ] Show binding specifications: Smyth-sewn, perfect bound, case bound, limp leather
+- [ ] Export spec sheet as PDF
+
+## Phase 24: Complete Bible Publishing Platform
+
+### 24a — Bible Design Studio Page
+- [ ] New page /bible-studio: full-page Bible edition configurator
+- [ ] Edition type selector (12 types) with description and feature list
+- [ ] Translation/version selector (13 translations + custom)
+- [ ] Trim size selector showing Bible-specific sizes with diagrams
+- [ ] Typesetting style selector (9 Bible styles) with live preview
+- [ ] Paper type selector with PPI and description
+- [ ] Binding type selector with durability rating
+- [ ] Special features toggles: red letter, cross-references, footnotes, section headings, poetry stanzas, verse-per-line, concordance, maps, ribbon marker, thumb index, gilded edges
+- [ ] Live spec summary panel showing all selected options
+- [ ] "Start Production" CTA linking to Auto-Produce with pre-filled settings
+- [ ] "Export Spec Sheet" button generating a PDF spec document
+
+### 24b — Bible Production Phases in Tracker
+- [ ] Add Bible-specific phases to flowchartData: Text Preparation, Reference Apparatus, Special Features, Pre-Press Specifications
+- [ ] Genre filter: show Bible phases only when genre is Bible/Scripture
+
+### 24c — Project Creation Bible Fields
+- [ ] Add Bible edition type dropdown to Create Project dialog
+- [ ] Add Bible translation/version dropdown
+- [ ] Auto-configure trim size and style when edition type is selected
+
+### 24d — Spine Width Calculator Page
+- [ ] New page /spine-calculator: interactive spine width calculator
+- [ ] Inputs: page count, paper type (PPI), binding type
+- [ ] Output: spine width in inches and mm, with visual diagram
+- [ ] Binding spec summary for print-ready file setup
+
+### 24e — Auto-Produce Bible Options
+- [ ] Add red-letter toggle
+- [ ] Add cross-reference column toggle
+- [ ] Add section headings toggle
+- [ ] Add poetry stanza formatting toggle
+- [ ] Add margin style dropdown
+- [ ] Add column layout dropdown
+
+## Phase 25: IDML (InDesign) Export
+- [ ] Build server/idmlGenerator.ts — generates a valid IDML package (mimetype, designmap.xml, Spreads, MasterSpreads, Resources/Styles, Stories)
+- [ ] Support Bible scripture style: double-column text frames, verse number character style, running headers
+- [ ] Support all typesetting styles: paragraph styles mapped from CSS to InDesign equivalents
+- [ ] Wire IDML generation into autoProduce.start pipeline (alongside PDF and EPUB)
+- [ ] Upload IDML zip to S3 and store URL in production_jobs table
+- [ ] Add IDML download button to job results page in AutoProduce.tsx
+- [ ] Write vitest tests for the IDML generator
+
+## Phase 26: Universal File Format Import
+- [ ] Install xlsx, node-rtf-parser, and other needed parsing libraries
+- [ ] Extend manuscriptParser.ts to handle: .xlsx, .xls, .csv, .numbers, .rtf, .html, .htm, .md, .markdown, .odt, .pages, .txt, .text, .tsv, .json
+- [ ] Update MIME type detection to cover all new formats
+- [ ] Update Auto-Produce file picker accept attribute to include all supported formats
+- [ ] Show supported format list in the upload area UI
+- [ ] Write vitest tests for each new file format parser
+
+## Phase 27: World-Class Publishing Platform Upgrade
+- [ ] Fix all 3 failing tests (bibleSpecs style fields, preview scripture style, IDML page dimensions)
+- [ ] Update Auto-Produce file picker to accept all 25+ formats with format badge grid
+- [ ] Polish Auto-Produce page: professional upload zone, animated progress, rich results card
+- [ ] Polish Bible Design Studio: full-page configurator with live spec summary and export
+- [ ] Polish home page: publishing-grade hero, project cards, stats, and CTAs
+- [ ] Polish project tracker: professional phase headers, step cards, and progress indicators
+
+## Phase 27: World-Class Polish (Completed)
+- [x] Fixed nested button HTML error in Home.tsx header nav
+- [x] Added Bible Publishing Tools section to home dashboard (Bible Studio, Spine Calculator, New Bible Project cards)
+- [x] Added Bible Studio and Spine Calculator nav links to home header
+- [x] Fixed all 3 failing tests (bibleSpecs field names, scripture style preview, IDML trim size ID)
+- [x] All 181 tests passing
+- [x] Universal file format support: .docx, .pdf, .txt, .md, .rtf, .xlsx, .xls, .csv, .numbers, .odt, .html, .epub
+- [x] IDML (InDesign) export wired into Auto-Produce pipeline with download button
+- [x] Bible phases injected into Project Tracker for Bible/Scripture projects
+- [x] Bible edition type and translation fields added to Create Project dialog
+- [x] Bible Design Studio page at /bible-studio
+- [x] Spine Width Calculator page at /spine-calculator

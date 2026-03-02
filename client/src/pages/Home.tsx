@@ -161,13 +161,17 @@ export default function Home() {
   const [title, setTitle] = useState("");
   const [author, setAuthor] = useState("");
   const [genre, setGenre] = useState("");
+  const [bibleEditionType, setBibleEditionType] = useState("");
+  const [bibleTranslation, setBibleTranslation] = useState("");
   const [notes, setNotes] = useState("");
+
+  const isBible = genre === "Bible / Scripture";
 
   const projectsQuery = trpc.project.list.useQuery(undefined, { enabled: isAuthenticated });
   const createMutation = trpc.project.create.useMutation({
     onSuccess: (project) => {
       setOpen(false);
-      setTitle(""); setAuthor(""); setGenre(""); setNotes("");
+      setTitle(""); setAuthor(""); setGenre(""); setBibleEditionType(""); setBibleTranslation(""); setNotes("");
       navigate(`/project/${project.id}`);
     },
   });
@@ -392,8 +396,14 @@ export default function Home() {
             <h1 className="font-serif text-2xl">The Bookmaker's Journey</h1>
           </div>
           <div className="flex items-center gap-4">
+            <Button variant="ghost" size="sm" className="text-[#c9a96e]/70 hover:text-[#c9a96e] hover:bg-[#c9a96e]/10 text-xs" onClick={() => navigate("/bible-studio")}>
+              <BookOpen size={14} className="mr-1.5" /> Bible Studio
+            </Button>
+            <Button variant="ghost" size="sm" className="text-[#c9a96e]/70 hover:text-[#c9a96e] hover:bg-[#c9a96e]/10 text-xs hidden sm:flex" onClick={() => navigate("/spine-calculator")}>
+              Spine Calc
+            </Button>
             <a href="/resources">
-              <Button variant="ghost" size="sm" className="text-[#c9a96e]/70 hover:text-[#c9a96e] hover:bg-[#c9a96e]/10 text-xs">
+              <Button variant="ghost" size="sm" className="text-[#c9a96e]/70 hover:text-[#c9a96e] hover:bg-[#c9a96e]/10 text-xs hidden md:flex">
                 <Sparkles size={14} className="mr-1.5" /> Resources
               </Button>
             </a>
@@ -419,7 +429,7 @@ export default function Home() {
               <DialogHeader>
                 <DialogTitle className="font-serif text-2xl text-[#3a2a1a]">Start a New Book Project</DialogTitle>
               </DialogHeader>
-              <form onSubmit={(e) => { e.preventDefault(); createMutation.mutate({ title, author, genre, notes }); }} className="space-y-4 mt-4">
+              <form onSubmit={(e) => { e.preventDefault(); createMutation.mutate({ title, author, genre, bibleEditionType: bibleEditionType || undefined, bibleTranslation: bibleTranslation || undefined, notes }); }} className="space-y-4 mt-4">
                 <div>
                   <Label className="text-[#5c3d2e] font-semibold">Book Title *</Label>
                   <Input value={title} onChange={e => setTitle(e.target.value)} placeholder="e.g., The Great American Novel" className="mt-1 border-[#d4c8b4]" required />
@@ -443,6 +453,63 @@ export default function Home() {
                     </Select>
                   </div>
                 </div>
+                {isBible && (
+                  <div className="rounded-lg border border-[#c9a96e]/40 bg-[#fdf5e4] p-4 space-y-4">
+                    <p className="text-xs font-semibold text-[#8b5e3c] uppercase tracking-wider">Bible Edition Details</p>
+                    <div className="grid grid-cols-2 gap-4">
+                      <div>
+                        <Label className="text-[#5c3d2e] font-semibold">Edition Type</Label>
+                        <Select value={bibleEditionType} onValueChange={setBibleEditionType}>
+                          <SelectTrigger className="mt-1 border-[#d4c8b4] bg-white text-[#3a2a1a]">
+                            <SelectValue placeholder="Select edition…" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {[
+                              "Standard Text Bible",
+                              "Red-Letter Edition",
+                              "Study Bible",
+                              "Journaling Bible",
+                              "Devotional Bible",
+                              "Large Print Bible",
+                              "Compact / Pew Bible",
+                              "Children's Bible",
+                              "Youth Bible",
+                              "Reference Bible",
+                              "Parallel Bible",
+                              "Interlinear Bible",
+                              "Illustrated Bible",
+                              "Audio Bible (Print Companion)",
+                              "Braille Bible",
+                              "Pulpit / Lectern Bible",
+                              "Wedding Bible",
+                              "Military Bible",
+                              "Outreach / Evangelism Bible",
+                              "Chronological Bible",
+                              "Topical Bible",
+                              "Custom / Specialty Edition",
+                            ].map(e => <SelectItem key={e} value={e}>{e}</SelectItem>)}
+                          </SelectContent>
+                        </Select>
+                      </div>
+                      <div>
+                        <Label className="text-[#5c3d2e] font-semibold">Translation</Label>
+                        <Select value={bibleTranslation} onValueChange={setBibleTranslation}>
+                          <SelectTrigger className="mt-1 border-[#d4c8b4] bg-white text-[#3a2a1a]">
+                            <SelectValue placeholder="Select translation…" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {[
+                              "KJV", "NKJV", "NIV", "ESV", "NASB", "NLT", "CSB", "RSV", "NRSV",
+                              "ASV", "MSG", "AMP", "HCSB", "NET", "WEB", "YLT", "DRB", "GNT",
+                              "CEV", "ISV", "VOICE", "TLB", "NCV", "ERV", "CJB",
+                              "Custom / Original Translation",
+                            ].map(t => <SelectItem key={t} value={t}>{t}</SelectItem>)}
+                          </SelectContent>
+                        </Select>
+                      </div>
+                    </div>
+                  </div>
+                )}
                 <div>
                   <Label className="text-[#5c3d2e] font-semibold">Notes</Label>
                   <Textarea value={notes} onChange={e => setNotes(e.target.value)} placeholder="Any notes about this project..." className="mt-1 border-[#d4c8b4]" rows={3} />
@@ -536,6 +603,71 @@ export default function Home() {
             ))}
           </div>
         )}
+        {/* Bible Publisher Tools */}
+        <div className="mt-12 mb-8">
+          <h3 className="font-serif text-xl text-[#3a2a1a] mb-4">Bible Publishing Tools</h3>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            <Card
+              className="bg-[#2c1a00] border-[#4a3828] hover:border-[#c9a96e]/50 transition-all cursor-pointer group"
+              onClick={() => navigate("/bible-studio")}
+            >
+              <CardContent className="p-5">
+                <div className="flex items-start gap-3">
+                  <div className="w-10 h-10 rounded-lg bg-[#c9a96e]/20 flex items-center justify-center flex-shrink-0">
+                    <BookOpen size={20} className="text-[#c9a96e]" />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <h4 className="font-serif text-base text-[#f5efe0] group-hover:text-[#c9a96e] transition-colors">Bible Design Studio</h4>
+                    <p className="text-xs text-[#a08060] mt-1 leading-relaxed">Configure any Bible edition — edition type, translation, trim size, paper, binding, and all special features.</p>
+                    <span className="inline-flex items-center gap-1 text-[10px] text-[#c9a96e] mt-2 font-medium">
+                      Open Studio <ArrowRight size={10} />
+                    </span>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card
+              className="bg-white border-[#e8dfd0] hover:shadow-md hover:border-[#c9a96e]/30 transition-all cursor-pointer group"
+              onClick={() => navigate("/spine-calculator")}
+            >
+              <CardContent className="p-5">
+                <div className="flex items-start gap-3">
+                  <div className="w-10 h-10 rounded-lg bg-[#f0e8d8] flex items-center justify-center flex-shrink-0">
+                    <Sparkles size={20} className="text-[#8b5e3c]" />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <h4 className="font-serif text-base text-[#3a2a1a] group-hover:text-[#5c3d2e] transition-colors">Spine Width Calculator</h4>
+                    <p className="text-xs text-[#8b7b6b] mt-1 leading-relaxed">Calculate exact spine width from page count, paper type, and binding. Includes bleed and safety margins.</p>
+                    <span className="inline-flex items-center gap-1 text-[10px] text-[#c9a96e] mt-2 font-medium">
+                      Open Calculator <ArrowRight size={10} />
+                    </span>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card
+              className="bg-white border-[#e8dfd0] hover:shadow-md hover:border-[#c9a96e]/30 transition-all cursor-pointer group"
+              onClick={() => setOpen(true)}
+            >
+              <CardContent className="p-5">
+                <div className="flex items-start gap-3">
+                  <div className="w-10 h-10 rounded-lg bg-[#f0e8d8] flex items-center justify-center flex-shrink-0">
+                    <Plus size={20} className="text-[#8b5e3c]" />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <h4 className="font-serif text-base text-[#3a2a1a] group-hover:text-[#5c3d2e] transition-colors">New Bible Project</h4>
+                    <p className="text-xs text-[#8b7b6b] mt-1 leading-relaxed">Start a new Bible / Scripture project with edition type, translation, and all Bible-specific production phases.</p>
+                    <span className="inline-flex items-center gap-1 text-[10px] text-[#c9a96e] mt-2 font-medium">
+                      Create Project <ArrowRight size={10} />
+                    </span>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+        </div>
       </main>
     </div>
   );

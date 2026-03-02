@@ -28,6 +28,8 @@ export const projects = mysqlTable("projects", {
   title: varchar("title", { length: 255 }).notNull(),
   author: varchar("author", { length: 255 }),
   genre: varchar("genre", { length: 128 }),
+  bibleEditionType: varchar("bibleEditionType", { length: 64 }),
+  bibleTranslation: varchar("bibleTranslation", { length: 32 }),
   notes: text("notes"),
   productionDeadline: bigint("productionDeadline", { mode: "number" }), // Unix timestamp ms
   createdAt: timestamp("createdAt").defaultNow().notNull(),
@@ -109,6 +111,8 @@ export const productionJobs = mysqlTable("production_jobs", {
   epubUrl: text("epubUrl"),
   pdfKey: varchar("pdfKey", { length: 512 }),
   epubKey: varchar("epubKey", { length: 512 }),
+  idmlUrl: text("idmlUrl"),
+  idmlKey: varchar("idmlKey", { length: 512 }),
   errorMessage: text("errorMessage"),
   createdAt: timestamp("createdAt").defaultNow().notNull(),
   updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),

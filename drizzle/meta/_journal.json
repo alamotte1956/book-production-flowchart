@@ -36,6 +36,20 @@
       "when": 1772460387569,
       "tag": "0004_spotty_spectrum",
       "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "5",
+      "when": 1772470408977,
+      "tag": "0005_lethal_smasher",
+      "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "5",
+      "when": 1772471061514,
+      "tag": "0006_safe_nick_fury",
+      "breakpoints": true
     }
   ]
 }

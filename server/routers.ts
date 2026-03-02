@@ -9,13 +9,14 @@ import {
   getStepStatusesByProject, upsertStepStatus, upsertStepDates,
   getFilesByProject, createUploadedFile, deleteUploadedFile,
   getDueDatesByProject, upsertPhaseDueDate, deletePhaseDueDate,
-  updateProjectDeadline, updateProjectGenre,
+  updateProjectDeadline, updateProjectGenre, updateProjectBibleSpecs,
   createProductionJob, getProductionJobsByProject, getProductionJobById, updateProductionJob,
 } from "./db";
 import { parseManuscript } from "./manuscriptParser";
 import { produceBook } from "./typesettingPipeline";
 import { TYPESETTING_STYLES, TRIM_SIZES, getTrimSize, getTypesettingStyle } from "./typesettingStyles";
 import { storagePut } from "./storage";
+import { generateIdml } from "./idmlGenerator";
 
 export const appRouter = router({
   system: systemRouter,
@@ -53,6 +54,8 @@ export const appRouter = router({
         title: z.string().min(1).max(255),
         author: z.string().max(255).optional(),
         genre: z.string().max(128).optional(),
+        bibleEditionType: z.string().max(64).optional(),
+        bibleTranslation: z.string().max(32).optional(),
         notes: z.string().optional(),
       }))
       .mutation(async ({ ctx, input }) => {
@@ -61,6 +64,8 @@ export const appRouter = router({
           title: input.title,
           author: input.author ?? null,
           genre: input.genre ?? null,
+          bibleEditionType: input.bibleEditionType ?? null,
+          bibleTranslation: input.bibleTranslation ?? null,
           notes: input.notes ?? null,
         });
       }),
@@ -103,6 +108,23 @@ export const appRouter = router({
           throw new Error("Project not found");
         }
         return updateProjectGenre(input.projectId, input.genre);
+      }),
+
+    updateBibleSpecs: protectedProcedure
+      .input(z.object({
+        projectId: z.number(),
+        bibleEditionType: z.string().max(64).nullable().optional(),
+        bibleTranslation: z.string().max(32).nullable().optional(),
+      }))
+      .mutation(async ({ ctx, input }) => {
+        const project = await getProjectById(input.projectId);
+        if (!project || project.userId !== ctx.user.id) {
+          throw new Error("Project not found");
+        }
+        return updateProjectBibleSpecs(input.projectId, {
+          bibleEditionType: input.bibleEditionType,
+          bibleTranslation: input.bibleTranslation,
+        });
       }),
   }),
 
@@ -241,7 +263,9 @@ export const appRouter = router({
         const style = getTypesettingStyle(input.styleId);
 
         // Sample content for the preview page
-        const isScripture = style.doubleColumn && style.verseNumbers;
+        // All scripture-* styles use Genesis sample content
+        const isScripture = (style.doubleColumn && style.verseNumbers)
+          || style.id.startsWith("scripture");
 
         const sampleTitle = isScripture ? "Genesis" : "Chapter One";
         const sampleSubtitle = isScripture ? "Chapter 1" : "The Beginning";
@@ -555,8 +579,8 @@ export const appRouter = router({
 
             await updateProductionJob(job.id, { wordCount: parsed.wordCount });
 
-            // Step 2: Run the full AI typesetting pipeline (chapter detection + PDF + EPUB)
-            const { pdfBuffer, epubBuffer, chapterCount, wordCount } = await produceBook(
+            // Step 2: Run the full AI typesetting pipeline (chapter detection + PDF + EPUB + IDML)
+            const { pdfBuffer, epubBuffer, chapterCount, wordCount, parsedBook, trimSize: prodTrimSize, style: prodStyle } = await produceBook(
               parsed.text,
               {
                 trimSizeId: input.trimSizeId,
@@ -588,6 +612,23 @@ export const appRouter = router({
               updates.epubUrl = epubUrl;
               updates.epubKey = epubKey;
             }
+
+            // Always generate IDML (InDesign) package
+            const idmlChapters = parsedBook.chapters.map(ch => ({
+              title: ch.title,
+              paragraphs: ch.body.split(/\n{2,}/).filter(p => p.trim().length > 0),
+            }));
+            const idmlBuffer = await generateIdml({
+              title: project.title,
+              author: project.author ?? "Unknown Author",
+              trimSize: prodTrimSize,
+              style: prodStyle,
+              chapters: idmlChapters,
+            });
+            const idmlKey = `output/${input.projectId}/${job.id}-layout.idml`;
+            const { url: idmlUrl } = await storagePut(idmlKey, idmlBuffer, "application/vnd.adobe.indesign-idml-package");
+            updates.idmlUrl = idmlUrl;
+            updates.idmlKey = idmlKey;
 
             await updateProductionJob(job.id, updates);
           } catch (err: unknown) {

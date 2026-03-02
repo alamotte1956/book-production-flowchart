@@ -34,6 +34,9 @@ export type ProduceResult = {
   epubBuffer: Buffer;
   chapterCount: number;
   wordCount: number;
+  parsedBook: ParsedBook;
+  trimSize: TrimSize;
+  style: TypesettingStyle;
 };
 
 // ─── Step 1: LLM Chapter Detection ──────────────────────────────────────────
@@ -483,5 +486,8 @@ export async function produceBook(
     epubBuffer,
     chapterCount: book.chapters.length,
     wordCount,
+    parsedBook: book,
+    trimSize: trim,
+    style,
   };
 }

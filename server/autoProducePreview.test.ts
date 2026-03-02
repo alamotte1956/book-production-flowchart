@@ -153,8 +153,10 @@ describe("autoProduce.preview", () => {
       expect(result.html).toContain("<!DOCTYPE html>");
       expect(result.html).toContain("</html>");
       expect(result.styleLabel).toBe(style.label);
-      // Scripture uses "Genesis" heading; all others use "Chapter One"
-      if (style.id === "scripture") {
+      // Scripture-family styles use "Genesis" heading; all others use "Chapter One"
+      const isScripture = style.id === "scripture" || style.id === "scripture-red-letter"
+        || style.bibleStyle === true;
+      if (isScripture) {
         expect(result.html).toContain("Genesis");
       } else {
         expect(result.html).toContain("Chapter One");

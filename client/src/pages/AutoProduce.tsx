@@ -26,11 +26,42 @@ import {
 
 const MAX_FILE_SIZE_MB = 15;
 const ACCEPTED_TYPES = [
+  // Word
   "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+  "application/msword",
+  // PDF
   "application/pdf",
+  // Plain text & markup
   "text/plain",
+  "text/markdown",
+  "text/html",
+  "text/rtf",
+  "application/rtf",
+  // Excel / Spreadsheets
+  "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+  "application/vnd.ms-excel",
+  // Apple Numbers (zip-based)
+  "application/vnd.apple.numbers",
+  // OpenDocument
+  "application/vnd.oasis.opendocument.text",
+  "application/vnd.oasis.opendocument.spreadsheet",
+  // CSV
+  "text/csv",
+  "application/csv",
+  // ePub
+  "application/epub+zip",
 ];
-const ACCEPTED_EXT = ".docx,.pdf,.txt";
+const ACCEPTED_EXT = [
+  ".docx", ".doc",
+  ".pdf",
+  ".txt", ".md", ".markdown", ".html", ".htm",
+  ".rtf",
+  ".xlsx", ".xls",
+  ".numbers",
+  ".odt", ".ods",
+  ".csv",
+  ".epub",
+].join(",");
 
 function fileToBase64(file: File): Promise<string> {
   return new Promise((resolve, reject) => {
@@ -265,30 +296,44 @@ function JobCard({ jobId, projectId }: { jobId: number; projectId: number }) {
         )}
 
         {job.status === "complete" && (
-          <div className="flex gap-3 pt-1">
-            {job.pdfUrl && (
+          <div className="flex flex-col gap-2 pt-1">
+            <div className="flex gap-3">
+              {job.pdfUrl && (
+                <a
+                  href={job.pdfUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex-1"
+                >
+                  <Button variant="default" size="sm" className="w-full bg-[#8b5e3c] hover:bg-[#7a4f30] text-white gap-2">
+                    <FileDown className="w-4 h-4" />
+                    Download Interior PDF
+                  </Button>
+                </a>
+              )}
+              {job.epubUrl && (
+                <a
+                  href={job.epubUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex-1"
+                >
+                  <Button variant="outline" size="sm" className="w-full border-[#8b5e3c] text-[#8b5e3c] hover:bg-[#f5ede4] gap-2">
+                    <BookOpen className="w-4 h-4" />
+                    Download EPUB
+                  </Button>
+                </a>
+              )}
+            </div>
+            {typeof (job as Record<string, unknown>).idmlUrl === 'string' && (
               <a
-                href={job.pdfUrl}
+                href={(job as Record<string, unknown>).idmlUrl as string}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex-1"
               >
-                <Button variant="default" size="sm" className="w-full bg-[#8b5e3c] hover:bg-[#7a4f30] text-white gap-2">
+                <Button variant="outline" size="sm" className="w-full border-[#5c3d2e] text-[#5c3d2e] hover:bg-[#f5ede4] gap-2">
                   <FileDown className="w-4 h-4" />
-                  Download Interior PDF
-                </Button>
-              </a>
-            )}
-            {job.epubUrl && (
-              <a
-                href={job.epubUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex-1"
-              >
-                <Button variant="outline" size="sm" className="w-full border-[#8b5e3c] text-[#8b5e3c] hover:bg-[#f5ede4] gap-2">
-                  <BookOpen className="w-4 h-4" />
-                  Download EPUB
+                  Download InDesign (.idml)
                 </Button>
               </a>
             )}
@@ -328,7 +373,18 @@ export default function AutoProduce() {
   const [isDragging, setIsDragging] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [previewOpen, setPreviewOpen] = useState(false);
+  const [styleAutoSelected, setStyleAutoSelected] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  // Auto-select Scripture / Reference style when the project genre is "Bible / Scripture"
+  useEffect(() => {
+    if (!projectData?.project) return;
+    const genre = projectData.project.genre;
+    if (genre === "Bible / Scripture" && !styleId) {
+      setStyleId("scripture");
+      setStyleAutoSelected(true);
+    }
+  }, [projectData?.project?.genre]);
 
   const startMutation = trpc.autoProduce.start.useMutation({
     onSuccess: () => {
@@ -348,8 +404,13 @@ export default function AutoProduce() {
       toast.error(`File too large. Maximum size is ${MAX_FILE_SIZE_MB}MB.`);
       return;
     }
-    if (!ACCEPTED_TYPES.includes(file.type) && !file.name.match(/\.(docx|pdf|txt)$/i)) {
-      toast.error("Unsupported file type. Please upload a .docx, .pdf, or .txt file.");
+    const ext = "." + (file.name.split(".").pop() ?? "").toLowerCase();
+    const validExt = ACCEPTED_EXT.split(",").includes(ext);
+    const validMime = ACCEPTED_TYPES.includes(file.type);
+    if (!validExt && !validMime) {
+      toast.error(
+        "Unsupported file type. Accepted: Word, PDF, TXT, MD, HTML, RTF, XLSX, XLS, Numbers, ODT, CSV, EPUB."
+      );
       return;
     }
     setSelectedFile(file);
@@ -480,7 +541,7 @@ export default function AutoProduce() {
               </div>
               <div className="space-y-1.5">
                 <label className="text-sm font-medium text-[#5c3d2e]">Typesetting Style</label>
-                <Select value={styleId} onValueChange={setStyleId}>
+                <Select value={styleId} onValueChange={(v) => { setStyleId(v); setStyleAutoSelected(false); }}>
                   <SelectTrigger className="border-[#d4b896]/60 bg-[#fdf9f3] text-[#3d2b1f]">
                     <SelectValue placeholder="Select style…" />
                   </SelectTrigger>
@@ -490,6 +551,12 @@ export default function AutoProduce() {
                     ))}
                   </SelectContent>
                 </Select>
+                {styleAutoSelected && (
+                  <p className="text-xs text-[#8b5e3c] flex items-center gap-1.5 mt-1">
+                    <Sparkles className="w-3 h-3 flex-shrink-0" />
+                    Auto-selected based on your project genre (Bible / Scripture). You can change it above.
+                  </p>
+                )}
               </div>
               <div className="space-y-1.5">
                 <label className="text-sm font-medium text-[#5c3d2e]">Output Format</label>
@@ -568,7 +635,12 @@ export default function AutoProduce() {
                   <Upload className="w-10 h-10 text-[#c9a96e] mx-auto" />
                   <div>
                     <p className="font-medium text-[#5c3d2e]">Drop your manuscript here</p>
-                    <p className="text-xs text-[#8b7b6b] mt-1">or click to browse — .docx, .pdf, .txt (max {MAX_FILE_SIZE_MB}MB)</p>
+                    <p className="text-xs text-[#8b7b6b] mt-1">
+                      or click to browse — max {MAX_FILE_SIZE_MB}MB
+                    </p>
+                    <p className="text-[10px] text-[#b09880] mt-1">
+                      Word · PDF · TXT · MD · HTML · RTF · XLSX · XLS · Numbers · ODT · CSV · EPUB
+                    </p>
                   </div>
                 </div>
               )}

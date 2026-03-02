@@ -279,6 +279,20 @@ export async function updateProjectMeta(
   return updated;
 }
 
+export async function updateProjectBibleSpecs(
+  projectId: number,
+  fields: { bibleEditionType?: string | null; bibleTranslation?: string | null }
+): Promise<Project> {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  const set: Partial<{ bibleEditionType: string | null; bibleTranslation: string | null }> = {};
+  if (fields.bibleEditionType !== undefined) set.bibleEditionType = fields.bibleEditionType;
+  if (fields.bibleTranslation !== undefined) set.bibleTranslation = fields.bibleTranslation;
+  await db.update(projects).set(set).where(eq(projects.id, projectId));
+  const [updated] = await db.select().from(projects).where(eq(projects.id, projectId));
+  return updated;
+}
+
 // ─── Phase due date helpers ────────────────────────────────────
 
 export async function getDueDatesByProject(projectId: number): Promise<PhaseDueDate[]> {
