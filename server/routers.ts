@@ -241,13 +241,21 @@ export const appRouter = router({
         const style = getTypesettingStyle(input.styleId);
 
         // Sample content for the preview page
-        const sampleTitle = "Chapter One";
-        const sampleSubtitle = "The Beginning";
-        const sampleParagraph1 = style.dropCap
+        const isScripture = style.doubleColumn && style.verseNumbers;
+
+        const sampleTitle = isScripture ? "Genesis" : "Chapter One";
+        const sampleSubtitle = isScripture ? "Chapter 1" : "The Beginning";
+
+        // Scripture sample: Genesis 1:1-8 with verse numbers
+        const scriptureParagraph1 = `<p class="body-text"><sup class="vn">1</sup> In the beginning God created the heavens and the earth. <sup class="vn">2</sup> Now the earth was formless and empty, darkness was over the surface of the deep, and the Spirit of God was hovering over the waters. <sup class="vn">3</sup> And God said, "Let there be light," and there was light. <sup class="vn">4</sup> God saw that the light was good, and he separated the light from the darkness.</p>`;
+        const scriptureParagraph2 = `<p class="body-text"><sup class="vn">5</sup> God called the light "day," and the darkness he called "night." And there was evening, and there was morning — the first day. <sup class="vn">6</sup> And God said, "Let there be a vault between the waters to separate water from water." <sup class="vn">7</sup> So God made the vault and separated the water under the vault from the water above it. And it was so. <sup class="vn">8</sup> God called the vault "sky." And there was evening, and there was morning — the second day.</p>`;
+        const scriptureParagraph3 = `<p class="body-text"><sup class="vn">9</sup> And God said, "Let the water under the sky be gathered to one place, and let dry ground appear." And it was so. <sup class="vn">10</sup> God called the dry ground "land," and the gathered waters he called "seas." And God saw that it was good. <sup class="vn">11</sup> Then God said, "Let the land produce vegetation: seed-bearing plants and trees on the land that bear fruit with seed in it, according to their various kinds." And it was so.</p>`;
+
+        const sampleParagraph1 = isScripture ? scriptureParagraph1 : (style.dropCap
           ? `<p class="body-text drop-cap">It was the best of times, it was the worst of times, it was the age of wisdom, it was the age of foolishness, it was the epoch of belief, it was the epoch of incredulity, it was the season of Light, it was the season of Darkness, it was the spring of hope, it was the winter of despair.</p>`
-          : `<p class="body-text">It was the best of times, it was the worst of times, it was the age of wisdom, it was the age of foolishness, it was the epoch of belief, it was the epoch of incredulity, it was the season of Light, it was the season of Darkness, it was the spring of hope, it was the winter of despair.</p>`;
-        const sampleParagraph2 = `<p class="body-text">We had everything before us, we had nothing before us, we were all going direct to Heaven, we were all going direct the other way. In short, the period was so far like the present period, that some of its noisiest authorities insisted on its being received, for good or for evil, in the superlative degree of comparison only.</p>`;
-        const sampleParagraph3 = `<p class="body-text">There were a king with a large jaw and a queen with a plain face, on the throne of England; there were a king with a large jaw and a queen with a fair face, on the throne of France. In both countries it was clearer than crystal to the lords of the State preserves of loaves and fishes, that things in general were settled for ever.</p>`;
+          : `<p class="body-text">It was the best of times, it was the worst of times, it was the age of wisdom, it was the age of foolishness, it was the epoch of belief, it was the epoch of incredulity, it was the season of Light, it was the season of Darkness, it was the spring of hope, it was the winter of despair.</p>`);
+        const sampleParagraph2 = isScripture ? scriptureParagraph2 : `<p class="body-text">We had everything before us, we had nothing before us, we were all going direct to Heaven, we were all going direct the other way. In short, the period was so far like the present period, that some of its noisiest authorities insisted on its being received, for good or for evil, in the superlative degree of comparison only.</p>`;
+        const sampleParagraph3 = isScripture ? scriptureParagraph3 : `<p class="body-text">There were a king with a large jaw and a queen with a plain face, on the throne of England; there were a king with a large jaw and a queen with a fair face, on the throne of France. In both countries it was clearer than crystal to the lords of the State preserves of loaves and fishes, that things in general were settled for ever.</p>`;
 
         const pageWidthPx = Math.round(trim.widthIn * 96);
         const pageHeightPx = Math.round(trim.heightIn * 96);
@@ -267,6 +275,54 @@ export const appRouter = router({
             margin-right: 4px;
             margin-top: 4px;
             color: ${style.headingColor};
+          }
+        ` : '';
+
+        const scriptureCss = isScripture ? `
+          .content {
+            display: block;
+          }
+          .scripture-heading {
+            text-align: center;
+            border-bottom: 1pt solid ${style.headingColor};
+            padding-bottom: 8px;
+            margin-bottom: 14px;
+            margin-top: 16px;
+          }
+          .scripture-book {
+            font-family: ${style.chapterHeadingFont};
+            font-size: ${style.chapterHeadingSize}pt;
+            font-weight: 700;
+            color: ${style.headingColor};
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+          }
+          .scripture-chapter {
+            font-family: ${style.chapterHeadingFont};
+            font-size: ${style.fontSize * 1.1}pt;
+            color: ${style.headingColor};
+            opacity: 0.75;
+            margin-top: 4px;
+          }
+          .columns {
+            column-count: 2;
+            column-gap: 18px;
+            column-rule: 0.5pt solid #c8b89a;
+          }
+          .body-text {
+            text-indent: 0;
+            margin-bottom: 6px;
+            font-size: ${style.fontSize}pt;
+            line-height: ${style.lineHeight};
+          }
+          sup.vn {
+            font-size: 0.6em;
+            font-weight: 700;
+            color: ${style.headingColor};
+            vertical-align: super;
+            line-height: 0;
+            margin-right: 2px;
+            font-style: normal;
           }
         ` : '';
 
@@ -368,6 +424,7 @@ export const appRouter = router({
     }
     .body-text:first-of-type { text-indent: 0; }
     ${dropCapCss}
+    ${scriptureCss}
     .preview-badge {
       position: absolute;
       top: 8px;
@@ -387,17 +444,29 @@ export const appRouter = router({
   <div class="page">
     <div class="preview-badge">Sample Preview</div>
     <div class="running-header">
-      <span>A Tale of Two Cities</span>
+      <span>${isScripture ? 'Holy Bible' : 'A Tale of Two Cities'}</span>
       <span>${style.label}</span>
     </div>
     <div class="content">
-      <div class="chapter-number">Chapter One</div>
-      <div class="chapter-title">${sampleTitle}</div>
-      <div class="chapter-subtitle">${sampleSubtitle}</div>
-      <div class="chapter-rule"></div>
-      ${sampleParagraph1}
-      ${sampleParagraph2}
-      ${sampleParagraph3}
+      ${isScripture ? `
+        <div class="scripture-heading">
+          <div class="scripture-book">${sampleTitle}</div>
+          <div class="scripture-chapter">${sampleSubtitle}</div>
+        </div>
+        <div class="columns">
+          ${sampleParagraph1}
+          ${sampleParagraph2}
+          ${sampleParagraph3}
+        </div>
+      ` : `
+        <div class="chapter-number">Chapter One</div>
+        <div class="chapter-title">${sampleTitle}</div>
+        <div class="chapter-subtitle">${sampleSubtitle}</div>
+        <div class="chapter-rule"></div>
+        ${sampleParagraph1}
+        ${sampleParagraph2}
+        ${sampleParagraph3}
+      `}
     </div>
     <div class="running-footer">1</div>
   </div>

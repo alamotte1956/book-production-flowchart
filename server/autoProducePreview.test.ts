@@ -153,8 +153,12 @@ describe("autoProduce.preview", () => {
       expect(result.html).toContain("<!DOCTYPE html>");
       expect(result.html).toContain("</html>");
       expect(result.styleLabel).toBe(style.label);
-      // Each preview should contain the sample chapter title
-      expect(result.html).toContain("Chapter One");
+      // Scripture uses "Genesis" heading; all others use "Chapter One"
+      if (style.id === "scripture") {
+        expect(result.html).toContain("Genesis");
+      } else {
+        expect(result.html).toContain("Chapter One");
+      }
     }
   });
 
@@ -179,6 +183,99 @@ describe("autoProduce.preview", () => {
 
     expect(result.html).toContain("running-header");
     expect(result.html).toContain("running-footer");
+  });
+
+  // ─── Scripture / Reference style tests ───────────────────────────────────
+
+  it("scripture preview includes double-column CSS", async () => {
+    const caller = appRouter.createCaller(createPublicContext());
+    const result = await caller.autoProduce.preview({
+      styleId: "scripture",
+      trimSizeId: "6x9",
+    });
+
+    expect(result.html).toContain("column-count: 2");
+    expect(result.html).toContain("column-rule");
+  });
+
+  it("scripture preview includes verse number superscripts", async () => {
+    const caller = appRouter.createCaller(createPublicContext());
+    const result = await caller.autoProduce.preview({
+      styleId: "scripture",
+      trimSizeId: "6x9",
+    });
+
+    expect(result.html).toContain('class="vn"');
+    expect(result.html).toContain("<sup");
+  });
+
+  it("scripture preview uses Genesis 1 sample text", async () => {
+    const caller = appRouter.createCaller(createPublicContext());
+    const result = await caller.autoProduce.preview({
+      styleId: "scripture",
+      trimSizeId: "6x9",
+    });
+
+    expect(result.html).toContain("Genesis");
+    expect(result.html).toContain("In the beginning God created");
+    expect(result.html).toContain("Let there be light");
+  });
+
+  it("scripture preview uses Gentium Book Plus font", async () => {
+    const caller = appRouter.createCaller(createPublicContext());
+    const result = await caller.autoProduce.preview({
+      styleId: "scripture",
+      trimSizeId: "6x9",
+    });
+
+    expect(result.html).toContain("Gentium");
+    expect(result.html).toContain("fonts.googleapis.com");
+  });
+
+  it("scripture preview shows 'Holy Bible' in the running header", async () => {
+    const caller = appRouter.createCaller(createPublicContext());
+    const result = await caller.autoProduce.preview({
+      styleId: "scripture",
+      trimSizeId: "6x9",
+    });
+
+    expect(result.html).toContain("Holy Bible");
+  });
+
+  it("scripture preview does NOT include drop-cap CSS", async () => {
+    const caller = appRouter.createCaller(createPublicContext());
+    const result = await caller.autoProduce.preview({
+      styleId: "scripture",
+      trimSizeId: "6x9",
+    });
+
+    expect(result.html).not.toContain("::first-letter");
+  });
+
+  it("scripture preview works for all trim sizes", async () => {
+    const caller = appRouter.createCaller(createPublicContext());
+
+    for (const trim of TRIM_SIZES) {
+      const result = await caller.autoProduce.preview({
+        styleId: "scripture",
+        trimSizeId: trim.id,
+      });
+
+      expect(result.html).toContain("column-count: 2");
+      expect(result.html).toContain("Genesis");
+      expect(result.pageWidthPx).toBe(Math.round(trim.widthIn * 96));
+    }
+  });
+
+  it("scripture preview returns correct style and trim labels", async () => {
+    const caller = appRouter.createCaller(createPublicContext());
+    const result = await caller.autoProduce.preview({
+      styleId: "scripture",
+      trimSizeId: "7x10",
+    });
+
+    expect(result.styleLabel).toBe("Scripture / Reference");
+    expect(result.trimLabel).toContain("7");
   });
 
   it("is accessible without authentication (publicProcedure)", async () => {

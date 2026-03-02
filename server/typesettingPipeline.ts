@@ -127,6 +127,33 @@ function textToHtmlParagraphs(text: string, dropCap: boolean, isFirst: boolean):
   }).join("\n");
 }
 
+/**
+ * Converts a paragraph of scripture text into HTML with inline verse numbers.
+ * Verse numbers are detected as patterns like "1 ", "2 ", "10 " at the start of
+ * sentences or after a period/newline. They are wrapped in <sup class="vn"> tags.
+ *
+ * Input example:  "1 In the beginning God created... 2 And the earth was..."
+ * Output example: "<sup class='vn'>1</sup> In the beginning... <sup class='vn'>2</sup> And..."
+ */
+function renderVerseText(text: string): string {
+  // Match verse numbers: a number (1-3 digits) followed by a space at the start
+  // of the text or after a sentence boundary
+  const escaped = escapeHtml(text.trim().replace(/\n/g, " "));
+  // Replace patterns like "1 " at start, or " 2 " mid-sentence (preceded by space)
+  return escaped.replace(
+    /(^|(?<=\s))(\d{1,3})(?=\s)/g,
+    (_, pre, num) => `${pre}<sup class="vn">${num}</sup>`
+  );
+}
+
+function textToHtmlParagraphsScripture(text: string): string {
+  const paragraphs = text.split(/\n{2,}/).filter(p => p.trim().length > 0);
+  return paragraphs.map(p => {
+    const withVerses = renderVerseText(p);
+    return `<p>${withVerses}</p>`;
+  }).join("\n");
+}
+
 export function generateBookHtml(
   book: ParsedBook,
   trim: TrimSize,
@@ -140,15 +167,25 @@ export function generateBookHtml(
   const marginInside = trim.marginInsideIn * DPI;
   const marginOutside = trim.marginOutsideIn * DPI;
 
+  const isScripture = style.doubleColumn && style.verseNumbers;
+
   const chapters = book.chapters.map((ch, idx) => {
     const isFirst = idx === 0;
-    const bodyHtml = textToHtmlParagraphs(ch.body, style.dropCap, isFirst);
+    const bodyHtml = isScripture
+      ? textToHtmlParagraphsScripture(ch.body)
+      : textToHtmlParagraphs(ch.body, style.dropCap, isFirst);
     const breakClass = style.chapterBreakStyle === "page-break" ? "page-break" : "large-space";
+    // Scripture uses book/chapter heading style (e.g. "Genesis 1") instead of "Chapter N"
+    const chapterLabel = isScripture
+      ? (ch.title && ch.title !== `Chapter ${ch.number}` ? escapeHtml(ch.title) : `Chapter ${ch.number}`)
+      : `Chapter ${ch.number}`;
+    const chapterSubtitle = isScripture ? "" :
+      (ch.title && ch.title !== `Chapter ${ch.number}` ? `<h1 class="chapter-title">${escapeHtml(ch.title)}</h1>` : "");
     return `
     <section class="chapter ${breakClass}" id="chapter-${ch.number}">
       <div class="chapter-heading">
-        <div class="chapter-number">Chapter ${ch.number}</div>
-        ${ch.title && ch.title !== `Chapter ${ch.number}` ? `<h1 class="chapter-title">${escapeHtml(ch.title)}</h1>` : ""}
+        <div class="chapter-number">${chapterLabel}</div>
+        ${chapterSubtitle}
       </div>
       <div class="chapter-body">
         ${bodyHtml}
@@ -268,6 +305,46 @@ export function generateBookHtml(
       font-weight: 600;
     }
     .frontmatter, .backmatter { padding-bottom: 0.5in; }
+
+    /* ── Scripture / Reference double-column layout ── */
+    ${isScripture ? `
+    .chapter-body {
+      column-count: 2;
+      column-gap: 0.25in;
+      column-rule: 0.5pt solid #c8b89a;
+    }
+    .chapter-heading {
+      column-span: all;
+      text-align: center;
+      border-bottom: 1pt solid #2c1a00;
+      padding-bottom: 0.1in;
+      margin-bottom: 0.2in;
+    }
+    .chapter-number {
+      font-size: ${style.chapterHeadingSize}pt;
+      font-weight: 700;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      color: ${style.headingColor};
+    }
+    .chapter-body p {
+      text-indent: 0;
+      margin-bottom: 0.05in;
+      text-align: justify;
+      hyphens: auto;
+      orphans: 2;
+      widows: 2;
+    }
+    sup.vn {
+      font-size: 0.6em;
+      font-weight: 700;
+      color: ${style.headingColor};
+      vertical-align: super;
+      line-height: 0;
+      margin-right: 0.05em;
+      font-style: normal;
+    }
+    ` : ""}
   </style>
 </head>
 <body>

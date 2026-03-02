@@ -28,6 +28,10 @@ export type TypesettingStyle = {
   bodyColor: string;
   headingColor: string;
   googleFontsUrl: string;
+  /** When true, body text is rendered in two columns (Scripture / Reference layout) */
+  doubleColumn?: boolean;
+  /** When true, inline verse numbers are rendered as superscripts */
+  verseNumbers?: boolean;
 };
 
 export const TRIM_SIZES: TrimSize[] = [
@@ -179,6 +183,23 @@ export const TYPESETTING_STYLES: TypesettingStyle[] = [
     bodyColor: "#1a1a1a",
     headingColor: "#1a1a1a",
     googleFontsUrl: "https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,600;1,400&display=swap",
+  },
+  {
+    id: "scripture",
+    label: "Scripture / Reference",
+    // Gentium Book Plus is a high-quality open-source font designed for scripture and multilingual text
+    fontFamily: "'Gentium Book Plus', 'EB Garamond', Georgia, serif",
+    fontSize: 9.5,
+    lineHeight: 1.45,
+    chapterHeadingFont: "'Gentium Book Plus', Georgia, serif",
+    chapterHeadingSize: 14,
+    dropCap: false,
+    chapterBreakStyle: "page-break",
+    bodyColor: "#1a1a1a",
+    headingColor: "#2c1a00",
+    googleFontsUrl: "https://fonts.googleapis.com/css2?family=Gentium+Book+Plus:ital,wght@0,400;0,700;1,400&display=swap",
+    doubleColumn: true,
+    verseNumbers: true,
   },
 ];
 

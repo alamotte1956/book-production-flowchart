@@ -136,3 +136,10 @@
 - [x] Added to NONFICTION_GENRES; hides 'proposal' and 'review' steps (direct-to-publisher path)
 - [x] Added filter reason text for proposal and review steps
 - [x] 6 new vitest tests; total now 89 passing
+
+## Phase 21: Scripture / Reference Typesetting Style
+- [x] Registered "scripture" style in TYPESETTING_STYLES (Gentium Book Plus font, 9.5pt, 1.45 leading, doubleColumn+verseNumbers flags)
+- [x] Added renderVerseText() and textToHtmlParagraphsScripture() helpers in typesettingPipeline.ts
+- [x] generateBookHtml uses scripture renderer when doubleColumn+verseNumbers are set; column-count:2 CSS injected
+- [x] Preview endpoint: scripture shows Genesis 1 sample text, double-column layout, verse superscripts, "Holy Bible" running header
+- [x] 8 new vitest tests for scripture style; total now 97 passing
