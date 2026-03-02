@@ -48,7 +48,7 @@ const features = [
 
 const PAGE_TITLE = "Book Production Tracker — The Bookmaker's Journey";
 const PAGE_DESCRIPTION = "Track every step of your book's production — from manuscript to published title — with file uploads, due dates, AI typesetting, and a Gantt timeline.";
-const PAGE_KEYWORDS = "book production tracker, publishing workflow, manuscript tracker, book publishing steps, editorial process, book project management, publishing timeline, author tools, AI typesetting";
+const PAGE_KEYWORDS = "book production tracker, publishing workflow, manuscript to print, Bible design studio, AI typesetting, book project management";
 
 function setMetaTag(name: string, content: string) {
   let el = document.querySelector<HTMLMetaElement>(`meta[name="${name}"]`);

@@ -333,3 +333,12 @@
 - [x] Add heading/chapter title typeface selector to BibleStudio
 - [x] Add verse number typeface selector to BibleStudio
 - [x] Show live typeface preview in the spec summary panel
+
+## Phase 31: Recommended Pairings Panel
+- [ ] Add TYPEFACE_PAIRINGS lookup table to shared/bibleSpecs.ts
+- [ ] Build RecommendedPairings component in BibleStudio
+- [ ] Auto-apply pairing on one-click "Use This Pairing" button
+- [ ] Show live three-font preview in the pairings panel
+
+## Phase 32: SEO Fixes
+- [x] Reduce meta keywords on home page (/) from 9 to 3-8 focused keywords
