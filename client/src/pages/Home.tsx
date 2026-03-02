@@ -175,6 +175,42 @@ export default function Home() {
           </div>
         </div>
 
+        {/* Resources teaser */}
+        <div className="max-w-5xl mx-auto px-6 py-16">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6 }}
+            className="bg-white rounded-2xl border border-[#e8dfd0] p-8 md:p-12 flex flex-col md:flex-row items-center gap-8"
+          >
+            <div className="flex-1">
+              <div className="flex items-center gap-2 mb-3">
+                <Sparkles size={18} className="text-[#c9a96e]" />
+                <span className="text-xs font-bold uppercase tracking-wider text-[#a89880]">Resources & Success Hub</span>
+              </div>
+              <h2 className="font-serif text-2xl md:text-3xl text-[#3a2a1a] mb-3">The Best Tools for Every Stage</h2>
+              <p className="text-[#8b7b6b] leading-relaxed mb-4">
+                We've curated the most efficient and widely trusted platforms across every phase — from Scrivener for writing to IngramSpark for distribution. Free and paid options included.
+              </p>
+              <div className="flex flex-wrap gap-2 text-xs">
+                {["Scrivener", "Reedsy", "QueryTracker", "KDP", "IngramSpark", "BookBub", "NetGalley", "Goodreads"].map(t => (
+                  <span key={t} className="px-2 py-1 rounded-full bg-[#f0e8d8] text-[#8b7b6b]">{t}</span>
+                ))}
+                <span className="px-2 py-1 rounded-full bg-[#f0e8d8] text-[#c9a96e]">+35 more</span>
+              </div>
+            </div>
+            <div className="shrink-0">
+              <a href="/resources">
+                <Button size="lg" variant="outline" className="border-[#c9a96e] text-[#5c3d2e] hover:bg-[#f0e8d8] font-semibold px-8">
+                  Browse Resources
+                  <ArrowRight className="ml-2" size={16} />
+                </Button>
+              </a>
+            </div>
+          </motion.div>
+        </div>
+
         {/* CTA */}
         <div className="py-20 text-center px-6">
           <motion.div
@@ -231,6 +267,11 @@ export default function Home() {
             <h1 className="font-serif text-2xl">The Bookmaker's Journey</h1>
           </div>
           <div className="flex items-center gap-4">
+            <a href="/resources">
+              <Button variant="ghost" size="sm" className="text-[#c9a96e]/70 hover:text-[#c9a96e] hover:bg-[#c9a96e]/10 text-xs">
+                <Sparkles size={14} className="mr-1.5" /> Resources
+              </Button>
+            </a>
             <span className="text-sm text-[#c9a96e]/70">{user?.name || user?.email}</span>
           </div>
         </div>

@@ -42,3 +42,9 @@
 
 ## Phase 8: Layout Change
 - [x] Move all step cards to far-left aligned layout
+
+## Phase 9: Resources & Success Hub
+- [x] Research top publishing and creative industry websites
+- [x] Build a Resources page with curated links organized by production phase (8 categories, 43 resources)
+- [x] Add industry stats section to landing page + Resources teaser block + header nav link
+- [x] Test and checkpoint (17/17 tests pass)
