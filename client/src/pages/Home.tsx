@@ -18,7 +18,7 @@ import {
   BookOpen, Plus, Trash2, ArrowRight, Loader2,
   Upload, CheckCircle2, SkipForward, Clock, Sparkles, Copy,
   Layers, BookMarked, Ruler, Zap, BarChart3, Library,
-  ChevronRight, Calendar, Star, TrendingUp, FileText, HelpCircle,
+  ChevronRight, ChevronDown, Calendar, Star, TrendingUp, FileText, HelpCircle,
 } from "lucide-react";
 import { useState, useEffect } from "react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -280,15 +280,14 @@ export default function Home() {
                 <div className="h-px w-16 bg-[#c9a96e]/60" />
               </div>
               <h1
-                className="font-serif text-6xl md:text-8xl leading-tight tracking-tight"
+                className="font-serif text-4xl md:text-6xl lg:text-7xl leading-tight tracking-tight whitespace-nowrap"
                 style={{
                   color: "#ffffff",
                   textShadow: "0 0 60px rgba(255,255,255,0.5), 0 0 120px rgba(201,169,110,0.35), 0 3px 6px rgba(0,0,0,0.6)",
                   letterSpacing: "0.02em",
                 }}
               >
-                Create Design<br />
-                <span style={{ color: "#f5d98a", textShadow: "0 0 40px rgba(245,217,138,0.6)" }}>Publish LLC</span>
+                Create Design{" "}<span style={{ color: "#f5d98a", textShadow: "0 0 40px rgba(245,217,138,0.6)" }}>Publish LLC</span>
               </h1>
               <p className="mt-6 font-sans text-lg md:text-xl text-[#d4c8b4] max-w-xl mx-auto leading-relaxed">
                 A creator, designer, and publisher's dream platform. Track every step of your book's production — from first idea to finished volume.
@@ -300,20 +299,33 @@ export default function Home() {
                 <span className="text-[#c9a96e]/30">|</span>
                 <span><strong className="text-3xl text-[#f5efe0]">8</strong> Pro Tools</span>
               </div>
-              <div className="mt-10">
+              <div className="mt-10 flex flex-col items-center gap-6">
                 <a href={getLoginUrl()}>
                   <Button size="lg" className="bg-[#c9a96e] hover:bg-[#b8944f] text-[#2a1a0a] font-semibold text-base px-10 py-6 rounded-lg shadow-lg shadow-[#c9a96e]/20">
                     Start Your Project
                     <ArrowRight className="ml-2" size={18} />
                   </Button>
                 </a>
+                <button
+                  onClick={() => document.getElementById('features')?.scrollIntoView({ behavior: 'smooth' })}
+                  className="flex flex-col items-center gap-1 text-[#c9a96e]/70 hover:text-[#c9a96e] transition-colors group"
+                  aria-label="Learn more"
+                >
+                  <span className="text-sm font-sans tracking-widest uppercase">Learn More</span>
+                  <motion.div
+                    animate={{ y: [0, 6, 0] }}
+                    transition={{ duration: 1.5, repeat: Infinity, ease: 'easeInOut' }}
+                  >
+                    <ChevronDown size={22} className="text-[#c9a96e]/70 group-hover:text-[#c9a96e]" />
+                  </motion.div>
+                </button>
               </div>
             </motion.div>
           </div>
         </div>
 
         {/* Features */}
-        <div className="max-w-5xl mx-auto px-6 py-20">
+        <div id="features" className="max-w-5xl mx-auto px-6 py-20">
           <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.6 }} className="text-center mb-14">
             <h2 className="font-serif text-3xl md:text-4xl text-[#3a2a1a]">A Real Project Tracker</h2>
             <p className="mt-3 text-[#8b7b6b] max-w-lg mx-auto">Not just a flowchart — a working tool where you attach your actual manuscripts, contracts, and proofs at every stage.</p>

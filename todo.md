@@ -442,3 +442,10 @@
 
 ## Phase 45: Landing Page Company Name
 - [x] Add "Create Design Publish LLC" prominently to the landing page hero (text-6xl/text-8xl, pure white with glow, gold "Publish LLC")
+
+## Phase 46: Learn More Scroll Button
+- [x] Add animated "Learn More" scroll button below CTA on landing page hero (bouncing ChevronDown with motion.div)
+- [x] Add id="features" anchor to the features section for scroll target
+
+## Phase 47: One-Line Hero Title
+- [x] Remove line break from landing page hero title — now reads on one line (whitespace-nowrap, text-4xl/text-6xl/text-7xl)
