@@ -122,3 +122,10 @@
 - [x] Add GenreEditor inline popover component in tracker header with genre dropdown
 - [x] Genre display shows "(edit)" hint on hover; shows "+ Add genre" when no genre is set
 - [x] On save: invalidates project query so filtering re-applies immediately, shows toast
+
+## Phase 19: Inline Title & Author Editing in Tracker Header
+- [ ] Add updateProjectMeta() db helper (updates title and/or author)
+- [ ] Add project.updateMeta tRPC mutation to server/routers.ts
+- [ ] Add TitleEditor inline popover component (text input, min 1 char validation)
+- [ ] Add AuthorEditor inline popover component (optional text input)
+- [ ] Both editors show edit hint on hover and save with Enter key support

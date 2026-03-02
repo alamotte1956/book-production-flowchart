@@ -730,6 +730,12 @@ export default function ProjectTracker() {
     });
   }, [dueDateMap, statusMap]);
 
+  // Genre-based step filtering — MUST be above early returns to satisfy Rules of Hooks
+  const hiddenStepIds = useMemo(
+    () => getIrrelevantStepIds(data?.project?.genre),
+    [data?.project?.genre]
+  );
+
   if (authLoading || isLoading) {
     return (
       <div className="min-h-screen bg-[#faf6ef] flex items-center justify-center">
@@ -765,12 +771,6 @@ export default function ProjectTracker() {
   }
 
   const { project } = data;
-
-  // Genre-based step filtering
-  const hiddenStepIds = useMemo(
-    () => getIrrelevantStepIds(project.genre),
-    [project.genre]
-  );
 
   let stepOffset = 0;
 

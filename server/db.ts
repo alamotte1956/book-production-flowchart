@@ -265,6 +265,20 @@ export async function updateProjectGenre(
   return updated;
 }
 
+export async function updateProjectMeta(
+  projectId: number,
+  fields: { title?: string; author?: string | null }
+): Promise<Project> {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  const set: Partial<{ title: string; author: string | null }> = {};
+  if (fields.title !== undefined) set.title = fields.title;
+  if (fields.author !== undefined) set.author = fields.author;
+  await db.update(projects).set(set).where(eq(projects.id, projectId));
+  const [updated] = await db.select().from(projects).where(eq(projects.id, projectId));
+  return updated;
+}
+
 // ─── Phase due date helpers ────────────────────────────────────
 
 export async function getDueDatesByProject(projectId: number): Promise<PhaseDueDate[]> {
