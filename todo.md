@@ -406,3 +406,23 @@
 - [ ] Add contextual next-step banner to Bible Design Studio after spec export
 - [ ] Add contextual next-step banner to Spine Calculator after calculation
 - [ ] Add contextual next-step banner to Cover Designer after spec export
+
+## Phase 39: Guided Publishing Onboarding Wizard
+- [ ] Build PublishingWizard multi-step component (client/src/components/PublishingWizard.tsx)
+- [ ] Step 1: What do you want to publish? (Bible, Novel, Non-Fiction, Children's Book, Poetry, Memoir, Textbook, Other)
+- [ ] Step 2: Is this your first time publishing? (Yes / No)
+- [ ] Step 3: Do you have a manuscript ready? (Yes / In progress / Not started)
+- [ ] Step 4: What format do you want to publish in? (Print / eBook / Both)
+- [ ] Step 5: Do you have an ISBN? (Yes / No / Not sure what that is)
+- [ ] Step 6: What is your target audience? (General / Children / Academic / Religious / Other)
+- [ ] Step 7: What is your timeline? (ASAP / 1-3 months / 3-6 months / 6+ months)
+- [ ] Build GuidedJourney page (/guided-journey) showing personalized roadmap with instructions
+- [ ] Roadmap shows numbered steps, each with: what it is, why it matters, how to do it in this program
+- [ ] Each roadmap step has a direct "Go to Tool" button
+- [ ] Add wizard trigger to dashboard (prominent "Start Your Publishing Journey" CTA for new users)
+- [ ] Add wizard trigger to the landing page hero section
+- [ ] Save wizard answers to database (new wizard_sessions table)
+- [ ] Add server endpoint: wizard.saveAnswers mutation
+- [ ] Add server endpoint: wizard.getAnswers query
+- [ ] Register /guided-journey route in App.tsx
+- [ ] Show personalized greeting on GuidedJourney page based on answers

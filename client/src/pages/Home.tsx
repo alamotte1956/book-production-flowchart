@@ -272,7 +272,11 @@ export default function Home() {
             <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8 }}>
               <div className="flex items-center justify-center gap-3 mb-6">
                 <div className="h-px w-16 bg-[#c9a96e]/60" />
-                <BookOpen size={28} className="text-[#c9a96e]" />
+                <img
+                  src="https://d2xsxph8kpxj0f.cloudfront.net/310519663211654017/kGjPju6hKCvCsjZhgUHyqj/cdp-logo-icon-VKK59tkJo7q6tVURkrEnnJ.webp"
+                  alt="Create Design Publish LLC"
+                  className="w-10 h-10 rounded-lg object-cover"
+                />
                 <div className="h-px w-16 bg-[#c9a96e]/60" />
               </div>
               <h1 className="font-serif text-5xl md:text-7xl text-[#f5efe0] leading-tight tracking-tight">
@@ -471,12 +475,14 @@ export default function Home() {
         <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
           <div className="flex items-center gap-4">
             <div className="flex items-center gap-2.5">
-              <div className="w-8 h-8 rounded-lg bg-[#c9a96e]/20 flex items-center justify-center">
-                <BookOpen size={18} className="text-[#c9a96e]" />
-              </div>
+              <img
+                src="https://d2xsxph8kpxj0f.cloudfront.net/310519663211654017/kGjPju6hKCvCsjZhgUHyqj/cdp-logo-icon-VKK59tkJo7q6tVURkrEnnJ.webp"
+                alt="Create Design Publish LLC"
+                className="w-9 h-9 rounded-lg object-cover"
+              />
               <div>
                 <h1 className="font-serif text-lg leading-tight text-[#f5efe0]">The Bookmaker's Journey</h1>
-                <p className="text-[10px] text-[#c9a96e]/50 uppercase tracking-widest">Publisher Command Center</p>
+                <p className="text-[10px] text-[#c9a96e]/50 uppercase tracking-widest">Create Design Publish LLC</p>
               </div>
             </div>
           </div>
