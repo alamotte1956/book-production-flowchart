@@ -22,6 +22,7 @@ import { toast } from "sonner";
 import {
   ArrowLeft, Upload, FileText, Wand2, Download, AlertCircle,
   CheckCircle2, Clock, Loader2, BookOpen, FileDown, Sparkles, Eye, X,
+  ChevronDown, ChevronUp, RefreshCw, Copy, Terminal,
 } from "lucide-react";
 
 const MAX_FILE_SIZE_MB = 15;
@@ -234,6 +235,10 @@ function StylePreviewModal({ open, onClose, styleId, trimSizeId }: StylePreviewM
 
 function JobCard({ jobId, projectId }: { jobId: number; projectId: number }) {
   const [enabled, setEnabled] = useState(true);
+  const [showTechDetails, setShowTechDetails] = useState(false);
+  const [retryJobId, setRetryJobId] = useState<number | null>(null);
+  const utils = trpc.useUtils();
+
   const { data: job } = trpc.autoProduce.status.useQuery(
     { jobId },
     {
@@ -241,6 +246,18 @@ function JobCard({ jobId, projectId }: { jobId: number; projectId: number }) {
       enabled,
     }
   );
+
+  const retryMutation = trpc.autoProduce.retry.useMutation({
+    onSuccess: (data) => {
+      setRetryJobId(data.jobId);
+      setEnabled(true);
+      utils.autoProduce.list.invalidate({ projectId });
+      toast.success("Retry started — the AI is reprocessing your manuscript.");
+    },
+    onError: (err) => {
+      toast.error(`Retry failed: ${err.message}`);
+    },
+  });
 
   useEffect(() => {
     if (job?.status === "complete" || job?.status === "error") {
@@ -289,9 +306,126 @@ function JobCard({ jobId, projectId }: { jobId: number; projectId: number }) {
           <Progress value={pct} className="h-2" />
         </div>
 
-        {job.status === "error" && job.errorMessage && (
-          <div className="rounded-md bg-red-50 border border-red-200 p-3 text-xs text-red-700">
-            <strong>Error:</strong> {job.errorMessage}
+        {job.status === "error" && (
+          <div className="rounded-lg border border-red-200 bg-red-50 overflow-hidden">
+            {/* Error header */}
+            <div className="flex items-start gap-3 p-4">
+              <div className="flex-shrink-0 mt-0.5">
+                <div className="w-8 h-8 rounded-full bg-red-100 flex items-center justify-center">
+                  <AlertCircle className="w-4 h-4 text-red-600" />
+                </div>
+              </div>
+              <div className="flex-1 min-w-0">
+                <p className="text-sm font-semibold text-red-800 mb-1">Production Failed</p>
+                {job.errorMessage && (
+                  <p className="text-sm text-red-700 break-words leading-relaxed">
+                    {job.errorMessage}
+                  </p>
+                )}
+              </div>
+            </div>
+
+            {/* Action bar */}
+            <div className="flex items-center gap-2 px-4 pb-3">
+              <Button
+                size="sm"
+                variant="default"
+                className="bg-red-600 hover:bg-red-700 text-white gap-2 text-xs"
+                disabled={retryMutation.isPending}
+                onClick={() => retryMutation.mutate({ jobId: job.id })}
+              >
+                {retryMutation.isPending ? (
+                  <Loader2 className="w-3 h-3 animate-spin" />
+                ) : (
+                  <RefreshCw className="w-3 h-3" />
+                )}
+                {retryMutation.isPending ? "Retrying…" : "Retry Job"}
+              </Button>
+              {job.errorMessage && (
+                <Button
+                  size="sm"
+                  variant="outline"
+                  className="border-red-200 text-red-700 hover:bg-red-100 gap-2 text-xs"
+                  onClick={() => {
+                    navigator.clipboard.writeText(job.errorMessage ?? "");
+                    toast.success("Error message copied to clipboard");
+                  }}
+                >
+                  <Copy className="w-3 h-3" />
+                  Copy Error
+                </Button>
+              )}
+              <Button
+                size="sm"
+                variant="ghost"
+                className="text-red-600 hover:text-red-800 hover:bg-red-100 gap-1 text-xs ml-auto"
+                onClick={() => setShowTechDetails(v => !v)}
+              >
+                <Terminal className="w-3 h-3" />
+                Technical Details
+                {showTechDetails ? <ChevronUp className="w-3 h-3" /> : <ChevronDown className="w-3 h-3" />}
+              </Button>
+            </div>
+
+            {/* Collapsible technical details */}
+            {showTechDetails && (
+              <div className="border-t border-red-200 bg-red-900/5 px-4 py-3">
+                <p className="text-xs font-semibold text-red-800 mb-2 flex items-center gap-1.5">
+                  <Terminal className="w-3 h-3" />
+                  Diagnostic Information
+                </p>
+                <div className="font-mono text-xs text-red-800 space-y-1 bg-white/60 rounded border border-red-200 p-3">
+                  <div className="flex gap-2">
+                    <span className="text-red-500 w-28 flex-shrink-0">Job ID</span>
+                    <span>#{job.id}</span>
+                  </div>
+                  <div className="flex gap-2">
+                    <span className="text-red-500 w-28 flex-shrink-0">File</span>
+                    <span className="break-all">{job.manuscriptFileName ?? "(unknown)"}</span>
+                  </div>
+                  <div className="flex gap-2">
+                    <span className="text-red-500 w-28 flex-shrink-0">Trim Size</span>
+                    <span>{job.trimSizeId}</span>
+                  </div>
+                  <div className="flex gap-2">
+                    <span className="text-red-500 w-28 flex-shrink-0">Style</span>
+                    <span>{job.styleId}</span>
+                  </div>
+                  <div className="flex gap-2">
+                    <span className="text-red-500 w-28 flex-shrink-0">Failed At</span>
+                    <span>{new Date(job.updatedAt).toLocaleString()}</span>
+                  </div>
+                  {job.wordCount ? (
+                    <div className="flex gap-2">
+                      <span className="text-red-500 w-28 flex-shrink-0">Words Parsed</span>
+                      <span>{job.wordCount.toLocaleString()} (parsing succeeded)</span>
+                    </div>
+                  ) : (
+                    <div className="flex gap-2">
+                      <span className="text-red-500 w-28 flex-shrink-0">Words Parsed</span>
+                      <span className="text-red-600">0 (failed during parsing)</span>
+                    </div>
+                  )}
+                  {job.errorMessage && (
+                    <div className="mt-2 pt-2 border-t border-red-200">
+                      <p className="text-red-500 mb-1">Full Error Message</p>
+                      <p className="text-red-800 break-all whitespace-pre-wrap">{job.errorMessage}</p>
+                    </div>
+                  )}
+                </div>
+                <p className="text-xs text-red-600 mt-2">
+                  Tip: If the error mentions &quot;parsing&quot; or &quot;LLM&quot;, try a simpler file format (TXT or DOCX). If it mentions &quot;PDF&quot; or &quot;render&quot;, the typesetting engine encountered an issue — retry usually resolves this.
+                </p>
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* Show new retry job card if retry was triggered */}
+        {retryJobId && retryJobId !== job.id && (
+          <div className="rounded-md bg-amber-50 border border-amber-200 p-3 text-xs text-amber-800 flex items-center gap-2">
+            <RefreshCw className="w-3 h-3 flex-shrink-0" />
+            Retry job #{retryJobId} is now processing. Scroll down to see its status.
           </div>
         )}
 

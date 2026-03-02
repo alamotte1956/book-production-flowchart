@@ -364,3 +364,13 @@
 - [x] Update executablePath in server/typesettingPipeline.ts from shell wrapper to actual binary
 - [x] Verified: puppeteer launches successfully and generates a PDF with the new path
 - [x] All 181 tests pass after the fix
+
+## Phase 35: Inline Error Detail Panel
+- [x] Add inline error detail panel to Auto-Produce status page for failed jobs
+- [x] Show full error message, timestamp, job ID, and file name in the panel
+- [x] Add a Retry button that re-submits the same job configuration
+- [x] Add a server-side retry endpoint (autoProduce.retry mutation)
+- [x] Style the panel with clear error state (red border, icon, expandable detail)
+- [x] Add Copy Error button to clipboard
+- [x] Add collapsible Technical Details panel with diagnostic monospace table
+- [x] Add contextual troubleshooting tip in the technical details panel

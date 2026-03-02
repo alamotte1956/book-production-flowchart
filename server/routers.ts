@@ -644,6 +644,78 @@ export const appRouter = router({
 
         return { jobId: job.id, status: "queued" };
       }),
+
+    // Retry a failed job using the same manuscript already in S3
+    retry: protectedProcedure
+      .input(z.object({ jobId: z.number() }))
+      .mutation(async ({ ctx, input }) => {
+        const originalJob = await getProductionJobById(input.jobId);
+        if (!originalJob) throw new Error("Job not found");
+        const project = await getProjectById(originalJob.projectId);
+        if (!project || project.userId !== ctx.user.id) throw new Error("Not authorized");
+        if (originalJob.status !== "error") throw new Error("Only failed jobs can be retried");
+        if (!originalJob.manuscriptFileKey) throw new Error("Original manuscript file not found in storage");
+
+        // Create a new job re-using the same S3 manuscript key
+        const newJob = await createProductionJob({
+          projectId: originalJob.projectId,
+          status: "queued",
+          trimSizeId: originalJob.trimSizeId,
+          styleId: originalJob.styleId,
+          manuscriptFileName: originalJob.manuscriptFileName,
+          manuscriptFileKey: originalJob.manuscriptFileKey,
+        });
+
+        // Fire-and-forget pipeline
+        (async () => {
+          try {
+            await updateProductionJob(newJob.id, { status: "processing" });
+            const { storageGet } = await import("./storage");
+            const { url: manuscriptUrl } = await storageGet(originalJob.manuscriptFileKey!);
+            const fetchRes = await fetch(manuscriptUrl);
+            if (!fetchRes.ok) throw new Error(`Storage fetch failed: ${fetchRes.status}`);
+            const buffer = Buffer.from(await fetchRes.arrayBuffer());
+            const ext = (originalJob.manuscriptFileName ?? "").split(".").pop()?.toLowerCase() ?? "";
+            const mimeMap: Record<string, string> = {
+              pdf: "application/pdf",
+              docx: "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+              doc: "application/msword",
+              txt: "text/plain",
+              md: "text/markdown",
+              html: "text/html",
+              rtf: "text/rtf",
+              epub: "application/epub+zip",
+            };
+            const mimeType = mimeMap[ext] ?? "application/octet-stream";
+            const parsed = await parseManuscript(buffer, mimeType, originalJob.manuscriptFileName ?? "manuscript");
+            await updateProductionJob(newJob.id, { wordCount: parsed.wordCount });
+            const { pdfBuffer, epubBuffer, chapterCount, wordCount, parsedBook, trimSize: prodTrimSize, style: prodStyle } = await produceBook(
+              parsed.text,
+              { trimSizeId: originalJob.trimSizeId, styleId: originalJob.styleId, title: project.title, author: project.author ?? "Unknown Author" }
+            );
+            await updateProductionJob(newJob.id, { wordCount, chapterCount });
+            const updates: Record<string, unknown> = { status: "complete" };
+            const pdfKey = `output/${originalJob.projectId}/${newJob.id}-interior.pdf`;
+            const { url: pdfUrl } = await storagePut(pdfKey, pdfBuffer, "application/pdf");
+            updates.pdfUrl = pdfUrl; updates.pdfKey = pdfKey;
+            const epubKey = `output/${originalJob.projectId}/${newJob.id}-ebook.epub`;
+            const { url: epubUrl } = await storagePut(epubKey, epubBuffer, "application/epub+zip");
+            updates.epubUrl = epubUrl; updates.epubKey = epubKey;
+            const idmlChapters = parsedBook.chapters.map(ch => ({ title: ch.title, paragraphs: ch.body.split(/\n{2,}/).filter(p => p.trim().length > 0) }));
+            const idmlBuffer = await generateIdml({ title: project.title, author: project.author ?? "Unknown Author", trimSize: prodTrimSize, style: prodStyle, chapters: idmlChapters });
+            const idmlKey = `output/${originalJob.projectId}/${newJob.id}-layout.idml`;
+            const { url: idmlUrl } = await storagePut(idmlKey, idmlBuffer, "application/vnd.adobe.indesign-idml-package");
+            updates.idmlUrl = idmlUrl; updates.idmlKey = idmlKey;
+            await updateProductionJob(newJob.id, updates);
+          } catch (err: unknown) {
+            const msg = err instanceof Error ? err.message : String(err);
+            console.error(`[AutoProduce] Retry job ${newJob.id} failed:`, msg);
+            await updateProductionJob(newJob.id, { status: "error", errorMessage: msg });
+          }
+        })();
+
+        return { jobId: newJob.id, status: "queued" };
+      }),
   }),
 
   // ─── AI Writing Assistant ─────────────────────────────────────────────────
