@@ -252,6 +252,14 @@ export default function Home() {
     },
   });
 
+  // ─── Guided prompts context (must be before any early returns to satisfy React hooks rules) ───
+  const projectList0 = projectsQuery.data ?? [];
+  const firstProjectForPrompts = projectList0[0];
+  const promptContextQuery = trpc.prompts.getContext.useQuery(
+    { projectId: firstProjectForPrompts?.id ?? 0 },
+    { enabled: isAuthenticated && !!firstProjectForPrompts }
+  );
+
   // ─── Unauthenticated landing ─────────────────────────────────────────────────
   if (!authLoading && !isAuthenticated) {
     return (
@@ -433,12 +441,7 @@ export default function Home() {
   const projectList = projectsQuery.data ?? [];
 
   // ─── Compute "What's Next?" prompts ──────────────────────────────────────────
-  // Use the first project for context; if no projects, show the create-project prompt
-  const firstProject = projectList[0];
-  const promptContextQuery = trpc.prompts.getContext.useQuery(
-    { projectId: firstProject?.id ?? 0 },
-    { enabled: isAuthenticated && !!firstProject }
-  );
+  const firstProject = firstProjectForPrompts;
 
   const whatsNextPrompts = getNextPrompts(
     (promptContextQuery.data
