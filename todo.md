@@ -326,3 +326,10 @@
 - [x] Add NASB (New American Standard Bible) to BIBLE_TRANSLATIONS in shared/bibleSpecs.ts (was already present)
 - [x] Add NASB 2020 (New American Standard Bible 2020 Update) to BIBLE_TRANSLATIONS in shared/bibleSpecs.ts
 - [x] Add ISV (International Standard Version) to BIBLE_TRANSLATIONS in shared/bibleSpecs.ts
+
+## Phase 30: Typeface Options in Bible Design Studio
+- [x] Add TYPEFACES data (serif, italic, sans-serif bold categories with named fonts) to shared/bibleSpecs.ts
+- [x] Add body text typeface selector to BibleStudio typography section
+- [x] Add heading/chapter title typeface selector to BibleStudio
+- [x] Add verse number typeface selector to BibleStudio
+- [x] Show live typeface preview in the spec summary panel

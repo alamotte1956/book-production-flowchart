@@ -27,10 +27,13 @@ import {
   TYPESETTING_STYLES,
   PAPER_TYPES,
   BINDING_TYPES,
+  TYPEFACES,
   calculateSpineWidth,
   getBibleTrimSizes,
   getBibleStyles,
+  getTypefacesByCategory,
   type BibleEditionType,
+  type TypefaceCategory,
 } from "@shared/bibleSpecs";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
@@ -59,6 +62,9 @@ interface BibleConfig {
   flexibleCover: boolean;
   twoColorPrinting: boolean;
   pageCount: number;
+  bodyTypefaceId: string;
+  headingTypefaceId: string;
+  verseNumberTypefaceId: string;
 }
 
 const DEFAULT_CONFIG: BibleConfig = {
@@ -85,6 +91,9 @@ const DEFAULT_CONFIG: BibleConfig = {
   flexibleCover: false,
   twoColorPrinting: false,
   pageCount: 1200,
+  bodyTypefaceId: "garamond",
+  headingTypefaceId: "italic-garamond",
+  verseNumberTypefaceId: "sans-roboto-condensed",
 };
 
 // ─── Section Header ───────────────────────────────────────────────────────────
@@ -280,6 +289,13 @@ function SpecSummary({ config }: { config: BibleConfig }) {
 
   <hr class="divider">
 
+  <p class="section-title">Typeface Selection</p>
+  <div class="spec-row"><span class="spec-label">Body Text</span><span class="spec-value">${TYPEFACES.find(t => t.id === config.bodyTypefaceId)?.name ?? "—"}</span></div>
+  <div class="spec-row"><span class="spec-label">Chapter Headings</span><span class="spec-value">${TYPEFACES.find(t => t.id === config.headingTypefaceId)?.name ?? "—"}</span></div>
+  <div class="spec-row"><span class="spec-label">Verse Numbers</span><span class="spec-value">${TYPEFACES.find(t => t.id === config.verseNumberTypefaceId)?.name ?? "—"}</span></div>
+
+  <hr class="divider">
+
   <p class="section-title">Physical Dimensions</p>
   <div class="spec-row"><span class="spec-label">Estimated Page Count</span><span class="spec-value">${config.pageCount.toLocaleString()} pp</span></div>
   <div class="spec-row"><span class="spec-label">Calculated Spine Width</span><span class="spec-value spine-value">${spine.spineWidthIn.toFixed(3)}" / ${spine.spineWidthMm}mm</span></div>
@@ -342,6 +358,19 @@ function SpecSummary({ config }: { config: BibleConfig }) {
           <div className="flex justify-between gap-2">
             <span className="text-[#a08060]">Binding</span>
             <span className="text-white font-medium text-right">{binding?.label ?? "—"}</span>
+          </div>
+          <Separator className="bg-[#4a3828] my-1" />
+          <div className="flex justify-between gap-2">
+            <span className="text-[#a08060]">Body Typeface</span>
+            <span className="text-white font-medium text-right">{TYPEFACES.find(t => t.id === config.bodyTypefaceId)?.name ?? "—"}</span>
+          </div>
+          <div className="flex justify-between gap-2">
+            <span className="text-[#a08060]">Heading Typeface</span>
+            <span className="text-white font-medium text-right">{TYPEFACES.find(t => t.id === config.headingTypefaceId)?.name ?? "—"}</span>
+          </div>
+          <div className="flex justify-between gap-2">
+            <span className="text-[#a08060]">Verse # Typeface</span>
+            <span className="text-white font-medium text-right">{TYPEFACES.find(t => t.id === config.verseNumberTypefaceId)?.name ?? "—"}</span>
           </div>
           <Separator className="bg-[#4a3828] my-1" />
           <div className="flex justify-between gap-2">
@@ -729,7 +758,101 @@ export default function BibleStudio() {
               </div>
             </section>
 
-            {/* Step 5: Paper Type */}
+            {/* Step 4b: Typeface Selection */}
+            <section>
+              <SectionHeader step={5} title="Typeface Selection" subtitle="Choose typefaces for body text, chapter headings, and verse numbers — three independent choices" />
+
+              {/* Load selected Google Fonts dynamically */}
+              {(() => {
+                const bodyFace = TYPEFACES.find(t => t.id === config.bodyTypefaceId);
+                const headingFace = TYPEFACES.find(t => t.id === config.headingTypefaceId);
+                const verseFace = TYPEFACES.find(t => t.id === config.verseNumberTypefaceId);
+                const urls = Array.from(new Set([bodyFace?.googleFontsUrl, headingFace?.googleFontsUrl, verseFace?.googleFontsUrl].filter((u): u is string => !!u)));
+                return urls.map(url => <link key={url} rel="stylesheet" href={url} />);
+              })()}
+
+              <div className="space-y-6">
+                {([
+                  { label: "Body Text", key: "bodyTypefaceId" as const, categories: ["serif"] as TypefaceCategory[], desc: "The primary reading font — used for all scripture text" },
+                  { label: "Chapter Headings & Titles", key: "headingTypefaceId" as const, categories: ["italic", "serif"] as TypefaceCategory[], desc: "Used for book names, chapter numbers, and section headers" },
+                  { label: "Verse Numbers", key: "verseNumberTypefaceId" as const, categories: ["sans-serif-bold", "serif"] as TypefaceCategory[], desc: "Inline verse number style — often a contrasting face" },
+                ] as const).map(({ label, key, categories, desc }) => {
+                  const allFaces = categories.flatMap(cat => getTypefacesByCategory(cat));
+                  const selectedFace = TYPEFACES.find(t => t.id === config[key]);
+                  return (
+                    <div key={key} className="bg-white rounded-xl border border-[#e8ddd0] p-4">
+                      <div className="mb-3">
+                        <p className="text-sm font-semibold text-[#2c1a00]">{label}</p>
+                        <p className="text-xs text-[#8b7b6b]">{desc}</p>
+                      </div>
+
+                      {/* Category tabs */}
+                      <div className="flex gap-1.5 mb-3 flex-wrap">
+                        {categories.map(cat => (
+                          <span key={cat} className="text-[10px] px-2 py-0.5 rounded-full bg-[#f0e8d8] text-[#5c3d2e] font-semibold uppercase tracking-wide">
+                            {cat === "sans-serif-bold" ? "Sans-Serif Bold" : cat === "italic" ? "Italic" : "Serif"}
+                          </span>
+                        ))}
+                      </div>
+
+                      {/* Font grid */}
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                        {allFaces.map(face => (
+                          <button
+                            key={face.id}
+                            onClick={() => set(key, face.id)}
+                            className={`text-left p-3 rounded-lg border transition-all ${
+                              config[key] === face.id
+                                ? "border-[#8b5e3c] bg-[#fdf5ec] shadow-sm"
+                                : "border-[#e8ddd0] bg-white hover:border-[#c9a96e] hover:bg-[#faf6ef]"
+                            }`}
+                          >
+                            <div className="flex items-start justify-between gap-2">
+                              <div className="flex-1 min-w-0">
+                                <p className="text-xs font-semibold text-[#3a2a1a] truncate">{face.name}</p>
+                                <p className="text-[10px] text-[#a08060] mt-0.5 leading-tight">{face.note}</p>
+                              </div>
+                              <div className="flex flex-col items-end gap-1 flex-shrink-0">
+                                {config[key] === face.id && (
+                                  <Check className="w-3.5 h-3.5 text-[#8b5e3c]" />
+                                )}
+                                {face.bibleRecommended && (
+                                  <span className="text-[9px] bg-[#c9a96e] text-[#2a1a0a] px-1.5 py-0.5 rounded font-bold">BIBLE</span>
+                                )}
+                              </div>
+                            </div>
+                            {/* Live preview */}
+                            <p
+                              className="mt-2 text-sm text-[#3a2a1a] leading-snug border-t border-[#f0e8dc] pt-2"
+                              style={{
+                                fontFamily: face.cssFamily,
+                                fontStyle: face.category === "italic" ? "italic" : "normal",
+                                fontWeight: face.category === "sans-serif-bold" ? 700 : 400,
+                              }}
+                            >
+                              {key === "verseNumberTypefaceId" ? "¹ In the beginning" : key === "headingTypefaceId" ? "Genesis · Chapter 1" : "In the beginning God created the heavens and the earth."}
+                            </p>
+                          </button>
+                        ))}
+                      </div>
+
+                      {/* Selected summary */}
+                      {selectedFace && (
+                        <div className="mt-3 flex items-center gap-2 text-xs text-[#5c3d2e] bg-[#fdf5ec] rounded-lg px-3 py-2">
+                          <Check className="w-3.5 h-3.5 text-[#8b5e3c] flex-shrink-0" />
+                          <span>
+                            <strong>{selectedFace.name}</strong>
+                            <span className="text-[#a08060]"> — {selectedFace.cssFamily}</span>
+                          </span>
+                        </div>
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
+            </section>
+
+            {/* Step 6: Paper Type */}
             <section>
               <SectionHeader step={5} title="Paper Type" subtitle="Paper weight, opacity, and thickness — critical for Bible bulk and readability" />
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">

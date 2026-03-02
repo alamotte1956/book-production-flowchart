@@ -749,6 +749,230 @@ export const BINDING_TYPES: BindingType[] = [
   },
 ];
 
+// ─── Typeface Options ────────────────────────────────────────────────────────
+
+export type TypefaceCategory = "serif" | "italic" | "sans-serif-bold";
+
+export type TypefaceOption = {
+  id: string;
+  name: string;
+  category: TypefaceCategory;
+  /** CSS font-family stack for live preview */
+  cssFamily: string;
+  /** Google Fonts URL to load the font in the browser */
+  googleFontsUrl?: string;
+  /** Typical use case note */
+  note: string;
+  /** Whether this face is particularly well-suited for Bible / scripture text */
+  bibleRecommended?: boolean;
+};
+
+export const TYPEFACES: TypefaceOption[] = [
+  // ── Serif ──────────────────────────────────────────────────────────────────
+  {
+    id: "garamond",
+    name: "Garamond",
+    category: "serif",
+    cssFamily: "'EB Garamond', Garamond, Georgia, serif",
+    googleFontsUrl: "https://fonts.googleapis.com/css2?family=EB+Garamond:wght@400;600&display=swap",
+    note: "Classic Renaissance serif — warm, readable, traditional",
+    bibleRecommended: true,
+  },
+  {
+    id: "palatino",
+    name: "Palatino",
+    category: "serif",
+    cssFamily: "'Palatino Linotype', 'Book Antiqua', Palatino, serif",
+    note: "Humanist serif — elegant proportions, excellent at small sizes",
+    bibleRecommended: true,
+  },
+  {
+    id: "times-new-roman",
+    name: "Times New Roman",
+    category: "serif",
+    cssFamily: "'Times New Roman', Times, serif",
+    note: "Ubiquitous newspaper serif — compact, highly legible",
+  },
+  {
+    id: "lora",
+    name: "Lora",
+    category: "serif",
+    cssFamily: "'Lora', Georgia, serif",
+    googleFontsUrl: "https://fonts.googleapis.com/css2?family=Lora:wght@400;600&display=swap",
+    note: "Contemporary literary serif — balanced and modern",
+    bibleRecommended: true,
+  },
+  {
+    id: "source-serif",
+    name: "Source Serif 4",
+    category: "serif",
+    cssFamily: "'Source Serif 4', Georgia, serif",
+    googleFontsUrl: "https://fonts.googleapis.com/css2?family=Source+Serif+4:wght@400;600&display=swap",
+    note: "Adobe's open-source text serif — clean, modern, versatile",
+    bibleRecommended: true,
+  },
+  {
+    id: "merriweather",
+    name: "Merriweather",
+    category: "serif",
+    cssFamily: "'Merriweather', Georgia, serif",
+    googleFontsUrl: "https://fonts.googleapis.com/css2?family=Merriweather:wght@400;700&display=swap",
+    note: "Screen-optimised serif — generous x-height, strong serifs",
+  },
+  {
+    id: "gentium",
+    name: "Gentium Book Plus",
+    category: "serif",
+    cssFamily: "'Gentium Book Plus', 'EB Garamond', Georgia, serif",
+    googleFontsUrl: "https://fonts.googleapis.com/css2?family=Gentium+Book+Plus:wght@400;700&display=swap",
+    note: "Designed for multilingual scripture — excellent diacritic support",
+    bibleRecommended: true,
+  },
+  {
+    id: "crimson-pro",
+    name: "Crimson Pro",
+    category: "serif",
+    cssFamily: "'Crimson Pro', Georgia, serif",
+    googleFontsUrl: "https://fonts.googleapis.com/css2?family=Crimson+Pro:wght@400;600&display=swap",
+    note: "Old-style serif with high legibility at small point sizes",
+    bibleRecommended: true,
+  },
+  {
+    id: "cormorant",
+    name: "Cormorant Garamond",
+    category: "serif",
+    cssFamily: "'Cormorant Garamond', Garamond, Georgia, serif",
+    googleFontsUrl: "https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;600&display=swap",
+    note: "Display serif — refined, high contrast, luxury feel",
+  },
+  {
+    id: "libre-baskerville",
+    name: "Libre Baskerville",
+    category: "serif",
+    cssFamily: "'Libre Baskerville', Baskerville, Georgia, serif",
+    googleFontsUrl: "https://fonts.googleapis.com/css2?family=Libre+Baskerville:wght@400;700&display=swap",
+    note: "Transitional serif — authoritative, formal, highly legible",
+  },
+
+  // ── Italic (display / chapter heading faces with strong italic forms) ────────
+  {
+    id: "italic-garamond",
+    name: "Garamond Italic",
+    category: "italic",
+    cssFamily: "'EB Garamond', Garamond, Georgia, serif",
+    googleFontsUrl: "https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@1,400;1,600&display=swap",
+    note: "Classic italic — used for poetry, Psalms, and section headings",
+    bibleRecommended: true,
+  },
+  {
+    id: "italic-lora",
+    name: "Lora Italic",
+    category: "italic",
+    cssFamily: "'Lora', Georgia, serif",
+    googleFontsUrl: "https://fonts.googleapis.com/css2?family=Lora:ital,wght@1,400;1,600&display=swap",
+    note: "Warm literary italic — ideal for introductory notes and captions",
+  },
+  {
+    id: "italic-crimson",
+    name: "Crimson Pro Italic",
+    category: "italic",
+    cssFamily: "'Crimson Pro', Georgia, serif",
+    googleFontsUrl: "https://fonts.googleapis.com/css2?family=Crimson+Pro:ital,wght@1,400;1,600&display=swap",
+    note: "Elegant italic with strong calligraphic character",
+    bibleRecommended: true,
+  },
+  {
+    id: "italic-cormorant",
+    name: "Cormorant Italic",
+    category: "italic",
+    cssFamily: "'Cormorant Garamond', Garamond, Georgia, serif",
+    googleFontsUrl: "https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@1,400;1,600&display=swap",
+    note: "High-contrast display italic — chapter titles, pull quotes",
+  },
+  {
+    id: "italic-playfair",
+    name: "Playfair Display Italic",
+    category: "italic",
+    cssFamily: "'Playfair Display', Georgia, serif",
+    googleFontsUrl: "https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@1,400;1,700&display=swap",
+    note: "Dramatic display italic — strong contrast, editorial feel",
+  },
+  {
+    id: "italic-libre-baskerville",
+    name: "Libre Baskerville Italic",
+    category: "italic",
+    cssFamily: "'Libre Baskerville', Baskerville, Georgia, serif",
+    googleFontsUrl: "https://fonts.googleapis.com/css2?family=Libre+Baskerville:ital,wght@1,400&display=swap",
+    note: "Authoritative italic — formal footnotes and cross-reference text",
+  },
+
+  // ── Sans-Serif Bold (headings, labels, verse numbers) ────────────────────────
+  {
+    id: "sans-nunito",
+    name: "Nunito Bold",
+    category: "sans-serif-bold",
+    cssFamily: "'Nunito', Arial, sans-serif",
+    googleFontsUrl: "https://fonts.googleapis.com/css2?family=Nunito:wght@700;800&display=swap",
+    note: "Rounded sans-serif — friendly, modern, excellent for study Bibles",
+    bibleRecommended: true,
+  },
+  {
+    id: "sans-inter",
+    name: "Inter Bold",
+    category: "sans-serif-bold",
+    cssFamily: "'Inter', Arial, sans-serif",
+    googleFontsUrl: "https://fonts.googleapis.com/css2?family=Inter:wght@700;800&display=swap",
+    note: "Neutral UI sans — crisp, high-legibility at small sizes",
+  },
+  {
+    id: "sans-source-sans",
+    name: "Source Sans 3 Bold",
+    category: "sans-serif-bold",
+    cssFamily: "'Source Sans 3', Arial, sans-serif",
+    googleFontsUrl: "https://fonts.googleapis.com/css2?family=Source+Sans+3:wght@700;900&display=swap",
+    note: "Adobe's open-source sans — pairs beautifully with Source Serif",
+    bibleRecommended: true,
+  },
+  {
+    id: "sans-open-sans",
+    name: "Open Sans Bold",
+    category: "sans-serif-bold",
+    cssFamily: "'Open Sans', Arial, sans-serif",
+    googleFontsUrl: "https://fonts.googleapis.com/css2?family=Open+Sans:wght@700;800&display=swap",
+    note: "Humanist sans — highly legible, widely used in devotional publishing",
+  },
+  {
+    id: "sans-montserrat",
+    name: "Montserrat Bold",
+    category: "sans-serif-bold",
+    cssFamily: "'Montserrat', Arial, sans-serif",
+    googleFontsUrl: "https://fonts.googleapis.com/css2?family=Montserrat:wght@700;800&display=swap",
+    note: "Geometric sans — strong, modern, excellent for chapter numbers",
+  },
+  {
+    id: "sans-raleway",
+    name: "Raleway Bold",
+    category: "sans-serif-bold",
+    cssFamily: "'Raleway', Arial, sans-serif",
+    googleFontsUrl: "https://fonts.googleapis.com/css2?family=Raleway:wght@700;800&display=swap",
+    note: "Elegant geometric sans — refined headings for premium editions",
+  },
+  {
+    id: "sans-roboto-condensed",
+    name: "Roboto Condensed Bold",
+    category: "sans-serif-bold",
+    cssFamily: "'Roboto Condensed', Arial Narrow, sans-serif",
+    googleFontsUrl: "https://fonts.googleapis.com/css2?family=Roboto+Condensed:wght@700&display=swap",
+    note: "Condensed sans — saves horizontal space in tight column layouts",
+    bibleRecommended: true,
+  },
+];
+
+/** Get all typefaces for a given category */
+export function getTypefacesByCategory(category: TypefaceCategory): TypefaceOption[] {
+  return TYPEFACES.filter(t => t.category === category);
+}
+
 // ─── Lookup helpers ───────────────────────────────────────────────────────────
 
 export function getTrimSize(id: string): TrimSize {
