@@ -94,6 +94,32 @@ vi.mock("./db", () => {
       const idx = dueDates.findIndex((d) => d.projectId === projectId && d.phaseId === phaseId);
       if (idx >= 0) dueDates.splice(idx, 1);
     }),
+    upsertStepDates: vi.fn(async (projectId: number, stepId: string, startDate?: number | null, targetDate?: number | null) => {
+      const existing = stepStatuses.find((s: any) => s.projectId === projectId && s.stepId === stepId);
+      if (existing) {
+        if (startDate !== undefined) existing.startDate = startDate;
+        if (targetDate !== undefined) existing.targetDate = targetDate;
+        return existing;
+      }
+      const entry = {
+        id: stepStatusIdCounter++,
+        projectId,
+        stepId,
+        status: "pending",
+        startDate: startDate ?? null,
+        targetDate: targetDate ?? null,
+        notes: null,
+        completedAt: null,
+        updatedAt: new Date(),
+      };
+      stepStatuses.push(entry);
+      return entry;
+    }),
+    updateProjectDeadline: vi.fn(async (projectId: number, productionDeadline: number | null) => {
+      const project = projects.find((p: any) => p.id === projectId);
+      if (project) project.productionDeadline = productionDeadline;
+      return project;
+    }),
   };
 });
 
@@ -372,5 +398,101 @@ describe("file router", () => {
 
     const result = await caller.file.delete({ fileId: uploaded.id, projectId });
     expect(result.success).toBe(true);
+  });
+});
+
+describe("step.setDates router", () => {
+  it("sets start and target dates for a step", async () => {
+    const ctx = createAuthContext(1);
+    const caller = appRouter.createCaller(ctx);
+
+    const list = await caller.project.list();
+    const projectId = list[0].id;
+
+    const startDate = Date.now();
+    const targetDate = Date.now() + 14 * 24 * 60 * 60 * 1000; // 14 days
+
+    const result = await caller.step.setDates({
+      projectId,
+      stepId: "idea",
+      startDate,
+      targetDate,
+    });
+
+    expect(result).toBeDefined();
+    expect(result.startDate).toBe(startDate);
+    expect(result.targetDate).toBe(targetDate);
+    expect(result.stepId).toBe("idea");
+  });
+
+  it("updates only targetDate when startDate is omitted", async () => {
+    const ctx = createAuthContext(1);
+    const caller = appRouter.createCaller(ctx);
+
+    const list = await caller.project.list();
+    const projectId = list[0].id;
+
+    const newTarget = Date.now() + 30 * 24 * 60 * 60 * 1000;
+
+    const result = await caller.step.setDates({
+      projectId,
+      stepId: "idea",
+      targetDate: newTarget,
+    });
+
+    expect(result.targetDate).toBe(newTarget);
+  });
+
+  it("rejects setDates for another user's project", async () => {
+    const ctx = createAuthContext(999);
+    const caller = appRouter.createCaller(ctx);
+
+    await expect(
+      caller.step.setDates({ projectId: 1, stepId: "idea", targetDate: Date.now() })
+    ).rejects.toThrow("Project not found");
+  });
+});
+
+describe("project_deadline router", () => {
+  it("sets a production deadline", async () => {
+    const ctx = createAuthContext(1);
+    const caller = appRouter.createCaller(ctx);
+
+    const list = await caller.project.list();
+    const projectId = list[0].id;
+
+    const deadline = Date.now() + 180 * 24 * 60 * 60 * 1000; // 6 months
+
+    const result = await caller.project_deadline.set({
+      projectId,
+      productionDeadline: deadline,
+    });
+
+    expect(result).toBeDefined();
+    expect(result.productionDeadline).toBe(deadline);
+  });
+
+  it("clears a production deadline by setting null", async () => {
+    const ctx = createAuthContext(1);
+    const caller = appRouter.createCaller(ctx);
+
+    const list = await caller.project.list();
+    const projectId = list[0].id;
+
+    const result = await caller.project_deadline.set({
+      projectId,
+      productionDeadline: null,
+    });
+
+    expect(result.productionDeadline).toBeNull();
+  });
+
+  it("rejects deadline set for another user's project", async () => {
+    const ctx = createAuthContext(999);
+    const caller = appRouter.createCaller(ctx);
+
+    await expect(
+      caller.project_deadline.set({ projectId: 1, productionDeadline: Date.now() })
+    ).rejects.toThrow("Project not found");
   });
 });

@@ -6,9 +6,10 @@ import { z } from "zod";
 import { nanoid } from "nanoid";
 import {
   createProject, getProjectsByUser, getProjectById, deleteProject,
-  getStepStatusesByProject, upsertStepStatus,
+  getStepStatusesByProject, upsertStepStatus, upsertStepDates,
   getFilesByProject, createUploadedFile, deleteUploadedFile,
   getDueDatesByProject, upsertPhaseDueDate, deletePhaseDueDate,
+  updateProjectDeadline,
 } from "./db";
 import { storagePut } from "./storage";
 
@@ -89,6 +90,21 @@ export const appRouter = router({
   }),
 
   step: router({
+    setDates: protectedProcedure
+      .input(z.object({
+        projectId: z.number(),
+        stepId: z.string(),
+        startDate: z.number().nullable().optional(),
+        targetDate: z.number().nullable().optional(),
+      }))
+      .mutation(async ({ ctx, input }) => {
+        const project = await getProjectById(input.projectId);
+        if (!project || project.userId !== ctx.user.id) {
+          throw new Error("Project not found");
+        }
+        return upsertStepDates(input.projectId, input.stepId, input.startDate, input.targetDate);
+      }),
+
     updateStatus: protectedProcedure
       .input(z.object({
         projectId: z.number(),
@@ -148,6 +164,21 @@ export const appRouter = router({
         }
         await deleteUploadedFile(input.fileId);
         return { success: true };
+      }),
+  }),
+
+  project_deadline: router({
+    set: protectedProcedure
+      .input(z.object({
+        projectId: z.number(),
+        productionDeadline: z.number().nullable(),
+      }))
+      .mutation(async ({ ctx, input }) => {
+        const project = await getProjectById(input.projectId);
+        if (!project || project.userId !== ctx.user.id) {
+          throw new Error("Project not found");
+        }
+        return updateProjectDeadline(input.projectId, input.productionDeadline);
       }),
   }),
 

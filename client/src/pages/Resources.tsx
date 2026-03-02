@@ -3,6 +3,7 @@
  * Curated links organized by book production phase, plus industry stats.
  */
 
+import { useEffect } from "react";
 import { useLocation } from "wouter";
 import { ArrowLeft, ExternalLink, TrendingUp, BookOpen, Users, DollarSign, Star } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -449,6 +450,21 @@ const stats = [
 
 export default function Resources() {
   const [, navigate] = useLocation();
+
+  // Scroll to the section indicated by the URL hash after the page renders
+  useEffect(() => {
+    const hash = window.location.hash;
+    if (hash) {
+      // Small delay to allow the page to fully render before scrolling
+      const timer = setTimeout(() => {
+        const el = document.querySelector(hash);
+        if (el) {
+          el.scrollIntoView({ behavior: "smooth", block: "start" });
+        }
+      }, 150);
+      return () => clearTimeout(timer);
+    }
+  }, []);
 
   return (
     <div className="min-h-screen bg-[#faf6ef]">

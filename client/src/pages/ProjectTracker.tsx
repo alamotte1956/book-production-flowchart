@@ -15,7 +15,7 @@ import {
   CheckSquare, MessageSquare, Type, LayoutGrid, Eye, RefreshCw, ShieldCheck,
   ClipboardCheck, Barcode, Printer, Palette, BookCopy, Microscope,
   Warehouse, Truck, Megaphone, Headphones, TrendingUp, Globe,
-  Calendar, AlertTriangle, Clock, Download, ChevronsDown, ChevronsUp, Copy,
+  Calendar, AlertTriangle, Clock, Download, ChevronsDown, ChevronsUp, Copy, BarChart2,
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 import { useState, useMemo, useCallback, useRef } from "react";
@@ -343,7 +343,19 @@ function StepCard({
 
                   {/* Input slots */}
                   <div className="space-y-3">
-                    <h5 className="text-xs font-bold uppercase tracking-wider text-[#a89880]">Required Inputs</h5>
+                    <div className="flex items-center justify-between">
+                      <h5 className="text-xs font-bold uppercase tracking-wider text-[#a89880]">Required Inputs</h5>
+                      {!printMode && (
+                        <a
+                          href={`/resources#resources-${step.resourceSection}`}
+                          onClick={(e) => e.stopPropagation()}
+                          className="inline-flex items-center gap-1 text-xs text-[#c9a96e] hover:text-[#a07840] font-medium transition-colors"
+                        >
+                          <ExternalLink size={11} />
+                          View Resources
+                        </a>
+                      )}
+                    </div>
                     {step.inputs.map((input) => {
                       const key = `${step.id}:${input.name}`;
                       return (
@@ -507,6 +519,7 @@ export default function ProjectTracker() {
   const [, navigate] = useLocation();
   const { isAuthenticated, loading: authLoading } = useAuth();
   const [printMode, setPrintMode] = useState(false);
+  const [showNotes, setShowNotes] = useState(false);
 
   const duplicateMutation = trpc.project.duplicate.useMutation({
     onSuccess: (newProject) => {
@@ -657,6 +670,20 @@ export default function ProjectTracker() {
                 <Button
                   variant="ghost" size="sm"
                   className="text-[#c9a96e]/70 hover:text-[#c9a96e] hover:bg-[#c9a96e]/10"
+                  onClick={() => navigate(`/timeline/${projectId}`)}
+                >
+                  <BarChart2 size={16} />
+                  <span className="ml-1.5 text-xs hidden sm:inline">Timeline</span>
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>View Gantt timeline & dashboard</TooltipContent>
+            </Tooltip>
+
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button
+                  variant="ghost" size="sm"
+                  className="text-[#c9a96e]/70 hover:text-[#c9a96e] hover:bg-[#c9a96e]/10"
                   onClick={() => window.print()}
                 >
                   <Download size={16} />
@@ -667,6 +694,15 @@ export default function ProjectTracker() {
             </Tooltip>
           </div>
 
+          {/* Notes toggle */}
+          <button
+            onClick={() => setShowNotes(v => !v)}
+            className="hidden sm:flex items-center gap-1.5 text-xs text-[#c9a96e]/60 hover:text-[#c9a96e] transition-colors print:hidden"
+          >
+            <MessageSquare size={14} />
+            Notes
+          </button>
+
           <div className="text-right shrink-0">
             <span className="text-2xl font-bold text-[#c9a96e] print:text-[#3a2a1a]">{overallPct}%</span>
             <div className="w-32 mt-1">
@@ -676,6 +712,48 @@ export default function ProjectTracker() {
           </div>
         </div>
       </header>
+
+      {/* Notes Summary Panel */}
+      {showNotes && (() => {
+        const stepsWithNotes = phases.flatMap(p =>
+          p.steps
+            .filter(s => statusMap[s.id]?.notes)
+            .map(s => ({ phase: p, step: s, notes: statusMap[s.id]!.notes! }))
+        );
+        return (
+          <div className="bg-amber-50 border-b border-amber-200 print:hidden">
+            <div className="max-w-6xl mx-auto px-6 py-4">
+              <div className="flex items-center justify-between mb-3">
+                <h3 className="font-serif text-sm font-semibold text-[#3a2a1a] flex items-center gap-2">
+                  <MessageSquare size={14} className="text-[#c9a96e]" />
+                  Notes Summary ({stepsWithNotes.length} step{stepsWithNotes.length !== 1 ? "s" : ""})
+                </h3>
+                <button onClick={() => setShowNotes(false)} className="text-[#a89880] hover:text-[#5c3d2e]">
+                  <X size={14} />
+                </button>
+              </div>
+              {stepsWithNotes.length === 0 ? (
+                <p className="text-xs text-[#a89880] italic">No notes added to any steps yet. Expand a step and add notes to see them here.</p>
+              ) : (
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+                  {stepsWithNotes.map(({ phase, step, notes }) => (
+                    <div key={step.id} className="bg-white rounded-lg border border-amber-200 p-3">
+                      <div className="flex items-center gap-1.5 mb-1.5">
+                        <span
+                          className="w-4 h-4 rounded-full flex items-center justify-center text-[9px] font-bold text-white shrink-0"
+                          style={{ backgroundColor: phase.accentColor }}
+                        >{phase.number}</span>
+                        <span className="text-xs font-semibold text-[#3a2a1a] truncate">{step.title}</span>
+                      </div>
+                      <p className="text-xs text-[#5c3d2e] leading-relaxed line-clamp-3">{notes}</p>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          </div>
+        );
+      })()}
 
       {/* Overdue alert banner */}
       {overduePhases.length > 0 && !printMode && (

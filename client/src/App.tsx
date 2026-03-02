@@ -7,6 +7,7 @@ import { ThemeProvider } from "./contexts/ThemeContext";
 import Home from "./pages/Home";
 import ProjectTracker from "./pages/ProjectTracker";
 import Resources from "./pages/Resources";
+import Timeline from "./pages/Timeline";
 
 function Router() {
   return (
@@ -14,6 +15,7 @@ function Router() {
       <Route path={"/"} component={Home} />
       <Route path={"/project/:id"} component={ProjectTracker} />
       <Route path={"/resources"} component={Resources} />
+      <Route path={"/timeline/:id"} component={Timeline} />
       <Route path={"/404"} component={NotFound} />
       <Route component={NotFound} />
     </Switch>

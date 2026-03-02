@@ -207,6 +207,52 @@ export async function deleteUploadedFile(fileId: number): Promise<void> {
   await db.delete(uploadedFiles).where(eq(uploadedFiles.id, fileId));
 }
 
+// ─── Step date helpers ────────────────────────────────────────
+
+export async function upsertStepDates(
+  projectId: number,
+  stepId: string,
+  startDate?: number | null,
+  targetDate?: number | null
+): Promise<StepStatus> {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  const existing = await db.select().from(stepStatuses)
+    .where(and(eq(stepStatuses.projectId, projectId), eq(stepStatuses.stepId, stepId)))
+    .limit(1);
+
+  if (existing.length > 0) {
+    const updateSet: Record<string, unknown> = {};
+    if (startDate !== undefined) updateSet.startDate = startDate;
+    if (targetDate !== undefined) updateSet.targetDate = targetDate;
+    await db.update(stepStatuses).set(updateSet).where(eq(stepStatuses.id, existing[0].id));
+    const [updated] = await db.select().from(stepStatuses).where(eq(stepStatuses.id, existing[0].id));
+    return updated;
+  } else {
+    const [result] = await db.insert(stepStatuses).values({
+      projectId,
+      stepId,
+      status: "pending",
+      startDate: startDate ?? null,
+      targetDate: targetDate ?? null,
+    }).$returningId();
+    const [created] = await db.select().from(stepStatuses).where(eq(stepStatuses.id, result.id));
+    return created;
+  }
+}
+
+export async function updateProjectDeadline(
+  projectId: number,
+  productionDeadline: number | null
+): Promise<Project> {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  await db.update(projects).set({ productionDeadline }).where(eq(projects.id, projectId));
+  const [updated] = await db.select().from(projects).where(eq(projects.id, projectId));
+  return updated;
+}
+
 // ─── Phase due date helpers ────────────────────────────────────
 
 export async function getDueDatesByProject(projectId: number): Promise<PhaseDueDate[]> {

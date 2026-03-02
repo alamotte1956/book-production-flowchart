@@ -15,6 +15,8 @@ export interface Step {
   description: string;
   inputs: StepInput[];
   icon: string; // Lucide icon name
+  resourceSection: string; // anchor id on the /resources page
+  estimatedDays: number; // industry-standard estimated duration in business days
 }
 
 export interface Phase {
@@ -53,6 +55,8 @@ export const phases: Phase[] = [
           { name: "Author Expertise", description: "Subject matter knowledge, unique perspective, and platform" },
         ],
         icon: "Lightbulb",
+        resourceSection: "writing",
+        estimatedDays: 14,
       },
       {
         id: "writing",
@@ -65,6 +69,8 @@ export const phases: Phase[] = [
           { name: "Writing Tools", description: "Word processor, reference manager, and backup systems" },
         ],
         icon: "PenTool",
+        resourceSection: "writing",
+        estimatedDays: 180,
       },
       {
         id: "self-edit",
@@ -76,6 +82,8 @@ export const phases: Phase[] = [
           { name: "Craft Knowledge", description: "Understanding of pacing, dialogue, structure, and prose quality" },
         ],
         icon: "FileEdit",
+        resourceSection: "editorial",
+        estimatedDays: 30,
       },
     ],
   },
@@ -100,6 +108,8 @@ export const phases: Phase[] = [
           { name: "Author Platform Info", description: "Social media following, speaking engagements, and credentials" },
         ],
         icon: "Send",
+        resourceSection: "acquisitions",
+        estimatedDays: 10,
       },
       {
         id: "review",
@@ -112,6 +122,8 @@ export const phases: Phase[] = [
           { name: "Editorial Vision", description: "The editor's plan for developing and positioning the book" },
         ],
         icon: "Search",
+        resourceSection: "acquisitions",
+        estimatedDays: 90,
       },
       {
         id: "contract",
@@ -124,6 +136,8 @@ export const phases: Phase[] = [
           { name: "Delivery Deadlines", description: "Manuscript due dates and publication timeline" },
         ],
         icon: "FileSignature",
+        resourceSection: "acquisitions",
+        estimatedDays: 21,
       },
     ],
   },
@@ -149,6 +163,8 @@ export const phases: Phase[] = [
           { name: "Market Positioning", description: "How the book should be differentiated from competitors" },
         ],
         icon: "Layers",
+        resourceSection: "editorial",
+        estimatedDays: 30,
       },
       {
         id: "line-edit",
@@ -160,6 +176,8 @@ export const phases: Phase[] = [
           { name: "Voice & Tone Guidelines", description: "Parameters for maintaining the author's unique voice" },
         ],
         icon: "AlignLeft",
+        resourceSection: "editorial",
+        estimatedDays: 21,
       },
       {
         id: "copyedit",
@@ -172,6 +190,8 @@ export const phases: Phase[] = [
           { name: "Fact-Checking Resources", description: "Reference materials for verifying claims and details" },
         ],
         icon: "CheckSquare",
+        resourceSection: "editorial",
+        estimatedDays: 14,
       },
       {
         id: "author-review",
@@ -183,6 +203,8 @@ export const phases: Phase[] = [
           { name: "Editor Notes", description: "Queries and suggestions requiring author decisions" },
         ],
         icon: "MessageSquare",
+        resourceSection: "editorial",
+        estimatedDays: 14,
       },
     ],
   },
@@ -209,6 +231,8 @@ export const phases: Phase[] = [
           { name: "Margin & Spacing Specs", description: "Gutter, margins, leading, and paragraph spacing" },
         ],
         icon: "Type",
+        resourceSection: "design",
+        estimatedDays: 10,
       },
       {
         id: "cover-design",
@@ -222,6 +246,8 @@ export const phases: Phase[] = [
           { name: "Cover Art / Photography", description: "Commissioned illustrations, stock images, or photo shoots" },
         ],
         icon: "Image",
+        resourceSection: "design",
+        estimatedDays: 21,
       },
       {
         id: "typesetting",
@@ -234,6 +260,8 @@ export const phases: Phase[] = [
           { name: "Compositor Software", description: "InDesign, LaTeX, or other professional typesetting tools" },
         ],
         icon: "LayoutGrid",
+        resourceSection: "design",
+        estimatedDays: 14,
       },
     ],
   },
@@ -258,6 +286,8 @@ export const phases: Phase[] = [
           { name: "Designer Review", description: "Text designer's check for aesthetic and layout issues" },
         ],
         icon: "Eye",
+        resourceSection: "editorial",
+        estimatedDays: 14,
       },
       {
         id: "second-pass",
@@ -269,6 +299,8 @@ export const phases: Phase[] = [
           { name: "Proofreader Notes", description: "Second-round proofreading corrections" },
         ],
         icon: "RefreshCw",
+        resourceSection: "editorial",
+        estimatedDays: 7,
       },
       {
         id: "final-pass",
@@ -280,6 +312,8 @@ export const phases: Phase[] = [
           { name: "Final Quality Checklist", description: "Comprehensive review of all elements before print" },
         ],
         icon: "ShieldCheck",
+        resourceSection: "editorial",
+        estimatedDays: 5,
       },
     ],
   },
@@ -304,6 +338,8 @@ export const phases: Phase[] = [
           { name: "Paper Stock Selection", description: "Specific paper grade, weight, and finish chosen for the interior" },
         ],
         icon: "ClipboardCheck",
+        resourceSection: "preproduction",
+        estimatedDays: 3,
       },
       {
         id: "indexing",
@@ -315,6 +351,8 @@ export const phases: Phase[] = [
           { name: "Index Style Guide", description: "Format, depth, and cross-referencing conventions" },
         ],
         icon: "BookOpen",
+        resourceSection: "preproduction",
+        estimatedDays: 14,
       },
       {
         id: "isbn",
@@ -328,6 +366,8 @@ export const phases: Phase[] = [
           { name: "Publication Date", description: "Official on-sale date for coordinating distribution" },
         ],
         icon: "Barcode",
+        resourceSection: "preproduction",
+        estimatedDays: 3,
       },
     ],
   },
@@ -352,6 +392,8 @@ export const phases: Phase[] = [
           { name: "Print Run Size", description: "Number of copies to be manufactured" },
         ],
         icon: "FileText",
+        resourceSection: "production",
+        estimatedDays: 5,
       },
       {
         id: "printing",
@@ -364,6 +406,8 @@ export const phases: Phase[] = [
           { name: "Print Run Quantity", description: "Exact number of copies to produce" },
         ],
         icon: "Printer",
+        resourceSection: "production",
+        estimatedDays: 10,
       },
       {
         id: "cover-print",
@@ -376,6 +420,8 @@ export const phases: Phase[] = [
           { name: "Special Finishes", description: "Foil stamping, embossing, spot UV, or die-cut details" },
         ],
         icon: "Palette",
+        resourceSection: "production",
+        estimatedDays: 5,
       },
       {
         id: "binding",
@@ -387,6 +433,8 @@ export const phases: Phase[] = [
           { name: "Binding Method", description: "Perfect bound, case bound, saddle-stitched, or spiral" },
         ],
         icon: "BookCopy",
+        resourceSection: "production",
+        estimatedDays: 5,
       },
       {
         id: "quality",
@@ -398,6 +446,8 @@ export const phases: Phase[] = [
           { name: "Color Proofs", description: "Original approved proofs for comparison" },
         ],
         icon: "Microscope",
+        resourceSection: "production",
+        estimatedDays: 3,
       },
     ],
   },
@@ -421,6 +471,8 @@ export const phases: Phase[] = [
           { name: "Storage Location", description: "Designated warehouse space with climate control" },
         ],
         icon: "Warehouse",
+        resourceSection: "marketing",
+        estimatedDays: 7,
       },
       {
         id: "distribute",
@@ -432,6 +484,8 @@ export const phases: Phase[] = [
           { name: "Shipping Logistics", description: "Freight scheduling, routing, and delivery timelines" },
         ],
         icon: "Truck",
+        resourceSection: "marketing",
+        estimatedDays: 14,
       },
       {
         id: "marketing",
@@ -445,6 +499,8 @@ export const phases: Phase[] = [
           { name: "Author Events", description: "Book signings, readings, interviews, and festival appearances" },
         ],
         icon: "Megaphone",
+        resourceSection: "marketing",
+        estimatedDays: 60,
       },
       {
         id: "digital",
@@ -456,6 +512,8 @@ export const phases: Phase[] = [
           { name: "Audio Narration", description: "Voice actor selection, recording, and post-production" },
         ],
         icon: "Headphones",
+        resourceSection: "production",
+        estimatedDays: 30,
       },
     ],
   },
@@ -479,6 +537,8 @@ export const phases: Phase[] = [
           { name: "Reprint Decisions", description: "Print quantity, timing, and any corrections to incorporate" },
         ],
         icon: "TrendingUp",
+        resourceSection: "postpublication",
+        estimatedDays: 90,
       },
       {
         id: "rights",
@@ -490,6 +550,8 @@ export const phases: Phase[] = [
           { name: "Adaptation Offers", description: "Film, TV, audio drama, or other media adaptation proposals" },
         ],
         icon: "Globe",
+        resourceSection: "postpublication",
+        estimatedDays: 180,
       },
     ],
   },

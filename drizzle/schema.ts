@@ -20,6 +20,7 @@ export type InsertUser = typeof users.$inferInsert;
 
 /**
  * A book project — each user can have multiple book projects.
+ * productionDeadline is stored as a bigint (Unix timestamp ms) for timezone-safe handling.
  */
 export const projects = mysqlTable("projects", {
   id: int("id").autoincrement().primaryKey(),
@@ -28,6 +29,7 @@ export const projects = mysqlTable("projects", {
   author: varchar("author", { length: 255 }),
   genre: varchar("genre", { length: 128 }),
   notes: text("notes"),
+  productionDeadline: bigint("productionDeadline", { mode: "number" }), // Unix timestamp ms
   createdAt: timestamp("createdAt").defaultNow().notNull(),
   updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
 });
@@ -37,6 +39,7 @@ export type InsertProject = typeof projects.$inferInsert;
 
 /**
  * Tracks the status of each step within a project.
+ * startDate and targetDate are stored as bigint (Unix timestamp ms).
  */
 export const stepStatuses = mysqlTable("step_statuses", {
   id: int("id").autoincrement().primaryKey(),
@@ -44,6 +47,8 @@ export const stepStatuses = mysqlTable("step_statuses", {
   stepId: varchar("stepId", { length: 64 }).notNull(),
   status: mysqlEnum("status", ["pending", "complete", "skipped"]).default("pending").notNull(),
   notes: text("notes"),
+  startDate: bigint("startDate", { mode: "number" }),    // Unix timestamp ms
+  targetDate: bigint("targetDate", { mode: "number" }),  // Unix timestamp ms
   completedAt: timestamp("completedAt"),
   updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
 });
@@ -73,7 +78,7 @@ export type InsertUploadedFile = typeof uploadedFiles.$inferInsert;
 /**
  * Due dates per phase within a project.
  * phaseId matches the phase.id from the flowchart data (e.g., "concept", "acquisitions").
- * dueDate is stored as a bigint (Unix timestamp in ms) for timezone-safe handling.
+ * dueDate is stored as a bigint (Unix timestamp ms) for timezone-safe handling.
  */
 export const phaseDueDates = mysqlTable("phase_due_dates", {
   id: int("id").autoincrement().primaryKey(),

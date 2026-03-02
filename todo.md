@@ -48,3 +48,22 @@
 - [x] Build a Resources page with curated links organized by production phase (8 categories, 43 resources)
 - [x] Add industry stats section to landing page + Resources teaser block + header nav link
 - [x] Test and checkpoint (17/17 tests pass)
+
+## Phase 10: Step-to-Resources Deep Links
+- [x] Map each of the 30 flowchart steps to its Resources page section anchor
+- [x] Add a "Resources" link button inside each expanded step card
+- [x] Ensure the Resources page section anchors match the link targets
+- [x] Add hash-based scroll-to-section on Resources page
+
+## Phase 11: Timing & Organization Upgrade
+- [x] Add estimated duration (days) to each step in flowchartData.ts
+- [x] Extend step_status table with startDate and targetDate columns
+- [x] Extend projects table with productionDeadline column
+- [x] Add step.setDates and project_deadline.set tRPC endpoints
+- [x] Build Gantt-style timeline view page (/timeline/:id)
+- [x] Build compact project dashboard table (all steps, phases, status, dates)
+- [x] Add notes summary panel (collapsible, shows all step notes in grid)
+- [x] Add production deadline to Timeline page header with risk warnings
+- [x] Add schedule risk warnings (overdue/due-soon/on-track) per step
+- [x] Add Timeline button to project tracker header
+- [x] Write vitest tests for step.setDates and project_deadline.set (23 total pass)
