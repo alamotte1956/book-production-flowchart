@@ -211,7 +211,7 @@ export default function PublishingWizard({ onComplete, onSkip, initialAnswers }:
               alt="Create Design Publish LLC"
               className="w-7 h-7 rounded-md object-cover"
             />
-            <span className="font-serif text-lg text-[#5c3d2e]">The Bookmaker's Journey</span>
+            <span className="font-serif text-lg text-[#5c3d2e]">Create Design Publish LLC</span>
           </div>
           <h1 className="font-serif text-3xl md:text-4xl text-[#2c1a00] leading-tight">
             Let's Publish Your Book

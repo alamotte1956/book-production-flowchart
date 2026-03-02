@@ -426,3 +426,6 @@
 - [ ] Add server endpoint: wizard.getAnswers query
 - [ ] Register /guided-journey route in App.tsx
 - [ ] Show personalized greeting on GuidedJourney page based on answers
+
+## Phase 41: Rebrand to Create Design Publish LLC
+- [ ] Replace all "The Bookmaker's Journey" with "Create Design Publish LLC" across all files

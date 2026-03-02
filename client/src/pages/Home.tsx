@@ -1,5 +1,5 @@
 /**
- * Home Page — The Bookmaker's Journey
+ * Home Page — Create Design Publish LLC
  * Authenticated: Publisher Command Center dashboard
  * Unauthenticated: Artisan storybook landing page
  */
@@ -48,7 +48,7 @@ const features = [
   { icon: Clock, title: "Set Due Dates", desc: "Add target dates per phase and get alerts when deadlines approach." },
 ];
 
-const PAGE_TITLE = "Book Production Tracker — The Bookmaker's Journey";
+const PAGE_TITLE = "Book Production Tracker — Create Design Publish LLC";
 const PAGE_DESCRIPTION = "Track every step of your book's production — from manuscript to published title — with file uploads, due dates, AI typesetting, and a Gantt timeline.";
 const PAGE_KEYWORDS = "book production tracker, publishing workflow, manuscript to print, Bible design studio, AI typesetting, book project management";
 
@@ -67,7 +67,7 @@ const SITE_URL = "https://booksrus.manus.space";
 const jsonLdSoftwareApp = {
   "@context": "https://schema.org",
   "@type": "SoftwareApplication",
-  "name": "The Bookmaker's Journey",
+  "name": "Create Design Publish LLC",
   "url": SITE_URL,
   "description": PAGE_DESCRIPTION,
   "applicationCategory": "ProductivityApplication",
@@ -89,7 +89,7 @@ const jsonLdSoftwareApp = {
 const jsonLdWebSite = {
   "@context": "https://schema.org",
   "@type": "WebSite",
-  "name": "The Bookmaker's Journey",
+  "name": "Create Design Publish LLC",
   "url": SITE_URL,
   "description": PAGE_DESCRIPTION,
   "potentialAction": {
@@ -280,7 +280,7 @@ export default function Home() {
                 <div className="h-px w-16 bg-[#c9a96e]/60" />
               </div>
               <h1 className="font-serif text-5xl md:text-7xl text-[#f5efe0] leading-tight tracking-tight">
-                The Bookmaker's<br />Journey
+                Create Design<br /><span className="text-[#c9a96e]">Publish LLC</span>
               </h1>
               <p className="mt-6 font-sans text-lg md:text-xl text-[#d4c8b4] max-w-xl mx-auto leading-relaxed">
                 A creator, designer, and publisher's dream platform. Track every step of your book's production — from first idea to finished volume.
@@ -481,7 +481,7 @@ export default function Home() {
                 className="w-9 h-9 rounded-lg object-cover"
               />
               <div>
-                <h1 className="font-serif text-lg leading-tight text-[#f5efe0]">The Bookmaker's Journey</h1>
+                <h1 className="font-serif text-lg leading-tight text-[#f5efe0]">Create Design Publish LLC</h1>
                 <p className="text-[10px] text-[#c9a96e]/50 uppercase tracking-widest">Create Design Publish LLC</p>
               </div>
             </div>
@@ -508,11 +508,7 @@ export default function Home() {
           </nav>
 
           <div className="flex items-center gap-3">
-            <div className="text-right hidden sm:block">
-              <p className="text-sm text-[#f5efe0] font-medium">{user?.name || user?.email}</p>
-              <p className="text-[10px] text-[#c9a96e]/40">Publisher</p>
-            </div>
-            <div className="w-8 h-8 rounded-full bg-[#c9a96e]/20 flex items-center justify-center">
+            <div className="w-8 h-8 rounded-full bg-[#c9a96e]/20 flex items-center justify-center" title={user?.name || user?.email || "Account"}>
               <span className="text-sm font-bold text-[#c9a96e]">
                 {(user?.name || user?.email || "?")[0].toUpperCase()}
               </span>
