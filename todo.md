@@ -342,3 +342,19 @@
 
 ## Phase 32: SEO Fixes
 - [x] Reduce meta keywords on home page (/) from 9 to 3-8 focused keywords
+
+## Phase 33: Public Domain Translations
+- [x] Add KJV + Apocrypha to BIBLE_TRANSLATIONS in shared/bibleSpecs.ts
+- [x] Add ASV (American Standard Version 1901) to BIBLE_TRANSLATIONS
+- [x] Add WEB variants (WEB Catholic, WEBBE, World Messianic Bible) to BIBLE_TRANSLATIONS
+- [x] Add BSB (Berean Standard Bible) to BIBLE_TRANSLATIONS
+- [x] Add OEB (Open English Bible) to BIBLE_TRANSLATIONS
+- [x] Add DRA (Douay-Rheims 1899) to BIBLE_TRANSLATIONS
+- [x] Add GNV (Geneva Bible 1599) to BIBLE_TRANSLATIONS
+- [x] Add YLT (Young's Literal Translation) to BIBLE_TRANSLATIONS
+- [x] Add DARBY (Darby Translation) to BIBLE_TRANSLATIONS
+- [x] Add Webster Bible to BIBLE_TRANSLATIONS
+- [x] Add Brenton English Septuagint to BIBLE_TRANSLATIONS
+- [x] Add publicDomain and ukRestriction fields to BibleTranslation type
+- [x] Group translations in Bible Studio UI: Public Domain / Licensed / Custom
+- [x] Show Public Domain, UK Restriction, and Licensed badges on translation cards

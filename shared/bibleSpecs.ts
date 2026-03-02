@@ -72,6 +72,8 @@ export type BibleTranslation = {
   id: string;
   label: string;
   fullName: string;
+  publicDomain?: boolean; // true = no license required for commercial publishing
+  ukRestriction?: boolean; // true = Crown copyright applies in the United Kingdom
 };
 
 export type BindingType = {
@@ -685,20 +687,37 @@ export const BIBLE_EDITION_TYPES: BibleEditionType[] = [
 // ─── Bible Translations ───────────────────────────────────────────────────────
 
 export const BIBLE_TRANSLATIONS: BibleTranslation[] = [
-  { id: "kjv", label: "KJV", fullName: "King James Version (1611)" },
-  { id: "nkjv", label: "NKJV", fullName: "New King James Version" },
-  { id: "niv", label: "NIV", fullName: "New International Version" },
-  { id: "esv", label: "ESV", fullName: "English Standard Version" },
-  { id: "nlt", label: "NLT", fullName: "New Living Translation" },
-  { id: "nasb", label: "NASB", fullName: "New American Standard Bible" },
+  // ── Public Domain Translations ──────────────────────────────────────────────
+  { id: "kjv",         label: "KJV",          fullName: "King James Version (1769)",                             publicDomain: true, ukRestriction: true },
+  { id: "kjv-apocrypha", label: "KJV + Apocrypha", fullName: "King James Version with Apocrypha / Deuterocanon",  publicDomain: true, ukRestriction: true },
+  { id: "asv",         label: "ASV",          fullName: "American Standard Version (1901)",                       publicDomain: true },
+  { id: "web",         label: "WEB",          fullName: "World English Bible (Public Domain)",                    publicDomain: true },
+  { id: "web-catholic",label: "WEB Catholic", fullName: "World English Bible with Deuterocanon (Catholic)",       publicDomain: true },
+  { id: "webbe",       label: "WEBBE",        fullName: "World English Bible British Edition",                    publicDomain: true },
+  { id: "wmb",         label: "WMB",          fullName: "World Messianic Bible",                                  publicDomain: true },
+  { id: "bsb",         label: "BSB",          fullName: "Berean Standard Bible (2020)",                          publicDomain: true },
+  { id: "oeb-us",      label: "OEB",          fullName: "Open English Bible — US Spelling (CC0)",                publicDomain: true },
+  { id: "oeb-cw",      label: "OEB Commonwealth", fullName: "Open English Bible — Commonwealth Spelling (CC0)",  publicDomain: true },
+  { id: "dra",         label: "DRA",          fullName: "Douay-Rheims 1899 American Edition (Catholic)",          publicDomain: true },
+  { id: "gnv",         label: "GNV",          fullName: "Geneva Bible (1599)",                                   publicDomain: true },
+  { id: "ylt",         label: "YLT",          fullName: "Young's Literal Translation (1898)",                    publicDomain: true },
+  { id: "darby",       label: "DARBY",        fullName: "Darby Translation (1884)",                              publicDomain: true },
+  { id: "webster",     label: "Webster",      fullName: "Webster Bible (1833)",                                  publicDomain: true },
+  { id: "brenton",     label: "Brenton LXX",  fullName: "Brenton English Septuagint (1851)",                     publicDomain: true },
+  // ── Licensed Translations (require rights agreement) ────────────────────────
+  { id: "nkjv",  label: "NKJV",   fullName: "New King James Version" },
+  { id: "niv",   label: "NIV",    fullName: "New International Version" },
+  { id: "esv",   label: "ESV",    fullName: "English Standard Version" },
+  { id: "nlt",   label: "NLT",    fullName: "New Living Translation" },
+  { id: "nasb",  label: "NASB",   fullName: "New American Standard Bible" },
   { id: "nasb2020", label: "NASB 2020", fullName: "New American Standard Bible (2020 Update)" },
-  { id: "isv", label: "ISV", fullName: "International Standard Version" },
-  { id: "csb", label: "CSB", fullName: "Christian Standard Bible" },
-  { id: "amp", label: "AMP", fullName: "Amplified Bible" },
-  { id: "msg", label: "MSG", fullName: "The Message (Eugene Peterson)" },
-  { id: "nrsv", label: "NRSV", fullName: "New Revised Standard Version" },
-  { id: "niv-uk", label: "NIVUK", fullName: "New International Version (UK)" },
-  { id: "web", label: "WEB", fullName: "World English Bible (Public Domain)" },
+  { id: "isv",   label: "ISV",    fullName: "International Standard Version" },
+  { id: "csb",   label: "CSB",    fullName: "Christian Standard Bible" },
+  { id: "amp",   label: "AMP",    fullName: "Amplified Bible" },
+  { id: "msg",   label: "MSG",    fullName: "The Message (Eugene Peterson)" },
+  { id: "nrsv",  label: "NRSV",   fullName: "New Revised Standard Version" },
+  { id: "niv-uk",label: "NIVUK",  fullName: "New International Version (UK)" },
+  // ── Custom ───────────────────────────────────────────────────────────────────
   { id: "custom", label: "Custom / Other", fullName: "Custom translation or paraphrase" },
 ];
 

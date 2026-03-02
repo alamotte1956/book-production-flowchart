@@ -705,17 +705,57 @@ export default function BibleStudio() {
             {/* Step 2: Translation */}
             <section>
               <SectionHeader step={2} title="Translation / Version" subtitle="Select the Bible translation or enter a custom version" />
-              <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
-                {BIBLE_TRANSLATIONS.map(t => (
-                  <OptionCard
-                    key={t.id}
-                    selected={config.translationId === t.id}
-                    onClick={() => set("translationId", t.id)}
-                    title={t.label}
-                    subtitle={t.fullName}
-                    badge={t.id === "kjv" ? "Public Domain" : t.id === "web" ? "Public Domain" : undefined}
-                  />
-                ))}
+              {/* Public Domain group */}
+              <div className="mb-3">
+                <p className="text-xs font-semibold text-[#4a7c59] uppercase tracking-wider mb-2 flex items-center gap-1.5">
+                  <span className="inline-block w-2 h-2 rounded-full bg-[#4a7c59]" />
+                  Public Domain — no license required
+                </p>
+                <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+                  {BIBLE_TRANSLATIONS.filter(t => t.publicDomain).map(t => (
+                    <OptionCard
+                      key={t.id}
+                      selected={config.translationId === t.id}
+                      onClick={() => set("translationId", t.id)}
+                      title={t.label}
+                      subtitle={t.fullName}
+                      badge={t.ukRestriction ? "UK Restriction" : "Public Domain"}
+                    />
+                  ))}
+                </div>
+              </div>
+              {/* Licensed group */}
+              <div className="mb-3">
+                <p className="text-xs font-semibold text-[#c0392b] uppercase tracking-wider mb-2 flex items-center gap-1.5">
+                  <span className="inline-block w-2 h-2 rounded-full bg-[#c0392b]" />
+                  Licensed — rights agreement required
+                </p>
+                <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+                  {BIBLE_TRANSLATIONS.filter(t => !t.publicDomain && t.id !== "custom").map(t => (
+                    <OptionCard
+                      key={t.id}
+                      selected={config.translationId === t.id}
+                      onClick={() => set("translationId", t.id)}
+                      title={t.label}
+                      subtitle={t.fullName}
+                      badge="Licensed"
+                    />
+                  ))}
+                </div>
+              </div>
+              {/* Custom */}
+              <div>
+                <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+                  {BIBLE_TRANSLATIONS.filter(t => t.id === "custom").map(t => (
+                    <OptionCard
+                      key={t.id}
+                      selected={config.translationId === t.id}
+                      onClick={() => set("translationId", t.id)}
+                      title={t.label}
+                      subtitle={t.fullName}
+                    />
+                  ))}
+                </div>
               </div>
             </section>
 
