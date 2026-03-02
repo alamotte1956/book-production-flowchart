@@ -289,7 +289,13 @@ export default function Home() {
               >
                 Create Design{" "}<span style={{ color: "#f5d98a", textShadow: "0 0 40px rgba(245,217,138,0.6)" }}>Publish LLC</span>
               </h1>
-              <p className="mt-6 font-sans text-lg md:text-xl text-[#d4c8b4] max-w-xl mx-auto leading-relaxed">
+              <p
+                className="mt-4 font-serif text-xl md:text-2xl tracking-widest uppercase"
+                style={{ color: "#c9a96e", letterSpacing: "0.18em", textShadow: "0 0 20px rgba(201,169,110,0.4)" }}
+              >
+                From Manuscript to Masterpiece
+              </p>
+              <p className="mt-5 font-sans text-lg md:text-xl text-[#d4c8b4] max-w-xl mx-auto leading-relaxed">
                 A creator, designer, and publisher's dream platform. Track every step of your book's production — from first idea to finished volume.
               </p>
               <div className="mt-8 flex items-center justify-center gap-8 text-[#c9a96e]/80 font-serif text-lg">

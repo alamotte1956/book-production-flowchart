@@ -449,3 +449,6 @@
 
 ## Phase 47: One-Line Hero Title
 - [x] Remove line break from landing page hero title — now reads on one line (whitespace-nowrap, text-4xl/text-6xl/text-7xl)
+
+## Phase 48: Company Tagline
+- [x] Add "From Manuscript to Masterpiece" tagline below hero title on landing page (gold serif, spaced uppercase, glow)
