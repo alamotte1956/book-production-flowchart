@@ -435,6 +435,7 @@ export const appRouter = router({
         projectId: z.number(),
         trimSizeId: z.string(),
         styleId: z.string(),
+        outputFormat: z.enum(["both", "pdf", "epub"]).default("both"),
         fileName: z.string(),
         mimeType: z.string(),
         fileBase64: z.string(),
@@ -460,6 +461,7 @@ export const appRouter = router({
           manuscriptFileName: input.fileName,
           manuscriptFileKey: manuscriptKey,
         });
+        const outputFormat = input.outputFormat ?? "both";
 
         // Run the pipeline asynchronously (fire and forget with error capture)
         (async () => {
@@ -487,21 +489,25 @@ export const appRouter = router({
               chapterCount,
             });
 
-            // Upload PDF
-            const pdfKey = `output/${input.projectId}/${job.id}-interior.pdf`;
-            const { url: pdfUrl } = await storagePut(pdfKey, pdfBuffer, "application/pdf");
+            const updates: Record<string, unknown> = { status: "complete" };
 
-            // Upload EPUB
-            const epubKey = `output/${input.projectId}/${job.id}-ebook.epub`;
-            const { url: epubUrl } = await storagePut(epubKey, epubBuffer, "application/epub+zip");
+            // Upload PDF if requested
+            if (outputFormat === "both" || outputFormat === "pdf") {
+              const pdfKey = `output/${input.projectId}/${job.id}-interior.pdf`;
+              const { url: pdfUrl } = await storagePut(pdfKey, pdfBuffer, "application/pdf");
+              updates.pdfUrl = pdfUrl;
+              updates.pdfKey = pdfKey;
+            }
 
-            await updateProductionJob(job.id, {
-              status: "complete",
-              pdfUrl,
-              pdfKey,
-              epubUrl,
-              epubKey,
-            });
+            // Upload EPUB if requested
+            if (outputFormat === "both" || outputFormat === "epub") {
+              const epubKey = `output/${input.projectId}/${job.id}-ebook.epub`;
+              const { url: epubUrl } = await storagePut(epubKey, epubBuffer, "application/epub+zip");
+              updates.epubUrl = epubUrl;
+              updates.epubKey = epubKey;
+            }
+
+            await updateProductionJob(job.id, updates);
           } catch (err: unknown) {
             const msg = err instanceof Error ? err.message : String(err);
             console.error(`[AutoProduce] Job ${job.id} failed:`, msg);

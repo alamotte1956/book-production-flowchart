@@ -7,6 +7,7 @@ import { Progress } from "@/components/ui/progress";
 import { Textarea } from "@/components/ui/textarea";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { toast } from "sonner";
 import {
   BookOpen, ArrowLeft, Check, SkipForward, Upload, X, FileText, Image,
@@ -290,31 +291,40 @@ function StepCard({
                 <div className="px-5 pb-5 space-y-4">
                   <p className="text-sm text-[#8b7b6b] leading-relaxed">{step.description}</p>
 
-                  {/* Action buttons — hidden in print mode */}
+                  {/* Status dropdown + notes toggle — hidden in print mode */}
                   {!printMode && (
                     <div className="flex items-center gap-2 flex-wrap print:hidden" onClick={(e) => e.stopPropagation()}>
-                      {status !== "complete" && (
-                        <Button size="sm" className="bg-[#4a6741] hover:bg-[#3a5731] text-white"
-                          onClick={(e) => { e.stopPropagation(); handleStatusChange("complete"); }}
-                          disabled={updateMutation.isPending}>
-                          <Check size={14} className="mr-1.5" /> Mark Complete
-                        </Button>
-                      )}
-                      {status !== "skipped" && (
-                        <Button size="sm" variant="outline" className="border-gray-300 text-gray-500 hover:bg-gray-100"
-                          onClick={(e) => { e.stopPropagation(); handleStatusChange("skipped"); }}
-                          disabled={updateMutation.isPending}>
-                          <SkipForward size={14} className="mr-1.5" /> Skip
-                        </Button>
-                      )}
-                      {status !== "pending" && (
-                        <Button size="sm" variant="outline" className="border-[#c9a96e]/40 text-[#8b7b6b]"
-                          onClick={(e) => { e.stopPropagation(); handleStatusChange("pending"); }}
-                          disabled={updateMutation.isPending}>
-                          Reset to Pending
-                        </Button>
-                      )}
-                      <Button size="sm" variant="ghost" className="text-[#8b7b6b]"
+                      <Select
+                        value={status}
+                        onValueChange={(val) => handleStatusChange(val as StepStatusType)}
+                        disabled={updateMutation.isPending}
+                      >
+                        <SelectTrigger
+                          className={`w-40 h-8 text-xs font-medium border ${
+                            status === "complete"
+                              ? "border-[#4a6741]/40 bg-[#f0faf2] text-[#2d4a3e]"
+                              : status === "skipped"
+                              ? "border-gray-300 bg-gray-50 text-gray-500"
+                              : "border-[#c9a96e]/40 bg-[#fdf9f3] text-[#8b7b6b]"
+                          }`}
+                          onClick={(e) => e.stopPropagation()}
+                        >
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent onClick={(e) => e.stopPropagation()}>
+                          <SelectItem value="pending">
+                            <span className="flex items-center gap-1.5"><Clock size={12} className="text-[#a89880]" /> Pending</span>
+                          </SelectItem>
+                          <SelectItem value="complete">
+                            <span className="flex items-center gap-1.5"><Check size={12} className="text-[#4a6741]" /> Complete</span>
+                          </SelectItem>
+                          <SelectItem value="skipped">
+                            <span className="flex items-center gap-1.5"><SkipForward size={12} className="text-gray-400" /> Skipped</span>
+                          </SelectItem>
+                        </SelectContent>
+                      </Select>
+                      {updateMutation.isPending && <Loader2 size={14} className="animate-spin text-[#c9a96e]" />}
+                      <Button size="sm" variant="ghost" className="text-[#8b7b6b] h-8 text-xs"
                         onClick={(e) => { e.stopPropagation(); setShowNotes(!showNotes); }}>
                         {showNotes ? "Hide Notes" : "Add Notes"}
                       </Button>

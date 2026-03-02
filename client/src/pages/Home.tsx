@@ -13,6 +13,7 @@ import {
   Upload, CheckCircle2, SkipForward, Clock, Sparkles, Copy,
 } from "lucide-react";
 import { useState, useMemo, useEffect } from "react";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useLocation } from "wouter";
 import { motion } from "framer-motion";
 import { phases } from "@/data/flowchartData";
@@ -21,6 +22,29 @@ const HERO_URL = "https://d2xsxph8kpxj0f.cloudfront.net/310519663211654017/kGjPj
 
 const totalSteps = phases.reduce((acc, p) => acc + p.steps.length, 0);
 const totalInputs = phases.reduce((acc, p) => acc + p.steps.reduce((a, s) => a + s.inputs.length, 0), 0);
+
+const GENRES = [
+  "Literary Fiction",
+  "Commercial Fiction",
+  "Mystery / Thriller",
+  "Science Fiction",
+  "Fantasy",
+  "Romance",
+  "Historical Fiction",
+  "Horror",
+  "Young Adult",
+  "Middle Grade",
+  "Children's",
+  "Narrative Nonfiction",
+  "Memoir / Autobiography",
+  "Self-Help / Personal Development",
+  "Business / Finance",
+  "Academic / Textbook",
+  "Poetry",
+  "Graphic Novel",
+  "Short Story Collection",
+  "Other",
+];
 
 const features = [
   { icon: Upload, title: "Upload Real Documents", desc: "Attach manuscripts, contracts, cover art, and proofs at every step." },
@@ -43,16 +67,95 @@ function setMetaTag(name: string, content: string) {
   el.setAttribute("content", content);
 }
 
+const SITE_URL = "https://booksrus.manus.space";
+
+// JSON-LD: SoftwareApplication schema
+const jsonLdSoftwareApp = {
+  "@context": "https://schema.org",
+  "@type": "SoftwareApplication",
+  "name": "The Bookmaker's Journey",
+  "url": SITE_URL,
+  "description": PAGE_DESCRIPTION,
+  "applicationCategory": "ProductivityApplication",
+  "operatingSystem": "Web",
+  "offers": {
+    "@type": "Offer",
+    "price": "0",
+    "priceCurrency": "USD"
+  },
+  "featureList": [
+    "30-step book production workflow",
+    "File uploads per step (manuscripts, contracts, cover art)",
+    "Gantt timeline with per-step due dates",
+    "AI-powered typesetting and PDF/EPUB generation",
+    "Resources & Success Hub with 43 curated publishing tools"
+  ],
+  "screenshot": HERO_URL,
+  "creator": {
+    "@type": "Organization",
+    "name": "Create Design Publish LLC",
+    "url": SITE_URL
+  }
+};
+
+// JSON-LD: WebSite schema with SearchAction for sitelinks search box
+const jsonLdWebSite = {
+  "@context": "https://schema.org",
+  "@type": "WebSite",
+  "name": "The Bookmaker's Journey",
+  "url": SITE_URL,
+  "description": PAGE_DESCRIPTION,
+  "potentialAction": {
+    "@type": "SearchAction",
+    "target": {
+      "@type": "EntryPoint",
+      "urlTemplate": `${SITE_URL}/resources?q={search_term_string}`
+    },
+    "query-input": "required name=search_term_string"
+  }
+};
+
+// JSON-LD: Organization schema for brand identity
+const jsonLdOrganization = {
+  "@context": "https://schema.org",
+  "@type": "Organization",
+  "name": "Create Design Publish LLC",
+  "url": SITE_URL,
+  "logo": `${SITE_URL}/favicon.ico`,
+  "sameAs": [SITE_URL],
+  "description": "Create Design Publish LLC builds tools for independent authors and small publishers to manage every step of the book production process."
+};
+
+function injectJsonLd(id: string, data: object) {
+  let el = document.getElementById(id) as HTMLScriptElement | null;
+  if (!el) {
+    el = document.createElement("script");
+    el.id = id;
+    el.type = "application/ld+json";
+    document.head.appendChild(el);
+  }
+  el.textContent = JSON.stringify(data);
+}
+
 export default function Home() {
   const { user, isAuthenticated, loading: authLoading } = useAuth();
   const [, navigate] = useLocation();
   const [open, setOpen] = useState(false);
 
-  // SEO: set title and meta tags for the landing page
+  // SEO: set title, meta tags, and JSON-LD structured data for the landing page
   useEffect(() => {
     document.title = PAGE_TITLE;
     setMetaTag("description", PAGE_DESCRIPTION);
     setMetaTag("keywords", PAGE_KEYWORDS);
+    injectJsonLd("jsonld-software-app", jsonLdSoftwareApp);
+    injectJsonLd("jsonld-website", jsonLdWebSite);
+    injectJsonLd("jsonld-organization", jsonLdOrganization);
+    return () => {
+      // Clean up JSON-LD scripts when navigating away from the home page
+      ["jsonld-software-app", "jsonld-website", "jsonld-organization"].forEach(id => {
+        document.getElementById(id)?.remove();
+      });
+    };
   }, []);
   const [title, setTitle] = useState("");
   const [author, setAuthor] = useState("");
@@ -327,7 +430,16 @@ export default function Home() {
                   </div>
                   <div>
                     <Label className="text-[#5c3d2e] font-semibold">Genre</Label>
-                    <Input value={genre} onChange={e => setGenre(e.target.value)} placeholder="e.g., Literary Fiction" className="mt-1 border-[#d4c8b4]" />
+                    <Select value={genre} onValueChange={setGenre}>
+                      <SelectTrigger className="mt-1 border-[#d4c8b4] bg-white text-[#3a2a1a]">
+                        <SelectValue placeholder="Select genre…" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {GENRES.map(g => (
+                          <SelectItem key={g} value={g}>{g}</SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
                   </div>
                 </div>
                 <div>

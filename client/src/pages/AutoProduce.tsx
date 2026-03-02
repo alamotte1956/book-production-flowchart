@@ -324,6 +324,7 @@ export default function AutoProduce() {
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [trimSizeId, setTrimSizeId] = useState("");
   const [styleId, setStyleId] = useState("");
+  const [outputFormat, setOutputFormat] = useState<"both" | "pdf" | "epub">("both");
   const [isDragging, setIsDragging] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [previewOpen, setPreviewOpen] = useState(false);
@@ -370,6 +371,7 @@ export default function AutoProduce() {
         projectId,
         trimSizeId,
         styleId,
+        outputFormat,
         fileName: selectedFile.name,
         mimeType: selectedFile.type || "text/plain",
         fileBase64,
@@ -460,7 +462,7 @@ export default function AutoProduce() {
           </CardHeader>
           <CardContent className="space-y-6">
             {/* Configuration row */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
               <div className="space-y-1.5">
                 <label className="text-sm font-medium text-[#5c3d2e]">Trim Size</label>
                 <Select value={trimSizeId} onValueChange={setTrimSizeId}>
@@ -486,6 +488,25 @@ export default function AutoProduce() {
                     {options?.styles.map(s => (
                       <SelectItem key={s.id} value={s.id}>{s.label}</SelectItem>
                     ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="space-y-1.5">
+                <label className="text-sm font-medium text-[#5c3d2e]">Output Format</label>
+                <Select value={outputFormat} onValueChange={(v) => setOutputFormat(v as "both" | "pdf" | "epub")}>
+                  <SelectTrigger className="border-[#d4b896]/60 bg-[#fdf9f3] text-[#3d2b1f]">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="both">
+                      <span className="flex items-center gap-1.5"><FileDown className="w-3.5 h-3.5" /> Interior PDF + EPUB</span>
+                    </SelectItem>
+                    <SelectItem value="pdf">
+                      <span className="flex items-center gap-1.5"><FileText className="w-3.5 h-3.5" /> Interior PDF only</span>
+                    </SelectItem>
+                    <SelectItem value="epub">
+                      <span className="flex items-center gap-1.5"><BookOpen className="w-3.5 h-3.5" /> EPUB only</span>
+                    </SelectItem>
                   </SelectContent>
                 </Select>
               </div>

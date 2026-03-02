@@ -95,3 +95,14 @@
 - [x] Show sample content: chapter heading, body paragraph, drop cap, running header, page number
 - [x] Add "Looks good — continue" CTA inside the preview modal footer
 - [x] Write vitest tests for the preview endpoint (11 tests: all styles, all trim sizes, fallbacks, auth)
+
+## Phase 15: JSON-LD Structured Data
+- [x] Add SoftwareApplication JSON-LD schema to the home page (injected via script tag in useEffect)
+- [x] Add WebSite JSON-LD schema with SearchAction for sitelinks search box
+- [x] Add Organization JSON-LD schema for brand identity
+
+## Phase 16: Dropdowns for All Decision Areas
+- [x] Create Project dialog: convert genre free-text to dropdown with 20 preset genres
+- [x] Project Tracker: convert Complete/Skip/Pending buttons to a status dropdown per step
+- [x] Auto-Produce: add output format dropdown (Both PDF+EPUB / PDF only / EPUB only)
+- [x] Timeline page: due-date status is a visual indicator only (no user decision needed — kept as-is)
