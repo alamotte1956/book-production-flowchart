@@ -17,6 +17,7 @@ import { produceBook } from "./typesettingPipeline";
 import { TYPESETTING_STYLES, TRIM_SIZES, getTrimSize, getTypesettingStyle } from "./typesettingStyles";
 import { storagePut } from "./storage";
 import { generateIdml } from "./idmlGenerator";
+import { invokeLLM } from "./_core/llm";
 
 export const appRouter = router({
   system: systemRouter,
@@ -642,6 +643,46 @@ export const appRouter = router({
         })();
 
         return { jobId: job.id, status: "queued" };
+      }),
+  }),
+
+  // ─── AI Writing Assistant ─────────────────────────────────────────────────
+  ai: router({
+    generateCopy: protectedProcedure
+      .input(z.object({
+        type: z.enum(["back-cover-blurb", "author-bio", "catalog-description", "press-release", "marketing-email"]),
+        bookTitle: z.string().min(1).max(255),
+        author: z.string().max(255).optional(),
+        genre: z.string().max(128).optional(),
+        synopsis: z.string().max(2000).optional(),
+        tone: z.enum(["literary", "commercial", "academic", "inspirational", "devotional"]).optional(),
+        wordCount: z.number().min(50).max(800).optional(),
+      }))
+      .mutation(async ({ input }) => {
+        const typeLabels: Record<string, string> = {
+          "back-cover-blurb": "back-cover blurb",
+          "author-bio": "author biography",
+          "catalog-description": "library/bookstore catalog description",
+          "press-release": "press release",
+          "marketing-email": "marketing email",
+        };
+        const targetWords = input.wordCount ?? (input.type === "back-cover-blurb" ? 150 : input.type === "author-bio" ? 100 : 200);
+        const toneGuide = input.tone ? `Tone: ${input.tone}.` : "";
+        const synopsisLine = input.synopsis ? `\nSynopsis / Key details: ${input.synopsis}` : "";
+
+        const systemPrompt = `You are a professional publishing copywriter specializing in book marketing and editorial copy. Write compelling, polished text for publishers and authors. Output only the requested copy — no preamble, no labels, no meta-commentary.`;
+
+        const userPrompt = `Write a ${typeLabels[input.type]} for the following book:\n\nTitle: ${input.bookTitle}\nAuthor: ${input.author ?? "(not specified)"}\nGenre: ${input.genre ?? "(not specified)"}${synopsisLine}\n\n${toneGuide}\nTarget length: approximately ${targetWords} words.`;
+
+        const response = await invokeLLM({
+          messages: [
+            { role: "system", content: systemPrompt },
+            { role: "user", content: userPrompt },
+          ],
+        });
+
+        const content = response.choices?.[0]?.message?.content ?? "";
+        return { content, type: input.type };
       }),
   }),
 });

@@ -3,17 +3,23 @@
  * A comprehensive Bible edition configurator giving publishers complete freedom
  * to design any style of Bible — from compact pocket editions to giant-print
  * study Bibles with journaling margins, red-letter text, and full reference apparatus.
+ * Includes AI Writing Assistant for generating back-cover blurbs, author bios, and marketing copy.
  */
 import { useState, useMemo } from "react";
 import { useLocation } from "wouter";
-import { ArrowLeft, BookOpen, Printer, FileDown, ChevronRight, Info, Check, Sparkles } from "lucide-react";
+import { ArrowLeft, BookOpen, Printer, FileDown, ChevronRight, Info, Check, Sparkles, Wand2, Copy, RefreshCw, ChevronDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
+import { Textarea } from "@/components/ui/textarea";
+import { Input } from "@/components/ui/input";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { toast } from "sonner";
+import { trpc } from "@/lib/trpc";
 import {
   BIBLE_EDITION_TYPES,
   BIBLE_TRANSLATIONS,
@@ -36,7 +42,6 @@ interface BibleConfig {
   styleId: string;
   paperTypeId: string;
   bindingTypeId: string;
-  // Special features
   redLetter: boolean;
   crossReferences: boolean;
   centerColumnReferences: boolean;
@@ -234,6 +239,77 @@ function SpecSummary({ config }: { config: BibleConfig }) {
     config.twoColorPrinting && "Two-Color Printing",
   ].filter(Boolean) as string[];
 
+  const handleExportSpecSheet = () => {
+    const specHtml = `<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Bible Edition Spec Sheet</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: Georgia, serif; background: #fff; color: #1a1008; padding: 48px; max-width: 720px; margin: 0 auto; }
+    h1 { font-size: 24px; font-weight: bold; margin-bottom: 4px; }
+    .subtitle { font-size: 12px; color: #8b7b6b; letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 32px; }
+    .divider { border: none; border-top: 1px solid #c9a96e; margin: 20px 0; }
+    .section-title { font-size: 10px; font-weight: bold; text-transform: uppercase; letter-spacing: 0.1em; color: #8b5e3c; margin-bottom: 12px; }
+    .spec-row { display: flex; justify-content: space-between; padding: 6px 0; border-bottom: 1px solid #f0e8dc; font-size: 13px; }
+    .spec-label { color: #8b7b6b; }
+    .spec-value { font-weight: 600; text-align: right; }
+    .spine-value { color: #8b5e3c; font-size: 16px; font-weight: bold; }
+    .features { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
+    .feature-tag { background: #8b5e3c; color: white; font-size: 11px; padding: 3px 10px; border-radius: 20px; font-family: Arial, sans-serif; }
+    .footer { margin-top: 40px; font-size: 10px; color: #a89880; text-align: center; }
+    @media print {
+      body { padding: 32px; }
+      .no-print { display: none; }
+    }
+  </style>
+</head>
+<body>
+  <h1>Bible Edition Spec Sheet</h1>
+  <p class="subtitle">Create Design Publish LLC &mdash; ${new Date().toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" })}</p>
+  <hr class="divider">
+
+  <p class="section-title">Core Specifications</p>
+  <div class="spec-row"><span class="spec-label">Edition Type</span><span class="spec-value">${edition?.label ?? "—"}</span></div>
+  <div class="spec-row"><span class="spec-label">Translation</span><span class="spec-value">${translation?.label ?? "—"} ${translation?.fullName ? `(${translation.fullName})` : ""}</span></div>
+  <div class="spec-row"><span class="spec-label">Trim Size</span><span class="spec-value">${trim?.label ?? "—"}</span></div>
+  <div class="spec-row"><span class="spec-label">Typesetting Style</span><span class="spec-value">${style?.label ?? "—"}</span></div>
+  <div class="spec-row"><span class="spec-label">Paper Type</span><span class="spec-value">${paper?.label ?? "—"}</span></div>
+  <div class="spec-row"><span class="spec-label">Binding Type</span><span class="spec-value">${binding?.label ?? "—"}</span></div>
+
+  <hr class="divider">
+
+  <p class="section-title">Physical Dimensions</p>
+  <div class="spec-row"><span class="spec-label">Estimated Page Count</span><span class="spec-value">${config.pageCount.toLocaleString()} pp</span></div>
+  <div class="spec-row"><span class="spec-label">Calculated Spine Width</span><span class="spec-value spine-value">${spine.spineWidthIn.toFixed(3)}" / ${spine.spineWidthMm}mm</span></div>
+
+  ${activeFeatures.length > 0 ? `
+  <hr class="divider">
+  <p class="section-title">Active Features (${activeFeatures.length})</p>
+  <div class="features">
+    ${activeFeatures.map(f => `<span class="feature-tag">${f}</span>`).join("")}
+  </div>
+  ` : ""}
+
+  <hr class="divider">
+  <p class="section-title">Spine Calculation Notes</p>
+  <p style="font-size: 12px; color: #7a6050; line-height: 1.6;">${spine.notes}</p>
+
+  <div class="footer">
+    Generated by The Bookmaker's Journey &mdash; Create Design Publish LLC
+  </div>
+</body>
+</html>`;
+
+    const win = window.open("", "_blank");
+    if (win) {
+      win.document.write(specHtml);
+      win.document.close();
+      setTimeout(() => win.print(), 500);
+    }
+  };
+
   return (
     <div className="space-y-4">
       <div className="bg-[#2c1a00] rounded-xl p-5 text-white">
@@ -281,7 +357,7 @@ function SpecSummary({ config }: { config: BibleConfig }) {
 
       {activeFeatures.length > 0 && (
         <div className="bg-[#fdf5ec] rounded-xl p-4 border border-[#e8ddd0]">
-          <p className="text-xs font-semibold text-[#5c3d2e] uppercase tracking-wide mb-3">Active Features</p>
+          <p className="text-xs font-semibold text-[#5c3d2e] uppercase tracking-wide mb-3">Active Features ({activeFeatures.length})</p>
           <div className="flex flex-wrap gap-1.5">
             {activeFeatures.map(f => (
               <span key={f} className="text-xs bg-[#8b5e3c] text-white px-2 py-0.5 rounded-full">
@@ -296,6 +372,215 @@ function SpecSummary({ config }: { config: BibleConfig }) {
         <p className="text-xs font-semibold text-[#5c3d2e] uppercase tracking-wide mb-2">Spine Calculation</p>
         <p className="text-xs text-[#7a6050] leading-relaxed">{spine.notes}</p>
       </div>
+
+      <Button
+        className="w-full bg-[#8b5e3c] hover:bg-[#7a4f30] text-white gap-2"
+        onClick={() => window.location.href = "/auto-produce/0"}
+      >
+        <Sparkles className="w-4 h-4" />
+        Start Production with These Specs
+        <ChevronRight className="w-4 h-4 ml-auto" />
+      </Button>
+
+      <Button
+        variant="outline"
+        className="w-full border-[#c9a96e] text-[#5c3d2e] hover:bg-[#fdf5ec] gap-2"
+        onClick={() => window.location.href = "/spine-calculator"}
+      >
+        <Printer className="w-4 h-4" />
+        Open Spine Calculator
+      </Button>
+
+      <Button
+        variant="outline"
+        className="w-full border-[#c9a96e] text-[#5c3d2e] hover:bg-[#fdf5ec] gap-2"
+        onClick={handleExportSpecSheet}
+      >
+        <FileDown className="w-4 h-4" />
+        Export Spec Sheet (Print / PDF)
+      </Button>
+    </div>
+  );
+}
+
+// ─── AI Writing Assistant ─────────────────────────────────────────────────────
+
+const COPY_TYPES = [
+  { value: "back-cover-blurb", label: "Back-Cover Blurb", desc: "~150 words" },
+  { value: "author-bio", label: "Author Biography", desc: "~100 words" },
+  { value: "catalog-description", label: "Catalog Description", desc: "~200 words" },
+  { value: "press-release", label: "Press Release", desc: "~300 words" },
+  { value: "marketing-email", label: "Marketing Email", desc: "~250 words" },
+] as const;
+
+const TONES = [
+  { value: "literary", label: "Literary" },
+  { value: "commercial", label: "Commercial" },
+  { value: "academic", label: "Academic" },
+  { value: "inspirational", label: "Inspirational" },
+  { value: "devotional", label: "Devotional" },
+] as const;
+
+function AIWritingAssistant() {
+  const [bookTitle, setBookTitle] = useState("");
+  const [author, setAuthor] = useState("");
+  const [genre, setGenre] = useState("");
+  const [synopsis, setSynopsis] = useState("");
+  const [copyType, setCopyType] = useState<typeof COPY_TYPES[number]["value"]>("back-cover-blurb");
+  const [tone, setTone] = useState<typeof TONES[number]["value"]>("inspirational");
+  const [result, setResult] = useState("");
+  const [isOpen, setIsOpen] = useState(false);
+
+  const generateMutation = trpc.ai.generateCopy.useMutation({
+    onSuccess: (data) => {
+      setResult(typeof data.content === "string" ? data.content : "");
+    },
+    onError: (err) => {
+      toast.error("Failed to generate copy: " + err.message);
+    },
+  });
+
+  const handleGenerate = () => {
+    if (!bookTitle.trim()) {
+      toast.error("Please enter a book title.");
+      return;
+    }
+    generateMutation.mutate({
+      type: copyType,
+      bookTitle: bookTitle.trim(),
+      author: author.trim() || undefined,
+      genre: genre.trim() || undefined,
+      synopsis: synopsis.trim() || undefined,
+      tone,
+    });
+  };
+
+  const handleCopy = () => {
+    navigator.clipboard.writeText(result);
+    toast.success("Copied to clipboard!");
+  };
+
+  return (
+    <div className="bg-white rounded-xl border border-[#e8ddd0] overflow-hidden">
+      {/* Header — always visible */}
+      <button
+        className="w-full flex items-center justify-between p-4 hover:bg-[#fdf9f3] transition-colors"
+        onClick={() => setIsOpen(v => !v)}
+      >
+        <div className="flex items-center gap-3">
+          <div className="w-8 h-8 rounded-lg bg-purple-100 flex items-center justify-center">
+            <Wand2 size={16} className="text-purple-600" />
+          </div>
+          <div className="text-left">
+            <h3 className="text-sm font-semibold text-[#2c1a00]">AI Writing Assistant</h3>
+            <p className="text-[11px] text-[#8b7b6b]">Generate blurbs, bios, and marketing copy</p>
+          </div>
+        </div>
+        <ChevronDown size={16} className={`text-[#a08060] transition-transform ${isOpen ? "rotate-180" : ""}`} />
+      </button>
+
+      {isOpen && (
+        <div className="px-4 pb-4 border-t border-[#f0e8dc] pt-4 space-y-4">
+          {/* Copy type */}
+          <div>
+            <Label className="text-xs font-semibold text-[#5c3d2e] uppercase tracking-wide mb-2 block">Copy Type</Label>
+            <div className="grid grid-cols-1 gap-1.5">
+              {COPY_TYPES.map(ct => (
+                <button
+                  key={ct.value}
+                  onClick={() => setCopyType(ct.value)}
+                  className={`flex items-center justify-between px-3 py-2 rounded-lg border text-sm transition-all ${
+                    copyType === ct.value
+                      ? "border-purple-400 bg-purple-50 text-purple-800"
+                      : "border-[#e8ddd0] bg-white text-[#3d2b1f] hover:border-[#c9a96e]/60"
+                  }`}
+                >
+                  <span className="font-medium">{ct.label}</span>
+                  <span className="text-[10px] text-[#a08060]">{ct.desc}</span>
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* Book details */}
+          <div className="space-y-2">
+            <Label className="text-xs font-semibold text-[#5c3d2e] uppercase tracking-wide block">Book Details</Label>
+            <Input
+              value={bookTitle}
+              onChange={e => setBookTitle(e.target.value)}
+              placeholder="Book title *"
+              className="text-sm border-[#e8ddd0]"
+            />
+            <div className="grid grid-cols-2 gap-2">
+              <Input
+                value={author}
+                onChange={e => setAuthor(e.target.value)}
+                placeholder="Author name"
+                className="text-sm border-[#e8ddd0]"
+              />
+              <Input
+                value={genre}
+                onChange={e => setGenre(e.target.value)}
+                placeholder="Genre"
+                className="text-sm border-[#e8ddd0]"
+              />
+            </div>
+            <Textarea
+              value={synopsis}
+              onChange={e => setSynopsis(e.target.value)}
+              placeholder="Brief synopsis or key selling points (optional)"
+              className="text-sm border-[#e8ddd0] resize-none"
+              rows={3}
+            />
+          </div>
+
+          {/* Tone */}
+          <div>
+            <Label className="text-xs font-semibold text-[#5c3d2e] uppercase tracking-wide mb-2 block">Tone</Label>
+            <Select value={tone} onValueChange={(v) => setTone(v as typeof tone)}>
+              <SelectTrigger className="border-[#e8ddd0] text-sm">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                {TONES.map(t => (
+                  <SelectItem key={t.value} value={t.value}>{t.label}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+
+          {/* Generate button */}
+          <Button
+            className="w-full bg-purple-600 hover:bg-purple-700 text-white gap-2"
+            onClick={handleGenerate}
+            disabled={generateMutation.isPending || !bookTitle.trim()}
+          >
+            {generateMutation.isPending ? (
+              <><RefreshCw size={14} className="animate-spin" /> Generating…</>
+            ) : (
+              <><Wand2 size={14} /> Generate Copy</>
+            )}
+          </Button>
+
+          {/* Result */}
+          {result && (
+            <div className="bg-[#fdf9f3] rounded-lg border border-[#e8ddd0] p-3">
+              <div className="flex items-center justify-between mb-2">
+                <span className="text-[10px] font-bold text-[#8b5e3c] uppercase tracking-wide">
+                  {COPY_TYPES.find(ct => ct.value === copyType)?.label}
+                </span>
+                <button
+                  onClick={handleCopy}
+                  className="flex items-center gap-1 text-[10px] text-[#8b7b6b] hover:text-[#5c3d2e] transition-colors"
+                >
+                  <Copy size={10} /> Copy
+                </button>
+              </div>
+              <p className="text-xs text-[#3d2b1f] leading-relaxed whitespace-pre-wrap">{result}</p>
+            </div>
+          )}
+        </div>
+      )}
     </div>
   );
 }
@@ -316,7 +601,6 @@ export default function BibleStudio() {
       trimSizeId: edition.defaultTrimSizeId,
       styleId: edition.defaultStyleId,
       paperTypeId: edition.defaultPaperTypeId,
-      // Apply feature defaults based on edition type
       redLetter: edition.id === "red-letter",
       crossReferences: ["study", "reference", "devotional"].includes(edition.id),
       centerColumnReferences: edition.id === "reference",
@@ -358,14 +642,7 @@ export default function BibleStudio() {
             size="sm"
             variant="outline"
             className="border-[#c9a96e] text-[#c9a96e] hover:bg-[#3d2810] gap-1.5 text-xs"
-            onClick={() => {
-              const params = new URLSearchParams({
-                styleId: config.styleId,
-                trimSizeId: config.trimSizeId,
-                paperTypeId: config.paperTypeId,
-              });
-              navigate(`/auto-produce/0?${params.toString()}`);
-            }}
+            onClick={() => navigate("/auto-produce/0")}
           >
             <Sparkles className="w-3.5 h-3.5" />
             Start Production
@@ -486,7 +763,7 @@ export default function BibleStudio() {
               </div>
             </section>
 
-            {/* Step 7: Page Count (for spine calc) */}
+            {/* Step 7: Page Count */}
             <section>
               <SectionHeader step={7} title="Estimated Page Count" subtitle="Used to calculate spine width — update when your final page count is known" />
               <div className="flex items-center gap-4 p-4 bg-white rounded-xl border border-[#e8ddd0]">
@@ -518,7 +795,6 @@ export default function BibleStudio() {
               <SectionHeader step={8} title="Special Features" subtitle="Toggle every feature that will appear in your Bible edition" />
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                {/* Text Features */}
                 <Card className="border-[#e8ddd0]">
                   <CardHeader className="pb-2 pt-4 px-4">
                     <CardTitle className="text-sm text-[#5c3d2e]">Text Features</CardTitle>
@@ -532,7 +808,6 @@ export default function BibleStudio() {
                   </CardContent>
                 </Card>
 
-                {/* Reference Apparatus */}
                 <Card className="border-[#e8ddd0]">
                   <CardHeader className="pb-2 pt-4 px-4">
                     <CardTitle className="text-sm text-[#5c3d2e]">Reference Apparatus</CardTitle>
@@ -546,7 +821,6 @@ export default function BibleStudio() {
                   </CardContent>
                 </Card>
 
-                {/* Supplementary Content */}
                 <Card className="border-[#e8ddd0]">
                   <CardHeader className="pb-2 pt-4 px-4">
                     <CardTitle className="text-sm text-[#5c3d2e]">Supplementary Content</CardTitle>
@@ -557,7 +831,6 @@ export default function BibleStudio() {
                   </CardContent>
                 </Card>
 
-                {/* Physical Finishing */}
                 <Card className="border-[#e8ddd0]">
                   <CardHeader className="pb-2 pt-4 px-4">
                     <CardTitle className="text-sm text-[#5c3d2e]">Physical Finishing</CardTitle>
@@ -574,40 +847,11 @@ export default function BibleStudio() {
 
           </div>
 
-          {/* Right: Sticky spec summary */}
+          {/* Right: Sticky spec summary + AI assistant */}
           <div className="lg:col-span-1">
             <div className="sticky top-24 space-y-4">
               <SpecSummary config={config} />
-
-              <Button
-                className="w-full bg-[#8b5e3c] hover:bg-[#7a4f30] text-white gap-2"
-                onClick={() => navigate(`/auto-produce/0`)}
-              >
-                <Sparkles className="w-4 h-4" />
-                Start Production with These Specs
-                <ChevronRight className="w-4 h-4 ml-auto" />
-              </Button>
-
-              <Button
-                variant="outline"
-                className="w-full border-[#c9a96e] text-[#5c3d2e] hover:bg-[#fdf5ec] gap-2"
-                onClick={() => navigate("/spine-calculator")}
-              >
-                <Printer className="w-4 h-4" />
-                Open Spine Calculator
-              </Button>
-
-              <Button
-                variant="outline"
-                className="w-full border-[#c9a96e] text-[#5c3d2e] hover:bg-[#fdf5ec] gap-2"
-                onClick={() => {
-                  // Future: export spec sheet as PDF
-                  alert("Export Spec Sheet — coming soon. This will generate a print-ready PDF specification document.");
-                }}
-              >
-                <FileDown className="w-4 h-4" />
-                Export Spec Sheet (PDF)
-              </Button>
+              <AIWritingAssistant />
             </div>
           </div>
 

@@ -258,3 +258,66 @@
 - [x] Bible edition type and translation fields added to Create Project dialog
 - [x] Bible Design Studio page at /bible-studio
 - [x] Spine Width Calculator page at /spine-calculator
+
+## Phase 28: Creator, Designer & Publisher's Dream Platform
+
+### 28a — Publisher Command Center (Home Page)
+- [ ] Redesign home dashboard as a full command center with feature hub grid
+- [ ] Add quick-access cards for all major tools: Projects, Auto-Produce, Bible Studio, Cover Designer, ISBN Manager, Print Specs, Spine Calculator, Resources, Timeline
+- [ ] Add recent activity feed showing last 5 actions across all projects
+- [ ] Add publishing stats bar: total projects, steps completed, files produced
+
+### 28b — Cover Designer Tool
+- [ ] New page /cover-designer: spec generator for front cover, back cover, and spine
+- [ ] Inputs: trim size, page count, paper type, binding → calculates full wrap dimensions
+- [ ] Cover spec sheet with bleed, safe zone, and spine width diagram
+- [ ] Export spec as PDF for sending to cover designers
+
+### 28c — ISBN & Metadata Manager
+- [ ] New page /isbn-manager: per-project ISBN, LCCN, BISAC codes, CIP data
+- [ ] Fields: ISBN-13, ISBN-10 (auto-calculated), publisher, imprint, edition, language, BISAC category
+- [ ] Auto-embed metadata into generated PDFs and EPUBs
+- [ ] Export metadata as ONIX 3.0 XML for distribution
+
+### 28d — Print Spec Sheet Generator
+- [ ] New page /print-specs: generates a complete press-ready file specification document
+- [ ] Covers: trim size, bleed, safe zone, color mode, resolution, font embedding, PDF/X standard
+- [ ] Bible-specific specs: paper type, PPI, spine width, binding, gilding, ribbon
+- [ ] Export as PDF spec sheet for sending to printer
+
+### 28e — AI Writing Assistant
+- [ ] Add AI assistant panel to project tracker sidebar
+- [ ] Features: generate back-cover blurb, author bio, press release, marketing copy, BISAC description
+- [ ] Bible-specific: generate table of contents description, study note summaries, devotional intros
+
+## Phase 28 Completion Status
+
+### 28a — Publisher Command Center (Home Page)
+- [x] Redesign home dashboard as a full command center with feature hub grid (8 tools)
+- [x] Add quick-access cards for all major tools: Bible Studio, Auto-Produce, Spine Calculator, Cover Designer, ISBN Manager, Timeline, Resources, New Project
+- [x] Add publishing stats bar: total projects, phases, steps per project, tracked inputs
+- [x] Richer project cards with progress bar, genre/bible badges, and Timeline quick-link
+
+### 28b — Cover Designer Tool
+- [x] New page /cover-designer: full-wrap cover spec generator
+- [x] Inputs: trim size, page count, paper type, binding → calculates full wrap dimensions
+- [x] Cover spec sheet with bleed, safe zone, spine width, and color mode
+- [x] Export spec as printable HTML/PDF for sending to cover designers
+- [x] Registered route in App.tsx
+
+### 28c — ISBN & Metadata Manager
+- [x] New page /isbn-manager: ISBN-13, ISBN-10 (auto-calculated), LCCN, BISAC codes, CIP data
+- [x] Fields: publisher, imprint, edition, language, BISAC category, subtitle, description
+- [x] Export metadata as ONIX 3.0 XML for distribution
+- [x] Registered route in App.tsx
+
+### 28d — Bible Design Studio Spec Sheet Export
+- [x] Export Spec Sheet button now opens a print-ready HTML page with all specs
+- [x] Spec sheet includes: edition, translation, trim, typography, paper, binding, spine width, active features
+
+### 28e — AI Writing Assistant
+- [x] Added AI Writing Assistant panel to Bible Design Studio sidebar (collapsible)
+- [x] Features: back-cover blurb, author bio, catalog description, press release, marketing email
+- [x] Tone selector: literary, commercial, academic, inspirational, devotional
+- [x] Copy-to-clipboard for generated content
+- [x] Added ai.generateCopy tRPC endpoint in server/routers.ts using invokeLLM

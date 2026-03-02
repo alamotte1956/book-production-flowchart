@@ -11,6 +11,8 @@ import Timeline from "./pages/Timeline";
 import AutoProduce from "./pages/AutoProduce";
 import BibleStudio from "./pages/BibleStudio";
 import SpineCalculator from "./pages/SpineCalculator";
+import CoverDesigner from "./pages/CoverDesigner";
+import IsbnManager from "./pages/IsbnManager";
 
 function Router() {
   return (
@@ -22,6 +24,8 @@ function Router() {
       <Route path={"/auto-produce/:id"} component={AutoProduce} />
       <Route path={"/bible-studio"} component={BibleStudio} />
       <Route path={"/spine-calculator"} component={SpineCalculator} />
+      <Route path={"/cover-designer"} component={CoverDesigner} />
+      <Route path={"/isbn-manager"} component={IsbnManager} />
       <Route path={"/404"} component={NotFound} />
       <Route component={NotFound} />
     </Switch>
