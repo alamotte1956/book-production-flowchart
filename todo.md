@@ -321,3 +321,8 @@
 - [x] Tone selector: literary, commercial, academic, inspirational, devotional
 - [x] Copy-to-clipboard for generated content
 - [x] Added ai.generateCopy tRPC endpoint in server/routers.ts using invokeLLM
+
+## Phase 29: Additional Bible Translations
+- [x] Add NASB (New American Standard Bible) to BIBLE_TRANSLATIONS in shared/bibleSpecs.ts (was already present)
+- [x] Add NASB 2020 (New American Standard Bible 2020 Update) to BIBLE_TRANSLATIONS in shared/bibleSpecs.ts
+- [x] Add ISV (International Standard Version) to BIBLE_TRANSLATIONS in shared/bibleSpecs.ts

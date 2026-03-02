@@ -691,6 +691,8 @@ export const BIBLE_TRANSLATIONS: BibleTranslation[] = [
   { id: "esv", label: "ESV", fullName: "English Standard Version" },
   { id: "nlt", label: "NLT", fullName: "New Living Translation" },
   { id: "nasb", label: "NASB", fullName: "New American Standard Bible" },
+  { id: "nasb2020", label: "NASB 2020", fullName: "New American Standard Bible (2020 Update)" },
+  { id: "isv", label: "ISV", fullName: "International Standard Version" },
   { id: "csb", label: "CSB", fullName: "Christian Standard Bible" },
   { id: "amp", label: "AMP", fullName: "Amplified Bible" },
   { id: "msg", label: "MSG", fullName: "The Message (Eugene Peterson)" },
