@@ -485,7 +485,7 @@ function PhaseSection({
         </div>
       </div>
 
-      <div className="space-y-3 ml-5 pl-5 border-l-2" style={{ borderColor: `${phase.accentColor}30` }}>
+      <div className="space-y-3 border-l-2 pl-4" style={{ borderColor: `${phase.accentColor}30` }}>
         {phase.steps.map((step, idx) => (
           <StepCard
             key={step.id}
@@ -692,7 +692,7 @@ export default function ProjectTracker() {
 
       <div className="max-w-6xl mx-auto px-6 py-8 flex gap-8">
         {/* Sidebar — phase navigation */}
-        <aside className="hidden lg:block w-56 shrink-0 print:hidden">
+        <aside className="hidden lg:block w-52 shrink-0 print:hidden">
           <nav className="sticky top-24 space-y-1">
             <p className="text-xs font-bold uppercase tracking-wider text-[#a89880] mb-3">Chapters</p>
             {phases.map((phase) => {
@@ -722,7 +722,7 @@ export default function ProjectTracker() {
           </nav>
         </aside>
 
-        {/* Main content */}
+        {/* Main content — left-aligned */}
         <main className="flex-1 min-w-0 space-y-10">
           {phases.map((phase) => {
             const currentOffset = stepOffset;

@@ -39,3 +39,6 @@
 - [x] Add "Duplicate" button to project cards on the Home page
 - [x] Add "Duplicate" button to the project tracker header
 - [x] Write vitest tests for the duplicate endpoint
+
+## Phase 8: Layout Change
+- [x] Move all step cards to far-left aligned layout
