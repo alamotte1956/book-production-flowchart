@@ -2,6 +2,10 @@
  * Auto-Produce Page
  * Upload a manuscript, choose trim size and style, and let AI produce
  * a press-ready interior PDF and EPUB ebook.
+ *
+ * Style Preview: once trim size + style are selected, a "Preview Style"
+ * button renders a one-page sample in a modal iframe so users can
+ * confirm the look before committing to the full pipeline.
  */
 import { useState, useRef, useCallback, useEffect } from "react";
 import { useParams, useLocation } from "wouter";
@@ -13,10 +17,11 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Progress } from "@/components/ui/progress";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { toast } from "sonner";
 import {
   ArrowLeft, Upload, FileText, Wand2, Download, AlertCircle,
-  CheckCircle2, Clock, Loader2, BookOpen, FileDown, Sparkles,
+  CheckCircle2, Clock, Loader2, BookOpen, FileDown, Sparkles, Eye, X,
 } from "lucide-react";
 
 const MAX_FILE_SIZE_MB = 15;
@@ -66,6 +71,132 @@ function progressPercent(status: string) {
     case "error": return 100;
     default: return 0;
   }
+}
+
+// ─── Style Preview Modal ──────────────────────────────────────────────────────
+
+interface StylePreviewModalProps {
+  open: boolean;
+  onClose: () => void;
+  styleId: string;
+  trimSizeId: string;
+}
+
+function StylePreviewModal({ open, onClose, styleId, trimSizeId }: StylePreviewModalProps) {
+  const { data, isLoading, error } = trpc.autoProduce.preview.useQuery(
+    { styleId, trimSizeId },
+    { enabled: open && !!styleId && !!trimSizeId }
+  );
+
+  const iframeRef = useRef<HTMLIFrameElement>(null);
+
+  // Write the HTML into the iframe once data arrives
+  useEffect(() => {
+    if (!data?.html || !iframeRef.current) return;
+    const doc = iframeRef.current.contentDocument;
+    if (doc) {
+      doc.open();
+      doc.write(data.html);
+      doc.close();
+    }
+  }, [data?.html]);
+
+  return (
+    <Dialog open={open} onOpenChange={(v) => { if (!v) onClose(); }}>
+      <DialogContent className="max-w-4xl w-full p-0 overflow-hidden bg-[#1a1008] border-[#4a3828]">
+        {/* Modal header */}
+        <div className="flex items-center justify-between px-5 py-3 border-b border-[#4a3828]">
+          <div>
+            <DialogHeader>
+              <DialogTitle className="text-[#f5ede4] font-serif text-base flex items-center gap-2">
+                <Eye className="w-4 h-4 text-[#c9a96e]" />
+                Style Preview
+              </DialogTitle>
+              <DialogDescription className="text-[#a08060] text-xs mt-0.5">
+                {data ? (
+                  <span>
+                    <strong className="text-[#c9a96e]">{data.styleLabel}</strong>
+                    {" · "}
+                    <strong className="text-[#c9a96e]">{data.trimLabel}</strong>
+                    {" — sample page rendered at actual proportions"}
+                  </span>
+                ) : (
+                  "Rendering sample page…"
+                )}
+              </DialogDescription>
+            </DialogHeader>
+          </div>
+          <button
+            onClick={onClose}
+            className="text-[#a08060] hover:text-[#f5ede4] transition-colors p-1 rounded"
+            aria-label="Close preview"
+          >
+            <X className="w-4 h-4" />
+          </button>
+        </div>
+
+        {/* Preview area */}
+        <div className="relative bg-[#2a1f10] flex items-center justify-center"
+          style={{ minHeight: 520 }}>
+          {isLoading && (
+            <div className="absolute inset-0 flex flex-col items-center justify-center gap-3 z-10">
+              <Loader2 className="w-8 h-8 animate-spin text-[#c9a96e]" />
+              <p className="text-[#a08060] text-sm">Rendering style preview…</p>
+            </div>
+          )}
+          {error && (
+            <div className="absolute inset-0 flex flex-col items-center justify-center gap-3 z-10">
+              <AlertCircle className="w-8 h-8 text-red-400" />
+              <p className="text-red-300 text-sm">Failed to load preview</p>
+            </div>
+          )}
+          {data && (
+            <div className="py-6 px-4 flex items-center justify-center w-full overflow-auto">
+              {/* Scale the page to fit the modal without scrolling */}
+              <div
+                style={{
+                  // Scale the page proportionally to fit within ~700px wide
+                  transform: `scale(${Math.min(1, 700 / data.pageWidthPx)})`,
+                  transformOrigin: "top center",
+                  width: data.pageWidthPx,
+                  height: data.pageHeightPx,
+                  flexShrink: 0,
+                }}
+              >
+                <iframe
+                  ref={iframeRef}
+                  title="Style Preview"
+                  sandbox="allow-same-origin"
+                  style={{
+                    width: data.pageWidthPx,
+                    height: data.pageHeightPx,
+                    border: "none",
+                    display: "block",
+                    background: "#fff",
+                  }}
+                />
+              </div>
+            </div>
+          )}
+        </div>
+
+        {/* Footer */}
+        <div className="flex items-center justify-between px-5 py-3 border-t border-[#4a3828] bg-[#1a1008]">
+          <p className="text-xs text-[#7a6050]">
+            This is a sample page using classic literature. Your manuscript will be typeset in this style.
+          </p>
+          <Button
+            size="sm"
+            onClick={onClose}
+            className="bg-[#8b5e3c] hover:bg-[#7a4f30] text-white text-xs gap-1.5"
+          >
+            <CheckCircle2 className="w-3.5 h-3.5" />
+            Looks good — continue
+          </Button>
+        </div>
+      </DialogContent>
+    </Dialog>
+  );
 }
 
 // ─── Job Status Card ─────────────────────────────────────────────────────────
@@ -195,6 +326,7 @@ export default function AutoProduce() {
   const [styleId, setStyleId] = useState("");
   const [isDragging, setIsDragging] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [previewOpen, setPreviewOpen] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const startMutation = trpc.autoProduce.start.useMutation({
@@ -269,6 +401,7 @@ export default function AutoProduce() {
   }
 
   const project = projectData?.project;
+  const canPreview = !!(trimSizeId && styleId);
   const canSubmit = selectedFile && trimSizeId && styleId && !isSubmitting;
 
   return (
@@ -322,7 +455,7 @@ export default function AutoProduce() {
           <CardHeader>
             <CardTitle className="font-serif text-[#3d2b1f] text-xl">New Production Run</CardTitle>
             <CardDescription className="text-[#8b7b6b]">
-              Configure your trim size and style, then upload your manuscript to begin.
+              Configure your trim size and style, preview the look, then upload your manuscript to begin.
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-6">
@@ -357,6 +490,25 @@ export default function AutoProduce() {
                 </Select>
               </div>
             </div>
+
+            {/* Preview Style button — shown once both dropdowns are selected */}
+            {canPreview && (
+              <div className="flex items-center gap-3 p-3 rounded-lg bg-[#f5ede4] border border-[#d4b896]/40">
+                <Eye className="w-4 h-4 text-[#8b5e3c] flex-shrink-0" />
+                <p className="text-sm text-[#5c3d2e] flex-1">
+                  See how your book will look before committing to the full pipeline.
+                </p>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setPreviewOpen(true)}
+                  className="border-[#8b5e3c] text-[#8b5e3c] hover:bg-[#f5ede4] gap-1.5 flex-shrink-0"
+                >
+                  <Eye className="w-3.5 h-3.5" />
+                  Preview Style
+                </Button>
+              </div>
+            )}
 
             {/* Drop zone */}
             <div
@@ -480,6 +632,14 @@ export default function AutoProduce() {
           </CardContent>
         </Card>
       </main>
+
+      {/* Style Preview Modal */}
+      <StylePreviewModal
+        open={previewOpen}
+        onClose={() => setPreviewOpen(false)}
+        styleId={styleId}
+        trimSizeId={trimSizeId}
+      />
     </div>
   );
 }

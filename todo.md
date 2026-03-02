@@ -88,3 +88,10 @@
 - [x] Build download section for PDF and EPUB outputs
 - [x] Add Auto-Produce button to project tracker header
 - [x] Write vitest tests for autoProduce router (29 total tests pass)
+
+## Phase 14: Style Preview
+- [x] Add `autoProduce.preview` tRPC endpoint that returns styled sample HTML for any style + trim size
+- [x] Build live preview panel in Auto-Produce page (modal dialog with iframe, updates on style/trim change)
+- [x] Show sample content: chapter heading, body paragraph, drop cap, running header, page number
+- [x] Add "Looks good — continue" CTA inside the preview modal footer
+- [x] Write vitest tests for the preview endpoint (11 tests: all styles, all trim sizes, fallbacks, auth)

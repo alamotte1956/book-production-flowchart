@@ -14,7 +14,7 @@ import {
 } from "./db";
 import { parseManuscript } from "./manuscriptParser";
 import { produceBook } from "./typesettingPipeline";
-import { TYPESETTING_STYLES, TRIM_SIZES } from "./typesettingStyles";
+import { TYPESETTING_STYLES, TRIM_SIZES, getTrimSize, getTypesettingStyle } from "./typesettingStyles";
 import { storagePut } from "./storage";
 
 export const appRouter = router({
@@ -217,6 +217,189 @@ export const appRouter = router({
   }),
 
   autoProduce: router({
+    // Generate a one-page styled HTML preview for a given style + trim size
+    preview: publicProcedure
+      .input(z.object({
+        styleId: z.string(),
+        trimSizeId: z.string(),
+      }))
+      .query(({ input }) => {
+        const trim = getTrimSize(input.trimSizeId);
+        const style = getTypesettingStyle(input.styleId);
+
+        // Sample content for the preview page
+        const sampleTitle = "Chapter One";
+        const sampleSubtitle = "The Beginning";
+        const sampleParagraph1 = style.dropCap
+          ? `<p class="body-text drop-cap">It was the best of times, it was the worst of times, it was the age of wisdom, it was the age of foolishness, it was the epoch of belief, it was the epoch of incredulity, it was the season of Light, it was the season of Darkness, it was the spring of hope, it was the winter of despair.</p>`
+          : `<p class="body-text">It was the best of times, it was the worst of times, it was the age of wisdom, it was the age of foolishness, it was the epoch of belief, it was the epoch of incredulity, it was the season of Light, it was the season of Darkness, it was the spring of hope, it was the winter of despair.</p>`;
+        const sampleParagraph2 = `<p class="body-text">We had everything before us, we had nothing before us, we were all going direct to Heaven, we were all going direct the other way. In short, the period was so far like the present period, that some of its noisiest authorities insisted on its being received, for good or for evil, in the superlative degree of comparison only.</p>`;
+        const sampleParagraph3 = `<p class="body-text">There were a king with a large jaw and a queen with a plain face, on the throne of England; there were a king with a large jaw and a queen with a fair face, on the throne of France. In both countries it was clearer than crystal to the lords of the State preserves of loaves and fishes, that things in general were settled for ever.</p>`;
+
+        const pageWidthPx = Math.round(trim.widthIn * 96);
+        const pageHeightPx = Math.round(trim.heightIn * 96);
+        const marginTopPx = Math.round(trim.marginTopIn * 96);
+        const marginBottomPx = Math.round(trim.marginBottomIn * 96);
+        const marginInsidePx = Math.round(trim.marginInsideIn * 96);
+        const marginOutsidePx = Math.round(trim.marginOutsideIn * 96);
+        const headerFooterPx = Math.round(trim.headerFooterIn * 96);
+
+        const dropCapCss = style.dropCap ? `
+          .drop-cap::first-letter {
+            font-size: ${style.fontSize * 3.5}pt;
+            font-family: ${style.chapterHeadingFont};
+            font-weight: 600;
+            float: left;
+            line-height: 0.8;
+            margin-right: 4px;
+            margin-top: 4px;
+            color: ${style.headingColor};
+          }
+        ` : '';
+
+        const html = `<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Style Preview — ${style.label}</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="${style.googleFontsUrl}" rel="stylesheet">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html, body { background: #e8e0d8; display: flex; justify-content: center; align-items: flex-start; padding: 24px; min-height: 100vh; }
+    .page {
+      width: ${pageWidthPx}px;
+      height: ${pageHeightPx}px;
+      background: #ffffff;
+      box-shadow: 0 4px 24px rgba(0,0,0,0.18);
+      position: relative;
+      overflow: hidden;
+      padding: ${marginTopPx}px ${marginOutsidePx}px ${marginBottomPx}px ${marginInsidePx}px;
+    }
+    .running-header {
+      position: absolute;
+      top: ${headerFooterPx}px;
+      left: ${marginInsidePx}px;
+      right: ${marginOutsidePx}px;
+      font-family: ${style.fontFamily};
+      font-size: ${style.fontSize * 0.72}pt;
+      color: #888;
+      display: flex;
+      justify-content: space-between;
+      border-bottom: 0.5px solid #ccc;
+      padding-bottom: 4px;
+      letter-spacing: 0.04em;
+    }
+    .running-footer {
+      position: absolute;
+      bottom: ${headerFooterPx}px;
+      left: ${marginInsidePx}px;
+      right: ${marginOutsidePx}px;
+      font-family: ${style.fontFamily};
+      font-size: ${style.fontSize * 0.72}pt;
+      color: #888;
+      text-align: center;
+      border-top: 0.5px solid #ccc;
+      padding-top: 4px;
+    }
+    .content {
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-start;
+    }
+    .chapter-number {
+      font-family: ${style.chapterHeadingFont};
+      font-size: ${style.fontSize * 0.85}pt;
+      color: ${style.headingColor};
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      margin-bottom: 12px;
+      margin-top: 24px;
+      opacity: 0.7;
+    }
+    .chapter-title {
+      font-family: ${style.chapterHeadingFont};
+      font-size: ${style.chapterHeadingSize}pt;
+      font-weight: 600;
+      color: ${style.headingColor};
+      margin-bottom: 8px;
+      line-height: 1.2;
+    }
+    .chapter-subtitle {
+      font-family: ${style.chapterHeadingFont};
+      font-size: ${style.fontSize * 1.1}pt;
+      color: ${style.headingColor};
+      font-style: italic;
+      margin-bottom: 28px;
+      opacity: 0.75;
+    }
+    .chapter-rule {
+      width: 48px;
+      height: 1px;
+      background: ${style.headingColor};
+      margin: 0 auto 28px auto;
+      opacity: 0.3;
+    }
+    .body-text {
+      font-family: ${style.fontFamily};
+      font-size: ${style.fontSize}pt;
+      line-height: ${style.lineHeight};
+      color: ${style.bodyColor};
+      text-align: justify;
+      text-indent: 1.5em;
+      margin-bottom: 0;
+      hyphens: auto;
+    }
+    .body-text:first-of-type { text-indent: 0; }
+    ${dropCapCss}
+    .preview-badge {
+      position: absolute;
+      top: 8px;
+      right: 8px;
+      background: rgba(0,0,0,0.06);
+      color: #999;
+      font-size: 8px;
+      font-family: sans-serif;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      padding: 2px 6px;
+      border-radius: 3px;
+    }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <div class="preview-badge">Sample Preview</div>
+    <div class="running-header">
+      <span>A Tale of Two Cities</span>
+      <span>${style.label}</span>
+    </div>
+    <div class="content">
+      <div class="chapter-number">Chapter One</div>
+      <div class="chapter-title">${sampleTitle}</div>
+      <div class="chapter-subtitle">${sampleSubtitle}</div>
+      <div class="chapter-rule"></div>
+      ${sampleParagraph1}
+      ${sampleParagraph2}
+      ${sampleParagraph3}
+    </div>
+    <div class="running-footer">1</div>
+  </div>
+</body>
+</html>`;
+
+        return {
+          html,
+          styleLabel: style.label,
+          trimLabel: trim.label,
+          pageWidthPx,
+          pageHeightPx,
+        };
+      }),
+
     // Return available trim sizes and styles for the UI dropdowns
     options: publicProcedure.query(() => ({
       trimSizes: TRIM_SIZES,
