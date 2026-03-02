@@ -13,6 +13,7 @@ import BibleStudio from "./pages/BibleStudio";
 import SpineCalculator from "./pages/SpineCalculator";
 import CoverDesigner from "./pages/CoverDesigner";
 import IsbnManager from "./pages/IsbnManager";
+import UserGuide from "./pages/UserGuide";
 
 function Router() {
   return (
@@ -26,6 +27,7 @@ function Router() {
       <Route path={"/spine-calculator"} component={SpineCalculator} />
       <Route path={"/cover-designer"} component={CoverDesigner} />
       <Route path={"/isbn-manager"} component={IsbnManager} />
+      <Route path={"/guide"} component={UserGuide} />
       <Route path={"/404"} component={NotFound} />
       <Route component={NotFound} />
     </Switch>

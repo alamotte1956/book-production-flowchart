@@ -429,3 +429,13 @@
 
 ## Phase 41: Rebrand to Create Design Publish LLC
 - [ ] Replace all "The Bookmaker's Journey" with "Create Design Publish LLC" across all files
+
+## Phase 43: User Guide Web Page
+- [ ] Build UserGuide page at /guide with full instruction book content
+- [ ] Add "Guide" nav link to the dashboard navigation bar
+- [ ] Register /guide route in App.tsx
+
+## Phase 44: User Guide Title Polish
+- [x] Make User Guide hero title letters brighter (pure white, text-white) and larger (text-5xl md:text-6xl)
+- [x] Add /guide route to App.tsx
+- [x] Add Guide link to dashboard nav bar with HelpCircle icon

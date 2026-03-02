@@ -18,7 +18,7 @@ import {
   BookOpen, Plus, Trash2, ArrowRight, Loader2,
   Upload, CheckCircle2, SkipForward, Clock, Sparkles, Copy,
   Layers, BookMarked, Ruler, Zap, BarChart3, Library,
-  ChevronRight, Calendar, Star, TrendingUp, FileText,
+  ChevronRight, Calendar, Star, TrendingUp, FileText, HelpCircle,
 } from "lucide-react";
 import { useState, useEffect } from "react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -495,6 +495,7 @@ export default function Home() {
               { label: "Cover Designer", path: "/cover-designer", icon: Layers },
               { label: "ISBN", path: "/isbn-manager", icon: BookMarked },
               { label: "Resources", path: "/resources", icon: Library },
+              { label: "Guide", path: "/guide", icon: HelpCircle },
             ].map(item => (
               <button
                 key={item.path}
