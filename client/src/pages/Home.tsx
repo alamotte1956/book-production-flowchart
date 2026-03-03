@@ -46,15 +46,15 @@ const GENRES = [
 ];
 
 const features = [
-  { icon: Upload, title: "Upload Real Documents", desc: "Attach manuscripts, contracts, cover art, and proofs at every step." },
-  { icon: CheckCircle2, title: "Track Progress", desc: "Mark steps complete or skip optional ones. See per-phase and overall progress." },
-  { icon: SkipForward, title: "Skip What You Don't Need", desc: "Not every book needs indexing or audio. Skip steps that don't apply." },
-  { icon: Clock, title: "Set Due Dates", desc: "Add target dates per phase and get alerts when deadlines approach." },
+  { icon: Upload, title: "Create & Upload Your Manuscript", desc: "Start your self-publishing journey by attaching manuscripts, contracts, cover art, and proofs at every production step." },
+  { icon: CheckCircle2, title: "Design Your Book Online", desc: "Use our online publishing tools to design layouts, configure typesetting, and track every phase of your book's design." },
+  { icon: SkipForward, title: "Flexible Publishing Workflow", desc: "Not every self-publishing project needs the same steps. Skip what doesn't apply and focus on what matters for your book." },
+  { icon: Clock, title: "Publishing Deadlines & Milestones", desc: "Set target dates per phase and stay on schedule from manuscript creation through final publishing and distribution." },
 ];
 
-const PAGE_TITLE = "Book Production Tracker — Create Design Publish LLC";
-const PAGE_DESCRIPTION = "Track every step of your book's production — from manuscript to published title — with file uploads, due dates, AI typesetting, and a Gantt timeline.";
-const PAGE_KEYWORDS = "book production tracker, publishing workflow, manuscript to print, Bible design studio, AI typesetting, book project management";
+const PAGE_TITLE = "Self-Publishing & Online Publishing Platform — Create Design Publish LLC";
+const PAGE_DESCRIPTION = "Create Design Publish LLC is the all-in-one self-publishing and online publishing platform. Create, design, and publish your book from manuscript to masterpiece with AI typesetting, cover design tools, ISBN management, and a 30-step production workflow.";
+const PAGE_KEYWORDS = "self-publishing, online publishing, create design publish, book design, publishing platform, Bible publishing, manuscript to print, AI typesetting, self-publish a book, book production workflow";
 
 function setMetaTag(name: string, content: string) {
   let el = document.querySelector<HTMLMetaElement>(`meta[name="${name}"]`);
@@ -71,20 +71,21 @@ const SITE_URL = "https://booksrus.manus.space";
 const jsonLdSoftwareApp = {
   "@context": "https://schema.org",
   "@type": "SoftwareApplication",
-  "name": "Create Design Publish LLC",
+  "name": "Create Design Publish LLC — Self-Publishing & Online Publishing Platform",
   "url": SITE_URL,
   "description": PAGE_DESCRIPTION,
   "applicationCategory": "ProductivityApplication",
   "operatingSystem": "Web",
   "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
   "featureList": [
-    "30-step book production workflow",
-    "File uploads per step",
-    "Gantt timeline with per-step due dates",
+    "Self-publishing workflow with 30 production steps",
+    "Online publishing tools for independent authors and small presses",
+    "Create, design, and publish books from manuscript to print",
+    "Bible Design Studio for scripture publishing",
     "AI-powered typesetting and PDF/EPUB generation",
     "Cover Designer with full-wrap spec generation",
-    "ISBN & ONIX 3.0 metadata manager",
-    "Resources & Success Hub with 43 curated publishing tools",
+    "ISBN & ONIX 3.0 metadata manager for publishing distribution",
+    "Resources & Success Hub with 43 curated self-publishing tools",
   ],
   "screenshot": HERO_URL,
   "creator": { "@type": "Organization", "name": "Create Design Publish LLC", "url": SITE_URL },
@@ -110,7 +111,7 @@ const jsonLdOrganization = {
   "url": SITE_URL,
   "logo": `${SITE_URL}/favicon.ico`,
   "sameAs": [SITE_URL],
-  "description": "Create Design Publish LLC builds tools for independent authors and small publishers to manage every step of the book production process.",
+  "description": "Create Design Publish LLC builds self-publishing and online publishing tools that help independent authors and small presses create, design, and publish professional books — from first draft to finished product.",
 };
 
 function injectJsonLd(id: string, data: object) {
@@ -344,7 +345,7 @@ export default function Home() {
                 Manuscript to Masterpiece
               </p>
               <p className="mt-5 font-sans text-lg md:text-xl text-[#d4c8b4] max-w-xl mx-auto leading-relaxed">
-                A creator, designer, and publisher's dream platform. Track every step of your book's production — from first idea to finished volume.
+                The all-in-one <strong className="text-[#f5d98a] font-semibold">self-publishing</strong> and <strong className="text-[#f5d98a] font-semibold">online publishing</strong> platform. Create, design, and publish your book — from first idea to finished volume.
               </p>
               <div className="mt-8 flex items-center justify-center gap-8 text-[#c9a96e]/80 font-serif text-lg">
                 <span><strong className="text-3xl text-[#f5efe0]">{phases.length}</strong> Phases</span>
@@ -388,8 +389,8 @@ export default function Home() {
         {/* Features */}
         <div id="features" className="max-w-5xl mx-auto px-6 py-20">
           <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.6 }} className="text-center mb-14">
-            <h2 className="font-serif text-3xl md:text-4xl text-[#3a2a1a]">A Real Project Tracker</h2>
-            <p className="mt-3 text-[#8b7b6b] max-w-lg mx-auto">Not just a flowchart — a working tool where you attach your actual manuscripts, contracts, and proofs at every stage.</p>
+            <h2 className="font-serif text-3xl md:text-4xl text-[#3a2a1a]">Your Complete Self-Publishing Toolkit</h2>
+            <p className="mt-3 text-[#8b7b6b] max-w-lg mx-auto">Not just a flowchart — a real online publishing workspace where you create, design, and track every stage of your book's production.</p>
           </motion.div>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
             {features.map((f, i) => (
@@ -410,8 +411,8 @@ export default function Home() {
         <div id="tools-section" className="bg-[#2a1a0a] py-20">
           <div className="max-w-5xl mx-auto px-6">
             <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.6 }} className="text-center mb-14">
-              <h2 className="font-serif text-3xl md:text-4xl text-[#f5efe0]">8 Professional Publishing Tools</h2>
-              <p className="mt-3 text-[#c9a96e]/60 max-w-lg mx-auto">Everything a creator, designer, and publisher needs — all in one place.</p>
+              <h2 className="font-serif text-3xl md:text-4xl text-[#f5efe0]">8 Professional Self-Publishing Tools</h2>
+              <p className="mt-3 text-[#c9a96e]/60 max-w-lg mx-auto">Everything you need to create, design, and publish your book — all in one online publishing platform.</p>
             </motion.div>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
               {[
@@ -468,8 +469,8 @@ export default function Home() {
                 <Sparkles size={18} className="text-[#c9a96e]" />
                 <span className="text-xs font-bold uppercase tracking-wider text-[#a89880]">Resources & Success Hub</span>
               </div>
-              <h2 className="font-serif text-2xl md:text-3xl text-[#3a2a1a] mb-3">The Best Tools for Every Stage</h2>
-              <p className="text-[#8b7b6b] leading-relaxed mb-4">We've curated the most efficient and widely trusted platforms across every phase — from Scrivener for writing to IngramSpark for distribution.</p>
+            <h2 className="font-serif text-2xl md:text-3xl text-[#3a2a1a] mb-3">The Best Self-Publishing Resources</h2>
+            <p className="text-[#8b7b6b] leading-relaxed mb-4">We've curated the most trusted online publishing and self-publishing platforms across every phase — from Scrivener for writing to IngramSpark for distribution.</p>
               <div className="flex flex-wrap gap-2 text-xs">
                 {["Scrivener", "Reedsy", "QueryTracker", "KDP", "IngramSpark", "BookBub", "NetGalley", "Goodreads"].map(t => (
                   <span key={t} className="px-2 py-1 rounded-full bg-[#f0e8d8] text-[#8b7b6b]">{t}</span>
@@ -491,8 +492,8 @@ export default function Home() {
         <div className="py-20 text-center px-6 bg-[#faf6ef]">
           <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.6 }}>
             <Sparkles size={32} className="mx-auto text-[#c9a96e] mb-4" />
-            <h2 className="font-serif text-3xl text-[#3a2a1a] mb-3">Ready to Begin?</h2>
-            <p className="text-[#8b7b6b] max-w-md mx-auto mb-8">Create your free account and start tracking your book from manuscript to shelf.</p>
+            <h2 className="font-serif text-3xl text-[#3a2a1a] mb-3">Start Self-Publishing Today</h2>
+            <p className="text-[#8b7b6b] max-w-md mx-auto mb-8">Create your free account and use our online publishing platform to design, track, and publish your book — from manuscript to shelf.</p>
             <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
               <a href={getSignUpUrl()}>
                 <Button size="lg" className="bg-[#c9a96e] hover:bg-[#b8944f] text-[#2a1a0a] font-semibold text-base px-10 py-6 rounded-lg">
