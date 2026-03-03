@@ -525,7 +525,7 @@ export default function Home() {
               </div>
               <div className="flex flex-col items-center md:items-end gap-1 text-center md:text-right">
                 <a href="https://createdesignpublish.net" className="text-xs text-[#c9a96e]/50 hover:text-[#c9a96e] transition-colors">createdesignpublish.net</a>
-                <a href="mailto:contact@createdesignpublish.net" className="text-xs text-[#c9a96e]/50 hover:text-[#c9a96e] transition-colors">contact@createdesignpublish.net</a>
+                <a href="mailto:John.Peterson@createdesignpublish.net" className="text-xs text-[#c9a96e]/50 hover:text-[#c9a96e] transition-colors">John.Peterson@createdesignpublish.net</a>
                 <p className="text-[10px] text-[#c9a96e]/25 mt-1">&copy; {new Date().getFullYear()} Create Design Publish LLC. All rights reserved.</p>
               </div>
             </div>
