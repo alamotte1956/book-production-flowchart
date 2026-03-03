@@ -517,3 +517,9 @@
 - [x] Add injectRouteMeta() in server/_core/vite.ts for both dev (setupVite) and production (serveStatic) modes
 - [x] Verified all 9 routes return unique title, description, canonical in raw HTML via curl
 - [x] Update sitemap.xml lastmod dates and add /auto-produce and /timeline entries (9 URLs total)
+
+## Phase 61: Open Graph & Twitter Card Meta Tags
+- [x] Generate branded OG preview image (1200x630) and upload to CDN
+- [x] Extend shared/routeMeta.ts with ogImage, ogType, twitterCard, siteName fields
+- [x] Updated injectRouteMeta() in vite.ts to inject 14 OG/Twitter tags per route
+- [x] Verified tags appear correctly in raw HTML via curl for / and /bible-studio

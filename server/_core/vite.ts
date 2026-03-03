@@ -9,9 +9,9 @@ import { getRouteMeta } from "../../shared/routeMeta";
 
 /**
  * Inject route-specific <title>, <meta name="description">, <meta name="keywords">,
- * <meta name="robots">, and <link rel="canonical"> into the HTML template.
- * This ensures crawlers receive unique, meaningful meta data for every URL
- * without needing full SSR.
+ * <meta name="robots">, <link rel="canonical">, Open Graph, and Twitter Card tags
+ * into the HTML template. This ensures crawlers and social platforms receive
+ * unique, meaningful meta data for every URL without needing full SSR.
  */
 function injectRouteMeta(html: string, urlPath: string): string {
   const meta = getRouteMeta(urlPath);
@@ -60,6 +60,34 @@ function injectRouteMeta(html: string, urlPath: string): string {
       `  <link rel="canonical" href="${meta.canonical}" />\n  </head>`
     );
   }
+
+  // Build Open Graph + Twitter Card block
+  const socialTags = [
+    `<meta property="og:type" content="${meta.ogType}" />`,
+    `<meta property="og:site_name" content="${meta.siteName}" />`,
+    `<meta property="og:title" content="${meta.title}" />`,
+    `<meta property="og:description" content="${meta.description}" />`,
+    `<meta property="og:url" content="${meta.canonical}" />`,
+    `<meta property="og:image" content="${meta.ogImage}" />`,
+    `<meta property="og:image:width" content="1200" />`,
+    `<meta property="og:image:height" content="630" />`,
+    `<meta property="og:image:alt" content="${meta.siteName} — Self-Publishing Platform" />`,
+    `<meta name="twitter:card" content="${meta.twitterCard}" />`,
+    `<meta name="twitter:title" content="${meta.title}" />`,
+    `<meta name="twitter:description" content="${meta.description}" />`,
+    `<meta name="twitter:image" content="${meta.ogImage}" />`,
+    `<meta name="twitter:image:alt" content="${meta.siteName} — Self-Publishing Platform" />`,
+  ].join("\n    ");
+
+  // Remove any previously injected OG/Twitter block to avoid duplicates on re-injection
+  // Use [\s\S]*? instead of the /s flag for broader TS target compatibility
+  html = html.replace(/\s*<!-- og:start -->[\s\S]*?<!-- og:end -->/, "");
+
+  // Inject the social tags block just before </head>
+  html = html.replace(
+    "</head>",
+    `    <!-- og:start -->\n    ${socialTags}\n    <!-- og:end -->\n  </head>`
+  );
 
   return html;
 }

@@ -1,13 +1,13 @@
 /**
- * Server-side route meta data for SEO injection.
- * Each entry maps a URL path prefix to a unique title, description,
- * canonical URL, and keywords that will be injected into index.html
- * before the HTML is sent to the browser / crawler.
+ * Server-side route meta data for SEO and social sharing injection.
+ * Each entry maps a URL path prefix to a unique set of meta tags that will
+ * be injected into index.html before the HTML is sent to the browser/crawler.
  *
  * Rules:
  *  - title: 30–60 characters
  *  - description: 50–160 characters
  *  - keywords: 3–8 comma-separated terms
+ *  - ogImage: absolute URL to a 1200×630 image (shared OG image used for all routes)
  */
 
 export interface RouteMeta {
@@ -15,9 +15,16 @@ export interface RouteMeta {
   description: string;
   keywords: string;
   canonical: string;
+  ogImage: string;
+  ogType: string;
+  twitterCard: string;
+  siteName: string;
 }
 
 const BASE = "https://www.createdesignpublish.net";
+const SITE_NAME = "Create Design Publish LLC";
+const OG_IMAGE =
+  "https://d2xsxph8kpxj0f.cloudfront.net/310519663211654017/kGjPju6hKCvCsjZhgUHyqj/og-preview-LrRyvCyZ6fWHwBLgjV9mdz.png";
 
 /** Ordered from most-specific to least-specific so the first match wins. */
 export const ROUTE_META: Array<{ path: string; meta: RouteMeta }> = [
@@ -30,6 +37,10 @@ export const ROUTE_META: Array<{ path: string; meta: RouteMeta }> = [
       keywords:
         "Bible design, Bible publishing, self-publishing, book design, typesetting, online publishing",
       canonical: `${BASE}/bible-studio`,
+      ogImage: OG_IMAGE,
+      ogType: "website",
+      twitterCard: "summary_large_image",
+      siteName: SITE_NAME,
     },
   },
   {
@@ -41,6 +52,10 @@ export const ROUTE_META: Array<{ path: string; meta: RouteMeta }> = [
       keywords:
         "spine calculator, spine width, book cover design, self-publishing, print-on-demand, publishing platform",
       canonical: `${BASE}/spine-calculator`,
+      ogImage: OG_IMAGE,
+      ogType: "website",
+      twitterCard: "summary_large_image",
+      siteName: SITE_NAME,
     },
   },
   {
@@ -52,6 +67,10 @@ export const ROUTE_META: Array<{ path: string; meta: RouteMeta }> = [
       keywords:
         "book cover design, cover designer, self-publishing, online publishing, bleed, safe zone",
       canonical: `${BASE}/cover-designer`,
+      ogImage: OG_IMAGE,
+      ogType: "website",
+      twitterCard: "summary_large_image",
+      siteName: SITE_NAME,
     },
   },
   {
@@ -63,6 +82,10 @@ export const ROUTE_META: Array<{ path: string; meta: RouteMeta }> = [
       keywords:
         "ISBN, ONIX, BISAC, book metadata, self-publishing, online publishing, publishing platform",
       canonical: `${BASE}/isbn-manager`,
+      ogImage: OG_IMAGE,
+      ogType: "website",
+      twitterCard: "summary_large_image",
+      siteName: SITE_NAME,
     },
   },
   {
@@ -74,6 +97,10 @@ export const ROUTE_META: Array<{ path: string; meta: RouteMeta }> = [
       keywords:
         "AI typesetting, book layout, auto-produce, self-publishing, online publishing, EPUB, PDF",
       canonical: `${BASE}/auto-produce`,
+      ogImage: OG_IMAGE,
+      ogType: "website",
+      twitterCard: "summary_large_image",
+      siteName: SITE_NAME,
     },
   },
   {
@@ -85,6 +112,10 @@ export const ROUTE_META: Array<{ path: string; meta: RouteMeta }> = [
       keywords:
         "book production timeline, publishing schedule, self-publishing, project management, online publishing",
       canonical: `${BASE}/timeline`,
+      ogImage: OG_IMAGE,
+      ogType: "website",
+      twitterCard: "summary_large_image",
+      siteName: SITE_NAME,
     },
   },
   {
@@ -96,6 +127,10 @@ export const ROUTE_META: Array<{ path: string; meta: RouteMeta }> = [
       keywords:
         "self-publishing resources, online publishing tools, book publishing, IngramSpark, Scrivener, publishing platform",
       canonical: `${BASE}/resources`,
+      ogImage: OG_IMAGE,
+      ogType: "website",
+      twitterCard: "summary_large_image",
+      siteName: SITE_NAME,
     },
   },
   {
@@ -107,6 +142,10 @@ export const ROUTE_META: Array<{ path: string; meta: RouteMeta }> = [
       keywords:
         "self-publishing guide, online publishing, book design, create design publish, publishing platform",
       canonical: `${BASE}/guide`,
+      ogImage: OG_IMAGE,
+      ogType: "website",
+      twitterCard: "summary_large_image",
+      siteName: SITE_NAME,
     },
   },
   {
@@ -118,6 +157,10 @@ export const ROUTE_META: Array<{ path: string; meta: RouteMeta }> = [
       keywords:
         "self-publishing, online publishing, book design, publishing platform, Bible publishing, create design publish",
       canonical: `${BASE}/`,
+      ogImage: OG_IMAGE,
+      ogType: "website",
+      twitterCard: "summary_large_image",
+      siteName: SITE_NAME,
     },
   },
 ];
