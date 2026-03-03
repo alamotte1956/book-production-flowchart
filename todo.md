@@ -511,3 +511,9 @@
 - [x] Add "Related Tools" section to Resources page linking to all 6 tools
 - [x] Add "Related Tools" section to UserGuide page linking to all 6 tools
 - [x] Add footer backlink bar to SpineCalculator, IsbnManager, BibleStudio, AutoProduce, Timeline, CoverDesigner
+
+## Phase 60: Server-Side Route Meta Tags
+- [x] Create shared/routeMeta.ts with per-route title, description, keywords, robots for all 9 pages
+- [x] Add injectRouteMeta() in server/_core/vite.ts for both dev (setupVite) and production (serveStatic) modes
+- [x] Verified all 9 routes return unique title, description, canonical in raw HTML via curl
+- [x] Update sitemap.xml lastmod dates and add /auto-produce and /timeline entries (9 URLs total)

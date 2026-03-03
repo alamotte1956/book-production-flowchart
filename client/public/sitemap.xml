@@ -12,7 +12,7 @@
     <priority>1.0</priority>
   </url>
 
-  <!-- Resources & Success Hub -->
+  <!-- Resources Hub -->
   <url>
     <loc>https://www.createdesignpublish.net/resources</loc>
     <lastmod>2026-03-03</lastmod>
@@ -31,6 +31,14 @@
   <!-- Bible Design Studio -->
   <url>
     <loc>https://www.createdesignpublish.net/bible-studio</loc>
+    <lastmod>2026-03-03</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <!-- Auto-Produce (AI Layout Engine) -->
+  <url>
+    <loc>https://www.createdesignpublish.net/auto-produce</loc>
     <lastmod>2026-03-03</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
@@ -55,6 +63,14 @@
   <!-- ISBN & Metadata Manager -->
   <url>
     <loc>https://www.createdesignpublish.net/isbn-manager</loc>
+    <lastmod>2026-03-03</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+
+  <!-- Production Timeline -->
+  <url>
+    <loc>https://www.createdesignpublish.net/timeline</loc>
     <lastmod>2026-03-03</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
