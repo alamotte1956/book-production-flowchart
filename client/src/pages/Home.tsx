@@ -278,7 +278,7 @@ export default function Home() {
               <img
                 src="https://d2xsxph8kpxj0f.cloudfront.net/310519663211654017/kGjPju6hKCvCsjZhgUHyqj/CDPlargelogo_25428631.PNG"
                 alt="Create Design Publish LLC"
-                className="w-8 h-8 rounded-md object-cover"
+                className="h-10 w-auto object-contain"
               />
               <span className="font-serif text-[#f5d98a] text-sm tracking-wide hidden sm:block">Create Design Publish LLC</span>
             </div>
@@ -320,7 +320,7 @@ export default function Home() {
                 <img
                   src="https://d2xsxph8kpxj0f.cloudfront.net/310519663211654017/kGjPju6hKCvCsjZhgUHyqj/CDPlargelogo_25428631.PNG"
                   alt="Create Design Publish LLC"
-                  className="w-10 h-10 rounded-lg object-cover"
+                  className="h-10 w-auto object-contain"
                 />
                 <div className="h-px w-16 bg-[#c9a96e]/60" />
               </div>
@@ -517,7 +517,7 @@ export default function Home() {
                 <img
                   src="https://d2xsxph8kpxj0f.cloudfront.net/310519663211654017/kGjPju6hKCvCsjZhgUHyqj/CDPlargelogo_25428631.PNG"
                   alt="Create Design Publish LLC"
-                  className="w-8 h-8 rounded-md object-cover"
+                  className="h-10 w-auto object-contain"
                 />
                 <div>
                   <p className="font-serif text-[#f5d98a] text-sm">Create Design Publish LLC</p>
@@ -593,7 +593,7 @@ export default function Home() {
             <img
               src="https://d2xsxph8kpxj0f.cloudfront.net/310519663211654017/kGjPju6hKCvCsjZhgUHyqj/CDPlargelogo_25428631.PNG"
               alt="Create Design Publish LLC"
-              className="w-7 h-7 rounded-md object-cover"
+              className="h-10 w-auto object-contain"
             />
             <span className="font-serif text-[#f5d98a] text-sm">Menu</span>
           </div>
@@ -665,7 +665,7 @@ export default function Home() {
               <img
                 src="https://d2xsxph8kpxj0f.cloudfront.net/310519663211654017/kGjPju6hKCvCsjZhgUHyqj/CDPlargelogo_25428631.PNG"
                 alt="Create Design Publish LLC"
-                className="w-9 h-9 rounded-lg object-cover"
+                className="h-10 w-auto object-contain"
               />
               <div>
                 <h1 className="font-serif text-lg leading-tight text-[#f5efe0]">Create Design Publish LLC</h1>
