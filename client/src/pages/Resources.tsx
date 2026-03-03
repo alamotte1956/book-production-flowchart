@@ -479,8 +479,8 @@ export default function Resources() {
             <ArrowLeft size={20} />
           </Button>
           <div className="flex-1">
-            <h1 className="font-serif text-xl">Resources & Success Hub</h1>
-            <p className="text-xs text-[#c9a96e]/70">The most efficient tools and platforms for every stage of book production</p>
+            <h1 className="font-serif text-xl">Self-Publishing &amp; Online Publishing Resources</h1>
+            <p className="text-xs text-[#c9a96e]/70">The most trusted tools and platforms to create, design, and publish your book at every stage</p>
           </div>
           <div className="hidden sm:flex items-center gap-2 text-xs text-[#c9a96e]/50">
             <span className="px-2 py-1 rounded-full bg-[#c9a96e]/10">
@@ -494,9 +494,9 @@ export default function Resources() {
 
         {/* Industry Stats */}
         <section>
-          <h2 className="font-serif text-2xl text-[#3a2a1a] mb-2">The Publishing Landscape</h2>
+          <h2 className="font-serif text-2xl text-[#3a2a1a] mb-2">The Self-Publishing Landscape</h2>
           <p className="text-sm text-[#8b7b6b] mb-6 max-w-2xl">
-            Understanding the market helps you set realistic goals and make informed decisions about your publishing path.
+            Understanding the online publishing market helps you set realistic goals and make informed decisions about your self-publishing path.
           </p>
           <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
             {stats.map((stat) => {

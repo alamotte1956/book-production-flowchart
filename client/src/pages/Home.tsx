@@ -668,7 +668,7 @@ export default function Home() {
               />
               <div>
                 <h1 className="font-serif text-lg leading-tight text-[#f5efe0]">Create Design Publish LLC</h1>
-                <p className="text-[10px] text-[#c9a96e]/50 uppercase tracking-widest hidden sm:block">Publisher Command Center</p>
+                <p className="text-[10px] text-[#c9a96e]/50 uppercase tracking-widest hidden sm:block">Self-Publishing &amp; Online Publishing Platform</p>
               </div>
             </div>
           </div>

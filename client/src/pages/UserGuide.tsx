@@ -448,10 +448,10 @@ export default function UserGuide() {
             className="mt-4 font-serif text-3xl tracking-widest"
             style={{ color: "#f5d98a", textShadow: "0 0 20px rgba(245,217,138,0.5)" }}
           >
-            Complete User Guide
+            Self-Publishing Platform Guide
           </p>
           <p className="mt-4 text-[#d4c8b4] max-w-xl mx-auto text-sm leading-relaxed">
-            Everything you need to take a book from first idea to finished, print-ready volume — step by step.
+            Everything you need to create, design, and publish your book — from first idea to finished, print-ready volume using our online publishing platform.
           </p>
           <div className="mt-6 flex items-center justify-center gap-6 text-[#c9a96e]/70 text-sm">
             <span><strong className="text-[#f5efe0]">11</strong> Chapters</span>
