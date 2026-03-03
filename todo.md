@@ -502,3 +502,12 @@
 - [x] Reduce meta keywords from 10 to 6 focused terms
 - [x] Shorten page title to 50 characters (was 72) in index.html and Home.tsx
 - [x] Shorten meta description to 149 characters (was 253) in index.html and Home.tsx
+
+## Phase 58: Robots Meta Tags
+- [x] Add meta robots index,follow to index.html (SPA shell)
+- [x] Add meta robots index,follow dynamically in Home.tsx setMetaTag
+
+## Phase 59: Internal Backlinks
+- [x] Add "Related Tools" section to Resources page linking to all 6 tools
+- [x] Add "Related Tools" section to UserGuide page linking to all 6 tools
+- [x] Add footer backlink bar to SpineCalculator, IsbnManager, BibleStudio, AutoProduce, Timeline, CoverDesigner

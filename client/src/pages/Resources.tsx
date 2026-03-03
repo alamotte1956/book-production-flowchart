@@ -4,8 +4,8 @@
  */
 
 import { useEffect } from "react";
-import { useLocation } from "wouter";
-import { ArrowLeft, ExternalLink, TrendingUp, BookOpen, Users, DollarSign, Star } from "lucide-react";
+import { Link, useLocation } from "wouter";
+import { ArrowLeft, ExternalLink, TrendingUp, BookOpen, Users, DollarSign, Star, BookMarked, Ruler, Layers, Barcode, Calendar, Zap } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 
@@ -584,6 +584,31 @@ export default function Resources() {
             </div>
           </section>
         ))}
+
+        {/* Related Tools — internal backlinks */}
+        <div className="py-10 border-t border-[#e8dfd0]">
+          <h2 className="font-serif text-2xl text-[#3a2a1a] text-center mb-2">Self-Publishing Tools</h2>
+          <p className="text-sm text-[#8b7b6b] text-center mb-8">Use these free online publishing tools alongside the resources above.</p>
+          <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+            {[
+              { href: "/bible-studio", icon: <BookMarked size={18} />, label: "Bible Design Studio", desc: "Configure trim, paper & binding" },
+              { href: "/spine-calculator", icon: <Ruler size={18} />, label: "Spine Calculator", desc: "Calculate exact spine width" },
+              { href: "/cover-designer", icon: <Layers size={18} />, label: "Cover Designer", desc: "Full-wrap cover dimensions" },
+              { href: "/isbn-manager", icon: <Barcode size={18} />, label: "ISBN & Metadata", desc: "Manage ISBN & ONIX 3.0 XML" },
+              { href: "/timeline", icon: <Calendar size={18} />, label: "Production Timeline", desc: "Gantt-style deadline tracker" },
+              { href: "/auto-produce", icon: <Zap size={18} />, label: "Auto-Produce", desc: "AI-powered layout engine" },
+            ].map(({ href, icon, label, desc }) => (
+              <Link key={href} href={href}
+                className="group flex items-start gap-3 bg-white rounded-xl border border-[#e8dfd0] p-4 hover:border-[#c9a96e]/60 hover:shadow-md transition-all duration-200">
+                <span className="mt-0.5 text-[#c9a96e] shrink-0">{icon}</span>
+                <span>
+                  <span className="block font-semibold text-sm text-[#3a2a1a] group-hover:text-[#5c3d2e] transition-colors">{label}</span>
+                  <span className="block text-xs text-[#8b7b6b] mt-0.5">{desc}</span>
+                </span>
+              </Link>
+            ))}
+          </div>
+        </div>
 
         {/* Footer note */}
         <div className="text-center py-8 border-t border-[#e8dfd0]">

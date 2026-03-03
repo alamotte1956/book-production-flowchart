@@ -8,7 +8,7 @@
  * confirm the look before committing to the full pipeline.
  */
 import { useState, useRef, useCallback, useEffect } from "react";
-import { useParams, useLocation } from "wouter";
+import { Link, useParams, useLocation } from "wouter";
 import { trpc } from "@/lib/trpc";
 import { useAuth } from "@/_core/hooks/useAuth";
 import { getLoginUrl } from "@/const";
@@ -884,6 +884,29 @@ export default function AutoProduce() {
         styleId={styleId}
         trimSizeId={trimSizeId}
       />
+
+      {/* Related Tools footer backlinks */}
+      <div className="border-t border-[#e8dfd0] bg-[#faf6ef] px-6 py-6">
+        <div className="max-w-5xl mx-auto">
+          <p className="text-xs text-[#8b7b6b] mb-3 font-semibold uppercase tracking-wide">Other Self-Publishing Tools</p>
+          <div className="flex flex-wrap gap-2">
+            {[
+              { href: "/bible-studio", label: "Bible Design Studio" },
+              { href: "/spine-calculator", label: "Spine Calculator" },
+              { href: "/cover-designer", label: "Cover Designer" },
+              { href: "/isbn-manager", label: "ISBN & Metadata" },
+              { href: "/timeline", label: "Production Timeline" },
+              { href: "/resources", label: "Resources Hub" },
+              { href: "/guide", label: "User Guide" },
+            ].map(({ href, label }) => (
+              <Link key={href} href={href}
+                className="text-xs px-3 py-1.5 rounded-full border border-[#d4c8b4] text-[#5c3d2e] hover:bg-[#c9a96e]/10 hover:border-[#c9a96e]/50 transition-colors">
+                {label}
+              </Link>
+            ))}
+          </div>
+        </div>
+      </div>
     </div>
   );
 }

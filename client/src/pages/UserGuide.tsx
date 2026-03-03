@@ -3,8 +3,8 @@
  * Full instruction book rendered as a navigable web page.
  */
 import { useState } from "react";
-import { useLocation } from "wouter";
-import { BookOpen, ChevronRight, ChevronDown, ArrowLeft, BookMarked, Layers, Ruler, Zap, BarChart3, Library, FileText, HelpCircle, Download } from "lucide-react";
+import { Link, useLocation } from "wouter";
+import { BookOpen, ChevronRight, ChevronDown, ArrowLeft, BookMarked, Layers, Ruler, Zap, BarChart3, Library, FileText, HelpCircle, Download, Barcode, Calendar } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 
@@ -486,6 +486,31 @@ export default function UserGuide() {
             onToggle={() => toggleSection(section.id)}
           />
         ))}
+
+        {/* Related Tools — internal backlinks */}
+        <div className="mt-8 p-6 bg-[#faf6ef] rounded-xl border border-[#e8dfd0]">
+          <h2 className="font-serif text-xl text-[#3a2a1a] text-center mb-1">Self-Publishing Tools</h2>
+          <p className="text-xs text-[#8b7b6b] text-center mb-5">Jump directly to any tool in the platform.</p>
+          <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+            {[
+              { href: "/bible-studio", icon: <BookMarked size={16} />, label: "Bible Design Studio" },
+              { href: "/spine-calculator", icon: <Ruler size={16} />, label: "Spine Calculator" },
+              { href: "/cover-designer", icon: <Layers size={16} />, label: "Cover Designer" },
+              { href: "/isbn-manager", icon: <Barcode size={16} />, label: "ISBN & Metadata" },
+              { href: "/timeline", icon: <Calendar size={16} />, label: "Production Timeline" },
+              { href: "/auto-produce", icon: <Zap size={16} />, label: "Auto-Produce" },
+            ].map(({ href, icon, label }) => (
+              <Link key={href} href={href}
+                className="group flex items-center gap-2 bg-white rounded-lg border border-[#e8dfd0] px-3 py-2.5 hover:border-[#c9a96e]/60 hover:shadow-sm transition-all duration-200">
+                <span className="text-[#c9a96e] shrink-0">{icon}</span>
+                <span className="text-sm text-[#3a2a1a] group-hover:text-[#5c3d2e] transition-colors font-medium">{label}</span>
+              </Link>
+            ))}
+          </div>
+          <div className="mt-4 text-center">
+            <Link href="/resources" className="text-xs text-[#c9a96e] hover:underline">Browse all self-publishing resources →</Link>
+          </div>
+        </div>
 
         {/* Footer note */}
         <div className="mt-8 p-6 bg-[#2a1a0a] rounded-xl text-center">

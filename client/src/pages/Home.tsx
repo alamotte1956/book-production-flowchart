@@ -220,6 +220,7 @@ export default function Home() {
     document.title = PAGE_TITLE;
     setMetaTag("description", PAGE_DESCRIPTION);
     setMetaTag("keywords", PAGE_KEYWORDS);
+    setMetaTag("robots", "index, follow");
     injectJsonLd("jsonld-software-app", jsonLdSoftwareApp);
     injectJsonLd("jsonld-website", jsonLdWebSite);
     injectJsonLd("jsonld-organization", jsonLdOrganization);
