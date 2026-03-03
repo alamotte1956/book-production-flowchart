@@ -536,3 +536,12 @@
 - [x] Replace old logo in UserGuide.tsx (CDP_LOGO constant)
 - [x] Replace old logo in PublishingWizard.tsx
 - [x] Verified 0 old logo references remain, 7 new logo references in place
+
+## Phase 63: Universal File Processing
+- [x] Audited: server file.upload endpoint already accepts any MIME type and stores to S3
+- [x] Audited: ProjectTracker file input already has no accept restriction
+- [x] Expanded AutoProduce ACCEPTED_TYPES to include images (PNG/JPG/WebP/TIFF/GIF/SVG) and archives (ZIP/RAR)
+- [x] Expanded AutoProduce ACCEPTED_EXT to include all image and archive extensions
+- [x] Raised AutoProduce MAX_FILE_SIZE_MB from 15 to 50
+- [x] Updated drop zone label and error message to list all supported formats
+- [x] All 181 tests pass, TypeScript 0 errors

@@ -25,7 +25,7 @@ import {
   ChevronDown, ChevronUp, RefreshCw, Copy, Terminal,
 } from "lucide-react";
 
-const MAX_FILE_SIZE_MB = 15;
+const MAX_FILE_SIZE_MB = 50;
 const ACCEPTED_TYPES = [
   // Word
   "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
@@ -51,6 +51,19 @@ const ACCEPTED_TYPES = [
   "application/csv",
   // ePub
   "application/epub+zip",
+  // Images
+  "image/png",
+  "image/jpeg",
+  "image/jpg",
+  "image/webp",
+  "image/tiff",
+  "image/gif",
+  "image/svg+xml",
+  // Archives
+  "application/zip",
+  "application/x-zip-compressed",
+  "application/x-rar-compressed",
+  "application/octet-stream",
 ];
 const ACCEPTED_EXT = [
   ".docx", ".doc",
@@ -62,6 +75,10 @@ const ACCEPTED_EXT = [
   ".odt", ".ods",
   ".csv",
   ".epub",
+  // Images
+  ".png", ".jpg", ".jpeg", ".webp", ".tiff", ".tif", ".gif", ".svg",
+  // Archives
+  ".zip", ".rar",
 ].join(",");
 
 function fileToBase64(file: File): Promise<string> {
@@ -560,7 +577,7 @@ export default function AutoProduce() {
     const validMime = ACCEPTED_TYPES.includes(file.type);
     if (!validExt && !validMime) {
       toast.error(
-        "Unsupported file type. Accepted: Word, PDF, TXT, MD, HTML, RTF, XLSX, XLS, Numbers, ODT, CSV, EPUB."
+        "Unsupported file type. Accepted: Word, PDF, TXT, MD, HTML, RTF, XLSX, ODT, CSV, EPUB, images (PNG/JPG/WebP/SVG/TIFF/GIF), and archives (ZIP/RAR)."
       );
       return;
     }
@@ -790,7 +807,7 @@ export default function AutoProduce() {
                       or click to browse — max {MAX_FILE_SIZE_MB}MB
                     </p>
                     <p className="text-[10px] text-[#b09880] mt-1">
-                      Word · PDF · TXT · MD · HTML · RTF · XLSX · XLS · Numbers · ODT · CSV · EPUB
+                      Word · PDF · TXT · MD · HTML · RTF · XLSX · ODT · CSV · EPUB · PNG · JPG · WebP · SVG · TIFF · GIF · ZIP · RAR
                     </p>
                   </div>
                 </div>
