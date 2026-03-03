@@ -52,9 +52,9 @@ const features = [
   { icon: Clock, title: "Publishing Deadlines & Milestones", desc: "Set target dates per phase and stay on schedule from manuscript creation through final publishing and distribution." },
 ];
 
-const PAGE_TITLE = "Self-Publishing & Online Publishing Platform — Create Design Publish LLC";
-const PAGE_DESCRIPTION = "Create Design Publish LLC is the all-in-one self-publishing and online publishing platform. Create, design, and publish your book from manuscript to masterpiece with AI typesetting, cover design tools, ISBN management, and a 30-step production workflow.";
-const PAGE_KEYWORDS = "self-publishing, online publishing, create design publish, book design, publishing platform, Bible publishing, manuscript to print, AI typesetting, self-publish a book, book production workflow";
+const PAGE_TITLE = "Create Design Publish — Self-Publishing Platform";
+const PAGE_DESCRIPTION = "Create, design, and publish your book with our all-in-one self-publishing platform. AI typesetting, cover design, ISBN tools, and a 30-step workflow.";
+const PAGE_KEYWORDS = "self-publishing, online publishing, book design, publishing platform, Bible publishing, create design publish";
 
 function setMetaTag(name: string, content: string) {
   let el = document.querySelector<HTMLMetaElement>(`meta[name="${name}"]`);
