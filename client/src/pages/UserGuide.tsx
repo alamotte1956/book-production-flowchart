@@ -8,7 +8,7 @@ import { BookOpen, ChevronRight, ChevronDown, ArrowLeft, BookMarked, Layers, Rul
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 
-const CDP_LOGO = "https://d2xsxph8kpxj0f.cloudfront.net/310519663211654017/kGjPju6hKCvCsjZhgUHyqj/cdp-logo-icon-VKK59tkJo7q6tVURkrEnnJ.webp";
+const CDP_LOGO = "https://d2xsxph8kpxj0f.cloudfront.net/310519663211654017/kGjPju6hKCvCsjZhgUHyqj/CDPlargelogo_25428631.PNG";
 
 interface Section {
   id: string;

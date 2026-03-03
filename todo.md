@@ -523,3 +523,16 @@
 - [x] Extend shared/routeMeta.ts with ogImage, ogType, twitterCard, siteName fields
 - [x] Updated injectRouteMeta() in vite.ts to inject 14 OG/Twitter tags per route
 - [x] Verified tags appear correctly in raw HTML via curl for / and /bible-studio
+
+## Phase 62: Logo Replacement
+- [ ] Copy uploaded logo to webdev-static-assets and upload to CDN
+- [ ] Replace logo in dashboard header (Home.tsx)
+- [ ] Replace logo in landing page nav bar (Home.tsx)
+- [ ] Update favicon if appropriate
+
+## Phase 62: Logo Replacement (Site-wide)
+- [x] Replace old logo CDN URL with new CDPlargelogo.PNG in Home.tsx (6 occurrences)
+- [x] Replace old logo in JSON-LD logo field
+- [x] Replace old logo in UserGuide.tsx (CDP_LOGO constant)
+- [x] Replace old logo in PublishingWizard.tsx
+- [x] Verified 0 old logo references remain, 7 new logo references in place

@@ -207,7 +207,7 @@ export default function PublishingWizard({ onComplete, onSkip, initialAnswers }:
         <div className="text-center mb-8">
           <div className="flex items-center justify-center gap-2 mb-3">
             <img
-              src="https://d2xsxph8kpxj0f.cloudfront.net/310519663211654017/kGjPju6hKCvCsjZhgUHyqj/cdp-logo-icon-VKK59tkJo7q6tVURkrEnnJ.webp"
+              src="https://d2xsxph8kpxj0f.cloudfront.net/310519663211654017/kGjPju6hKCvCsjZhgUHyqj/CDPlargelogo_25428631.PNG"
               alt="Create Design Publish LLC"
               className="w-7 h-7 rounded-md object-cover"
             />

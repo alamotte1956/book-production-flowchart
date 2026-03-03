@@ -109,7 +109,7 @@ const jsonLdOrganization = {
   "@type": "Organization",
   "name": "Create Design Publish LLC",
   "url": SITE_URL,
-  "logo": `${SITE_URL}/favicon.ico`,
+  "logo": "https://d2xsxph8kpxj0f.cloudfront.net/310519663211654017/kGjPju6hKCvCsjZhgUHyqj/CDPlargelogo_25428631.PNG",
   "sameAs": [SITE_URL],
   "description": "Create Design Publish LLC builds self-publishing and online publishing tools that help independent authors and small presses create, design, and publish professional books — from first draft to finished product.",
 };
@@ -276,7 +276,7 @@ export default function Home() {
           <div className="max-w-6xl mx-auto px-6 py-3 flex items-center justify-between">
             <div className="flex items-center gap-2.5">
               <img
-                src="https://d2xsxph8kpxj0f.cloudfront.net/310519663211654017/kGjPju6hKCvCsjZhgUHyqj/cdp-logo-icon-VKK59tkJo7q6tVURkrEnnJ.webp"
+                src="https://d2xsxph8kpxj0f.cloudfront.net/310519663211654017/kGjPju6hKCvCsjZhgUHyqj/CDPlargelogo_25428631.PNG"
                 alt="Create Design Publish LLC"
                 className="w-8 h-8 rounded-md object-cover"
               />
@@ -318,7 +318,7 @@ export default function Home() {
               <div className="flex items-center justify-center gap-3 mb-6">
                 <div className="h-px w-16 bg-[#c9a96e]/60" />
                 <img
-                  src="https://d2xsxph8kpxj0f.cloudfront.net/310519663211654017/kGjPju6hKCvCsjZhgUHyqj/cdp-logo-icon-VKK59tkJo7q6tVURkrEnnJ.webp"
+                  src="https://d2xsxph8kpxj0f.cloudfront.net/310519663211654017/kGjPju6hKCvCsjZhgUHyqj/CDPlargelogo_25428631.PNG"
                   alt="Create Design Publish LLC"
                   className="w-10 h-10 rounded-lg object-cover"
                 />
@@ -515,7 +515,7 @@ export default function Home() {
             <div className="flex flex-col md:flex-row items-center justify-between gap-6">
               <div className="flex items-center gap-3">
                 <img
-                  src="https://d2xsxph8kpxj0f.cloudfront.net/310519663211654017/kGjPju6hKCvCsjZhgUHyqj/cdp-logo-icon-VKK59tkJo7q6tVURkrEnnJ.webp"
+                  src="https://d2xsxph8kpxj0f.cloudfront.net/310519663211654017/kGjPju6hKCvCsjZhgUHyqj/CDPlargelogo_25428631.PNG"
                   alt="Create Design Publish LLC"
                   className="w-8 h-8 rounded-md object-cover"
                 />
@@ -591,7 +591,7 @@ export default function Home() {
         <div className="flex items-center justify-between px-5 py-4 border-b border-[#c9a96e]/10">
           <div className="flex items-center gap-2.5">
             <img
-              src="https://d2xsxph8kpxj0f.cloudfront.net/310519663211654017/kGjPju6hKCvCsjZhgUHyqj/cdp-logo-icon-VKK59tkJo7q6tVURkrEnnJ.webp"
+              src="https://d2xsxph8kpxj0f.cloudfront.net/310519663211654017/kGjPju6hKCvCsjZhgUHyqj/CDPlargelogo_25428631.PNG"
               alt="Create Design Publish LLC"
               className="w-7 h-7 rounded-md object-cover"
             />
@@ -663,7 +663,7 @@ export default function Home() {
           <div className="flex items-center gap-4">
             <div className="flex items-center gap-2.5">
               <img
-                src="https://d2xsxph8kpxj0f.cloudfront.net/310519663211654017/kGjPju6hKCvCsjZhgUHyqj/cdp-logo-icon-VKK59tkJo7q6tVURkrEnnJ.webp"
+                src="https://d2xsxph8kpxj0f.cloudfront.net/310519663211654017/kGjPju6hKCvCsjZhgUHyqj/CDPlargelogo_25428631.PNG"
                 alt="Create Design Publish LLC"
                 className="w-9 h-9 rounded-lg object-cover"
               />
