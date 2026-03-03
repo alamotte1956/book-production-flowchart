@@ -489,3 +489,8 @@
 - [x] Update Resources page h1 and intro text with keywords
 - [x] Update Guide page subtitle and intro text with keywords
 - [x] Update The Publishing Landscape h2 on Resources page
+
+## Phase 55: Sitemap & Robots
+- [x] Create sitemap.xml in client/public/ with all public pages and correct canonical domain
+- [x] Create/update robots.txt to reference the sitemap
+- [x] Add canonical link tag and sitemap link tag to index.html
