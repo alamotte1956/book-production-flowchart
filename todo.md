@@ -672,3 +672,11 @@
 
 ## Phase 81: KP&A Legend Note Link
 - [x] Made "Koechel Peterson & Associates (KP&A)" in the ISBN Lookup legend note a clickable Link to /kpa-templates (amber underline, hover darkens). Zero TypeScript errors.
+
+## Phase 82: Recent Lookups History
+- [x] Added localStorage-backed recentLookups state (max 5 ISBNs with title)
+- [x] Recent Lookups panel appears below the legend note when history is non-empty
+- [x] Each chip shows a book icon, truncated title, and monospace ISBN; clickable to re-run the search
+- [x] "Clear" button wipes the history from state and localStorage
+- [x] useEffect appends to history on every successful ISBN search result
+- [x] Zero TypeScript errors

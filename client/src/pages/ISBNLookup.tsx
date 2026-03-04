@@ -5,7 +5,7 @@
  * "Recreate This Book" button that opens the Publishing Wizard.
  */
 
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
 import { trpc } from "@/lib/trpc";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -351,10 +351,43 @@ export default function ISBNLookup() {
   const [wizardTemplate, setWizardTemplate] = useState<CDPTemplate | null>(null);
   const [wizardBook, setWizardBook] = useState<LookupResult | null>(null);
 
+  // ── Recent Lookups (localStorage) ───────────────────────────────────────────
+  type RecentEntry = { isbn: string; title: string };
+  const STORAGE_KEY = "cdp-isbn-recent";
+  const [recentLookups, setRecentLookups] = useState<RecentEntry[]>(() => {
+    try {
+      const raw = localStorage.getItem(STORAGE_KEY);
+      return raw ? (JSON.parse(raw) as RecentEntry[]) : [];
+    } catch {
+      return [];
+    }
+  });
+
+  const addToRecent = useCallback((isbn: string, title: string) => {
+    setRecentLookups(prev => {
+      const filtered = prev.filter(e => e.isbn !== isbn);
+      const next = [{ isbn, title }, ...filtered].slice(0, 5);
+      try { localStorage.setItem(STORAGE_KEY, JSON.stringify(next)); } catch { /* ignore */ }
+      return next;
+    });
+  }, []);
+
+  const clearRecent = useCallback(() => {
+    setRecentLookups([]);
+    try { localStorage.removeItem(STORAGE_KEY); } catch { /* ignore */ }
+  }, []);
+
   const { data, isLoading, error } = trpc.book.lookupByIsbn.useQuery(
     { isbn: searchIsbn! },
     { enabled: !!searchIsbn, retry: false }
   );
+
+  // When a successful result arrives, add it to recent history
+  useEffect(() => {
+    if (data && searchIsbn) {
+      addToRecent(searchIsbn, data.title || searchIsbn);
+    }
+  }, [data, searchIsbn, addToRecent]);
 
   const handleSearch = useCallback(() => {
     const clean = inputValue.replace(/[-\s]/g, "");
@@ -460,6 +493,35 @@ export default function ISBNLookup() {
           <span className="inline-block w-1.5 h-1.5 rounded-full bg-amber-500 flex-shrink-0" />
           <span>Amber dot indicates a title designed by{" "}<Link href="/kpa-templates" className="underline text-amber-700 hover:text-amber-900 transition-colors">Koechel Peterson &amp; Associates (KP&amp;A)</Link>{" "}— searching these will surface a matching KP&A production template.</span>
         </p>
+
+        {/* Recent Lookups */}
+        {recentLookups.length > 0 && (
+          <div className="mt-4 border border-[#c9a96e]/20 rounded-lg bg-white/60 px-4 py-3">
+            <div className="flex items-center justify-between mb-2">
+              <span className="text-xs font-medium text-[#8b7b6b] tracking-wide uppercase">Recent Lookups</span>
+              <button
+                onClick={clearRecent}
+                className="text-[10px] text-[#b0a090] hover:text-[#8b7b6b] transition-colors underline"
+              >
+                Clear
+              </button>
+            </div>
+            <div className="flex flex-wrap gap-2">
+              {recentLookups.map(entry => (
+                <button
+                  key={entry.isbn}
+                  onClick={() => { setInputValue(entry.isbn); setSearchIsbn(entry.isbn); }}
+                  className="inline-flex items-center gap-1.5 text-xs bg-[#f5efe6] hover:bg-[#ede5d8] text-[#5c3d2e] border border-[#c9a96e]/30 rounded-full px-3 py-1 transition-colors"
+                  title={entry.isbn}
+                >
+                  <BookMarked className="w-3 h-3 text-[#c9a96e]" />
+                  <span className="max-w-[180px] truncate">{entry.title}</span>
+                  <span className="text-[#b0a090] font-mono text-[10px]">{entry.isbn}</span>
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
 
         {/* Results area */}
         <div className="mt-8">
