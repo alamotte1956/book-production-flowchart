@@ -669,3 +669,6 @@
 - [x] Added both titles to the Inspirational Gift Book template in kpaTemplates.ts with full design credit
 - [x] Added Each Day a New Beginning as the sixth KP&A example chip in ISBNLookup.tsx
 - [x] Zero TypeScript errors, 203 tests passing
+
+## Phase 81: KP&A Legend Note Link
+- [x] Made "Koechel Peterson & Associates (KP&A)" in the ISBN Lookup legend note a clickable Link to /kpa-templates (amber underline, hover darkens). Zero TypeScript errors.
