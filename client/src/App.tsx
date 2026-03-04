@@ -15,6 +15,7 @@ import CoverDesigner from "./pages/CoverDesigner";
 import IsbnManager from "./pages/IsbnManager";
 import UserGuide from "./pages/UserGuide";
 import CDPTemplates from "./pages/CDPTemplates";
+import ISBNLookup from "./pages/ISBNLookup";
 
 function Router() {
   return (
@@ -30,6 +31,7 @@ function Router() {
       <Route path={"/isbn-manager"} component={IsbnManager} />
       <Route path={"/guide"} component={UserGuide} />
       <Route path={"/cdp-templates"} component={CDPTemplates} />
+      <Route path={"/isbn-lookup"} component={ISBNLookup} />
       <Route path={"/404"} component={NotFound} />
       <Route component={NotFound} />
     </Switch>

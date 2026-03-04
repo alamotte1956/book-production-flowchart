@@ -18,7 +18,7 @@ import {
   BookOpen, Plus, Trash2, ArrowRight, Loader2,
   Upload, CheckCircle2, SkipForward, Clock, Sparkles, Copy,
   Layers, BookMarked, Ruler, Zap, BarChart3, Library,
-  ChevronRight, ChevronDown, Calendar, Star, TrendingUp, FileText, HelpCircle, LogOut, User, Menu, X, LayoutGrid,
+  ChevronRight, ChevronDown, Calendar, Star, TrendingUp, FileText, HelpCircle, LogOut, User, Menu, X, LayoutGrid, Search,
 } from "lucide-react";
 import {
   DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel,
@@ -205,6 +205,16 @@ const TOOLS = [
     desc: "One-click presets for every book type CDP has published — Bibles, devotionals, children's books, theological works, and more.",
     badge: "Templates",
     badgeColor: "bg-amber-100 text-amber-800",
+    dark: false,
+  },
+  {
+    id: "isbn-lookup",
+    path: "/isbn-lookup",
+    icon: Search,
+    label: "ISBN Book Lookup",
+    desc: "Enter any ISBN to retrieve a book's production specs and get an instant CDP template recommendation for recreating it.",
+    badge: "Lookup",
+    badgeColor: "bg-indigo-100 text-indigo-800",
     dark: false,
   },
   {

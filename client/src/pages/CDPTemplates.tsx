@@ -6,6 +6,7 @@
  */
 import { useState } from "react";
 import { Link, useLocation } from "wouter";
+import CDPProductionWizard from "@/components/CDPProductionWizard";
 import {
   ArrowLeft, BookOpen, Heart, BookMarked, PenLine, ZoomIn, Package, Star, Users,
   Columns, Languages, Gift, LayoutGrid, Cross, ClipboardList, Sun, Sparkles, Image,
@@ -59,7 +60,7 @@ const CATEGORY_COLORS: Record<CDPTemplateCategory, { bg: string; text: string; b
 
 // ─── Template Card ────────────────────────────────────────────────────────────
 
-function TemplateCard({ template }: { template: CDPTemplate }) {
+function TemplateCard({ template, onOpenWizard }: { template: CDPTemplate; onOpenWizard: (t: CDPTemplate) => void }) {
   const [, navigate] = useLocation();
   const colors = CATEGORY_COLORS[template.category];
 
@@ -68,11 +69,8 @@ function TemplateCard({ template }: { template: CDPTemplate }) {
       // Navigate to Bible Studio — it will read the URL param
       navigate(`/bible-studio?template=${template.id}&edition=${template.bibleEditionTypeId ?? ""}&style=${template.styleId}&trim=${template.trimSizeId}&paper=${template.paperTypeId}&binding=${template.bindingTypeId}`);
     } else {
-      // Navigate to Auto-Produce (requires a project) — show a toast with instructions
-      toast.info("To use this template, create a new book project from the dashboard, then open Auto-Produce and select the matching style.", {
-        duration: 6000,
-        description: `Style: ${template.styleId} · Trim: ${template.trimLabel} · ${template.pageCountRange[0]}–${template.pageCountRange[1]} pages`,
-      });
+      // Open the CDP Production Wizard for non-Bible templates
+      onOpenWizard(template);
     }
   }
 
@@ -151,7 +149,7 @@ function TemplateCard({ template }: { template: CDPTemplate }) {
 
 // ─── Category Section ─────────────────────────────────────────────────────────
 
-function CategorySection({ category, templates }: { category: CDPTemplateCategory; templates: CDPTemplate[] }) {
+function CategorySection({ category, templates, onOpenWizard }: { category: CDPTemplateCategory; templates: CDPTemplate[]; onOpenWizard: (t: CDPTemplate) => void }) {
   const colors = CATEGORY_COLORS[category];
   return (
     <section className="mb-12">
@@ -164,7 +162,7 @@ function CategorySection({ category, templates }: { category: CDPTemplateCategor
       </div>
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
         {templates.map((t) => (
-          <TemplateCard key={t.id} template={t} />
+          <TemplateCard key={t.id} template={t} onOpenWizard={onOpenWizard} />
         ))}
       </div>
     </section>
@@ -177,6 +175,7 @@ export default function CDPTemplates() {
   const [, navigate] = useLocation();
   const [search, setSearch] = useState("");
   const [activeCategory, setActiveCategory] = useState<CDPTemplateCategory | "All">("All");
+  const [wizardTemplate, setWizardTemplate] = useState<CDPTemplate | null>(null);
 
   const filtered = CDP_TEMPLATES.filter((t) => {
     const matchesCategory = activeCategory === "All" || t.category === activeCategory;
@@ -323,7 +322,7 @@ export default function CDPTemplates() {
           </div>
         ) : (
           groupedByCategory.map(({ category, templates }) => (
-            <CategorySection key={category} category={category} templates={templates} />
+            <CategorySection key={category} category={category} templates={templates} onOpenWizard={setWizardTemplate} />
           ))
         )}
 
@@ -372,9 +371,9 @@ export default function CDPTemplates() {
             {[
               { label: "Bible Design Studio", path: "/bible-studio" },
               { label: "Auto-Produce", path: "/" },
+              { label: "ISBN Lookup", path: "/isbn-lookup" },
               { label: "Spine Calculator", path: "/spine-calculator" },
               { label: "Cover Designer", path: "/cover-designer" },
-              { label: "ISBN & Metadata", path: "/isbn-manager" },
               { label: "Resources Hub", path: "/resources" },
             ].map((link) => (
               <button
@@ -389,6 +388,14 @@ export default function CDPTemplates() {
           </div>
         </div>
       </main>
+
+      {/* CDP Production Wizard modal */}
+      {wizardTemplate && (
+        <CDPProductionWizard
+          template={wizardTemplate}
+          onClose={() => setWizardTemplate(null)}
+        />
+      )}
     </div>
   );
 }

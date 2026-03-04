@@ -18,6 +18,7 @@ import { TYPESETTING_STYLES, TRIM_SIZES, getTrimSize, getTypesettingStyle } from
 import { storagePut } from "./storage";
 import { generateIdml } from "./idmlGenerator";
 import { invokeLLM } from "./_core/llm";
+import { lookupByIsbn } from "./isbnLookup";
 
 // ─── Error classification helper (module scope so it's shared by start + retry) ──
 const classifyError = (err: unknown, fileName: string, wordCount?: number | null): "format_unsupported" | "parse_empty" | "pipeline_error" | "unknown" => {
@@ -784,6 +785,22 @@ export const appRouter = router({
 
         const content = response.choices?.[0]?.message?.content ?? "";
         return { content, type: input.type };
+      }),
+  }),
+
+  // ─── Book / ISBN Lookup ─────────────────────────────────────────────────────
+  book: router({
+    /**
+     * Looks up a book by ISBN using Open Library and Google Books APIs.
+     * Returns title, author, publisher, page count, dimensions, cover image,
+     * and the best-matching CDP production template.
+     */
+    lookupByIsbn: publicProcedure
+      .input(z.object({
+        isbn: z.string().min(10).max(17),
+      }))
+      .query(async ({ input }) => {
+        return lookupByIsbn(input.isbn);
       }),
   }),
 

@@ -575,3 +575,32 @@
 - [x] Wire /cdp-templates route in App.tsx and add to dashboard nav
 - [x] Add CDP Templates link to landing page tools section (TOOLS array + desktop/mobile nav)
 - [ ] Update Resources Hub with CDP publisher partners
+
+## Phase 68: Full Book Recreation Workflow
+- [ ] Build PublishingWizard.tsx — multi-step guided workflow (Template → Project → Manuscript → Typesetting → Cover → Generate)
+- [ ] Add wizard tRPC procedures: wizard.create, wizard.getStep, wizard.updateStep, wizard.complete
+- [ ] Add wizard_sessions table to drizzle schema
+- [ ] Wire "Use This Template" button on CDPTemplates to launch the wizard
+- [ ] Auto-Produce: read ?template= and ?style= URL params to pre-select style on load
+- [ ] Auto-Produce: read ?trim= URL param to pre-select trim size on load
+- [ ] Add CDP genre options to project creation dialog (Christian Living, Devotional, Children's Christian, Prayer, Pastoral, Biography, Academic/Theological, Music/Audio)
+- [ ] Add "Recreate This Book" flow with step-by-step checklist per template
+- [ ] Show template-specific production checklist in ProjectTracker when project has a CDP template
+
+## Phase 69: CDP ISBN Research & Real Book Data
+- [ ] Search CDP books by ISBN in Open Library, WorldCat, Google Books, and publisher databases
+- [ ] Compile real CDP titles with ISBN, author, year, trim size, page count, and binding
+- [ ] Update cdpTemplates.ts exampleTitles with real ISBN-verified CDP books
+- [ ] Add isbn field to CDPTemplate type for each verified title
+- [ ] Display ISBN on template cards in CDPTemplates.tsx
+
+## Phase 70: ISBN Lookup + Publishing Wizard
+- [x] Add tRPC procedure `book.lookupByIsbn` that queries Open Library and Google Books APIs
+- [x] Return title, author, publisher, year, page count, dimensions, and cover image URL from ISBN
+- [x] Auto-map ISBN lookup results to nearest CDP template (trim size, style, binding)
+- [x] Build ISBNLookup.tsx component with input field, loading state, and result card
+- [x] Build CDPProductionWizard.tsx multi-step modal: template confirm → book details → typesetting → manuscript → launch
+- [x] Wire "Use This Template" button on CDPTemplates page to open CDPProductionWizard
+- [x] Add /isbn-lookup route to App.tsx and dashboard nav
+- [x] Write vitest tests for lookupISBN and matchCDPTemplate (12 tests, all passing)
+- [x] All 193 tests pass across 7 test files
