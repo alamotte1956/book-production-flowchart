@@ -702,3 +702,9 @@
 - [x] Added failedStage column to production_jobs DB schema and migrated (pnpm db:push)
 - [x] failedStage stored in DB on error and shown in Technical Details panel and Copy Error Report JSON
 - [x] All 235 tests pass across 9 test files, zero TypeScript errors
+
+## Phase 85: Email Address Replacement
+- [x] Searched all source files (client, server, shared, drizzle) for hard-coded email addresses
+- [x] Found John.Peterson@createdesignpublish.net in client/src/pages/Home.tsx footer
+- [x] Replaced with gs@safarilegacy.org (mailto link + display text)
+- [x] Verified no other email addresses exist in source files or database records
