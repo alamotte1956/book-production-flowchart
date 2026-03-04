@@ -647,3 +647,15 @@
 
 ## Phase 76: Jerusalem Rising ISBN Example
 - [x] Added Jerusalem Rising (9781496453907) to exampleIsbns in ISBNLookup.tsx as a fifth KP&A example (trade non-fiction, 6" x 9", full design)
+
+## Phase 77: Jerusalem Rising KP&A Template
+- [x] Jerusalem Rising (ISBN 9781496453907) was already present in kpaTemplates.ts under the kpa-apologetics template with Tyndale publisher credit, 6"x9" trim, 208 pages, year 2021, and full design credit
+- [x] KPA_ALL_TITLES flat export automatically includes it — ISBN Lookup already returns the named Apologetics & Theology template card for this ISBN
+- [x] No code changes required; template was complete from Phase 71
+
+## Phase 78: KP&A Amber Indicator Dots on ISBN Lookup Example Chips
+- [x] Added isKpa: true flag to the five KP&A entries in exampleIsbns array
+- [x] KP&A chips now render with an amber dot (bg-amber-500, 6px circle) and amber text (text-amber-700)
+- [x] Hover tooltip shows "KP&A-designed title — {isbn}" for KP&A chips
+- [x] Generic examples retain the original gold/tan color scheme
+- [x] Zero TypeScript errors

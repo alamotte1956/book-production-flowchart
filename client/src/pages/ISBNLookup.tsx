@@ -374,11 +374,11 @@ export default function ISBNLookup() {
 
   // Example ISBNs for quick testing
   const exampleIsbns = [
-    { isbn: "9780736907972", label: "New Inductive Study Bible (KP&A)" },
-    { isbn: "1590523318",    label: "His Princess (KP&A)" },
-    { isbn: "9781414381503", label: "Life Recovery Bible (KP&A cover)" },
-    { isbn: "9781404189584", label: "Heavens Proclaim His Glory (KP&A)" },
-    { isbn: "9781496453907", label: "Jerusalem Rising (KP&A trade)" },
+    { isbn: "9780736907972", label: "New Inductive Study Bible", isKpa: true },
+    { isbn: "1590523318",    label: "His Princess",             isKpa: true },
+    { isbn: "9781414381503", label: "Life Recovery Bible",      isKpa: true },
+    { isbn: "9781404189584", label: "Heavens Proclaim His Glory", isKpa: true },
+    { isbn: "9781496453907", label: "Jerusalem Rising",          isKpa: true },
     { isbn: "9780785250777", label: "Thompson Chain-Reference Bible" },
     { isbn: "9780310908501", label: "The Purpose Driven Life" },
     { isbn: "9780884197508", label: "The Hiding Place" },
@@ -429,14 +429,26 @@ export default function ISBNLookup() {
         </div>
 
         {/* Example ISBNs */}
-        <div className="mt-3 flex flex-wrap gap-2">
+        <div className="mt-3 flex flex-wrap gap-2 items-center">
           <span className="text-xs text-[#b0a090] self-center">Try:</span>
           {exampleIsbns.map(ex => (
             <button
               key={ex.isbn}
               onClick={() => { setInputValue(ex.isbn); setSearchIsbn(ex.isbn); }}
-              className="text-xs text-[#c9a96e] hover:text-[#a07840] underline underline-offset-2 transition-colors"
+              title={ex.isKpa ? `KP&A-designed title — ${ex.isbn}` : ex.isbn}
+              className={[
+                "inline-flex items-center gap-1 text-xs underline underline-offset-2 transition-colors",
+                ex.isKpa
+                  ? "text-amber-700 hover:text-amber-900"
+                  : "text-[#c9a96e] hover:text-[#a07840]",
+              ].join(" ")}
             >
+              {ex.isKpa && (
+                <span
+                  className="inline-block w-1.5 h-1.5 rounded-full bg-amber-500 flex-shrink-0"
+                  aria-label="KP&A designed"
+                />
+              )}
               {ex.label}
             </button>
           ))}
