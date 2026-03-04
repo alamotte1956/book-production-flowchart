@@ -635,3 +635,6 @@
 - [x] KP&A card shows design credit badge (Full Design / Cover+Interior / Cover Design), template category, features, and "Use KP&A Template" button
 - [x] "Use KP&A Template" opens CDPProductionWizard with book metadata pre-filled
 - [x] Write 5 vitest tests for KP&A ISBN match logic (203 total tests passing)
+
+## Phase 73: ISBN Lookup Example List
+- [x] Added New Inductive Study Bible (9780736907972) and His Princess (1590523318) to the exampleIsbns array in ISBNLookup.tsx with KP&A labels

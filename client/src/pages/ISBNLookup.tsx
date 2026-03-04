@@ -374,9 +374,10 @@ export default function ISBNLookup() {
 
   // Example ISBNs for quick testing
   const exampleIsbns = [
+    { isbn: "9780736907972", label: "New Inductive Study Bible (KP&A)" },
+    { isbn: "1590523318",    label: "His Princess (KP&A)" },
     { isbn: "9780785250777", label: "Thompson Chain-Reference Bible" },
     { isbn: "9780310908501", label: "The Purpose Driven Life" },
-    { isbn: "9780801065521", label: "Experiencing God" },
     { isbn: "9780884197508", label: "The Hiding Place" },
   ];
 
