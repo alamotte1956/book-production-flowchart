@@ -641,3 +641,6 @@
 
 ## Phase 74: Life Recovery Bible ISBN Example
 - [x] Added Life Recovery Bible (9781414381503) to exampleIsbns array in ISBNLookup.tsx as a cover-only KP&A design example
+
+## Phase 75: Heavens Proclaim His Glory ISBN Example
+- [x] Added The Heavens Proclaim His Glory (9781404189584) to exampleIsbns in ISBNLookup.tsx as a KP&A large-format illustrated gift book example (4th KP&A entry)
