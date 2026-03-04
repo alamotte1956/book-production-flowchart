@@ -720,3 +720,7 @@
 - [x] Confirmed import 'dotenv/config' already present at top of server/_core/index.ts
 - [x] Replaced OAuth error check in server/_core/sdk.ts with fallback constant: OAUTH_SERVER_URL = ENV.oAuthServerUrl || "https://createdesignpublish.net"
 - [x] Server restarts cleanly with no TypeScript errors, no OAuth warning in logs
+
+## Phase 88: Suppress baseline-browser-mapping Dev Warning
+- [x] Ran pnpm add -D baseline-browser-mapping@latest — installed v2.10.0
+- [x] Restarted dev server — warning no longer appears in new server startup logs
