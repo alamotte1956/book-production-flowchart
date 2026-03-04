@@ -39,6 +39,28 @@ export type ProduceResult = {
   style: TypesettingStyle;
 };
 
+// ─── Pipeline stage error wrapper ────────────────────────────────────────────
+
+/**
+ * Wraps an async operation in a named pipeline stage.
+ * On failure it re-throws an Error whose message is prefixed with
+ * "[Stage: <stageName>] " so the caller can identify the failure point.
+ * The original stack is preserved via the `cause` property.
+ */
+async function runStage<T>(stageName: string, fn: () => Promise<T>): Promise<T> {
+  try {
+    return await fn();
+  } catch (err: unknown) {
+    const original = err instanceof Error ? err : new Error(String(err));
+    // Don't double-wrap if already staged
+    if (original.message.startsWith('[Stage:')) throw original;
+    const wrapped = new Error(`[Stage: ${stageName}] ${original.message}`);
+    wrapped.stack = `[Stage: ${stageName}]\n${original.stack ?? original.message}`;
+    (wrapped as Error & { cause?: unknown }).cause = original;
+    throw wrapped;
+  }
+}
+
 // ─── Step 1: LLM Chapter Detection ──────────────────────────────────────────
 
 export async function detectChapters(
@@ -46,17 +68,20 @@ export async function detectChapters(
   title: string,
   author: string
 ): Promise<ParsedBook> {
-  // Truncate very long manuscripts to avoid token limits — process in chunks if needed
-  const MAX_CHARS = 80000;
-  const truncated = rawText.length > MAX_CHARS
-    ? rawText.slice(0, MAX_CHARS) + "\n\n[... manuscript continues ...]"
-    : rawText;
+  return runStage("chapter-detection", async () => {
+    // Truncate very long manuscripts to avoid token limits — process in chunks if needed
+    const MAX_CHARS = 80000;
+    const truncated = rawText.length > MAX_CHARS
+      ? rawText.slice(0, MAX_CHARS) + "\n\n[... manuscript continues ...]"
+      : rawText;
 
-  const response = await invokeLLM({
-    messages: [
-      {
-        role: "system",
-        content: `You are a professional book typesetter. Your job is to parse a raw manuscript and extract its structure.
+    let response: Awaited<ReturnType<typeof invokeLLM>>;
+    try {
+      response = await invokeLLM({
+        messages: [
+          {
+            role: "system",
+            content: `You are a professional book typesetter. Your job is to parse a raw manuscript and extract its structure.
 Identify chapters by looking for patterns like "Chapter 1", "CHAPTER ONE", "Part I", numbered sections, or clear thematic breaks.
 Return a JSON object with this exact structure:
 {
@@ -73,22 +98,31 @@ Return a JSON object with this exact structure:
   "backmatter": "Any epilogue, afterword, acknowledgements (plain text, may be empty string)"
 }
 Preserve all paragraph breaks. Do not summarize or shorten any text. Return ONLY valid JSON.`,
-      },
-      {
-        role: "user",
-        content: `Title: ${title}\nAuthor: ${author}\n\nManuscript:\n\n${truncated}`,
-      },
-    ],
-    response_format: { type: "json_object" },
-    max_tokens: 32768,
-  });
+          },
+          {
+            role: "user",
+            content: `Title: ${title}\nAuthor: ${author}\n\nManuscript:\n\n${truncated}`,
+          },
+        ],
+        response_format: { type: "json_object" },
+        max_tokens: 32768,
+      });
+    } catch (llmErr: unknown) {
+      const msg = llmErr instanceof Error ? llmErr.message : String(llmErr);
+      throw new Error(`LLM call failed during chapter detection: ${msg}`);
+    }
 
-  const content = response.choices[0]?.message?.content;
-  if (typeof content !== "string") throw new Error("LLM returned no content");
+    const content = response.choices[0]?.message?.content;
+    if (typeof content !== "string" || content.trim() === "") {
+      throw new Error("LLM returned empty or non-string content for chapter detection");
+    }
 
-  try {
-    const parsed = JSON.parse(content) as ParsedBook;
-    if (!parsed.chapters || parsed.chapters.length === 0) {
+    let parsed: ParsedBook;
+    try {
+      parsed = JSON.parse(content) as ParsedBook;
+    } catch (parseErr: unknown) {
+      const msg = parseErr instanceof Error ? parseErr.message : String(parseErr);
+      console.warn(`[Stage: chapter-detection] JSON parse failed (${msg}); falling back to single-chapter mode. Raw LLM response length: ${content.length}`);
       // Fallback: treat entire text as a single chapter
       return {
         title,
@@ -96,15 +130,18 @@ Preserve all paragraph breaks. Do not summarize or shorten any text. Return ONLY
         chapters: [{ number: 1, title: "Full Text", body: rawText }],
       };
     }
+
+    if (!parsed.chapters || parsed.chapters.length === 0) {
+      console.warn(`[Stage: chapter-detection] LLM returned 0 chapters; falling back to single-chapter mode. Title: "${title}", Author: "${author}"`);
+      return {
+        title,
+        author,
+        chapters: [{ number: 1, title: "Full Text", body: rawText }],
+      };
+    }
+
     return parsed;
-  } catch {
-    // Fallback: treat entire text as a single chapter
-    return {
-      title,
-      author,
-      chapters: [{ number: 1, title: "Full Text", body: rawText }],
-    };
-  }
+  });
 }
 
 // ─── Step 2: HTML Generation ─────────────────────────────────────────────────
@@ -367,96 +404,132 @@ export function generateBookHtml(
 // ─── Step 3: PDF Rendering via Puppeteer ─────────────────────────────────────
 
 export async function renderToPdf(html: string, trim: TrimSize): Promise<Buffer> {
-  // /usr/bin/chromium-browser is a shell wrapper; puppeteer-core v24+ requires the actual binary
-  const chromiumPath =
-    process.env.CHROMIUM_PATH ||
-    "/usr/lib/chromium-browser/chromium-browser";
-  const browser = await puppeteer.launch({
-    executablePath: chromiumPath,
-    args: [
-      "--no-sandbox",
-      "--disable-setuid-sandbox",
-      "--disable-dev-shm-usage",
-      "--disable-gpu",
-      "--font-render-hinting=none",
-    ],
-    headless: true,
+  return runStage("pdf-rendering", async () => {
+    // /usr/bin/chromium-browser is a shell wrapper; puppeteer-core v24+ requires the actual binary
+    const chromiumPath =
+      process.env.CHROMIUM_PATH ||
+      "/usr/lib/chromium-browser/chromium-browser";
+
+    let browser: Awaited<ReturnType<typeof puppeteer.launch>>;
+    try {
+      browser = await puppeteer.launch({
+        executablePath: chromiumPath,
+        args: [
+          "--no-sandbox",
+          "--disable-setuid-sandbox",
+          "--disable-dev-shm-usage",
+          "--disable-gpu",
+          "--font-render-hinting=none",
+        ],
+        headless: true,
+      });
+    } catch (launchErr: unknown) {
+      const msg = launchErr instanceof Error ? launchErr.message : String(launchErr);
+      throw new Error(`Chromium browser failed to launch (path: ${chromiumPath}): ${msg}`);
+    }
+
+    try {
+      const page = await browser.newPage();
+
+      try {
+        await page.setContent(html, { waitUntil: "networkidle0", timeout: 60000 });
+      } catch (contentErr: unknown) {
+        const msg = contentErr instanceof Error ? contentErr.message : String(contentErr);
+        throw new Error(`Page content load timed out or failed: ${msg}`);
+      }
+
+      // Wait for fonts to load
+      await page.evaluateHandle("document.fonts.ready");
+
+      let pdfBuffer: Uint8Array;
+      try {
+        pdfBuffer = await page.pdf({
+          width: `${trim.widthIn}in`,
+          height: `${trim.heightIn}in`,
+          printBackground: true,
+          margin: {
+            top: `${trim.marginTopIn}in`,
+            bottom: `${trim.marginBottomIn}in`,
+            left: `${trim.marginInsideIn}in`,
+            right: `${trim.marginOutsideIn}in`,
+          },
+          displayHeaderFooter: true,
+          headerTemplate: `<div style="font-size:8pt;font-family:serif;width:100%;text-align:center;color:#555;padding:0 ${trim.marginInsideIn}in;"></div>`,
+          footerTemplate: `<div style="font-size:8pt;font-family:serif;width:100%;text-align:center;color:#555;padding:0 ${trim.marginInsideIn}in;"><span class="pageNumber"></span></div>`,
+        });
+      } catch (pdfErr: unknown) {
+        const msg = pdfErr instanceof Error ? pdfErr.message : String(pdfErr);
+        throw new Error(`Puppeteer PDF generation failed (trim: ${trim.widthIn}×${trim.heightIn}in): ${msg}`);
+      }
+
+      return Buffer.from(pdfBuffer);
+    } finally {
+      await browser.close().catch(() => { /* ignore close errors */ });
+    }
   });
-
-  try {
-    const page = await browser.newPage();
-    await page.setContent(html, { waitUntil: "networkidle0", timeout: 60000 });
-
-    // Wait for fonts to load
-    await page.evaluateHandle("document.fonts.ready");
-
-    const pdfBuffer = await page.pdf({
-      width: `${trim.widthIn}in`,
-      height: `${trim.heightIn}in`,
-      printBackground: true,
-      margin: {
-        top: `${trim.marginTopIn}in`,
-        bottom: `${trim.marginBottomIn}in`,
-        left: `${trim.marginInsideIn}in`,
-        right: `${trim.marginOutsideIn}in`,
-      },
-      displayHeaderFooter: true,
-      headerTemplate: `<div style="font-size:8pt;font-family:serif;width:100%;text-align:center;color:#555;padding:0 ${trim.marginInsideIn}in;"></div>`,
-      footerTemplate: `<div style="font-size:8pt;font-family:serif;width:100%;text-align:center;color:#555;padding:0 ${trim.marginInsideIn}in;"><span class="pageNumber"></span></div>`,
-    });
-
-    return Buffer.from(pdfBuffer);
-  } finally {
-    await browser.close();
-  }
 }
 
 // ─── Step 4: EPUB Generation ─────────────────────────────────────────────────
 
 export async function renderToEpub(book: ParsedBook, style: TypesettingStyle): Promise<Buffer> {
-  // Dynamic import to avoid issues with ESM
-  const { default: Epub } = await import("epub-gen-memory");
+  return runStage("epub-generation", async () => {
+    // Dynamic import to avoid issues with ESM
+    let EpubModule: { default: (...args: unknown[]) => Promise<Uint8Array> };
+    try {
+      EpubModule = await import("epub-gen-memory") as typeof EpubModule;
+    } catch (importErr: unknown) {
+      const msg = importErr instanceof Error ? importErr.message : String(importErr);
+      throw new Error(`Failed to import epub-gen-memory: ${msg}`);
+    }
+    const Epub = EpubModule.default;
 
-  const content: Array<{ title?: string; content: string }> = book.chapters.map(ch => ({
-    title: ch.title || `Chapter ${ch.number}`,
-    content: `<div>${ch.body.split(/\n{2,}/).map(p =>
-      `<p style="text-indent:1.5em;margin:0;text-align:justify;">${escapeHtml(p.trim().replace(/\n/g, " "))}</p>`
-    ).join("")}</div>`,
-  }));
-
-  if (book.frontmatter?.trim()) {
-    content.unshift({
-      title: "Introduction",
-      content: `<div>${book.frontmatter.split(/\n{2,}/).map(p =>
-        `<p style="text-indent:1.5em;margin:0;">${escapeHtml(p.trim())}</p>`
+    const content: Array<{ title?: string; content: string }> = book.chapters.map(ch => ({
+      title: ch.title || `Chapter ${ch.number}`,
+      content: `<div>${ch.body.split(/\n{2,}/).map(p =>
+        `<p style="text-indent:1.5em;margin:0;text-align:justify;">${escapeHtml(p.trim().replace(/\n/g, " "))}</p>`
       ).join("")}</div>`,
-    });
-  }
+    }));
 
-  if (book.backmatter?.trim()) {
-    content.push({
-      title: "Acknowledgements",
-      content: `<div>${book.backmatter.split(/\n{2,}/).map(p =>
-        `<p style="text-indent:1.5em;margin:0;">${escapeHtml(p.trim())}</p>`
-      ).join("")}</div>`,
-    });
-  }
+    if (book.frontmatter?.trim()) {
+      content.unshift({
+        title: "Introduction",
+        content: `<div>${book.frontmatter.split(/\n{2,}/).map(p =>
+          `<p style="text-indent:1.5em;margin:0;">${escapeHtml(p.trim())}</p>`
+        ).join("")}</div>`,
+      });
+    }
 
-  const epubBuffer = await Epub(
-    {
-      title: book.title,
-      author: book.author,
-      lang: "en",
-      css: `
-        body { font-family: ${style.fontFamily}; font-size: 1em; line-height: ${style.lineHeight}; color: ${style.bodyColor}; }
-        h1 { font-family: ${style.chapterHeadingFont}; font-size: 1.5em; color: ${style.headingColor}; text-align: center; margin: 1em 0; }
-        p { text-indent: 1.5em; margin: 0; text-align: justify; }
-      `,
-    },
-    content
-  );
+    if (book.backmatter?.trim()) {
+      content.push({
+        title: "Acknowledgements",
+        content: `<div>${book.backmatter.split(/\n{2,}/).map(p =>
+          `<p style="text-indent:1.5em;margin:0;">${escapeHtml(p.trim())}</p>`
+        ).join("")}</div>`,
+      });
+    }
 
-  return Buffer.from(epubBuffer);
+    let epubBuffer: Uint8Array;
+    try {
+      epubBuffer = await Epub(
+        {
+          title: book.title,
+          author: book.author,
+          lang: "en",
+          css: `
+            body { font-family: ${style.fontFamily}; font-size: 1em; line-height: ${style.lineHeight}; color: ${style.bodyColor}; }
+            h1 { font-family: ${style.chapterHeadingFont}; font-size: 1.5em; color: ${style.headingColor}; text-align: center; margin: 1em 0; }
+            p { text-indent: 1.5em; margin: 0; text-align: justify; }
+          `,
+        },
+        content
+      );
+    } catch (epubErr: unknown) {
+      const msg = epubErr instanceof Error ? epubErr.message : String(epubErr);
+      throw new Error(`epub-gen-memory failed (title: "${book.title}", chapters: ${book.chapters.length}): ${msg}`);
+    }
+
+    return Buffer.from(epubBuffer);
+  });
 }
 
 // ─── Main Pipeline Entry Point ────────────────────────────────────────────────
@@ -465,19 +538,40 @@ export async function produceBook(
   rawText: string,
   options: ProduceOptions
 ): Promise<ProduceResult> {
-  const trim = getTrimSize(options.trimSizeId);
-  const style = getTypesettingStyle(options.styleId);
+  let trim: TrimSize;
+  let style: TypesettingStyle;
+
+  try {
+    trim = getTrimSize(options.trimSizeId);
+  } catch (err: unknown) {
+    const msg = err instanceof Error ? err.message : String(err);
+    throw new Error(`[Stage: config-resolution] Invalid trim size ID "${options.trimSizeId}": ${msg}`);
+  }
+
+  try {
+    style = getTypesettingStyle(options.styleId);
+  } catch (err: unknown) {
+    const msg = err instanceof Error ? err.message : String(err);
+    throw new Error(`[Stage: config-resolution] Invalid typesetting style ID "${options.styleId}": ${msg}`);
+  }
 
   // Step 1: Parse chapters with AI
   const book = await detectChapters(rawText, options.title, options.author);
 
-  // Step 2: Generate HTML
-  const html = generateBookHtml(book, trim, style);
+  // Step 2: Generate HTML (synchronous — wrap in try/catch for safety)
+  let html: string;
+  try {
+    html = generateBookHtml(book, trim!, style!);
+  } catch (err: unknown) {
+    const msg = err instanceof Error ? err.message : String(err);
+    throw new Error(`[Stage: html-generation] Failed to build book HTML: ${msg}`);
+  }
 
-  // Step 3: Render PDF and EPUB in parallel
+  // Step 3: Render PDF and EPUB — the individual stage wrappers already prefix
+  // the message with [Stage: ...] so the caller can identify the failure point.
   const [pdfBuffer, epubBuffer] = await Promise.all([
-    renderToPdf(html, trim),
-    renderToEpub(book, style),
+    renderToPdf(html, trim!),
+    renderToEpub(book, style!),
   ]);
 
   const wordCount = book.chapters.reduce(
@@ -491,7 +585,7 @@ export async function produceBook(
     chapterCount: book.chapters.length,
     wordCount,
     parsedBook: book,
-    trimSize: trim,
-    style,
+    trimSize: trim!,
+    style: style!,
   };
 }

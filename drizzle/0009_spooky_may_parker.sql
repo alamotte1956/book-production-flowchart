@@ -1,0 +1,1 @@
+ALTER TABLE `production_jobs` ADD `failedStage` varchar(64);

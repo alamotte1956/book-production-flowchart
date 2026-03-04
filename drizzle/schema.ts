@@ -115,6 +115,7 @@ export const productionJobs = mysqlTable("production_jobs", {
   idmlKey: varchar("idmlKey", { length: 512 }),
   errorMessage: text("errorMessage"),
   errorType: mysqlEnum("errorType", ["format_unsupported", "parse_empty", "pipeline_error", "unknown"]).default("unknown"),  // Classifies the failure cause for targeted UI suggestions
+  failedStage: varchar("failedStage", { length: 64 }),  // Pipeline stage that caused the failure (e.g. "pdf-rendering", "chapter-detection")
   retryCount: int("retryCount").default(0).notNull(),  // Number of times this job has been retried (max 3)
   createdAt: timestamp("createdAt").defaultNow().notNull(),
   updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),

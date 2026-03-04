@@ -387,6 +387,8 @@ function JobCard({ jobId, projectId }: { jobId: number; projectId: number }) {
                       wordCount: job.wordCount ?? 0,
                       chapterCount: job.chapterCount ?? 0,
                       retryCount: job.retryCount ?? 0,
+                      failedStage: (job as { failedStage?: string }).failedStage ?? null,
+                      errorType: job.errorType ?? null,
                       errorMessage: job.errorMessage,
                       failedAt: new Date(job.updatedAt).toISOString(),
                     }, null, 2);
@@ -451,6 +453,16 @@ function JobCard({ jobId, projectId }: { jobId: number; projectId: number }) {
                       {job.retryCount ?? 0} of 3{(job.retryCount ?? 0) >= 3 ? " — limit reached" : ""}
                     </span>
                   </div>
+                  <div className="flex gap-2">
+                    <span className="text-red-500 w-28 flex-shrink-0">Error Type</span>
+                    <span className="font-semibold">{job.errorType ?? "unknown"}</span>
+                  </div>
+                  {(job as { failedStage?: string }).failedStage && (
+                    <div className="flex gap-2">
+                      <span className="text-red-500 w-28 flex-shrink-0">Failed Stage</span>
+                      <span className="font-semibold text-red-700">{(job as { failedStage?: string }).failedStage}</span>
+                    </div>
+                  )}
                   {job.wordCount ? (
                     <div className="flex gap-2">
                       <span className="text-red-500 w-28 flex-shrink-0">Words Parsed</span>
@@ -470,7 +482,12 @@ function JobCard({ jobId, projectId }: { jobId: number; projectId: number }) {
                   )}
                 </div>
                 <p className="text-xs text-red-600 mt-2">
-                  Tip: If the error mentions &quot;parsing&quot; or &quot;LLM&quot;, try a simpler file format (TXT or DOCX). If it mentions &quot;PDF&quot; or &quot;render&quot;, the typesetting engine encountered an issue — retry usually resolves this.
+                  <strong>Tip:</strong> The <em>Failed Stage</em> field tells you exactly where the pipeline stopped.
+                  {" "}"chapter-detection" → LLM issue (retry or simplify the file).
+                  {" "}"pdf-rendering" → Chromium issue (retry usually resolves this).
+                  {" "}"epub-generation" → EPUB packaging issue (retry or switch to PDF-only).
+                  {" "}"config-resolution" → Invalid trim/style ID (contact support).
+                  {" "}Use <strong>Copy Error Report</strong> to share the full report with support.
                 </p>
               </div>
             )}

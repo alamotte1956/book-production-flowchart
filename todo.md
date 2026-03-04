@@ -691,3 +691,14 @@
 - [x] Added window.unhandledrejection and window.error listeners in main.tsx for full stack trace logging to browser console
 - [x] Wrote 10 vitest tests in server/errorHandling.test.ts for invalid ISBN, not-found, lookupISBN alias, and TRPCError classification
 - [x] All 213 tests pass across 8 test files, zero TypeScript errors
+
+## Phase 84: Pipeline Error Handling — Full Audit & Improvements
+- [x] Audit typesettingPipeline.ts for silent failures (bare try/catch, missing stage labels)
+- [x] Wrap each pipeline stage (parse, chapter-detect, render, PDF, EPUB) in a named try/catch that includes stage name, input file, word count, and full stack in the thrown error
+- [x] Add server-side console.error with full context in autoProduce.start and autoProduce.status procedures
+- [x] Add a "Failed Stage" field to the production job error display in Auto-Produce UI
+- [x] Ensure every caught error in the pipeline is re-thrown with a structured message: "[Stage: X] Original message — context: {...}"
+- [x] Write vitest tests for the new pipeline error paths
+- [x] Added failedStage column to production_jobs DB schema and migrated (pnpm db:push)
+- [x] failedStage stored in DB on error and shown in Technical Details panel and Copy Error Report JSON
+- [x] All 235 tests pass across 9 test files, zero TypeScript errors

@@ -654,13 +654,26 @@ export const appRouter = router({
             await updateProductionJob(job.id, updates);
           } catch (err: unknown) {
             const msg = err instanceof Error ? err.message : String(err);
-            console.error(`[AutoProduce] Job ${job.id} failed:`, msg);
+            const stack = err instanceof Error ? (err.stack ?? msg) : msg;
+            // Extract stage name from "[Stage: X] ..." prefix if present
+            const stageMatch = msg.match(/^\[Stage:\s*([^\]]+)\]/);
+            const failedStage = stageMatch ? stageMatch[1].trim() : undefined;
+            console.error(
+              `[AutoProduce] Job ${job.id} FAILED`,
+              `\n  File: ${input.fileName}`,
+              `\n  Trim: ${input.trimSizeId}`,
+              `\n  Style: ${input.styleId}`,
+              failedStage ? `\n  Stage: ${failedStage}` : "",
+              `\n  Error: ${msg}`,
+              `\n  Stack:\n${stack}`
+            );
             const currentJob = await getProductionJobById(job.id);
             const errorType = classifyError(err, input.fileName, currentJob?.wordCount);
             await updateProductionJob(job.id, {
               status: "error",
               errorMessage: msg,
               errorType,
+              ...(failedStage ? { failedStage } : {}),
             });
           }
         })();
@@ -738,10 +751,27 @@ export const appRouter = router({
             await updateProductionJob(newJob.id, updates);
           } catch (err: unknown) {
             const msg = err instanceof Error ? err.message : String(err);
-            console.error(`[AutoProduce] Retry job ${newJob.id} failed:`, msg);
+            const stack = err instanceof Error ? (err.stack ?? msg) : msg;
+            const stageMatch = msg.match(/^\[Stage:\s*([^\]]+)\]/);
+            const failedStage = stageMatch ? stageMatch[1].trim() : undefined;
+            console.error(
+              `[AutoProduce] Retry job ${newJob.id} FAILED (original: ${originalJob.id})`,
+              `\n  File: ${originalJob.manuscriptFileName ?? "unknown"}`,
+              `\n  Trim: ${originalJob.trimSizeId}`,
+              `\n  Style: ${originalJob.styleId}`,
+              `\n  Retry #: ${originalJob.retryCount + 1}`,
+              failedStage ? `\n  Stage: ${failedStage}` : "",
+              `\n  Error: ${msg}`,
+              `\n  Stack:\n${stack}`
+            );
             const currentRetryJob = await getProductionJobById(newJob.id);
             const retryErrorType = classifyError(err, originalJob.manuscriptFileName ?? "", currentRetryJob?.wordCount);
-            await updateProductionJob(newJob.id, { status: "error", errorMessage: msg, errorType: retryErrorType });
+            await updateProductionJob(newJob.id, {
+              status: "error",
+              errorMessage: msg,
+              errorType: retryErrorType,
+              ...(failedStage ? { failedStage } : {}),
+            });
           }
         })();
 
