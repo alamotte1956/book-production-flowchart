@@ -454,6 +454,12 @@ export default function ISBNLookup() {
           ))}
         </div>
 
+        {/* KP&A legend */}
+        <p className="mt-1.5 text-[10px] text-[#b0a090] flex items-center gap-1">
+          <span className="inline-block w-1.5 h-1.5 rounded-full bg-amber-500 flex-shrink-0" />
+          <span>Amber dot indicates a title designed by Koechel Peterson &amp; Associates (KP&A) — searching these will surface a matching KP&A production template.</span>
+        </p>
+
         {/* Results area */}
         <div className="mt-8">
           {isLoading && (

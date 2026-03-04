@@ -659,3 +659,6 @@
 - [x] Hover tooltip shows "KP&A-designed title — {isbn}" for KP&A chips
 - [x] Generic examples retain the original gold/tan color scheme
 - [x] Zero TypeScript errors
+
+## Phase 79: KP&A Legend Note Below Chip Row
+- [x] Added a legend line below the example chip row in ISBNLookup.tsx: amber dot + "Amber dot indicates a title designed by Koechel Peterson & Associates (KP&A) — searching these will surface a matching KP&A production template." Zero TypeScript errors.
