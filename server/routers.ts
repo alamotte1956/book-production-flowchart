@@ -19,6 +19,8 @@ import { storagePut } from "./storage";
 import { generateIdml } from "./idmlGenerator";
 import { invokeLLM } from "./_core/llm";
 import { lookupByIsbn } from "./isbnLookup";
+import { notifyOwner } from "./_core/notification";
+import { createContactSubmission } from "./db";
 import { TRPCError } from "@trpc/server";
 
 // ─── Error classification helper (module scope so it's shared by start + retry) ──
@@ -843,6 +845,89 @@ export const appRouter = router({
             cause: err instanceof Error ? err : new Error(message),
           });
         }
+      }),
+  }),
+
+  // ─── Contact Form ─────────────────────────────────────────────────────────
+  contact: router({
+    /**
+     * Public procedure — anyone can submit the contact form.
+     * Saves the submission to the DB (for audit) and fires an owner notification.
+     * Returns { success: true } on success; throws TRPCError on validation failure.
+     */
+    send: publicProcedure
+      .input(z.object({
+        name: z.string().min(1, "Name is required").max(255),
+        email: z.string().email("Please enter a valid email address").max(320),
+        subject: z.string().min(1, "Subject is required").max(255),
+        message: z.string().min(10, "Message must be at least 10 characters").max(5000),
+      }))
+      .mutation(async ({ input }) => {
+        // 1. Persist to DB so no submission is ever lost
+        let submission;
+        try {
+          submission = await createContactSubmission({
+            name: input.name,
+            email: input.email,
+            subject: input.subject,
+            message: input.message,
+            notified: 0,
+          });
+        } catch (dbErr) {
+          const msg = dbErr instanceof Error ? dbErr.message : String(dbErr);
+          console.error("[Contact] Failed to save submission to DB:", msg);
+          throw new TRPCError({
+            code: "INTERNAL_SERVER_ERROR",
+            message: "Unable to save your message. Please try again.",
+          });
+        }
+
+        // 2. Notify the project owner via the Manus notification service
+        const notificationContent = [
+          `From: ${input.name} <${input.email}>`,
+          `Subject: ${input.subject}`,
+          ``,
+          input.message,
+          ``,
+          `---`,
+          `Submitted at: ${new Date().toISOString()}`,
+          `Submission ID: #${submission.id}`,
+          `Reply to: ${input.email}`,
+        ].join("\n");
+
+        let notified = false;
+        try {
+          notified = await notifyOwner({
+            title: `Contact Form: ${input.subject}`,
+            content: notificationContent,
+          });
+        } catch (notifyErr) {
+          // Non-fatal: submission is already saved to DB
+          console.warn("[Contact] Owner notification failed (submission saved):", notifyErr);
+        }
+
+        // 3. Update the notified flag if delivery succeeded
+        if (notified) {
+          try {
+            const { getDb } = await import("./db");
+            const db = await getDb();
+            if (db) {
+              const { eq } = await import("drizzle-orm");
+              const { contactSubmissions } = await import("../drizzle/schema");
+              await db.update(contactSubmissions)
+                .set({ notified: 1 })
+                .where(eq(contactSubmissions.id, submission.id));
+            }
+          } catch {
+            // Non-fatal
+          }
+        }
+
+        console.log(
+          `[Contact] Submission #${submission.id} from ${input.email} — notified: ${notified}`
+        );
+
+        return { success: true, submissionId: submission.id };
       }),
   }),
 

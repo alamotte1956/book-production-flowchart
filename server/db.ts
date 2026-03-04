@@ -7,6 +7,7 @@ import {
   uploadedFiles, InsertUploadedFile, UploadedFile,
   phaseDueDates, InsertPhaseDueDate, PhaseDueDate,
   productionJobs, InsertProductionJob, ProductionJob,
+  contactSubmissions, InsertContactSubmission, ContactSubmission,
 } from "../drizzle/schema";
 import { ENV } from './_core/env';
 
@@ -368,4 +369,20 @@ export async function updateProductionJob(
   await db.update(productionJobs).set(data).where(eq(productionJobs.id, jobId));
   const [updated] = await db.select().from(productionJobs).where(eq(productionJobs.id, jobId));
   return updated;
+}
+
+// ─── Contact Submissions ──────────────────────────────────────────────────────
+
+export async function createContactSubmission(
+  data: Omit<InsertContactSubmission, "id" | "createdAt">
+): Promise<ContactSubmission> {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  const [result] = await db.insert(contactSubmissions).values(data).$returningId();
+  const [submission] = await db
+    .select()
+    .from(contactSubmissions)
+    .where(eq(contactSubmissions.id, result.id))
+    .limit(1);
+  return submission;
 }

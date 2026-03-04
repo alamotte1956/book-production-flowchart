@@ -123,3 +123,20 @@ export const productionJobs = mysqlTable("production_jobs", {
 
 export type ProductionJob = typeof productionJobs.$inferSelect;
 export type InsertProductionJob = typeof productionJobs.$inferInsert;
+
+/**
+ * Contact form submissions sent from the public footer form.
+ * Stored for audit and follow-up even if the notification delivery fails.
+ */
+export const contactSubmissions = mysqlTable("contact_submissions", {
+  id: int("id").autoincrement().primaryKey(),
+  name: varchar("name", { length: 255 }).notNull(),
+  email: varchar("email", { length: 320 }).notNull(),
+  subject: varchar("subject", { length: 255 }).notNull(),
+  message: text("message").notNull(),
+  notified: int("notified").default(0).notNull(), // 1 if owner notification was delivered
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+});
+
+export type ContactSubmission = typeof contactSubmissions.$inferSelect;
+export type InsertContactSubmission = typeof contactSubmissions.$inferInsert;

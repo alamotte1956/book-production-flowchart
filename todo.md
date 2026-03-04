@@ -708,3 +708,15 @@
 - [x] Found John.Peterson@createdesignpublish.net in client/src/pages/Home.tsx footer
 - [x] Replaced with gs@safarilegacy.org (mailto link + display text)
 - [x] Verified no other email addresses exist in source files or database records
+
+## Phase 86: Footer Contact Form
+- [ ] Add contact.send tRPC publicProcedure that accepts name, email, subject, message and sends to gs@safarilegacy.org via Manus notification API
+- [ ] Build ContactFormModal component (Dialog with name, email, subject, message fields + validation)
+- [ ] Replace mailto link in Home.tsx footer with "Contact Us" button that opens the modal
+- [ ] Show success/error toast after submission
+- [ ] Write vitest tests for the contact.send procedure
+
+## Phase 87: OAuth Warning Fix
+- [x] Confirmed import 'dotenv/config' already present at top of server/_core/index.ts
+- [x] Replaced OAuth error check in server/_core/sdk.ts with fallback constant: OAUTH_SERVER_URL = ENV.oAuthServerUrl || "https://createdesignpublish.net"
+- [x] Server restarts cleanly with no TypeScript errors, no OAuth warning in logs
