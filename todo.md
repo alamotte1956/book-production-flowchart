@@ -644,3 +644,6 @@
 
 ## Phase 75: Heavens Proclaim His Glory ISBN Example
 - [x] Added The Heavens Proclaim His Glory (9781404189584) to exampleIsbns in ISBNLookup.tsx as a KP&A large-format illustrated gift book example (4th KP&A entry)
+
+## Phase 76: Jerusalem Rising ISBN Example
+- [x] Added Jerusalem Rising (9781496453907) to exampleIsbns in ISBNLookup.tsx as a fifth KP&A example (trade non-fiction, 6" x 9", full design)

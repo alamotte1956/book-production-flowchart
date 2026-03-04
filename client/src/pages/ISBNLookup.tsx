@@ -378,6 +378,7 @@ export default function ISBNLookup() {
     { isbn: "1590523318",    label: "His Princess (KP&A)" },
     { isbn: "9781414381503", label: "Life Recovery Bible (KP&A cover)" },
     { isbn: "9781404189584", label: "Heavens Proclaim His Glory (KP&A)" },
+    { isbn: "9781496453907", label: "Jerusalem Rising (KP&A trade)" },
     { isbn: "9780785250777", label: "Thompson Chain-Reference Bible" },
     { isbn: "9780310908501", label: "The Purpose Driven Life" },
     { isbn: "9780884197508", label: "The Hiding Place" },
