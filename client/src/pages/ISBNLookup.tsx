@@ -17,6 +17,7 @@ import {
   Ruler, ExternalLink, Sparkles, ChevronRight, AlertCircle,
   Loader2, CheckCircle2, BookMarked,
 } from "lucide-react";
+import { ErrorDetail } from "@/components/ErrorDetail";
 import { useLocation, Link } from "wouter";
 import CDPProductionWizard from "@/components/CDPProductionWizard";
 import type { CDPTemplate, CDPTemplateCategory } from "../../../shared/cdpTemplates";
@@ -533,15 +534,7 @@ export default function ISBNLookup() {
           )}
 
           {error && !isLoading && (
-            <div className="flex items-start gap-3 bg-red-50 border border-red-200 rounded-lg p-4">
-              <AlertCircle className="w-5 h-5 text-red-500 flex-shrink-0 mt-0.5" />
-              <div>
-                <p className="text-sm font-medium text-red-800">Book not found</p>
-                <p className="text-sm text-red-600 mt-1">
-                  {error.message || "No book was found for this ISBN. Please check the number and try again."}
-                </p>
-              </div>
-            </div>
+            <ErrorDetail error={error} context="ISBN Lookup" />
           )}
 
           {data && !isLoading && !error && (

@@ -19,6 +19,7 @@ import { storagePut } from "./storage";
 import { generateIdml } from "./idmlGenerator";
 import { invokeLLM } from "./_core/llm";
 import { lookupByIsbn } from "./isbnLookup";
+import { TRPCError } from "@trpc/server";
 
 // ─── Error classification helper (module scope so it's shared by start + retry) ──
 const classifyError = (err: unknown, fileName: string, wordCount?: number | null): "format_unsupported" | "parse_empty" | "pipeline_error" | "unknown" => {
@@ -800,7 +801,18 @@ export const appRouter = router({
         isbn: z.string().min(10).max(17),
       }))
       .query(async ({ input }) => {
-        return lookupByIsbn(input.isbn);
+        try {
+          return await lookupByIsbn(input.isbn);
+        } catch (err) {
+          const message = err instanceof Error ? err.message : String(err);
+          const isNotFound = message.toLowerCase().includes("no book found") || message.toLowerCase().includes("not found");
+          const isInvalidIsbn = message.toLowerCase().includes("invalid isbn");
+          throw new TRPCError({
+            code: isInvalidIsbn ? "BAD_REQUEST" : isNotFound ? "NOT_FOUND" : "INTERNAL_SERVER_ERROR",
+            message,
+            cause: err instanceof Error ? err : new Error(message),
+          });
+        }
       }),
   }),
 

@@ -377,12 +377,32 @@ function JobCard({ jobId, projectId }: { jobId: number; projectId: number }) {
                   variant="outline"
                   className="border-red-200 text-red-700 hover:bg-red-100 gap-2 text-xs"
                   onClick={() => {
-                    navigator.clipboard.writeText(job.errorMessage ?? "");
-                    toast.success("Error message copied to clipboard");
+                    const report = JSON.stringify({
+                      context: "Auto-Produce",
+                      timestamp: new Date().toISOString(),
+                      jobId: job.id,
+                      file: job.manuscriptFileName ?? "(unknown)",
+                      trimSizeId: job.trimSizeId,
+                      styleId: job.styleId,
+                      wordCount: job.wordCount ?? 0,
+                      chapterCount: job.chapterCount ?? 0,
+                      retryCount: job.retryCount ?? 0,
+                      errorMessage: job.errorMessage,
+                      failedAt: new Date(job.updatedAt).toISOString(),
+                    }, null, 2);
+                    navigator.clipboard.writeText(report).catch(() => {
+                      const ta = document.createElement("textarea");
+                      ta.value = report;
+                      document.body.appendChild(ta);
+                      ta.select();
+                      document.execCommand("copy");
+                      document.body.removeChild(ta);
+                    });
+                    toast.success("Full error report copied to clipboard");
                   }}
                 >
                   <Copy className="w-3 h-3" />
-                  Copy Error
+                  Copy Error Report
                 </Button>
               )}
               <Button

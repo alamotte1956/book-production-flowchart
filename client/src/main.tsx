@@ -5,8 +5,29 @@ import { httpBatchLink, TRPCClientError } from "@trpc/client";
 import { createRoot } from "react-dom/client";
 import superjson from "superjson";
 import App from "./App";
+import { GlobalErrorBoundary } from "./components/GlobalErrorBoundary";
 import { getLoginUrl } from "./const";
 import "./index.css";
+
+// ─── Global unhandled error / promise rejection logging ───────────────────────
+window.addEventListener("unhandledrejection", (event) => {
+  const reason = event.reason;
+  console.group("%c[Unhandled Promise Rejection]", "color: #dc2626; font-weight: bold;");
+  console.error("Reason:", reason);
+  if (reason instanceof Error) {
+    console.error("Message:", reason.message);
+    console.error("Stack:", reason.stack);
+  }
+  console.groupEnd();
+});
+
+window.addEventListener("error", (event) => {
+  console.group("%c[Uncaught Error]", "color: #dc2626; font-weight: bold;");
+  console.error("Message:", event.message);
+  console.error("Source:", `${event.filename}:${event.lineno}:${event.colno}`);
+  if (event.error) console.error("Error object:", event.error);
+  console.groupEnd();
+});
 
 const queryClient = new QueryClient();
 
@@ -53,9 +74,11 @@ const trpcClient = trpc.createClient({
 });
 
 createRoot(document.getElementById("root")!).render(
-  <trpc.Provider client={trpcClient} queryClient={queryClient}>
-    <QueryClientProvider client={queryClient}>
-      <App />
-    </QueryClientProvider>
-  </trpc.Provider>
+  <GlobalErrorBoundary>
+    <trpc.Provider client={trpcClient} queryClient={queryClient}>
+      <QueryClientProvider client={queryClient}>
+        <App />
+      </QueryClientProvider>
+    </trpc.Provider>
+  </GlobalErrorBoundary>
 );

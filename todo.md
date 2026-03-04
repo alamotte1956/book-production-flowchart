@@ -680,3 +680,14 @@
 - [x] "Clear" button wipes the history from state and localStorage
 - [x] useEffect appends to history on every successful ISBN search result
 - [x] Zero TypeScript errors
+
+## Phase 83: Comprehensive Error Handling
+- [x] Audited all error paths in ISBNLookup, AutoProduce, Bible Studio, CDPProductionWizard, and tRPC routers
+- [x] Added structured TRPCError with BAD_REQUEST / NOT_FOUND / INTERNAL_SERVER_ERROR codes in server/routers.ts book.lookupByIsbn procedure
+- [x] Built reusable ErrorDetail component (client/src/components/ErrorDetail.tsx): shows error code, message, raw JSON, copy-to-clipboard button
+- [x] Wired ErrorDetail into ISBNLookup.tsx replacing the basic error block
+- [x] Enhanced AutoProduce "Copy Error Report" button to copy full structured JSON (jobId, file, trim, style, wordCount, chapterCount, retryCount, failedAt, errorMessage)
+- [x] Added GlobalErrorBoundary React class component (client/src/components/GlobalErrorBoundary.tsx) wrapping the entire app in main.tsx
+- [x] Added window.unhandledrejection and window.error listeners in main.tsx for full stack trace logging to browser console
+- [x] Wrote 10 vitest tests in server/errorHandling.test.ts for invalid ISBN, not-found, lookupISBN alias, and TRPCError classification
+- [x] All 213 tests pass across 8 test files, zero TypeScript errors
