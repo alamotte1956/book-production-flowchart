@@ -662,3 +662,10 @@
 
 ## Phase 79: KP&A Legend Note Below Chip Row
 - [x] Added a legend line below the example chip row in ISBNLookup.tsx: amber dot + "Amber dot indicates a title designed by Koechel Peterson & Associates (KP&A) — searching these will surface a matching KP&A production template." Zero TypeScript errors.
+
+## Phase 80: Hallmark Children's Gift Book KP&A Example
+- [x] Looked up KP&A-designed Hallmark gift book ISBNs via Open Library and Google Books
+- [x] Found two Lance Wubbels Hallmark Gift Books titles: Each Day a New Beginning (9781595304452, 2011) and The Lord Is My Shepherd (9781595305343, 2012)
+- [x] Added both titles to the Inspirational Gift Book template in kpaTemplates.ts with full design credit
+- [x] Added Each Day a New Beginning as the sixth KP&A example chip in ISBNLookup.tsx
+- [x] Zero TypeScript errors, 203 tests passing
