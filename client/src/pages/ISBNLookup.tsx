@@ -19,9 +19,24 @@ import {
 } from "lucide-react";
 import { useLocation } from "wouter";
 import CDPProductionWizard from "@/components/CDPProductionWizard";
-import type { CDPTemplate } from "../../../shared/cdpTemplates";
+import type { CDPTemplate, CDPTemplateCategory } from "../../../shared/cdpTemplates";
+import { Award, Palette, Layers } from "lucide-react";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
+
+type KPAMatch = {
+  templateId: string;
+  templateLabel: string;
+  category: string;
+  designCredit: "cover" | "cover+interior" | "full";
+  bookTitle: string;
+  author: string;
+  publisher: string;
+  year: number;
+  accentColor: string;
+  features: string[];
+  trimLabel: string;
+};
 
 type LookupResult = {
   isbn: string;
@@ -42,6 +57,7 @@ type LookupResult = {
   suggestedTemplate?: CDPTemplate;
   matchConfidence?: number;
   matchReason?: string;
+  kpaMatch?: KPAMatch;
 };
 
 // ─── Confidence Badge ─────────────────────────────────────────────────────────
@@ -164,6 +180,104 @@ function BookResultCard({
           </div>
         </CardContent>
       </Card>
+
+      {/* KP&A Exact Match Banner */}
+      {result.kpaMatch && (
+        <Card className="border-amber-300/60 bg-gradient-to-br from-amber-50 to-orange-50 shadow-sm">
+          <CardHeader className="pb-2">
+            <div className="flex items-center justify-between">
+              <CardTitle className="flex items-center gap-2 text-base text-amber-900">
+                <Award className="w-4 h-4 text-amber-600" />
+                Koechel Peterson &amp; Associates Design Match
+              </CardTitle>
+              <Badge
+                className="text-xs"
+                style={{
+                  backgroundColor: result.kpaMatch.accentColor + "20",
+                  color: result.kpaMatch.accentColor,
+                  border: `1px solid ${result.kpaMatch.accentColor}50`,
+                }}
+              >
+                {result.kpaMatch.designCredit === "full"
+                  ? "Full Design"
+                  : result.kpaMatch.designCredit === "cover+interior"
+                  ? "Cover + Interior"
+                  : "Cover Design"}
+              </Badge>
+            </div>
+          </CardHeader>
+          <CardContent className="pt-0">
+            <div className="flex items-start gap-4">
+              <div
+                className="w-12 h-12 rounded-lg flex items-center justify-center flex-shrink-0"
+                style={{
+                  backgroundColor: result.kpaMatch.accentColor + "15",
+                  border: `1.5px solid ${result.kpaMatch.accentColor}40`,
+                }}
+              >
+                <Palette className="w-5 h-5" style={{ color: result.kpaMatch.accentColor }} />
+              </div>
+              <div className="flex-1 min-w-0">
+                <p className="text-sm text-amber-800 font-medium">
+                  This book was designed by Koechel Peterson &amp; Associates.
+                </p>
+                <p className="text-xs text-amber-700 mt-1">
+                  Template: <span className="font-semibold">{result.kpaMatch.templateLabel}</span>
+                  &nbsp;·&nbsp;{result.kpaMatch.category}
+                  &nbsp;·&nbsp;{result.kpaMatch.trimLabel}
+                </p>
+                <div className="mt-2 flex flex-wrap gap-1.5">
+                  {result.kpaMatch.features.slice(0, 4).map((f) => (
+                    <Badge
+                      key={f}
+                      variant="outline"
+                      className="text-xs border-amber-300 text-amber-800"
+                    >
+                      {f}
+                    </Badge>
+                  ))}
+                </div>
+              </div>
+            </div>
+
+            <div className="mt-4">
+              <Button
+                className="w-full text-white"
+                style={{ backgroundColor: result.kpaMatch.accentColor }}
+                onClick={() => {
+                  // Build a synthetic CDPTemplate from the KP&A match to open the wizard
+                  const syntheticTemplate: CDPTemplate = {
+                    id: result.kpaMatch!.templateId,
+                    label: result.kpaMatch!.templateLabel,
+                    tagline: `Designed by Koechel Peterson & Associates — ${result.kpaMatch!.category}`,
+                    category: result.kpaMatch!.category as CDPTemplateCategory,
+                    trimLabel: result.kpaMatch!.trimLabel,
+                    trimSizeId: "",
+                    styleId: "",
+                    bindingTypeId: "case-bound",
+                    pageCountRange: [100, 500] as [number, number],
+                    features: result.kpaMatch!.features,
+                    accentColor: result.kpaMatch!.accentColor,
+                    exampleTitles: [result.kpaMatch!.bookTitle],
+                    icon: "Palette",
+                    description: `KP&A-designed ${result.kpaMatch!.category} template`,
+                    paperTypeId: "standard-offset",
+                    isBible: false,
+                  };
+                  onRecreate(syntheticTemplate, result);
+                }}
+              >
+                <Layers className="w-4 h-4 mr-2" />
+                Use KP&amp;A Template to Recreate This Book
+                <ChevronRight className="w-4 h-4 ml-1" />
+              </Button>
+              <p className="mt-2 text-xs text-amber-700/70 text-center">
+                Opens the Publishing Wizard pre-filled with this book's KP&amp;A production specs.
+              </p>
+            </div>
+          </CardContent>
+        </Card>
+      )}
 
       {/* CDP Template suggestion */}
       {result.suggestedTemplate && (

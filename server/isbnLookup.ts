@@ -5,6 +5,7 @@
  */
 
 import { CDP_TEMPLATES, CDPTemplate } from "../shared/cdpTemplates";
+import { KPA_ALL_TITLES, KPATemplate, KPA_TEMPLATES } from "../shared/kpaTemplates";
 import { TRIM_SIZES } from "./typesettingStyles";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
@@ -35,6 +36,20 @@ export type IsbnLookupResult = {
   matchConfidence?: number;
   /** Human-readable explanation of why this template was chosen */
   matchReason?: string;
+  /** If the ISBN matches a known KP&A-designed title, this field is populated */
+  kpaMatch?: {
+    templateId: string;
+    templateLabel: string;
+    category: string;
+    designCredit: "cover" | "cover+interior" | "full";
+    bookTitle: string;
+    author: string;
+    publisher: string;
+    year: number;
+    accentColor: string;
+    features: string[];
+    trimLabel: string;
+  };
 };
 
 // ─── Open Library Fetcher ─────────────────────────────────────────────────────
@@ -330,6 +345,30 @@ export async function lookupByIsbn(isbn: string): Promise<IsbnLookupResult> {
     source: olData && gbData ? "combined" : olData ? "open-library" : "google-books",
   };
 
+  // Check for exact KP&A ISBN match
+  const kpaBookMatch = KPA_ALL_TITLES.find(
+    (b) => b.isbn && b.isbn.replace(/[-\s]/g, "") === cleanIsbn
+  );
+  let kpaMatch: IsbnLookupResult["kpaMatch"] | undefined;
+  if (kpaBookMatch) {
+    const kpaTemplate = KPA_TEMPLATES.find((t) => t.id === kpaBookMatch.templateId);
+    if (kpaTemplate) {
+      kpaMatch = {
+        templateId: kpaBookMatch.templateId,
+        templateLabel: kpaBookMatch.templateLabel,
+        category: kpaTemplate.category,
+        designCredit: kpaBookMatch.designCredit,
+        bookTitle: kpaBookMatch.title,
+        author: kpaBookMatch.author,
+        publisher: kpaBookMatch.publisher,
+        year: kpaBookMatch.year,
+        accentColor: kpaTemplate.accentColor,
+        features: kpaTemplate.features,
+        trimLabel: kpaTemplate.trimLabel,
+      };
+    }
+  }
+
   // Match to CDP template
   const { template, confidence, reason } = matchCDPTemplate(merged);
 
@@ -342,5 +381,6 @@ export async function lookupByIsbn(isbn: string): Promise<IsbnLookupResult> {
     suggestedTemplate: template,
     matchConfidence: confidence,
     matchReason: reason,
+    kpaMatch,
   };
 }

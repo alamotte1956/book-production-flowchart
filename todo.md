@@ -627,3 +627,11 @@
 - [x] Add KP&A Templates to desktop nav and mobile drawer in Home.tsx
 - [x] Add KP&A Templates to TOOLS array in Home.tsx
 - [x] All 198 tests pass (zero TypeScript errors)
+
+## Phase 72: KP&A ISBN Integration
+- [x] Extend server/isbnLookup.ts to check KPA_ALL_TITLES for a matching ISBN
+- [x] Return kpaMatch field in IsbnLookupResult (templateId, templateLabel, designCredit, title, author, publisher, year, accentColor, features, trimLabel)
+- [x] Update ISBNLookup.tsx to render a KP&A amber-toned banner card when kpaMatch is present
+- [x] KP&A card shows design credit badge (Full Design / Cover+Interior / Cover Design), template category, features, and "Use KP&A Template" button
+- [x] "Use KP&A Template" opens CDPProductionWizard with book metadata pre-filled
+- [x] Write 5 vitest tests for KP&A ISBN match logic (203 total tests passing)

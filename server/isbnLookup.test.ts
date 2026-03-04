@@ -256,3 +256,141 @@ describe("matchCDPTemplate", () => {
     expect(result.confidence).toBeLessThanOrEqual(1);
   });
 });
+
+// ─── KP&A ISBN match tests ────────────────────────────────────────────────────
+
+describe("lookupISBN — KP&A match", () => {
+  beforeEach(() => {
+    mockFetch.mockReset();
+  });
+
+  it("populates kpaMatch when the ISBN matches a known KP&A title (New Inductive Study Bible NASB)", async () => {
+    // ISBN 9780736907972 = New Inductive Study Bible (NASB) — KP&A full design
+    mockFetch
+      .mockResolvedValueOnce({
+        ok: true,
+        json: async () => ({
+          "ISBN:9780736907972": {
+            title: "The New Inductive Study Bible",
+            authors: [{ name: "Precept Ministries International" }],
+            publishers: [{ name: "Harvest House Publishers" }],
+            publish_date: "2000",
+            number_of_pages: 2288,
+          },
+        }),
+      })
+      .mockResolvedValueOnce({
+        ok: true,
+        json: async () => ({ totalItems: 0 }),
+      });
+
+    const result = await lookupISBN("9780736907972");
+
+    expect(result).not.toBeNull();
+    expect(result!.kpaMatch).toBeDefined();
+    expect(result!.kpaMatch!.templateId).toBe("kpa-new-inductive-study-bible");
+    expect(result!.kpaMatch!.designCredit).toBe("full");
+    expect(result!.kpaMatch!.bookTitle).toBe("The New Inductive Study Bible (NASB)");
+    expect(result!.kpaMatch!.publisher).toBe("Harvest House Publishers");
+  });
+
+  it("populates kpaMatch when the ISBN matches a KP&A cover-only title (Life Recovery Bible)", async () => {
+    // ISBN 9781414381503 = Life Recovery Bible (NLT) — KP&A cover design
+    mockFetch
+      .mockResolvedValueOnce({
+        ok: true,
+        json: async () => ({
+          "ISBN:9781414381503": {
+            title: "The Life Recovery Bible",
+            authors: [{ name: "Stephen Arterburn" }],
+            publishers: [{ name: "Tyndale House Publishers" }],
+            publish_date: "1998",
+          },
+        }),
+      })
+      .mockResolvedValueOnce({
+        ok: true,
+        json: async () => ({ totalItems: 0 }),
+      });
+
+    const result = await lookupISBN("9781414381503");
+
+    expect(result).not.toBeNull();
+    expect(result!.kpaMatch).toBeDefined();
+    expect(result!.kpaMatch!.templateId).toBe("kpa-life-recovery-bible");
+    expect(result!.kpaMatch!.designCredit).toBe("cover");
+    expect(result!.kpaMatch!.category).toBe("Recovery Bible");
+  });
+
+  it("populates kpaMatch for His Princess (cover+interior design)", async () => {
+    // ISBN 1590523318 = His Princess — KP&A cover+interior design
+    mockFetch
+      .mockResolvedValueOnce({
+        ok: true,
+        json: async () => ({
+          "ISBN:1590523318": {
+            title: "His Princess: Love Letters from Your King",
+            authors: [{ name: "Sheri Rose Shepherd" }],
+            publishers: [{ name: "Multnomah Gifts" }],
+            publish_date: "2004",
+            number_of_pages: 192,
+          },
+        }),
+      })
+      .mockResolvedValueOnce({
+        ok: true,
+        json: async () => ({ totalItems: 0 }),
+      });
+
+    const result = await lookupISBN("1590523318");
+
+    expect(result).not.toBeNull();
+    expect(result!.kpaMatch).toBeDefined();
+    expect(result!.kpaMatch!.templateId).toBe("kpa-his-princess");
+    expect(result!.kpaMatch!.designCredit).toBe("cover+interior");
+    expect(result!.kpaMatch!.trimLabel).toBe("5.5\" × 8.5\"");
+  });
+
+  it("does NOT populate kpaMatch for a non-KP&A ISBN", async () => {
+    // ISBN 9780310908501 = The Purpose Driven Life — not a KP&A title
+    mockFetch
+      .mockResolvedValueOnce({
+        ok: true,
+        json: async () => makeOpenLibraryResponse(),
+      })
+      .mockResolvedValueOnce({
+        ok: true,
+        json: async () => makeGoogleBooksResponse(),
+      });
+
+    const result = await lookupISBN("9780310908501");
+
+    expect(result).not.toBeNull();
+    expect(result!.kpaMatch).toBeUndefined();
+  });
+
+  it("kpaMatch includes features and accentColor from the KP&A template", async () => {
+    mockFetch
+      .mockResolvedValueOnce({
+        ok: true,
+        json: async () => ({
+          "ISBN:9780736907972": {
+            title: "The New Inductive Study Bible",
+            authors: [{ name: "Precept Ministries International" }],
+            publishers: [{ name: "Harvest House Publishers" }],
+            publish_date: "2000",
+          },
+        }),
+      })
+      .mockResolvedValueOnce({
+        ok: true,
+        json: async () => ({ totalItems: 0 }),
+      });
+
+    const result = await lookupISBN("9780736907972");
+
+    expect(result!.kpaMatch!.features).toBeInstanceOf(Array);
+    expect(result!.kpaMatch!.features.length).toBeGreaterThan(0);
+    expect(result!.kpaMatch!.accentColor).toMatch(/^#[0-9a-f]{6}$/i);
+  });
+});
