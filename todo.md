@@ -604,3 +604,9 @@
 - [x] Add /isbn-lookup route to App.tsx and dashboard nav
 - [x] Write vitest tests for lookupISBN and matchCDPTemplate (12 tests, all passing)
 - [x] All 193 tests pass across 7 test files
+
+## Phase 22 (implemented): Auto-Select Scripture Style
+- [x] Auto-Produce page: when project genre is "Bible / Scripture", pre-select "scripture" style on load
+- [x] Show a subtle info note explaining why the style was pre-selected
+- [x] Allow user to override the pre-selection manually (clearing the auto-selected flag on manual change)
+- [x] Write vitest tests for the auto-selection behavior (3 new tests, 196 total passing)

@@ -11,9 +11,11 @@ vi.mock("./db", () => {
   const stepStatuses: any[] = [];
   const uploadedFiles: any[] = [];
   const dueDates: any[] = [];
+  const productionJobs: any[] = [];
   let fileIdCounter = 1;
   let stepStatusIdCounter = 1;
   let dueDateIdCounter = 1;
+  let productionJobIdCounter = 1;
 
   return {
     createProject: vi.fn(async (data: any) => {
@@ -124,33 +126,25 @@ vi.mock("./db", () => {
     // Production job mocks
     createProductionJob: vi.fn(async (data: any) => {
       const job = {
-        id: 1,
+        id: productionJobIdCounter++,
         ...data,
+        status: "queued",
         createdAt: new Date(),
         updatedAt: new Date(),
       };
+      productionJobs.push(job);
       return job;
     }),
-    getProductionJobsByProject: vi.fn(async (_projectId: number) => []),
-    getProductionJobById: vi.fn(async (jobId: number) => ({
-      id: jobId,
-      projectId: 1,
-      status: "queued",
-      trimSizeId: "6x9",
-      styleId: "literary-fiction",
-      manuscriptFileName: "test.txt",
-      manuscriptFileKey: "manuscripts/1/test.txt",
-      wordCount: null,
-      chapterCount: null,
-      pdfUrl: null,
-      pdfKey: null,
-      epubUrl: null,
-      epubKey: null,
-      errorMessage: null,
-      createdAt: new Date(),
-      updatedAt: new Date(),
-    })),
-    updateProductionJob: vi.fn(async (_jobId: number, _data: any) => {}),
+    getProductionJobsByProject: vi.fn(async (projectId: number) =>
+      productionJobs.filter((j: any) => j.projectId === projectId)
+    ),
+    getProductionJobById: vi.fn(async (jobId: number) =>
+      productionJobs.find((j: any) => j.id === jobId) ?? null
+    ),
+    updateProductionJob: vi.fn(async (jobId: number, data: any) => {
+      const job = productionJobs.find((j: any) => j.id === jobId);
+      if (job) Object.assign(job, data);
+    }),
   };
 });
 
@@ -633,5 +627,83 @@ describe("autoProduce.status", () => {
     const job = await caller.autoProduce.status({ jobId });
     expect(job.id).toBe(jobId);
     expect(job.trimSizeId).toBe("6x9");
+  });
+});
+
+// ─── Auto-select scripture style: server-side validation ──────────────────────
+// The front-end auto-selects the "scripture" style when genre is "Bible / Scripture".
+// These tests verify that the server correctly accepts and stores a job submitted
+// with the scripture style for a Bible/Scripture project, and that the options
+// endpoint exposes the scripture style so the front-end can select it.
+
+describe("autoProduce — scripture style for Bible/Scripture genre", () => {
+  it("accepts a job with styleId 'scripture' for a Bible/Scripture project", async () => {
+    const ctx = createAuthContext(1);
+    const caller = appRouter.createCaller(ctx);
+
+    // Create a project with the Bible / Scripture genre
+    const project = await caller.project.create({
+      title: "Holy Bible — KJV",
+      author: "Various",
+      genre: "Bible / Scripture",
+    });
+
+    expect(project.genre).toBe("Bible / Scripture");
+
+    // Start a production job with the scripture style
+    const result = await caller.autoProduce.start({
+      projectId: project.id,
+      trimSizeId: "5.25x8",
+      styleId: "scripture",
+      fileName: "kjv.txt",
+      mimeType: "text/plain",
+      fileBase64: Buffer.from("In the beginning God created the heavens and the earth.").toString("base64"),
+      outputFormat: "both",
+    });
+
+    expect(result.jobId).toBeDefined();
+
+    // Verify the job was stored with the scripture style
+    const job = await caller.autoProduce.status({ jobId: result.jobId });
+    expect(job.styleId).toBe("scripture");
+    expect(job.trimSizeId).toBe("5.25x8");
+  });
+
+  it("exposes the 'scripture' style in autoProduce.options so the front-end can select it", async () => {
+    const ctx = createUnauthContext();
+    const caller = appRouter.createCaller(ctx);
+
+    const options = await caller.autoProduce.options();
+    const scriptureStyle = options.styles.find((s: { id: string }) => s.id === "scripture");
+
+    expect(scriptureStyle).toBeDefined();
+    expect(scriptureStyle?.id).toBe("scripture");
+  });
+
+  it("also accepts a non-scripture style for a Bible/Scripture project (user override)", async () => {
+    const ctx = createAuthContext(1);
+    const caller = appRouter.createCaller(ctx);
+
+    const project = await caller.project.create({
+      title: "Bible Study Guide",
+      author: "Various",
+      genre: "Bible / Scripture",
+    });
+
+    // User overrides the auto-selected style with a different one
+    const result = await caller.autoProduce.start({
+      projectId: project.id,
+      trimSizeId: "6x9",
+      styleId: "academic-nonfiction",
+      fileName: "study-guide.txt",
+      mimeType: "text/plain",
+      fileBase64: Buffer.from("Chapter 1: Introduction to the Psalms.").toString("base64"),
+      outputFormat: "pdf",
+    });
+
+    expect(result.jobId).toBeDefined();
+    const job = await caller.autoProduce.status({ jobId: result.jobId });
+    // Server should accept the override without error
+    expect(job.styleId).toBe("academic-nonfiction");
   });
 });

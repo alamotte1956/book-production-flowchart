@@ -600,7 +600,9 @@ export default function AutoProduce() {
     return () => { cancelled = true; };
   }, [selectedFile]);
 
-  // Auto-select Scripture / Reference style when the project genre is "Bible / Scripture"
+  // Auto-select Scripture / Reference style when the project genre is "Bible / Scripture".
+  // Only fires once when project data first loads (styleId is empty at that point).
+  // If the user manually changes the style, styleAutoSelected is cleared via onValueChange.
   useEffect(() => {
     if (!projectData?.project) return;
     const genre = projectData.project.genre;
@@ -608,7 +610,8 @@ export default function AutoProduce() {
       setStyleId("scripture");
       setStyleAutoSelected(true);
     }
-  }, [projectData?.project?.genre]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [projectData?.project?.genre]); // intentionally omit styleId — we only want to fire on genre load
 
   const startMutation = trpc.autoProduce.start.useMutation({
     onSuccess: () => {
