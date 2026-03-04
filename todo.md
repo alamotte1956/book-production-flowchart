@@ -616,3 +616,14 @@
 - [x] Update info banner under trim size dropdown to explain auto-selection
 - [x] Allow user to override trim size independently (clears auto-selected flag)
 - [x] Write vitest tests for trim size auto-selection (2 new tests, 198 total passing)
+
+## Phase 71: Koechel Peterson & Associates Templates
+- [x] Research all KP&A titles via Open Library, Google Books, WorldCat, Amazon, ECPA records
+- [x] Extract production specs (trim size, binding, genre, page count, ISBN) for each title
+- [x] Create shared/kpaTemplates.ts with 12 templates covering 11 categories and 25+ verified KP&A-designed titles
+- [x] Build KPATemplates.tsx page with category filter, collapsible title lists, and design credit badges (cover / cover+interior / full)
+- [x] Wire CDPProductionWizard into KPATemplates.tsx ("Use This Template" button)
+- [x] Wire /kpa-templates route into App.tsx
+- [x] Add KP&A Templates to desktop nav and mobile drawer in Home.tsx
+- [x] Add KP&A Templates to TOOLS array in Home.tsx
+- [x] All 198 tests pass (zero TypeScript errors)

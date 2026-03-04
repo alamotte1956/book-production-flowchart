@@ -218,6 +218,16 @@ const TOOLS = [
     dark: false,
   },
   {
+    id: "kpa-templates",
+    path: "/kpa-templates",
+    icon: LayoutGrid,
+    label: "KP&A Book Templates",
+    desc: "Templates from Koechel Peterson & Associates — the Minneapolis design firm that shaped Christian publishing for 30+ years.",
+    badge: "KP&A",
+    badgeColor: "bg-violet-100 text-violet-800",
+    dark: false,
+  },
+  {
     id: "new-project",
     path: null, // opens new project dialog
     icon: Plus,
@@ -645,6 +655,7 @@ export default function Home() {
         <nav className="px-3 py-4 flex flex-col gap-1">
           {[
             { label: "CDP Templates", path: "/cdp-templates", icon: LayoutGrid, badge: "New" },
+            { label: "KP&A Templates", path: "/kpa-templates", icon: LayoutGrid, badge: "KP&A" },
             { label: "Bible Design Studio", path: "/bible-studio", icon: BookOpen, badge: "Bible" },
             { label: "Spine Calculator", path: "/spine-calculator", icon: Ruler, badge: "Print" },
             { label: "Cover Designer", path: "/cover-designer", icon: Layers, badge: "Design" },
@@ -699,6 +710,7 @@ export default function Home() {
           <nav className="hidden md:flex items-center gap-1">
             {[
               { label: "Templates", path: "/cdp-templates", icon: LayoutGrid },
+              { label: "KP&A", path: "/kpa-templates", icon: LayoutGrid },
               { label: "Bible Studio", path: "/bible-studio", icon: BookOpen },
               { label: "Spine Calc", path: "/spine-calculator", icon: Ruler },
               { label: "Cover Designer", path: "/cover-designer", icon: Layers },
