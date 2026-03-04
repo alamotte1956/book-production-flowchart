@@ -535,6 +535,7 @@ export default function AutoProduce() {
   );
 
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [trimSizeId, setTrimSizeId] = useState("");
   const [styleId, setStyleId] = useState("");
   const [outputFormat, setOutputFormat] = useState<"both" | "pdf" | "epub">("both");
@@ -543,6 +544,22 @@ export default function AutoProduce() {
   const [previewOpen, setPreviewOpen] = useState(false);
   const [styleAutoSelected, setStyleAutoSelected] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  // Generate / revoke object URL for image previews
+  useEffect(() => {
+    if (!selectedFile) {
+      setPreviewUrl(null);
+      return;
+    }
+    const isImage = selectedFile.type.startsWith("image/");
+    if (!isImage) {
+      setPreviewUrl(null);
+      return;
+    }
+    const url = URL.createObjectURL(selectedFile);
+    setPreviewUrl(url);
+    return () => URL.revokeObjectURL(url);
+  }, [selectedFile]);
 
   // Auto-select Scripture / Reference style when the project genre is "Bible / Scripture"
   useEffect(() => {
@@ -792,11 +809,27 @@ export default function AutoProduce() {
               />
               {selectedFile ? (
                 <div className="space-y-2">
-                  <CheckCircle2 className="w-10 h-10 text-green-500 mx-auto" />
-                  <p className="font-medium text-green-700">{selectedFile.name}</p>
-                  <p className="text-xs text-green-600">
-                    {(selectedFile.size / 1024 / 1024).toFixed(2)} MB — click to change
-                  </p>
+                  {previewUrl ? (
+                    <div className="flex flex-col items-center gap-2">
+                      <img
+                        src={previewUrl}
+                        alt="Selected image preview"
+                        className="max-h-40 max-w-full rounded-md object-contain border border-green-300 shadow-sm"
+                      />
+                      <p className="font-medium text-green-700 text-sm">{selectedFile.name}</p>
+                      <p className="text-xs text-green-600">
+                        {(selectedFile.size / 1024 / 1024).toFixed(2)} MB — click to change
+                      </p>
+                    </div>
+                  ) : (
+                    <>
+                      <CheckCircle2 className="w-10 h-10 text-green-500 mx-auto" />
+                      <p className="font-medium text-green-700">{selectedFile.name}</p>
+                      <p className="text-xs text-green-600">
+                        {(selectedFile.size / 1024 / 1024).toFixed(2)} MB — click to change
+                      </p>
+                    </>
+                  )}
                 </div>
               ) : (
                 <div className="space-y-3">

@@ -545,3 +545,11 @@
 - [x] Raised AutoProduce MAX_FILE_SIZE_MB from 15 to 50
 - [x] Updated drop zone label and error message to list all supported formats
 - [x] All 181 tests pass, TypeScript 0 errors
+
+## Phase 64: Image Thumbnail Preview in Drop Zone
+- [x] Add previewUrl state (string | null) to AutoProduce
+- [x] Generate object URL when an image file is selected, revoke on cleanup
+- [x] Render thumbnail (max-h-40) inside the drop zone when previewUrl is set
+- [x] Show file name, size, and "click to change" hint below the thumbnail
+- [x] Non-image files show the existing CheckCircle icon instead
+- [x] All 181 tests pass, TypeScript 0 errors
