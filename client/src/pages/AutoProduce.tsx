@@ -23,7 +23,9 @@ import {
   ArrowLeft, Upload, FileText, Wand2, Download, AlertCircle,
   CheckCircle2, Clock, Loader2, BookOpen, FileDown, Sparkles, Eye, X,
   ChevronDown, ChevronUp, RefreshCw, Copy, Terminal,
+  File, Image, Archive, FileCode, FileSpreadsheet,
 } from "lucide-react";
+import JSZip from "jszip";
 
 const MAX_FILE_SIZE_MB = 50;
 const ACCEPTED_TYPES = [
@@ -536,6 +538,7 @@ export default function AutoProduce() {
 
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+  const [zipContents, setZipContents] = useState<Array<{ name: string; size: number }> | null>(null);
   const [trimSizeId, setTrimSizeId] = useState("");
   const [styleId, setStyleId] = useState("");
   const [outputFormat, setOutputFormat] = useState<"both" | "pdf" | "epub">("both");
@@ -559,6 +562,42 @@ export default function AutoProduce() {
     const url = URL.createObjectURL(selectedFile);
     setPreviewUrl(url);
     return () => URL.revokeObjectURL(url);
+  }, [selectedFile]);
+
+  // Read ZIP contents when a .zip file is selected
+  useEffect(() => {
+    if (!selectedFile) {
+      setZipContents(null);
+      return;
+    }
+    const isZip =
+      selectedFile.type === "application/zip" ||
+      selectedFile.type === "application/x-zip-compressed" ||
+      selectedFile.name.toLowerCase().endsWith(".zip");
+    if (!isZip) {
+      setZipContents(null);
+      return;
+    }
+    let cancelled = false;
+    selectedFile.arrayBuffer().then((buf) => {
+      return JSZip.loadAsync(buf);
+    }).then((zip) => {
+      if (cancelled) return;
+      const entries: Array<{ name: string; size: number }> = [];
+      zip.forEach((relativePath, file) => {
+        if (!file.dir) {
+          entries.push({
+            name: relativePath,
+            size: (file as unknown as { _data?: { uncompressedSize?: number } })._data?.uncompressedSize ?? 0,
+          });
+        }
+      });
+      entries.sort((a, b) => a.name.localeCompare(b.name));
+      setZipContents(entries);
+    }).catch(() => {
+      if (!cancelled) setZipContents([]);
+    });
+    return () => { cancelled = true; };
   }, [selectedFile]);
 
   // Auto-select Scripture / Reference style when the project genre is "Bible / Scripture"
@@ -808,8 +847,9 @@ export default function AutoProduce() {
                 }}
               />
               {selectedFile ? (
-                <div className="space-y-2">
-                  {previewUrl ? (
+                <div className="space-y-2 w-full">
+                  {/* Image preview */}
+                  {previewUrl && (
                     <div className="flex flex-col items-center gap-2">
                       <img
                         src={previewUrl}
@@ -821,7 +861,48 @@ export default function AutoProduce() {
                         {(selectedFile.size / 1024 / 1024).toFixed(2)} MB — click to change
                       </p>
                     </div>
-                  ) : (
+                  )}
+
+                  {/* ZIP contents preview */}
+                  {zipContents !== null && !previewUrl && (
+                    <div className="w-full text-left">
+                      <div className="flex items-center gap-2 mb-2 justify-center">
+                        <Archive className="w-6 h-6 text-amber-600" />
+                        <p className="font-medium text-green-700 text-sm">{selectedFile.name}</p>
+                        <span className="text-xs text-green-600">
+                          ({(selectedFile.size / 1024 / 1024).toFixed(2)} MB)
+                        </span>
+                      </div>
+                      {zipContents.length === 0 ? (
+                        <p className="text-xs text-center text-amber-600">ZIP appears to be empty or unreadable.</p>
+                      ) : (
+                        <div className="max-h-36 overflow-y-auto rounded-md border border-green-200 bg-green-50 divide-y divide-green-100">
+                          {zipContents.map((entry) => {
+                            const ext = entry.name.split(".").pop()?.toLowerCase() ?? "";
+                            const isImg = ["png","jpg","jpeg","webp","gif","svg","tiff"].includes(ext);
+                            const isDoc = ["docx","doc","pdf","txt","md","rtf","odt","epub"].includes(ext);
+                            const isSheet = ["xlsx","xls","csv","ods"].includes(ext);
+                            const isCode = ["html","htm","xml","json"].includes(ext);
+                            const Icon = isImg ? Image : isDoc ? FileText : isSheet ? FileSpreadsheet : isCode ? FileCode : File;
+                            const kb = entry.size > 0 ? `${(entry.size / 1024).toFixed(1)} KB` : "";
+                            return (
+                              <div key={entry.name} className="flex items-center gap-2 px-3 py-1.5">
+                                <Icon className="w-3.5 h-3.5 text-green-600 flex-shrink-0" />
+                                <span className="text-xs text-green-800 truncate flex-1" title={entry.name}>
+                                  {entry.name.split("/").pop()}
+                                </span>
+                                {kb && <span className="text-[10px] text-green-500 flex-shrink-0">{kb}</span>}
+                              </div>
+                            );
+                          })}
+                        </div>
+                      )}
+                      <p className="text-[10px] text-center text-green-600 mt-1.5">click to change</p>
+                    </div>
+                  )}
+
+                  {/* Default non-image, non-zip file confirmation */}
+                  {!previewUrl && zipContents === null && (
                     <>
                       <CheckCircle2 className="w-10 h-10 text-green-500 mx-auto" />
                       <p className="font-medium text-green-700">{selectedFile.name}</p>

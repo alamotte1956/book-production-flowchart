@@ -553,3 +553,12 @@
 - [x] Show file name, size, and "click to change" hint below the thumbnail
 - [x] Non-image files show the existing CheckCircle icon instead
 - [x] All 181 tests pass, TypeScript 0 errors
+
+## Phase 65: ZIP File Content Preview in Drop Zone
+- [x] Install jszip package
+- [x] Add zipContents state (array of {name, size} | null) to AutoProduce
+- [x] Read ZIP file client-side with JSZip when a .zip file is selected
+- [x] Render scrollable file list (max-h-36) with type icons (FileText, Image, FileSpreadsheet, FileCode, File) and KB sizes
+- [x] Empty or unreadable ZIP shows a warning message
+- [x] ZIP contents cleared when file is changed or cleared
+- [x] All 181 tests pass, TypeScript 0 errors
