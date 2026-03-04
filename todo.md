@@ -610,3 +610,9 @@
 - [x] Show a subtle info note explaining why the style was pre-selected
 - [x] Allow user to override the pre-selection manually (clearing the auto-selected flag on manual change)
 - [x] Write vitest tests for the auto-selection behavior (3 new tests, 196 total passing)
+
+## Phase 22b: Auto-Select Bible Trim Size
+- [x] Auto-Produce: also pre-select bible-standard (5.25" × 8") trim size when genre is "Bible / Scripture"
+- [x] Update info banner under trim size dropdown to explain auto-selection
+- [x] Allow user to override trim size independently (clears auto-selected flag)
+- [x] Write vitest tests for trim size auto-selection (2 new tests, 198 total passing)

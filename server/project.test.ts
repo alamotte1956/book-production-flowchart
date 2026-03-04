@@ -707,3 +707,51 @@ describe("autoProduce — scripture style for Bible/Scripture genre", () => {
     expect(job.styleId).toBe("academic-nonfiction");
   });
 });
+
+// ─── Auto-select trim size: server-side validation ────────────────────────────
+// The front-end auto-selects the "5.25x8" trim size when genre is "Bible / Scripture".
+// This test verifies the server correctly accepts and stores a job submitted
+// with that trim size, and that "5.25x8" is exposed in the options endpoint.
+
+describe("autoProduce — 5.25x8 trim size auto-select for Bible/Scripture genre", () => {
+  it("exposes 'bible-standard' (5.25\" × 8\") trim size in autoProduce.options", async () => {
+    const ctx = createUnauthContext();
+    const caller = appRouter.createCaller(ctx);
+
+    const options = await caller.autoProduce.options();
+    const bibleTrim = options.trimSizes.find((t: { id: string }) => t.id === "bible-standard");
+
+    expect(bibleTrim).toBeDefined();
+    expect(bibleTrim?.id).toBe("bible-standard");
+    // Verify the dimensions match the expected 5.25" × 8" Bible Standard size
+    expect(bibleTrim?.widthIn).toBe(5.25);
+    expect(bibleTrim?.heightIn).toBe(8);
+  });
+
+  it("accepts a job with trimSizeId '5.25x8' and styleId 'scripture' for a Bible project", async () => {
+    const ctx = createAuthContext(1);
+    const caller = appRouter.createCaller(ctx);
+
+    const project = await caller.project.create({
+      title: "KJV Bible — Standard Edition",
+      author: "Various",
+      genre: "Bible / Scripture",
+    });
+
+    const result = await caller.autoProduce.start({
+      projectId: project.id,
+      trimSizeId: "bible-standard",
+      styleId: "scripture",
+      fileName: "kjv-standard.txt",
+      mimeType: "text/plain",
+      fileBase64: Buffer.from("Genesis 1:1 In the beginning God created the heavens and the earth.").toString("base64"),
+      outputFormat: "both",
+    });
+
+    expect(result.jobId).toBeDefined();
+
+    const job = await caller.autoProduce.status({ jobId: result.jobId });
+    expect(job.trimSizeId).toBe("bible-standard");
+    expect(job.styleId).toBe("scripture");
+  });
+});

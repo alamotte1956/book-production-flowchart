@@ -546,6 +546,7 @@ export default function AutoProduce() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [previewOpen, setPreviewOpen] = useState(false);
   const [styleAutoSelected, setStyleAutoSelected] = useState(false);
+  const [trimAutoSelected, setTrimAutoSelected] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   // Generate / revoke object URL for image previews
@@ -600,18 +601,24 @@ export default function AutoProduce() {
     return () => { cancelled = true; };
   }, [selectedFile]);
 
-  // Auto-select Scripture / Reference style when the project genre is "Bible / Scripture".
-  // Only fires once when project data first loads (styleId is empty at that point).
-  // If the user manually changes the style, styleAutoSelected is cleared via onValueChange.
+  // Auto-select Scripture style + standard Bible trim when genre is "Bible / Scripture".
+  // Only fires once when project data first loads (both fields are empty at that point).
+  // Manually changing either dropdown clears its auto-selected indicator.
   useEffect(() => {
     if (!projectData?.project) return;
     const genre = projectData.project.genre;
-    if (genre === "Bible / Scripture" && !styleId) {
-      setStyleId("scripture");
-      setStyleAutoSelected(true);
+    if (genre === "Bible / Scripture") {
+      if (!styleId) {
+        setStyleId("scripture");
+        setStyleAutoSelected(true);
+      }
+      if (!trimSizeId) {
+        setTrimSizeId("bible-standard");
+        setTrimAutoSelected(true);
+      }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [projectData?.project?.genre]); // intentionally omit styleId — we only want to fire on genre load
+  }, [projectData?.project?.genre]); // intentionally omit styleId/trimSizeId — fire only on genre load
 
   const startMutation = trpc.autoProduce.start.useMutation({
     onSuccess: () => {
@@ -753,7 +760,7 @@ export default function AutoProduce() {
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
               <div className="space-y-1.5">
                 <label className="text-sm font-medium text-[#5c3d2e]">Trim Size</label>
-                <Select value={trimSizeId} onValueChange={setTrimSizeId}>
+                <Select value={trimSizeId} onValueChange={(v) => { setTrimSizeId(v); setTrimAutoSelected(false); }}>
                   <SelectTrigger className="border-[#d4b896]/60 bg-[#fdf9f3] text-[#3d2b1f]">
                     <SelectValue placeholder="Select trim size…" />
                   </SelectTrigger>
@@ -765,6 +772,12 @@ export default function AutoProduce() {
                     ))}
                   </SelectContent>
                 </Select>
+                {trimAutoSelected && (
+                  <p className="text-xs text-[#8b5e3c] flex items-center gap-1.5 mt-1">
+                    <Sparkles className="w-3 h-3 flex-shrink-0" />
+                    Auto-selected for Bible / Scripture (5.25" × 8"). You can change it above.
+                  </p>
+                )}
               </div>
               <div className="space-y-1.5">
                 <label className="text-sm font-medium text-[#5c3d2e]">Typesetting Style</label>
