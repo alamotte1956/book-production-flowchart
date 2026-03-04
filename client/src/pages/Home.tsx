@@ -18,7 +18,7 @@ import {
   BookOpen, Plus, Trash2, ArrowRight, Loader2,
   Upload, CheckCircle2, SkipForward, Clock, Sparkles, Copy,
   Layers, BookMarked, Ruler, Zap, BarChart3, Library,
-  ChevronRight, ChevronDown, Calendar, Star, TrendingUp, FileText, HelpCircle, LogOut, User, Menu, X,
+  ChevronRight, ChevronDown, Calendar, Star, TrendingUp, FileText, HelpCircle, LogOut, User, Menu, X, LayoutGrid,
 } from "lucide-react";
 import {
   DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel,
@@ -195,6 +195,16 @@ const TOOLS = [
     desc: "43 curated tools across every production phase — Scrivener, IngramSpark, NetGalley, and more.",
     badge: "Reference",
     badgeColor: "bg-orange-100 text-orange-800",
+    dark: false,
+  },
+  {
+    id: "cdp-templates",
+    path: "/cdp-templates",
+    icon: LayoutGrid,
+    label: "CDP Book Templates",
+    desc: "One-click presets for every book type CDP has published — Bibles, devotionals, children's books, theological works, and more.",
+    badge: "Templates",
+    badgeColor: "bg-amber-100 text-amber-800",
     dark: false,
   },
   {
@@ -624,6 +634,7 @@ export default function Home() {
         {/* Drawer nav links */}
         <nav className="px-3 py-4 flex flex-col gap-1">
           {[
+            { label: "CDP Templates", path: "/cdp-templates", icon: LayoutGrid, badge: "New" },
             { label: "Bible Design Studio", path: "/bible-studio", icon: BookOpen, badge: "Bible" },
             { label: "Spine Calculator", path: "/spine-calculator", icon: Ruler, badge: "Print" },
             { label: "Cover Designer", path: "/cover-designer", icon: Layers, badge: "Design" },
@@ -677,6 +688,7 @@ export default function Home() {
           {/* Desktop quick nav */}
           <nav className="hidden md:flex items-center gap-1">
             {[
+              { label: "Templates", path: "/cdp-templates", icon: LayoutGrid },
               { label: "Bible Studio", path: "/bible-studio", icon: BookOpen },
               { label: "Spine Calc", path: "/spine-calculator", icon: Ruler },
               { label: "Cover Designer", path: "/cover-designer", icon: Layers },

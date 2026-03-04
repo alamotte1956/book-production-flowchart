@@ -562,3 +562,16 @@
 - [x] Empty or unreadable ZIP shows a warning message
 - [x] ZIP contents cleared when file is changed or cleared
 - [x] All 181 tests pass, TypeScript 0 errors
+
+## Phase 66: CDP Publishing Catalog Integration
+- [x] Add Bible edition types to Bible Studio (Youth, Gift, Interlinear, Harmony of the Gospels, Expanded Text)
+- [x] Add Auto-Produce typesetting styles for Christian Living, Devotionals, Children's Christian, Prayer, Pastoral, Biography, Theological, Music/Audio (already in bibleSpecs.ts)
+- [ ] Update Resources Hub to include CDP's publisher partners (Harvest House, Tyndale, Zondervan, BronzeBow)
+
+## Phase 67: CDP Book Templates Page
+- [x] Create shared/cdpTemplates.ts with one-click presets for all CDP book types
+- [x] Build CDPTemplates.tsx page with visual cards for each book type
+- [x] Add "Use This Template" button that pre-fills Auto-Produce settings
+- [x] Wire /cdp-templates route in App.tsx and add to dashboard nav
+- [x] Add CDP Templates link to landing page tools section (TOOLS array + desktop/mobile nav)
+- [ ] Update Resources Hub with CDP publisher partners
