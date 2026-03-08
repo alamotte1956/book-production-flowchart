@@ -557,6 +557,20 @@ export default function ISBNLookup() {
               <p className="text-[#b0a090] text-xs mt-2">
                 Supports ISBN-10 and ISBN-13 formats, with or without hyphens.
               </p>
+              <div className="mt-8 mx-auto max-w-md border border-[#e8dfd0] rounded-lg bg-white/80 px-5 py-4">
+                <p className="text-sm font-semibold text-[#5c3d2e] mb-1">Need to purchase an ISBN?</p>
+                <p className="text-xs text-[#8b7b6b] mb-3">
+                  In the US, ISBNs are issued exclusively by Bowker. A single ISBN costs $125; a block of 10 costs $295. Each format (hardcover, paperback, EPUB) requires its own ISBN.
+                </p>
+                <a
+                  href="https://www.myidentifiers.com/identify-protect-your-book/isbn/buy-isbn"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-1.5 text-sm font-medium text-[#c9a96e] hover:text-[#b8923e] transition-colors"
+                >
+                  Purchase ISBNs at myidentifiers.com <ExternalLink className="w-3.5 h-3.5" />
+                </a>
+              </div>
             </div>
           )}
         </div>
