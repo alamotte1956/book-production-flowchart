@@ -1,4 +1,4 @@
-import { boolean, index, integer, jsonb, pgEnum, pgTable, text, timestamp, varchar, bigint, serial } from "drizzle-orm/pg-core";
+import { boolean, index, integer, jsonb, numeric, pgEnum, pgTable, text, timestamp, varchar, bigint, serial } from "drizzle-orm/pg-core";
 
 export const roleEnum = pgEnum("role", ["user", "admin"]);
 export const stepStatusEnum = pgEnum("step_status", ["pending", "complete", "skipped"]);
@@ -174,3 +174,74 @@ export const wizardSessions = pgTable("wizard_sessions", {
 
 export type WizardSession = typeof wizardSessions.$inferSelect;
 export type InsertWizardSession = typeof wizardSessions.$inferInsert;
+
+export const affiliateStatusEnum = pgEnum("affiliate_status", ["pending", "approved", "suspended"]);
+export const conversionStatusEnum = pgEnum("conversion_status", ["pending", "approved", "paid"]);
+export const payoutStatusEnum = pgEnum("payout_status", ["pending", "processing", "completed", "failed"]);
+
+export const affiliates = pgTable("affiliates", {
+  id: serial("id").primaryKey(),
+  userId: integer("userId"),
+  affiliateCode: varchar("affiliateCode", { length: 64 }).notNull().unique(),
+  name: varchar("name", { length: 255 }).notNull(),
+  email: varchar("email", { length: 320 }).notNull(),
+  website: varchar("website", { length: 500 }),
+  paypalEmail: varchar("paypalEmail", { length: 320 }),
+  promotionMethod: text("promotionMethod"),
+  commissionRate: integer("commissionRate").default(25).notNull(),
+  status: affiliateStatusEnum("status").default("pending").notNull(),
+  totalClicks: integer("totalClicks").default(0).notNull(),
+  totalConversions: integer("totalConversions").default(0).notNull(),
+  totalEarnings: numeric("totalEarnings", { precision: 10, scale: 2 }).default("0.00").notNull(),
+  pendingEarnings: numeric("pendingEarnings", { precision: 10, scale: 2 }).default("0.00").notNull(),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().notNull(),
+});
+
+export type Affiliate = typeof affiliates.$inferSelect;
+export type InsertAffiliate = typeof affiliates.$inferInsert;
+
+export const affiliateClicks = pgTable("affiliate_clicks", {
+  id: serial("id").primaryKey(),
+  affiliateId: integer("affiliateId").notNull(),
+  ipHash: varchar("ipHash", { length: 64 }),
+  userAgent: varchar("userAgent", { length: 500 }),
+  referrerUrl: varchar("referrerUrl", { length: 1000 }),
+  landingPage: varchar("landingPage", { length: 500 }),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+});
+
+export type AffiliateClick = typeof affiliateClicks.$inferSelect;
+export type InsertAffiliateClick = typeof affiliateClicks.$inferInsert;
+
+export const affiliateConversions = pgTable("affiliate_conversions", {
+  id: serial("id").primaryKey(),
+  affiliateId: integer("affiliateId").notNull(),
+  stripeSessionId: varchar("stripeSessionId", { length: 255 }),
+  customerEmail: varchar("customerEmail", { length: 320 }),
+  planName: varchar("planName", { length: 64 }).notNull(),
+  billingCycle: varchar("billingCycle", { length: 32 }),
+  saleAmount: numeric("saleAmount", { precision: 10, scale: 2 }).notNull(),
+  commissionAmount: numeric("commissionAmount", { precision: 10, scale: 2 }).notNull(),
+  commissionRate: integer("commissionRate").notNull(),
+  status: conversionStatusEnum("status").default("pending").notNull(),
+  paidAt: timestamp("paidAt"),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+});
+
+export type AffiliateConversion = typeof affiliateConversions.$inferSelect;
+export type InsertAffiliateConversion = typeof affiliateConversions.$inferInsert;
+
+export const affiliatePayouts = pgTable("affiliate_payouts", {
+  id: serial("id").primaryKey(),
+  affiliateId: integer("affiliateId").notNull(),
+  amount: numeric("amount", { precision: 10, scale: 2 }).notNull(),
+  paypalEmail: varchar("paypalEmail", { length: 320 }).notNull(),
+  conversionIds: jsonb("conversionIds"),
+  status: payoutStatusEnum("status").default("pending").notNull(),
+  processedAt: timestamp("processedAt"),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+});
+
+export type AffiliatePayout = typeof affiliatePayouts.$inferSelect;
+export type InsertAffiliatePayout = typeof affiliatePayouts.$inferInsert;

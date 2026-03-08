@@ -1,4 +1,4 @@
-import { BookOpen, Layers, Ruler, Library, Search, FileText, LayoutGrid, HelpCircle, CreditCard, Compass, Shield } from "lucide-react";
+import { BookOpen, Layers, Ruler, Library, Search, FileText, LayoutGrid, HelpCircle, CreditCard, Compass, Shield, Users } from "lucide-react";
 
 const footerSections = [
   {
@@ -28,6 +28,7 @@ const footerSections = [
       { label: "Publishing Wizard", href: "/guided-journey", icon: Compass },
       { label: "Pricing & Plans", href: "/pricing", icon: CreditCard },
       { label: "Privacy & Terms", href: "/privacy-terms", icon: Shield },
+      { label: "Affiliate Program", href: "/affiliates", icon: Users },
     ],
   },
 ];
@@ -106,6 +107,8 @@ export default function SiteFooter() {
               <a href="/templates" className="hover:text-[#c9a96e] transition-colors">Templates</a>
               <span className="text-[#5c3d2e]">|</span>
               <a href="/privacy-terms" className="hover:text-[#c9a96e] transition-colors">Privacy & Terms</a>
+              <span className="text-[#5c3d2e]">|</span>
+              <a href="/affiliates" className="hover:text-[#c9a96e] transition-colors">Affiliates</a>
             </div>
             <p className="text-xs text-[#8b7b6b]">
               &copy; {new Date().getFullYear()} Easy Book Publishers. All rights reserved.

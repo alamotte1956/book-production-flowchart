@@ -128,6 +128,20 @@ PostgreSQL via Replit's built-in database. Use `npx drizzle-kit push` to sync sc
 - **SEO Footer**: Global `SiteFooter` component with links to all 14 public pages, export format badges, and copyright. Added to every page (via DashboardLayout for sidebar pages, directly for standalone pages)
 - **Related Tools Cross-Linking**: `RelatedTools` component shows 6 contextual tool links on every tool page for internal SEO link equity
 
+## Affiliate Program
+
+- **Commission**: 25% on every sale, no cap on earnings
+- **Cookie Duration**: 90-day tracking cookie (`ebp_ref`) set via Express middleware on `?ref=CODE` visits
+- **Cookie Type**: httpOnly, server-read only — server reads cookie in `createCheckoutSession` and passes as metadata to Stripe
+- **Payouts**: Monthly via PayPal, $50 minimum threshold
+- **Pages**: `/affiliates` (landing/signup), `/affiliate-dashboard` (stats/marketing/conversions/payouts)
+- **tRPC Routes**: `affiliate.submitApplication`, `affiliate.getDashboard`, `affiliate.trackClick`, `affiliate.getMarketingAssets`, `affiliate.lookupByCode`
+- **DB Helpers**: `server/affiliateDb.ts` — createAffiliate, getAffiliateByCode/Email/Id, recordClick, createConversion, getAffiliateStats, getDailyEarnings, payouts
+- **Webhook Integration**: `checkout.session.completed` handler checks `affiliateCode` in session metadata and creates conversion record
+- **Auto-approval**: Applications are auto-approved (status set to "approved" on creation)
+- **Affiliate Code Format**: `{name-slug}-{nanoid(8)}` — unique per affiliate
+- **Dashboard Auth**: Affiliates log in with their affiliate code (stored in localStorage)
+
 ## Database Tables
 
 - `users` — Auth users (id serial, openId varchar unique)
@@ -139,6 +153,10 @@ PostgreSQL via Replit's built-in database. Use `npx drizzle-kit push` to sync sc
 - `production_jobs` — Auto-produce AI typesetting jobs
 - `contact_submissions` — Contact form entries
 - `wizard_sessions` — Publishing wizard answers (userId, answers jsonb, completedAt)
+- `affiliates` — Affiliate accounts (affiliateCode unique, commissionRate, status, totalClicks/Conversions/Earnings)
+- `affiliate_clicks` — Click tracking (affiliateId, ipHash, userAgent, referrerUrl, landingPage)
+- `affiliate_conversions` — Conversion records (affiliateId, stripeSessionId, planName, saleAmount, commissionAmount, status)
+- `affiliate_payouts` — Payout history (affiliateId, amount, paypalEmail, status)
 
 ## Stripe Integration
 

@@ -1191,6 +1191,16 @@ export const appRouter = router({
 
         const validatedPlanName = product.metadata.planName as "author_pro" | "publisher";
 
+        let validatedAffiliateCode: string | null = null;
+        const rawRef = (ctx.req as any).cookies?.ebp_ref;
+        if (rawRef && typeof rawRef === "string" && /^[a-z0-9-]{3,64}$/i.test(rawRef)) {
+          const { getAffiliateByCode } = await import("./affiliateDb");
+          const aff = await getAffiliateByCode(rawRef);
+          if (aff && aff.status === "approved") {
+            validatedAffiliateCode = rawRef;
+          }
+        }
+
         const session = await stripe.checkout.sessions.create({
           customer: customerId,
           payment_method_types: ["card"],
@@ -1202,6 +1212,7 @@ export const appRouter = router({
             userId: String(user.id),
             planName: validatedPlanName,
             billingCycle: input.billingCycle,
+            ...(validatedAffiliateCode ? { affiliateCode: validatedAffiliateCode } : {}),
           },
           ...(isLifetime ? {} : {
             subscription_data: {
@@ -1291,6 +1302,117 @@ export const appRouter = router({
         return { products: [] };
       }
     }),
+  }),
+
+  affiliate: router({
+    submitApplication: publicProcedure
+      .input(z.object({
+        name: z.string().min(1).max(255),
+        email: z.string().email().max(320),
+        website: z.string().max(500).optional(),
+        paypalEmail: z.string().email().max(320).optional(),
+        promotionMethod: z.string().max(2000).optional(),
+      }))
+      .mutation(async ({ input }) => {
+        const { createAffiliate, getAffiliateByEmail } = await import("./affiliateDb");
+        const existing = await getAffiliateByEmail(input.email);
+        if (existing) {
+          throw new TRPCError({ code: "CONFLICT", message: "An affiliate application with this email already exists" });
+        }
+
+        const code = input.name.toLowerCase().replace(/[^a-z0-9]/g, "").slice(0, 12) + "-" + nanoid(8);
+        const affiliate = await createAffiliate({
+          affiliateCode: code,
+          name: input.name,
+          email: input.email,
+          website: input.website ?? null,
+          paypalEmail: input.paypalEmail ?? null,
+          promotionMethod: input.promotionMethod ?? null,
+          status: "approved",
+        });
+
+        return { success: true, affiliateCode: affiliate.affiliateCode, affiliateId: affiliate.id };
+      }),
+
+    getDashboard: publicProcedure
+      .input(z.object({ affiliateCode: z.string() }))
+      .query(async ({ input }) => {
+        const { getAffiliateByCode, getAffiliateStats, getConversionsByAffiliate, getPayoutsByAffiliate, getDailyEarnings } = await import("./affiliateDb");
+        const affiliate = await getAffiliateByCode(input.affiliateCode);
+        if (!affiliate) throw new TRPCError({ code: "NOT_FOUND", message: "Affiliate not found" });
+
+        const stats = await getAffiliateStats(affiliate.id);
+        const conversions = await getConversionsByAffiliate(affiliate.id, 20);
+        const payouts = await getPayoutsByAffiliate(affiliate.id);
+        const dailyEarnings = await getDailyEarnings(affiliate.id, 30);
+
+        return { affiliate, stats, conversions, payouts, dailyEarnings };
+      }),
+
+    trackClick: publicProcedure
+      .input(z.object({
+        code: z.string(),
+        landingPage: z.string().optional(),
+        referrer: z.string().optional(),
+      }))
+      .mutation(async ({ ctx, input }) => {
+        const { getAffiliateByCode, recordClick } = await import("./affiliateDb");
+        const affiliate = await getAffiliateByCode(input.code);
+        if (!affiliate || affiliate.status !== "approved") return { success: false };
+
+        const crypto = await import("crypto");
+        const ip = ctx.req.ip || ctx.req.headers["x-forwarded-for"] || "unknown";
+        const ipHash = crypto.createHash("sha256").update(String(ip)).digest("hex").slice(0, 16);
+
+        await recordClick({
+          affiliateId: affiliate.id,
+          ipHash,
+          userAgent: (ctx.req.headers["user-agent"] || "").slice(0, 500),
+          referrerUrl: (input.referrer || "").slice(0, 1000) || null,
+          landingPage: (input.landingPage || "").slice(0, 500) || null,
+        });
+
+        return { success: true };
+      }),
+
+    getMarketingAssets: publicProcedure
+      .input(z.object({ affiliateCode: z.string() }))
+      .query(async ({ input }) => {
+        const baseUrl = "https://easybookpublishers.replit.app";
+        const refLink = `${baseUrl}/?ref=${input.affiliateCode}`;
+
+        return {
+          referralLink: refLink,
+          textLinks: [
+            { label: "Homepage", url: refLink },
+            { label: "Pricing Page", url: `${baseUrl}/pricing?ref=${input.affiliateCode}` },
+            { label: "Templates", url: `${baseUrl}/templates?ref=${input.affiliateCode}` },
+            { label: "Auto-Produce", url: `${baseUrl}/auto-produce/0?ref=${input.affiliateCode}` },
+          ],
+          socialCopy: [
+            `I've been using Easy Book Publishers for my self-publishing workflow and it's incredible. Professional typesetting, PDF/EPUB/IDML export, all in one place. Check it out: ${refLink}`,
+            `Stop paying for Atticus + Vellum + IngramSpark separately. Easy Book Publishers does it all for less. ${refLink}`,
+            `If you're self-publishing a book, you need to try Easy Book Publishers. Real print-ready output, 40+ templates, AI typesetting. ${refLink}`,
+            `Just discovered Easy Book Publishers — it's like having a professional book designer on demand. Free to start: ${refLink}`,
+          ],
+          emailTemplate: `Subject: A better way to self-publish your book\n\nHi [Name],\n\nI wanted to share a tool I've been using for book production — Easy Book Publishers.\n\nIt handles everything from manuscript upload to print-ready PDF, EPUB, and InDesign IDML export. The AI typesetting is surprisingly good, and it's significantly cheaper than Atticus or Vellum.\n\nYou can start for free and upgrade when you're ready:\n${refLink}\n\nBest,\n[Your Name]`,
+          bannerSizes: [
+            { size: "728x90", label: "Leaderboard" },
+            { size: "300x250", label: "Medium Rectangle" },
+            { size: "160x600", label: "Wide Skyscraper" },
+            { size: "320x50", label: "Mobile Banner" },
+          ],
+        };
+      }),
+
+    lookupByCode: publicProcedure
+      .input(z.object({ code: z.string() }))
+      .query(async ({ input }) => {
+        const { getAffiliateByCode } = await import("./affiliateDb");
+        const affiliate = await getAffiliateByCode(input.code);
+        if (!affiliate) return null;
+        return { id: affiliate.id, name: affiliate.name, status: affiliate.status };
+      }),
   }),
 });
 

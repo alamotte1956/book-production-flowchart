@@ -526,6 +526,40 @@ export const ROUTE_META: Array<{ path: string; meta: RouteMeta }> = [
       siteName: SITE_NAME,
     },
   },
+  {
+    path: "/affiliates",
+    meta: {
+      title: "Affiliate Program — Earn 25% Commission | Easy Book Publishers",
+      description: "Join the Easy Book Publishers affiliate program. Earn 25% on every sale with a 90-day cookie, real-time dashboard, and monthly PayPal payouts.",
+      keywords: "affiliate program, book publishing affiliate, earn commissions, referral program, self-publishing affiliate",
+      canonical: `${BASE}/affiliates`,
+      ogImage: OG_IMAGE,
+      ogType: "website",
+      twitterCard: "summary_large_image",
+      siteName: SITE_NAME,
+      jsonLd: {
+        "@context": "https://schema.org",
+        "@type": "WebPage",
+        name: "Affiliate Program — Easy Book Publishers",
+        description: "Earn 25% commission on every referral sale. 90-day tracking cookie, monthly PayPal payouts, real-time dashboard.",
+        url: `${BASE}/affiliates`,
+        provider: ORG_SCHEMA,
+      },
+    },
+  },
+  {
+    path: "/affiliate-dashboard",
+    meta: {
+      title: "Affiliate Dashboard | Easy Book Publishers",
+      description: "Track your affiliate clicks, conversions, and earnings in real time. Access marketing materials and payout history.",
+      keywords: "affiliate dashboard, affiliate earnings, referral tracking, Easy Book Publishers",
+      canonical: `${BASE}/affiliate-dashboard`,
+      ogImage: OG_IMAGE,
+      ogType: "website",
+      twitterCard: "summary",
+      siteName: SITE_NAME,
+    },
+  },
 ];
 
 /** Returns the best-matching RouteMeta for a given URL path. */

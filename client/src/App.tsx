@@ -21,6 +21,8 @@ import PrintSpecs from "./pages/PrintSpecs";
 import Pricing from "./pages/Pricing";
 import PrivacyTerms from "./pages/PrivacyTerms";
 import ConfirmEmail from "./pages/ConfirmEmail";
+import AffiliateProgram from "./pages/AffiliateProgram";
+import AffiliateDashboard from "./pages/AffiliateDashboard";
 
 function Router() {
   return (
@@ -29,6 +31,8 @@ function Router() {
       <Route path={"/pricing"} component={Pricing} />
       <Route path={"/privacy-terms"} component={PrivacyTerms} />
       <Route path={"/confirm-email"} component={ConfirmEmail} />
+      <Route path={"/affiliates"} component={AffiliateProgram} />
+      <Route path={"/affiliate-dashboard"} component={AffiliateDashboard} />
       <Route path={"/project/:id"} component={ProjectTracker} />
       <Route path={"/resources"} component={Resources} />
       <Route path={"/timeline/:id"} component={Timeline} />

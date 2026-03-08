@@ -1,5 +1,6 @@
 import "dotenv/config";
 import express from "express";
+import cookieParser from "cookie-parser";
 import { createServer } from "http";
 import net from "net";
 import path from "path";
@@ -92,6 +93,21 @@ async function startServer() {
 
   app.use(express.json({ limit: "100mb" }));
   app.use(express.urlencoded({ limit: "100mb", extended: true }));
+  app.use(cookieParser());
+
+  app.use((req, res, next) => {
+    const ref = req.query.ref as string | undefined;
+    if (ref && typeof ref === "string" && ref.length > 0 && ref.length <= 64) {
+      res.cookie("ebp_ref", ref, {
+        maxAge: 90 * 24 * 60 * 60 * 1000,
+        httpOnly: true,
+        sameSite: "lax",
+        secure: process.env.NODE_ENV === "production",
+        path: "/",
+      });
+    }
+    next();
+  });
 
   const CONTENT_TYPE_MAP: Record<string, string> = {
     ".pdf": "application/pdf",
