@@ -20,7 +20,7 @@ export default function PrivacyTerms() {
             />
             <span className="font-serif text-[#f5d98a] text-lg md:text-xl tracking-wide hidden sm:block">Easy Book Publishers</span>
           </button>
-          <Button onClick={() => navigate("/")} className="bg-[#c9a96e] hover:bg-[#b8944f] text-[#1a1008] font-semibold">
+          <Button onClick={() => navigate("/dashboard")} className="bg-[#c9a96e] hover:bg-[#b8944f] text-[#1a1008] font-semibold">
             Go to Dashboard
           </Button>
         </div>

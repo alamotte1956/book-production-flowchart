@@ -1206,7 +1206,7 @@ export const appRouter = router({
           payment_method_types: ["card"],
           line_items: [{ price: input.priceId, quantity: 1 }],
           mode: isLifetime ? "payment" : "subscription",
-          success_url: `${baseUrl}/?checkout=success&plan=${validatedPlanName}`,
+          success_url: `${baseUrl}/dashboard?checkout=success&plan=${validatedPlanName}`,
           cancel_url: `${baseUrl}/pricing?checkout=cancelled`,
           metadata: {
             userId: String(user.id),

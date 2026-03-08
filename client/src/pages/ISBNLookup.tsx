@@ -427,7 +427,7 @@ export default function ISBNLookup() {
       <div className="bg-[#2c1a00] text-white px-6 py-8 border-b border-[#4a3828]">
         <div className="max-w-2xl mx-auto">
           <button
-            onClick={() => navigate("/")}
+            onClick={() => navigate("/dashboard")}
             className="text-[#c9a96e] text-sm hover:text-white transition-colors mb-4 flex items-center gap-1.5 hover:gap-2"
           >
             <ArrowLeft className="w-4 h-4" />

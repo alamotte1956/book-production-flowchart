@@ -435,7 +435,7 @@ export default function CoverDesigner() {
       {/* Header */}
       <header className="bg-[#2a1a0a] text-white px-6 py-4 flex items-center gap-4 sticky top-0 z-30 shadow-lg">
         <button
-          onClick={() => navigate("/")}
+          onClick={() => navigate("/dashboard")}
           className="text-[#c9a96e] hover:text-white transition-colors p-1 rounded"
         >
           <ArrowLeft className="w-5 h-5" />

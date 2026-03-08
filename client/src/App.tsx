@@ -4,6 +4,7 @@ import NotFound from "@/pages/NotFound";
 import { Route, Switch, Redirect } from "wouter";
 import ErrorBoundary from "./components/ErrorBoundary";
 import { ThemeProvider } from "./contexts/ThemeContext";
+import LandingPage from "./pages/LandingPage";
 import Home from "./pages/Home";
 import ProjectTracker from "./pages/ProjectTracker";
 import Resources from "./pages/Resources";
@@ -27,7 +28,8 @@ import AffiliateDashboard from "./pages/AffiliateDashboard";
 function Router() {
   return (
     <Switch>
-      <Route path={"/"} component={Home} />
+      <Route path={"/"} component={LandingPage} />
+      <Route path={"/dashboard"} component={Home} />
       <Route path={"/pricing"} component={Pricing} />
       <Route path={"/privacy-terms"} component={PrivacyTerms} />
       <Route path={"/confirm-email"} component={ConfirmEmail} />

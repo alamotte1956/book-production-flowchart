@@ -95,7 +95,7 @@ export default function AffiliateProgram() {
             <Button onClick={() => navigate("/pricing")} variant="outline" className="border-[#c9a96e]/30 text-[#f5d98a] hover:bg-[#c9a96e]/10">
               Pricing
             </Button>
-            <Button onClick={() => navigate("/")} className="bg-[#c9a96e] hover:bg-[#b8944f] text-[#1a1008] font-semibold">
+            <Button onClick={() => navigate("/dashboard")} className="bg-[#c9a96e] hover:bg-[#b8944f] text-[#1a1008] font-semibold">
               Dashboard
             </Button>
           </div>
@@ -278,7 +278,7 @@ export default function AffiliateProgram() {
                   <p className="text-[#5c4a2a]/70 mb-4">
                     We'll review your application and send you an email within 24 hours with your affiliate link and dashboard access.
                   </p>
-                  <Button onClick={() => navigate("/")} className="bg-[#c9a96e] hover:bg-[#b8944f] text-[#1a1008] font-semibold">
+                  <Button onClick={() => navigate("/dashboard")} className="bg-[#c9a96e] hover:bg-[#b8944f] text-[#1a1008] font-semibold">
                     Return to Dashboard
                   </Button>
                 </CardContent>

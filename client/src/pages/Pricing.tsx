@@ -175,7 +175,7 @@ export default function Pricing() {
 
   const handleSelectPlan = (tierName: string) => {
     if (tierName === "Starter") {
-      navigate("/");
+      navigate("/dashboard");
       return;
     }
 
@@ -220,7 +220,7 @@ export default function Pricing() {
             />
             <span className="font-serif text-[#f5d98a] text-lg md:text-xl tracking-wide hidden sm:block">Easy Book Publishers</span>
           </button>
-          <Button onClick={() => navigate("/")} className="bg-[#c9a96e] hover:bg-[#b8944f] text-[#1a1008] font-semibold">
+          <Button onClick={() => navigate("/dashboard")} className="bg-[#c9a96e] hover:bg-[#b8944f] text-[#1a1008] font-semibold">
             Go to Dashboard
           </Button>
         </div>
@@ -439,7 +439,7 @@ export default function Pricing() {
           <p className="text-[#d4c8b4]/80 mb-8 max-w-xl mx-auto">
             Join authors and publishers using Easy Book Publishers to bring their books to life — from first idea to finished volume.
           </p>
-          <Button onClick={() => navigate("/")} size="lg" className="bg-gradient-to-r from-[#d4b480] to-[#c9a96e] hover:from-[#e0c490] hover:to-[#d4b480] text-[#1a1008] font-bold text-base px-10 py-6 rounded-xl shadow-xl shadow-[#c9a96e]/25">
+          <Button onClick={() => navigate("/dashboard")} size="lg" className="bg-gradient-to-r from-[#d4b480] to-[#c9a96e] hover:from-[#e0c490] hover:to-[#d4b480] text-[#1a1008] font-bold text-base px-10 py-6 rounded-xl shadow-xl shadow-[#c9a96e]/25">
             Go to Dashboard
             <ArrowRight className="ml-2" size={18} />
           </Button>

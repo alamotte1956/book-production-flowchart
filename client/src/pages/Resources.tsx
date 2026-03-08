@@ -556,7 +556,7 @@ export default function Resources() {
           <Button
             variant="ghost" size="icon"
             className="text-[#c9a96e] hover:bg-[#c9a96e]/10"
-            onClick={() => navigate("/")}
+            onClick={() => navigate("/dashboard")}
           >
             <ArrowLeft size={20} />
           </Button>

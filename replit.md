@@ -115,7 +115,7 @@ PostgreSQL via Replit's built-in database. Use `npx drizzle-kit push` to sync sc
 - **Polished Auto-Produce Results**: Animated progress, detail chips, file type icons, status indicators
 - **Polished Project Tracker**: Ornamental chapter dividers, color-coded progress lines, phase celebration effects, improved step cards
 - **Project Export**: Export project summary as formatted HTML document from Project Tracker
-- **Polished Landing Page**: Enhanced hero, How It Works section, testimonials/social proof, feature card hover effects
+- **Landing Page**: Full marketing landing page at `/` with hero, How It Works, tools grid, output formats, testimonials, navigation CTAs. Dashboard moved to `/dashboard`
 - **Dark Mode**: Toggle in sidebar, persists to localStorage, full dark palette with CSS custom properties
 - **Enhanced ISBN Manager**: ISBN-10 auto-calculation from ISBN-13, 30+ BISAC categories, LCCN field, prominent read-only ISBN-10 display
 - **Guided Journey Dashboard**: New users see "Start Your Publishing Journey" CTA, wizard-completers see roadmap summary with retake option

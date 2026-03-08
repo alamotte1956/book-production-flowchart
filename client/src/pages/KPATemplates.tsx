@@ -303,7 +303,7 @@ export default function KPATemplates() {
     <div className="min-h-screen bg-[#faf6ef]">
       <header className="bg-[#1e1108] text-[#f5efe0] border-b border-[#c9a96e]/10">
         <div className="max-w-7xl mx-auto px-6 py-4 flex items-center gap-3">
-          <Link href="/">
+          <Link href="/dashboard">
             <Button variant="ghost" size="sm" className="gap-1 text-[#c9a96e]/60 hover:text-[#c9a96e] hover:bg-[#c9a96e]/10">
               <ArrowLeft className="w-4 h-4" />
               Dashboard

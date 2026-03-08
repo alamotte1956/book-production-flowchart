@@ -1576,7 +1576,7 @@ export default function ProjectTracker() {
       <div className="min-h-screen bg-[#faf6ef] flex items-center justify-center">
         <div className="text-center">
           <p className="text-[#8b7b6b]">Project not found</p>
-          <Button variant="outline" className="mt-4" onClick={() => navigate("/")}>
+          <Button variant="outline" className="mt-4" onClick={() => navigate("/dashboard")}>
             <ArrowLeft size={16} className="mr-2" /> Back to projects
           </Button>
         </div>
@@ -1597,7 +1597,7 @@ export default function ProjectTracker() {
           <Button
             variant="ghost" size="icon"
             className="text-[#c9a96e] hover:bg-[#c9a96e]/10 print:hidden"
-            onClick={() => navigate("/")}
+            onClick={() => navigate("/dashboard")}
           >
             <ArrowLeft size={20} />
           </Button>

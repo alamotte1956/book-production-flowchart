@@ -360,7 +360,7 @@ function TemplatesInner() {
       <header className="bg-[#1e1108] text-[#f5efe0] border-b border-[#c9a96e]/10">
         <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <button onClick={() => navigate("/")} className="flex items-center gap-1.5 text-[#c9a96e]/60 hover:text-[#c9a96e] text-xs transition-colors">
+            <button onClick={() => navigate("/dashboard")} className="flex items-center gap-1.5 text-[#c9a96e]/60 hover:text-[#c9a96e] text-xs transition-colors">
               <ArrowLeft size={14} />
               Dashboard
             </button>

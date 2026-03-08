@@ -63,7 +63,7 @@ function generateRoadmap(answers: WizardAnswers): RoadmapStep[] {
     title: "Create Your Book Project",
     description: `Set up a new project for "${answers.bookTitle}" and start tracking your production progress across all phases.`,
     icon: FileText,
-    toolPath: "/",
+    toolPath: "/dashboard",
     toolLabel: "Go to Dashboard",
     priority: "essential",
     phase: "Setup",
@@ -325,7 +325,7 @@ function Roadmap({ answers, onReset }: { answers: WizardAnswers; onReset: () => 
           <div className="mt-8 flex flex-col sm:flex-row items-center justify-center gap-3">
             <Button
               className="bg-[#c9a96e] hover:bg-[#b8944f] text-[#2a1a0a] font-semibold gap-2"
-              onClick={() => navigate("/")}
+              onClick={() => navigate("/dashboard")}
             >
               Go to Dashboard <ArrowRight size={16} />
             </Button>
@@ -402,7 +402,7 @@ export default function GuidedJourney() {
   return (
     <PublishingWizard
       onComplete={handleComplete}
-      onSkip={() => navigate("/")}
+      onSkip={() => navigate("/dashboard")}
       initialAnswers={forceWizard && hasExistingAnswers ? savedAnswers : undefined}
     />
   );

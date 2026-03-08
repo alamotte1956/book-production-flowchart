@@ -290,7 +290,7 @@ ${bisacElements}
       {/* Header */}
       <header className="bg-[#2c1a00] text-white px-6 py-4 flex items-center gap-4 sticky top-0 z-30 shadow-lg border-b border-[#4a3828]">
         <button
-          onClick={() => navigate("/")}
+          onClick={() => navigate("/dashboard")}
           className="text-[#c9a96e] hover:text-white transition-colors p-1.5 rounded-lg hover:bg-[#3d2810]"
         >
           <ArrowLeft className="w-5 h-5" />
