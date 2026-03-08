@@ -65,5 +65,4 @@ Run `pnpm run db:push` to sync schema changes.
 - Originally used MySQL (`mysql2`), migrated to PostgreSQL for Replit compatibility
 - Drizzle `onDuplicateKeyUpdate` → `onConflictDoUpdate` (PostgreSQL syntax)
 - Drizzle `$returningId()` → `.returning()` (PostgreSQL syntax)
-- Originally used custom Manus OAuth (`createdesignpublish.net`), replaced with Replit Auth
-- Old OAuth files (`server/_core/oauth.ts`, `server/_core/sdk.ts`) are no longer imported but remain in the codebase
+- Originally used custom Manus OAuth (`createdesignpublish.net`), fully replaced with Replit Auth; all old OAuth files removed
