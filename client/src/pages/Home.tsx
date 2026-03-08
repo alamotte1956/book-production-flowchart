@@ -384,6 +384,12 @@ export default function Home() {
               >
                 Tools
               </button>
+              <a
+                href="/pricing"
+                className="font-serif text-base text-[#f5efe0] hover:text-[#f5d98a] transition-colors hidden md:block px-3 py-1.5"
+              >
+                Pricing
+              </a>
               <button
                 onClick={() => document.getElementById('contact-section')?.scrollIntoView({ behavior: 'smooth' })}
                 className="font-serif text-base text-[#f5efe0] hover:text-[#f5d98a] transition-colors hidden md:block px-3 py-1.5"

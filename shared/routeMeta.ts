@@ -164,6 +164,21 @@ export const ROUTE_META: Array<{ path: string; meta: RouteMeta }> = [
     },
   },
   {
+    path: "/pricing",
+    meta: {
+      title: "Pricing — Easy Book Publishers",
+      description:
+        "Simple, transparent pricing for self-publishing. Free, Pro, and Enterprise plans with AI typesetting, EPUB/PDF export, and team features.",
+      keywords:
+        "pricing, self-publishing plans, book publishing pricing, online publishing, publishing platform",
+      canonical: `${BASE}/pricing`,
+      ogImage: OG_IMAGE,
+      ogType: "website",
+      twitterCard: "summary_large_image",
+      siteName: SITE_NAME,
+    },
+  },
+  {
     path: "/",
     meta: {
       title: "Easy Book Publishers — Self-Publishing Platform",

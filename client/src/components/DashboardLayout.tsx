@@ -19,17 +19,19 @@ import {
   SidebarTrigger,
   useSidebar,
 } from "@/components/ui/sidebar";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { useIsMobile } from "@/hooks/useMobile";
 import {
   LayoutDashboard, LogOut, PanelLeft,
   BookOpen, Ruler, Layers, BookMarked, Library, HelpCircle, LayoutGrid, Search, FileText,
-  Sun, Moon,
+  Sun, Moon, Bell, CheckCircle, Upload, Zap,
 } from "lucide-react";
-import { CSSProperties, useEffect, useRef, useState } from "react";
+import { CSSProperties, useCallback, useEffect, useRef, useState } from "react";
 import { useLocation } from "wouter";
 import { DashboardLayoutSkeleton } from './DashboardLayoutSkeleton';
 import { useTheme } from "@/contexts/ThemeContext";
 import { Button } from "./ui/button";
+import { trpc } from "@/lib/trpc";
 
 const menuItems = [
   { icon: LayoutDashboard, label: "Dashboard", path: "/" },
@@ -49,6 +51,126 @@ const SIDEBAR_WIDTH_KEY = "sidebar-width";
 const DEFAULT_WIDTH = 280;
 const MIN_WIDTH = 200;
 const MAX_WIDTH = 480;
+const NOTIFICATIONS_LAST_READ_KEY = "notifications-last-read";
+
+function getNotificationIcon(type: string) {
+  switch (type) {
+    case "step_completion":
+      return <CheckCircle className="h-4 w-4 text-green-600 shrink-0" />;
+    case "file_upload":
+      return <Upload className="h-4 w-4 text-blue-600 shrink-0" />;
+    case "production_job":
+      return <Zap className="h-4 w-4 text-amber-600 shrink-0" />;
+    default:
+      return <Bell className="h-4 w-4 text-walnut/60 shrink-0" />;
+  }
+}
+
+function formatTimeAgo(date: Date) {
+  const now = new Date();
+  const diffMs = now.getTime() - new Date(date).getTime();
+  const diffMin = Math.floor(diffMs / 60000);
+  if (diffMin < 1) return "just now";
+  if (diffMin < 60) return `${diffMin}m ago`;
+  const diffHr = Math.floor(diffMin / 60);
+  if (diffHr < 24) return `${diffHr}h ago`;
+  const diffDay = Math.floor(diffHr / 24);
+  if (diffDay < 7) return `${diffDay}d ago`;
+  return new Date(date).toLocaleDateString();
+}
+
+function NotificationBell() {
+  const [open, setOpen] = useState(false);
+  const [lastRead, setLastRead] = useState<number>(() => {
+    const saved = localStorage.getItem(NOTIFICATIONS_LAST_READ_KEY);
+    return saved ? parseInt(saved, 10) : 0;
+  });
+
+  const { data: notifications, isLoading } = trpc.activity.recent.useQuery(undefined, {
+    refetchInterval: 30000,
+  });
+
+  const unreadCount = notifications
+    ? notifications.filter((n) => new Date(n.timestamp).getTime() > lastRead).length
+    : 0;
+
+  const markAsRead = useCallback(() => {
+    const now = Date.now();
+    setLastRead(now);
+    localStorage.setItem(NOTIFICATIONS_LAST_READ_KEY, now.toString());
+  }, []);
+
+  useEffect(() => {
+    if (open) {
+      markAsRead();
+    }
+  }, [open, markAsRead]);
+
+  return (
+    <Popover open={open} onOpenChange={setOpen}>
+      <PopoverTrigger asChild>
+        <button
+          className="relative h-9 w-9 flex items-center justify-center rounded-lg hover:bg-gold/15 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-burgundy/30"
+          aria-label="Notifications"
+        >
+          <Bell className="h-4 w-4 text-walnut/70" />
+          {unreadCount > 0 && (
+            <span className="absolute -top-0.5 -right-0.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-red-500 px-1 text-[10px] font-bold text-white">
+              {unreadCount > 9 ? "9+" : unreadCount}
+            </span>
+          )}
+        </button>
+      </PopoverTrigger>
+      <PopoverContent
+        align="end"
+        className="w-80 p-0 bg-parchment border-gold/20"
+      >
+        <div className="px-4 py-3 border-b border-gold/15">
+          <h3 className="text-sm font-semibold text-walnut">Notifications</h3>
+        </div>
+        <div className="max-h-80 overflow-y-auto">
+          {isLoading ? (
+            <div className="px-4 py-6 text-center text-sm text-walnut/50">
+              Loading...
+            </div>
+          ) : !notifications || notifications.length === 0 ? (
+            <div className="px-4 py-6 text-center text-sm text-walnut/50">
+              No notifications yet
+            </div>
+          ) : (
+            notifications.map((notification, i) => {
+              const isUnread = new Date(notification.timestamp).getTime() > lastRead;
+              return (
+                <div
+                  key={`${notification.type}-${notification.projectId}-${i}`}
+                  className={`flex items-start gap-3 px-4 py-3 border-b border-gold/10 last:border-b-0 transition-colors ${
+                    isUnread ? "bg-burgundy/5" : ""
+                  }`}
+                >
+                  {getNotificationIcon(notification.type)}
+                  <div className="flex-1 min-w-0">
+                    <p className="text-xs font-medium text-walnut truncate">
+                      {notification.projectTitle}
+                    </p>
+                    <p className="text-xs text-walnut/70 mt-0.5">
+                      {notification.detail}
+                    </p>
+                    <p className="text-[10px] text-walnut/40 mt-1">
+                      {formatTimeAgo(notification.timestamp)}
+                    </p>
+                  </div>
+                  {isUnread && (
+                    <span className="mt-1 h-2 w-2 rounded-full bg-burgundy shrink-0" />
+                  )}
+                </div>
+              );
+            })
+          )}
+        </div>
+      </PopoverContent>
+    </Popover>
+  );
+}
 
 export default function DashboardLayout({
   children,
@@ -186,12 +308,13 @@ function DashboardLayoutContent({
                 <PanelLeft className="h-4 w-4 text-walnut/70" />
               </button>
               {!isCollapsed ? (
-                <div className="flex items-center gap-2 min-w-0">
+                <div className="flex items-center gap-2 min-w-0 flex-1">
                   <span className="font-bold tracking-tight text-walnut truncate text-sm">
                     Easy Book Publishers
                   </span>
                 </div>
               ) : null}
+              <NotificationBell />
             </div>
           </SidebarHeader>
 
@@ -295,6 +418,7 @@ function DashboardLayoutContent({
                 </div>
               </div>
             </div>
+            <NotificationBell />
           </div>
         )}
         <main className="flex-1 p-4 bg-parchment/50">{children}</main>

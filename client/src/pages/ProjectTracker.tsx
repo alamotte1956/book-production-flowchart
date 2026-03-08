@@ -18,7 +18,7 @@ import {
   ClipboardCheck, Barcode, Printer, Palette, BookCopy, Microscope,
   Warehouse, Truck, Megaphone, Headphones, TrendingUp, Globe,
   Calendar, AlertTriangle, Clock, Download, ChevronsDown, ChevronsUp, Copy, BarChart2, Wand2,
-  Sparkles, Star,
+  Sparkles, Star, Rocket, User, Tag, Ruler, CircleCheck, Circle,
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 import { useState, useMemo, useCallback, useRef, useEffect, type KeyboardEvent } from "react";
@@ -506,7 +506,7 @@ function GenreEditor({ projectId, currentGenre }: { projectId: number; currentGe
   return (
     <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger asChild>
-        <button className="flex items-center gap-1 hover:text-[#c9a96e] transition-colors group print:hidden">
+        <button data-genre-editor className="flex items-center gap-1 hover:text-[#c9a96e] transition-colors group print:hidden">
           {currentGenre ? (
             <>
               <span>• {currentGenre}</span>
@@ -588,7 +588,7 @@ function TitleEditor({ projectId, currentTitle }: { projectId: number; currentTi
   return (
     <Popover open={open} onOpenChange={(v) => { if (!v) setLocalTitle(currentTitle); setOpen(v); }}>
       <PopoverTrigger asChild>
-        <button className="font-serif text-xl truncate tracking-wide hover:text-[#c9a96e] transition-colors group flex items-center gap-1.5 print:pointer-events-none">
+        <button data-title-editor className="font-serif text-xl truncate tracking-wide hover:text-[#c9a96e] transition-colors group flex items-center gap-1.5 print:pointer-events-none">
           {currentTitle}
           <span className="opacity-0 group-hover:opacity-100 transition-opacity text-[#c9a96e]/60 text-[10px] print:hidden">(edit)</span>
         </button>
@@ -658,7 +658,7 @@ function AuthorEditor({ projectId, currentAuthor }: { projectId: number; current
   return (
     <Popover open={open} onOpenChange={(v) => { if (!v) setLocalAuthor(currentAuthor ?? ""); setOpen(v); }}>
       <PopoverTrigger asChild>
-        <button className="flex items-center gap-1 hover:text-[#c9a96e] transition-colors group print:hidden">
+        <button data-author-editor className="flex items-center gap-1 hover:text-[#c9a96e] transition-colors group print:hidden">
           {currentAuthor ? (
             <>
               <span className="italic">by {currentAuthor}</span>
@@ -1260,6 +1260,138 @@ function downloadProjectSummary(args: Parameters<typeof generateProjectSummaryHT
   URL.revokeObjectURL(url);
 }
 
+// ─── Getting Started Checklist ───────────────────────────────────
+
+function GettingStartedChecklist({
+  projectId,
+  projectTitle,
+  projectAuthor,
+  projectGenre,
+}: {
+  projectId: number;
+  projectTitle: string;
+  projectAuthor: string | null | undefined;
+  projectGenre: string | null | undefined;
+}) {
+  const [, navigate] = useLocation();
+
+  const items = [
+    {
+      label: "Set your book title",
+      done: !!projectTitle && projectTitle !== "Untitled Project",
+      icon: BookOpen,
+      action: () => {
+        const el = document.querySelector<HTMLButtonElement>('[data-title-editor]');
+        el?.click();
+      },
+    },
+    {
+      label: "Add author name",
+      done: !!projectAuthor,
+      icon: User,
+      action: () => {
+        const el = document.querySelector<HTMLButtonElement>('[data-author-editor]');
+        el?.click();
+      },
+    },
+    {
+      label: "Choose a genre",
+      done: !!projectGenre,
+      icon: Tag,
+      action: () => {
+        const el = document.querySelector<HTMLButtonElement>('[data-genre-editor]');
+        el?.click();
+      },
+    },
+    {
+      label: "Upload your manuscript",
+      done: false,
+      icon: Upload,
+      action: () => {
+        const el = document.getElementById("phase-concept");
+        el?.scrollIntoView({ behavior: "smooth" });
+      },
+    },
+    {
+      label: "Select a trim size",
+      done: false,
+      icon: Ruler,
+      action: () => navigate("/print-specs"),
+    },
+    {
+      label: "Run Auto-Produce",
+      done: false,
+      icon: Wand2,
+      action: () => navigate(`/auto-produce/${projectId}`),
+    },
+  ];
+
+  const doneCount = items.filter((i) => i.done).length;
+
+  if (doneCount >= 3) return null;
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 16 }}
+      animate={{ opacity: 1, y: 0 }}
+      exit={{ opacity: 0, y: -16 }}
+      transition={{ duration: 0.4, ease: "easeOut" }}
+    >
+      <Card className="border-[#c9a96e]/40 bg-gradient-to-br from-[#fdf9f3] to-[#f5efe0] shadow-md mb-8 overflow-hidden">
+        <CardContent className="p-6">
+          <div className="flex items-center gap-3 mb-4">
+            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#c9a96e] to-[#e0c48a] flex items-center justify-center shadow-sm">
+              <Rocket size={20} className="text-white" />
+            </div>
+            <div>
+              <h3 className="font-serif text-lg font-semibold text-[#3a2a1a]">Getting Started</h3>
+              <p className="text-xs text-[#8b7b6b]">Complete these steps to set up your project</p>
+            </div>
+            <div className="ml-auto text-right">
+              <span className="text-sm font-semibold text-[#c9a96e]">{doneCount}/{items.length}</span>
+              <div className="w-20 h-1.5 rounded-full bg-[#c9a96e]/20 mt-1 overflow-hidden">
+                <div
+                  className="h-full rounded-full bg-gradient-to-r from-[#c9a96e] to-[#e0c48a] transition-all duration-500"
+                  style={{ width: `${(doneCount / items.length) * 100}%` }}
+                />
+              </div>
+            </div>
+          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+            {items.map((item) => {
+              const ItemIcon = item.icon;
+              return (
+                <button
+                  key={item.label}
+                  onClick={item.action}
+                  className={`flex items-center gap-3 px-4 py-3 rounded-lg text-left transition-all duration-200 ${
+                    item.done
+                      ? "bg-[#f0faf2] border border-[#4a6741]/20 cursor-default"
+                      : "bg-white border border-[#e8dfd0] hover:border-[#c9a96e]/50 hover:shadow-sm cursor-pointer"
+                  }`}
+                >
+                  {item.done ? (
+                    <CircleCheck size={18} className="text-emerald-500 shrink-0" />
+                  ) : (
+                    <Circle size={18} className="text-[#c9a96e]/40 shrink-0" />
+                  )}
+                  <ItemIcon size={16} className={item.done ? "text-emerald-500/60 shrink-0" : "text-[#c9a96e] shrink-0"} />
+                  <span className={`text-sm font-medium ${item.done ? "text-[#4a6741] line-through" : "text-[#3a2a1a]"}`}>
+                    {item.label}
+                  </span>
+                  {!item.done && (
+                    <ChevronRight size={14} className="ml-auto text-[#a89880]" />
+                  )}
+                </button>
+              );
+            })}
+          </div>
+        </CardContent>
+      </Card>
+    </motion.div>
+  );
+}
+
 // ─── Main Page ──────────────────────────────────────────────────
 
 export default function ProjectTracker() {
@@ -1703,6 +1835,16 @@ export default function ProjectTracker() {
 
         {/* Main content — left-aligned */}
         <main className="flex-1 min-w-0 space-y-10">
+          <AnimatePresence>
+            {completedSteps < 3 && !printMode && (
+              <GettingStartedChecklist
+                projectId={projectId}
+                projectTitle={project.title}
+                projectAuthor={project.author}
+                projectGenre={project.genre}
+              />
+            )}
+          </AnimatePresence>
           {allPhases.map((phase) => {
             const currentOffset = stepOffset;
             stepOffset += phase.steps.length;

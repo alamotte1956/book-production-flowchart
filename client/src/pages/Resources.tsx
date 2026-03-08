@@ -3,11 +3,12 @@
  * Curated links organized by book production phase, plus industry stats.
  */
 
-import { useEffect } from "react";
+import { useEffect, useState, useMemo } from "react";
 import { Link, useLocation } from "wouter";
-import { ArrowLeft, ExternalLink, TrendingUp, BookOpen, Users, DollarSign, Star, BookMarked, Ruler, Layers, Barcode, Calendar, Zap, Handshake } from "lucide-react";
+import { ArrowLeft, ExternalLink, TrendingUp, BookOpen, Users, DollarSign, Star, BookMarked, Ruler, Layers, Barcode, Calendar, Zap, Handshake, Search, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { Input } from "@/components/ui/input";
 
 // ─── Types ──────────────────────────────────────────────────────
 
@@ -475,16 +476,66 @@ const publisherPartners = [
   },
 ];
 
+const categoryFilters = [
+  { id: "all", label: "All" },
+  { id: "writing", label: "Writing" },
+  { id: "acquisitions", label: "Acquisitions" },
+  { id: "editorial", label: "Editorial" },
+  { id: "design", label: "Design" },
+  { id: "preproduction", label: "Pre-Production" },
+  { id: "production", label: "Production" },
+  { id: "marketing", label: "Marketing" },
+  { id: "postpublication", label: "Post-Publication" },
+] as const;
+
+function HighlightText({ text, query }: { text: string; query: string }) {
+  if (!query.trim()) return <>{text}</>;
+  const escaped = query.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+  const parts = text.split(new RegExp(`(${escaped})`, "gi"));
+  return (
+    <>
+      {parts.map((part, i) =>
+        part.toLowerCase() === query.toLowerCase() ? (
+          <mark key={i} className="bg-[#c9a96e]/30 text-inherit rounded-sm px-0.5">
+            {part}
+          </mark>
+        ) : (
+          part
+        ),
+      )}
+    </>
+  );
+}
+
 // ─── Component ───────────────────────────────────────────────────
 
 export default function Resources() {
   const [, navigate] = useLocation();
+  const [searchQuery, setSearchQuery] = useState("");
+  const [activeCategory, setActiveCategory] = useState<string>("all");
 
-  // Scroll to the section indicated by the URL hash after the page renders
+  const filteredCategories = useMemo(() => {
+    const q = searchQuery.toLowerCase().trim();
+    return categories
+      .filter((cat) => activeCategory === "all" || cat.id === activeCategory)
+      .map((cat) => {
+        if (!q) return cat;
+        const filtered = cat.resources.filter(
+          (r) =>
+            r.name.toLowerCase().includes(q) ||
+            r.description.toLowerCase().includes(q) ||
+            r.tags.some((t) => t.toLowerCase().includes(q)),
+        );
+        return { ...cat, resources: filtered };
+      })
+      .filter((cat) => cat.resources.length > 0);
+  }, [searchQuery, activeCategory]);
+
+  const hasActiveFilters = searchQuery.trim() !== "" || activeCategory !== "all";
+
   useEffect(() => {
     const hash = window.location.hash;
     if (hash) {
-      // Small delay to allow the page to fully render before scrolling
       const timer = setTimeout(() => {
         const el = document.querySelector(hash);
         if (el) {
@@ -520,6 +571,59 @@ export default function Resources() {
       </header>
 
       <div className="max-w-6xl mx-auto px-6 py-10 space-y-14">
+
+        {/* Search & Filter */}
+        <section className="space-y-4">
+          <div className="relative">
+            <Search size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-[#a89880]" />
+            <Input
+              type="text"
+              placeholder="Search resources by name, description, or tag…"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="pl-10 pr-10 h-11 bg-white border-[#e8dfd0] text-[#3a2a1a] placeholder:text-[#a89880] focus-visible:ring-[#c9a96e]/40"
+            />
+            {searchQuery && (
+              <button
+                onClick={() => setSearchQuery("")}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-[#a89880] hover:text-[#3a2a1a] transition-colors"
+              >
+                <X size={16} />
+              </button>
+            )}
+          </div>
+          <div className="flex flex-wrap gap-2">
+            {categoryFilters.map((filter) => (
+              <button
+                key={filter.id}
+                onClick={() => setActiveCategory(filter.id)}
+                className={`px-3 py-1.5 rounded-full text-sm font-medium transition-all duration-200 ${
+                  activeCategory === filter.id
+                    ? "bg-[#2a1a0a] text-[#f5efe0] shadow-sm"
+                    : "bg-white border border-[#e8dfd0] text-[#5c3d2e] hover:border-[#c9a96e]/50 hover:bg-[#c9a96e]/5"
+                }`}
+              >
+                {filter.label}
+              </button>
+            ))}
+          </div>
+          {hasActiveFilters && (
+            <div className="flex items-center gap-3 text-sm text-[#8b7b6b]">
+              <span>
+                {filteredCategories.reduce((acc, c) => acc + c.resources.length, 0)} resource{filteredCategories.reduce((acc, c) => acc + c.resources.length, 0) !== 1 ? "s" : ""} found
+              </span>
+              <button
+                onClick={() => {
+                  setSearchQuery("");
+                  setActiveCategory("all");
+                }}
+                className="text-[#c9a96e] hover:text-[#3a2a1a] underline underline-offset-2 transition-colors"
+              >
+                Clear filters
+              </button>
+            </div>
+          )}
+        </section>
 
         {/* Industry Stats */}
         <section>
@@ -599,7 +703,14 @@ export default function Resources() {
         </section>
 
         {/* Resource Categories */}
-        {categories.map((category) => (
+        {filteredCategories.length === 0 && hasActiveFilters && (
+          <div className="text-center py-16">
+            <Search size={40} className="mx-auto text-[#e8dfd0] mb-4" />
+            <p className="font-serif text-lg text-[#3a2a1a]">No resources found</p>
+            <p className="text-sm text-[#8b7b6b] mt-1">Try adjusting your search or category filter.</p>
+          </div>
+        )}
+        {filteredCategories.map((category) => (
           <section key={category.id} id={`resources-${category.id}`} className="scroll-mt-20">
             {/* Phase header */}
             <div className="flex items-center gap-3 mb-5">
@@ -630,7 +741,7 @@ export default function Resources() {
                   <div className="flex items-start justify-between gap-3">
                     <div className="flex items-center gap-2 flex-wrap">
                       <h3 className="font-serif text-base text-[#3a2a1a] group-hover:text-[#5c3d2e] transition-colors">
-                        {resource.name}
+                        <HighlightText text={resource.name} query={searchQuery} />
                       </h3>
                       <Badge
                         variant="outline"
@@ -641,14 +752,16 @@ export default function Resources() {
                     </div>
                     <ExternalLink size={14} className="text-[#a89880] group-hover:text-[#c9a96e] shrink-0 mt-0.5 transition-colors" />
                   </div>
-                  <p className="text-sm text-[#5c3d2e] leading-relaxed">{resource.description}</p>
+                  <p className="text-sm text-[#5c3d2e] leading-relaxed">
+                    <HighlightText text={resource.description} query={searchQuery} />
+                  </p>
                   <div className="flex flex-wrap gap-1.5 mt-auto">
                     {resource.tags.map((tag) => (
                       <span
                         key={tag}
                         className="text-[10px] px-2 py-0.5 rounded-full bg-[#f0e8d8] text-[#8b7b6b]"
                       >
-                        {tag}
+                        <HighlightText text={tag} query={searchQuery} />
                       </span>
                     ))}
                   </div>

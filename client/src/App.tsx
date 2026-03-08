@@ -19,11 +19,13 @@ import ISBNLookup from "./pages/ISBNLookup";
 import KPATemplates from "./pages/KPATemplates";
 import GuidedJourney from "./pages/GuidedJourney";
 import PrintSpecs from "./pages/PrintSpecs";
+import Pricing from "./pages/Pricing";
 
 function Router() {
   return (
     <Switch>
       <Route path={"/"} component={Home} />
+      <Route path={"/pricing"} component={Pricing} />
       <Route path={"/project/:id"} component={ProjectTracker} />
       <Route path={"/resources"} component={Resources} />
       <Route path={"/timeline/:id"} component={Timeline} />

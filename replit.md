@@ -106,6 +106,10 @@ PostgreSQL via Replit's built-in database. Use `npx drizzle-kit push` to sync sc
 - **Enhanced ISBN Manager**: ISBN-10 auto-calculation from ISBN-13, 30+ BISAC categories, LCCN field, prominent read-only ISBN-10 display
 - **Guided Journey Dashboard**: New users see "Start Your Publishing Journey" CTA, wizard-completers see roadmap summary with retake option
 - **Project Duplication**: Duplicate button in Project Tracker creates project copy with "(Copy)" suffix
+- **Notification Center**: Bell icon in sidebar with unread count, popover dropdown, localStorage-based read tracking
+- **Pricing Page**: Three tiers (Free, Pro $19/mo, Enterprise) with feature comparison table
+- **Getting Started Checklist**: New projects show 6-step onboarding checklist, auto-hides after 3 completed steps
+- **Resources Search & Filter**: Search bar with text highlighting, category filter pills (Writing, Editorial, Design, etc.)
 - **Contact Form**: Public contact form on landing page (backend wired to contact_submissions table)
 
 ## Database Tables
