@@ -9,7 +9,7 @@ A full-stack book production workflow management platform ("Manuscript to Master
 - **Frontend**: React 19, TypeScript, Vite, TailwindCSS 4, shadcn/ui components
 - **Backend**: Node.js, Express, tRPC
 - **Database**: PostgreSQL (Drizzle ORM with `pg` driver)
-- **Auth**: Custom OAuth via `createdesignpublish.net`
+- **Auth**: Replit Auth (OpenID Connect via passport)
 - **Package Manager**: pnpm
 
 ## Architecture
@@ -19,6 +19,17 @@ A full-stack book production workflow management platform ("Manuscript to Master
 - Frontend lives in `client/src/`
 - Shared types/utilities in `shared/`
 - Database schema in `drizzle/schema.ts` (PostgreSQL)
+- Auth integration in `server/replit_integrations/auth/`
+
+## Auth Flow
+
+- Replit Auth handles login/signup via OpenID Connect
+- Login: `/api/login` → Replit OIDC → `/api/callback` → session created
+- Logout: `/api/logout` → Replit end-session
+- User info: `/api/auth/user` (authenticated endpoint)
+- Sessions stored in PostgreSQL `sessions` table
+- App users stored in `users` table, keyed by `openId` (Replit Auth `sub` claim)
+- tRPC context extracts user from passport session via `req.user.claims.sub` → `users.openId`
 
 ## Running the App
 
@@ -26,22 +37,20 @@ The app runs on port 5000 via the "Start application" workflow (`pnpm run dev`).
 
 ## Environment Variables
 
-Required:
-- `DATABASE_URL` — PostgreSQL connection string (set by Replit automatically)
-- `JWT_SECRET` — Secret for session JWT signing
-- `VITE_APP_ID` — OAuth app ID for the app
-- `VITE_OAUTH_PORTAL_URL` — OAuth portal URL (e.g. `https://createdesignpublish.net`)
-- `OAUTH_SERVER_URL` — Server-side OAuth URL
+Required (auto-managed by Replit):
+- `DATABASE_URL` — PostgreSQL connection string
+- `SESSION_SECRET` — Session signing secret
+- `REPL_ID` — Replit app identifier (for OIDC client_id)
 
 Optional:
-- `OWNER_OPEN_ID` — The owner's OAuth openId (grants admin role automatically)
 - `VITE_ANALYTICS_ENDPOINT` — Analytics endpoint URL
 - `VITE_ANALYTICS_WEBSITE_ID` — Analytics website ID
 
 ## Database
 
 PostgreSQL via Replit's built-in database. Schema includes:
-- `users` — Auth users
+- `users` — Auth users (id serial, openId varchar unique)
+- `sessions` — Replit Auth session storage
 - `projects` — Book projects
 - `step_statuses` — Per-step completion tracking
 - `uploaded_files` — File uploads per step
@@ -51,9 +60,10 @@ PostgreSQL via Replit's built-in database. Schema includes:
 
 Run `pnpm run db:push` to sync schema changes.
 
-## Notes
+## Migration Notes
 
 - Originally used MySQL (`mysql2`), migrated to PostgreSQL for Replit compatibility
 - Drizzle `onDuplicateKeyUpdate` → `onConflictDoUpdate` (PostgreSQL syntax)
 - Drizzle `$returningId()` → `.returning()` (PostgreSQL syntax)
-- The OAuth system connects to `createdesignpublish.net` — the `VITE_APP_ID` must match a registered app on that platform for login to work
+- Originally used custom Manus OAuth (`createdesignpublish.net`), replaced with Replit Auth
+- Old OAuth files (`server/_core/oauth.ts`, `server/_core/sdk.ts`) are no longer imported but remain in the codebase

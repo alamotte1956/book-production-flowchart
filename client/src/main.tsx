@@ -6,10 +6,8 @@ import { createRoot } from "react-dom/client";
 import superjson from "superjson";
 import App from "./App";
 import { GlobalErrorBoundary } from "./components/GlobalErrorBoundary";
-import { getLoginUrl } from "./const";
 import "./index.css";
 
-// ─── Global unhandled error / promise rejection logging ───────────────────────
 window.addEventListener("unhandledrejection", (event) => {
   const reason = event.reason;
   console.group("%c[Unhandled Promise Rejection]", "color: #dc2626; font-weight: bold;");
@@ -39,7 +37,7 @@ const redirectToLoginIfUnauthorized = (error: unknown) => {
 
   if (!isUnauthorized) return;
 
-  window.location.href = getLoginUrl();
+  window.location.href = "/api/login";
 };
 
 queryClient.getQueryCache().subscribe(event => {
