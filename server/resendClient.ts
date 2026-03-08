@@ -42,16 +42,17 @@ export async function getUncachableResendClient() {
   return {
     client: new Resend(apiKey),
     fromEmail: fromEmail || 'noreply@easybookpublishers.com',
+    brandFromEmail: 'Easy Book Publishers <noreply@easybookpublishers.com>',
   };
 }
 
 export async function sendConfirmationEmail(toEmail: string, token: string, userName: string) {
-  const { client, fromEmail } = await getUncachableResendClient();
+  const { client, brandFromEmail } = await getUncachableResendClient();
 
-  const confirmUrl = `https://${process.env.REPLIT_DOMAINS?.split(',')[0] || 'easybookpublishers.com'}/confirm-email?token=${token}`;
+  const confirmUrl = `https://easybookpublishers.com/confirm-email?token=${token}`;
 
   const { data, error } = await client.emails.send({
-    from: fromEmail,
+    from: brandFromEmail,
     to: toEmail,
     subject: 'Confirm your email — Easy Book Publishers',
     html: `
