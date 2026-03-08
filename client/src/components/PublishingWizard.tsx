@@ -1,24 +1,10 @@
-/**
- * PublishingWizard — A guided interview that asks what the user wants to publish
- * and collects all the information needed to generate a personalized publishing roadmap.
- *
- * Steps:
- *  1. Book type (Bible, Novel, Non-Fiction, Children's, Poetry, Memoir, Textbook, Other)
- *  2. Publishing experience (First time / Some experience / Professional)
- *  3. Manuscript status (Ready / In progress / Not started)
- *  4. Target format (Print / eBook / Both)
- *  5. ISBN status (Have one / Need one / What's an ISBN?)
- *  6. Target audience (General / Children / Academic / Religious / Other)
- *  7. Timeline (ASAP / 1–3 months / 3–6 months / 6+ months)
- */
-
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
   BookOpen, Zap, FileText, Users, Clock, Tag, Printer,
-  ChevronRight, ChevronLeft, Check, BookMarked, Feather,
+  ChevronRight, Check, BookMarked, Feather,
   GraduationCap, Heart, Baby, Globe, Sparkles,
 } from "lucide-react";
 
@@ -36,7 +22,6 @@ export type WizardAnswers = {
 
 type Props = {
   onComplete: (answers: WizardAnswers) => void;
-  onSkip?: () => void;
   initialAnswers?: Partial<WizardAnswers>;
 };
 
@@ -144,9 +129,8 @@ function OptionGrid({ options, selected, onSelect }: { options: Option[]; select
   );
 }
 
-export default function PublishingWizard({ onComplete, onSkip, initialAnswers }: Props) {
+export default function PublishingWizard({ onComplete, initialAnswers }: Props) {
   const [step, setStep] = useState(0);
-  const [direction, setDirection] = useState(1);
   const [answers, setAnswers] = useState<WizardAnswers>({
     bookType: initialAnswers?.bookType ?? "",
     bookTitle: initialAnswers?.bookTitle ?? "",
@@ -183,27 +167,13 @@ export default function PublishingWizard({ onComplete, onSkip, initialAnswers }:
       onComplete(answers);
       return;
     }
-    setDirection(1);
     setStep(s => s + 1);
   }
-
-  function goBack() {
-    if (step === 0) return;
-    setDirection(-1);
-    setStep(s => s - 1);
-  }
-
-  const variants = {
-    enter: (dir: number) => ({ x: dir > 0 ? 60 : -60, opacity: 0 }),
-    center: { x: 0, opacity: 1 },
-    exit: (dir: number) => ({ x: dir > 0 ? -60 : 60, opacity: 0 }),
-  };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-[#f3efe6] via-[#f5ede0] to-[#f3efe6] flex items-center justify-center p-4">
       <div className="w-full max-w-2xl">
 
-        {/* Header */}
         <div className="text-center mb-8">
           <div className="flex items-center justify-center gap-2 mb-3">
             <img
@@ -221,7 +191,6 @@ export default function PublishingWizard({ onComplete, onSkip, initialAnswers }:
           </p>
         </div>
 
-        {/* Progress bar */}
         <div className="mb-6">
           <div className="flex items-center justify-between text-xs text-[#8b7b6b] mb-2">
             <span>Step {step + 1} of {totalSteps}</span>
@@ -235,7 +204,6 @@ export default function PublishingWizard({ onComplete, onSkip, initialAnswers }:
               transition={{ duration: 0.4 }}
             />
           </div>
-          {/* Step dots */}
           <div className="flex items-center justify-center gap-1.5 mt-3">
             {STEPS.map((s, i) => (
               <div
@@ -250,20 +218,16 @@ export default function PublishingWizard({ onComplete, onSkip, initialAnswers }:
           </div>
         </div>
 
-        {/* Card */}
         <div className="bg-white rounded-2xl border border-[#e8dfd0] shadow-lg overflow-hidden">
-          <AnimatePresence mode="wait" custom={direction}>
+          <AnimatePresence mode="wait">
             <motion.div
               key={step}
-              custom={direction}
-              variants={variants}
-              initial="enter"
-              animate="center"
-              exit="exit"
+              initial={{ x: 60, opacity: 0 }}
+              animate={{ x: 0, opacity: 1 }}
+              exit={{ x: -60, opacity: 0 }}
               transition={{ duration: 0.25, ease: "easeInOut" }}
               className="p-6 md:p-8"
             >
-              {/* Step header */}
               <div className="flex items-center gap-3 mb-6">
                 <div className="w-10 h-10 rounded-xl bg-[#fdf5e4] border border-[#e8c87a]/40 flex items-center justify-center shrink-0">
                   <currentStep.icon size={20} className="text-[#c9a96e]" />
@@ -274,7 +238,6 @@ export default function PublishingWizard({ onComplete, onSkip, initialAnswers }:
                 </div>
               </div>
 
-              {/* Step content */}
               {step === 0 && (
                 <OptionGrid options={BOOK_TYPES} selected={answers.bookType} onSelect={v => setAnswers(a => ({ ...a, bookType: v }))} />
               )}
@@ -319,7 +282,6 @@ export default function PublishingWizard({ onComplete, onSkip, initialAnswers }:
 
               {step === 5 && (
                 <div className="space-y-4">
-                  {/* ISBN explanation for new publishers */}
                   <div className="rounded-xl bg-[#fdf5e4] border border-[#e8c87a]/40 p-4 text-sm text-[#5c3d2e]">
                     <p className="font-semibold mb-1">What is an ISBN?</p>
                     <p className="text-xs text-[#7a6e60] leading-relaxed">
@@ -342,21 +304,7 @@ export default function PublishingWizard({ onComplete, onSkip, initialAnswers }:
             </motion.div>
           </AnimatePresence>
 
-          {/* Navigation */}
-          <div className="px-6 md:px-8 pb-6 flex items-center justify-between border-t border-[#f0e8d8] pt-5">
-            <div className="flex items-center gap-3">
-              {step > 0 ? (
-                <Button variant="outline" onClick={goBack} className="gap-1.5 border-[#d4c8b4] text-[#5c3d2e]">
-                  <ChevronLeft size={16} /> Back
-                </Button>
-              ) : (
-                onSkip && (
-                  <button onClick={onSkip} className="text-xs text-[#8b7b6b] hover:text-[#5c3d2e] transition-colors">
-                    Skip for now
-                  </button>
-                )
-              )}
-            </div>
+          <div className="px-6 md:px-8 pb-6 flex items-center justify-end border-t border-[#f0e8d8] pt-5">
             <Button
               onClick={goNext}
               disabled={!canAdvance()}
@@ -371,7 +319,6 @@ export default function PublishingWizard({ onComplete, onSkip, initialAnswers }:
           </div>
         </div>
 
-        {/* Trust note */}
         <p className="text-center text-xs text-[#8b7b6b] mt-4">
           Your answers are saved to your account and used only to personalize your publishing roadmap.
         </p>

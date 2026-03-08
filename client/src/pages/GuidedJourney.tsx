@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useLocation } from "wouter";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import { trpc } from "@/lib/trpc";
 import { useAuth } from "@/_core/hooks/useAuth";
 import PublishingWizard, { type WizardAnswers } from "@/components/PublishingWizard";
@@ -10,10 +10,9 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import {
   BookOpen, FileText, Layers, Ruler, BookMarked, Zap, Calendar, Library,
-  ArrowRight, CheckCircle2, Clock, Sparkles, ChevronRight, RotateCcw,
-  Printer, Globe, Tag, Users, GraduationCap, Baby, Heart, Feather,
+  ArrowRight, Clock, Sparkles, ChevronRight,
+  Printer, Globe, Users, GraduationCap, Baby, Heart, Feather,
 } from "lucide-react";
-import { phases } from "@/data/flowchartData";
 
 type RoadmapStep = {
   title: string;
@@ -21,7 +20,6 @@ type RoadmapStep = {
   icon: typeof BookOpen;
   toolPath?: string;
   toolLabel?: string;
-  priority: "essential" | "recommended" | "optional";
   phase: string;
 };
 
@@ -42,8 +40,7 @@ function generateRoadmap(answers: WizardAnswers): RoadmapStep[] {
         ? "Start writing your manuscript. Use our project tracker to organize your ideas and set writing milestones."
         : "Finish your manuscript draft and do a round of self-editing before moving into production.",
       icon: Feather,
-      priority: "essential",
-      phase: "Concept & Manuscript",
+      phase: "Manuscript",
     });
   }
 
@@ -54,7 +51,6 @@ function generateRoadmap(answers: WizardAnswers): RoadmapStep[] {
       icon: BookOpen,
       toolPath: "/guide",
       toolLabel: "Open User Guide",
-      priority: "essential",
       phase: "Getting Started",
     });
   }
@@ -65,7 +61,6 @@ function generateRoadmap(answers: WizardAnswers): RoadmapStep[] {
     icon: FileText,
     toolPath: "/dashboard",
     toolLabel: "Go to Dashboard",
-    priority: "essential",
     phase: "Setup",
   });
 
@@ -76,7 +71,6 @@ function generateRoadmap(answers: WizardAnswers): RoadmapStep[] {
       icon: BookOpen,
       toolPath: "/bible-studio",
       toolLabel: "Open Bible Studio",
-      priority: "essential",
       phase: "Design",
     });
   }
@@ -88,7 +82,6 @@ function generateRoadmap(answers: WizardAnswers): RoadmapStep[] {
       icon: Ruler,
       toolPath: "/spine-calculator",
       toolLabel: "Open Spine Calculator",
-      priority: needsPrint ? "essential" : "optional",
       phase: "Design",
     });
 
@@ -98,7 +91,6 @@ function generateRoadmap(answers: WizardAnswers): RoadmapStep[] {
       icon: Layers,
       toolPath: "/cover-designer",
       toolLabel: "Open Cover Designer",
-      priority: "essential",
       phase: "Design",
     });
   }
@@ -113,7 +105,6 @@ function generateRoadmap(answers: WizardAnswers): RoadmapStep[] {
     icon: Zap,
     toolPath: "/auto-produce",
     toolLabel: "Start Auto-Produce",
-    priority: "essential",
     phase: "Production",
   });
 
@@ -126,7 +117,6 @@ function generateRoadmap(answers: WizardAnswers): RoadmapStep[] {
       icon: BookMarked,
       toolPath: "/isbn-manager",
       toolLabel: "Open ISBN Manager",
-      priority: "essential",
       phase: "Metadata",
     });
   } else {
@@ -136,7 +126,6 @@ function generateRoadmap(answers: WizardAnswers): RoadmapStep[] {
       icon: BookMarked,
       toolPath: "/isbn-manager",
       toolLabel: "Open ISBN Manager",
-      priority: "recommended",
       phase: "Metadata",
     });
   }
@@ -146,7 +135,6 @@ function generateRoadmap(answers: WizardAnswers): RoadmapStep[] {
       title: "Coordinate Illustration & Layout",
       description: "Children's books need tight coordination between illustrations and text. Plan your page spreads and illustration briefs early.",
       icon: Layers,
-      priority: "recommended",
       phase: "Design",
     });
   }
@@ -159,7 +147,6 @@ function generateRoadmap(answers: WizardAnswers): RoadmapStep[] {
     icon: Calendar,
     toolPath: "/timeline",
     toolLabel: "Open Timeline",
-    priority: "recommended",
     phase: "Planning",
   });
 
@@ -169,7 +156,6 @@ function generateRoadmap(answers: WizardAnswers): RoadmapStep[] {
     icon: Library,
     toolPath: "/resources",
     toolLabel: "Open Resources Hub",
-    priority: "recommended",
     phase: "Resources",
   });
 
@@ -179,7 +165,6 @@ function generateRoadmap(answers: WizardAnswers): RoadmapStep[] {
     icon: Globe,
     toolPath: "/templates",
     toolLabel: "Browse Templates",
-    priority: "optional",
     phase: "Templates",
   });
 
@@ -218,131 +203,119 @@ function getTimelineLabel(timeline: string) {
   }
 }
 
-function getPriorityBadge(priority: "essential" | "recommended" | "optional") {
-  switch (priority) {
-    case "essential":
-      return <Badge className="bg-[#c9a96e]/15 text-[#8b6914] border-[#c9a96e]/30 text-[10px] font-semibold">Essential</Badge>;
-    case "recommended":
-      return <Badge className="bg-blue-50 text-blue-700 border-blue-200 text-[10px] font-semibold">Recommended</Badge>;
-    case "optional":
-      return <Badge className="bg-slate-50 text-slate-600 border-slate-200 text-[10px] font-semibold">Optional</Badge>;
-  }
-}
-
-function Roadmap({ answers, onReset }: { answers: WizardAnswers; onReset: () => void }) {
+function Roadmap({ answers }: { answers: WizardAnswers }) {
   const [, navigate] = useLocation();
   const roadmap = generateRoadmap(answers);
+  const [currentStep, setCurrentStep] = useState(0);
   const BookTypeIcon = getBookTypeIcon(answers.bookType);
 
-  const essentialCount = roadmap.filter(s => s.priority === "essential").length;
-  const totalPhases = new Set(roadmap.map(s => s.phase)).size;
+  const step = roadmap[currentStep];
+  const isLastStep = currentStep === roadmap.length - 1;
 
   return (
     <DashboardLayout>
-      <div className="max-w-3xl mx-auto py-8 px-4">
+      <div className="max-w-2xl mx-auto py-8 px-4">
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}>
-          <div className="text-center mb-8">
+          <div className="text-center mb-6">
             <div className="inline-flex items-center gap-2 bg-[#fdf5e4] border border-[#e8c87a]/40 rounded-full px-4 py-1.5 mb-4">
               <Sparkles size={14} className="text-[#c9a96e]" />
-              <span className="text-xs font-semibold text-[#8b6914]">Your Personalized Roadmap</span>
+              <span className="text-xs font-semibold text-[#8b6914]">Your Publishing Roadmap</span>
             </div>
-            <h1 className="font-serif text-3xl md:text-4xl text-[#2c1a00] leading-tight">
-              Publishing Roadmap for<br />
-              <span className="text-[#c9a96e]">{answers.bookTitle}</span>
+            <h1 className="font-serif text-2xl md:text-3xl text-[#2c1a00] leading-tight">
+              {answers.bookTitle}
             </h1>
-            <p className="text-[#7a6e60] mt-3 text-sm max-w-lg mx-auto">
-              Based on your answers, here's your personalized step-by-step publishing plan with {essentialCount} essential steps across {totalPhases} phases.
+            <p className="text-[#7a6e60] mt-2 text-sm">
+              Step {currentStep + 1} of {roadmap.length}
             </p>
           </div>
 
-          <div className="flex flex-wrap items-center justify-center gap-3 mb-8">
-            <div className="flex items-center gap-1.5 bg-white rounded-lg border border-[#e8dfd0] px-3 py-1.5">
-              <BookTypeIcon size={14} className="text-[#c9a96e]" />
-              <span className="text-xs font-medium text-[#5c3d2e]">{answers.bookType}</span>
-            </div>
-            <div className="flex items-center gap-1.5 bg-white rounded-lg border border-[#e8dfd0] px-3 py-1.5">
-              <Printer size={14} className="text-[#c9a96e]" />
-              <span className="text-xs font-medium text-[#5c3d2e]">{getFormatLabel(answers.format)}</span>
-            </div>
-            <div className="flex items-center gap-1.5 bg-white rounded-lg border border-[#e8dfd0] px-3 py-1.5">
-              <Clock size={14} className="text-[#c9a96e]" />
-              <span className="text-xs font-medium text-[#5c3d2e]">{getTimelineLabel(answers.timeline)}</span>
-            </div>
-            <div className="flex items-center gap-1.5 bg-white rounded-lg border border-[#e8dfd0] px-3 py-1.5">
-              <Users size={14} className="text-[#c9a96e]" />
-              <span className="text-xs font-medium text-[#5c3d2e]">{answers.authorName}</span>
-            </div>
-          </div>
-
-          <div className="space-y-3">
-            {roadmap.map((step, i) => (
+          <div className="mb-6">
+            <div className="h-2 bg-[#e8dfd0] rounded-full overflow-hidden">
               <motion.div
-                key={i}
-                initial={{ opacity: 0, x: -20 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ delay: i * 0.06, duration: 0.35 }}
-              >
-                <Card className="border-[#e8dfd0] hover:border-[#c9a96e]/40 transition-all hover:shadow-sm bg-white">
-                  <CardContent className="p-4">
-                    <div className="flex items-start gap-4">
-                      <div className="flex flex-col items-center gap-1 shrink-0">
-                        <div className="w-8 h-8 rounded-full bg-[#fdf5e4] border border-[#e8c87a]/40 flex items-center justify-center text-xs font-bold text-[#c9a96e]">
-                          {i + 1}
-                        </div>
-                        {i < roadmap.length - 1 && (
-                          <div className="w-px h-4 bg-[#e8dfd0]" />
-                        )}
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <div className="flex items-center gap-2 flex-wrap">
-                          <step.icon size={16} className="text-[#c9a96e] shrink-0" />
-                          <h3 className="font-serif text-base font-semibold text-[#2c1a00] leading-tight">{step.title}</h3>
-                          {getPriorityBadge(step.priority)}
-                          <Badge variant="outline" className="text-[10px] text-[#8b7b6b] border-[#e8dfd0]">{step.phase}</Badge>
-                        </div>
-                        <p className="text-sm text-[#6b5f53] mt-1.5 leading-relaxed">{step.description}</p>
-                        {step.toolPath && (
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            className="mt-2 h-7 text-xs text-[#c9a96e] hover:text-[#8b6914] hover:bg-[#fdf5e4] gap-1 px-2"
-                            onClick={() => navigate(step.toolPath!)}
-                          >
-                            {step.toolLabel} <ChevronRight size={12} />
-                          </Button>
-                        )}
-                        {!step.toolPath && step.toolLabel && (
-                          <span className="inline-flex items-center gap-1 mt-2 text-xs text-[#8b7b6b]">
-                            <ArrowRight size={10} /> {step.toolLabel}
-                          </span>
-                        )}
-                      </div>
+                className="h-full bg-[#c9a96e] rounded-full"
+                animate={{ width: `${((currentStep + 1) / roadmap.length) * 100}%` }}
+                transition={{ duration: 0.4 }}
+              />
+            </div>
+            <div className="flex items-center justify-center gap-1 mt-3">
+              {roadmap.map((_, i) => (
+                <div
+                  key={i}
+                  className={`rounded-full transition-all duration-300 ${
+                    i < currentStep ? "w-2.5 h-2.5 bg-[#c9a96e]" :
+                    i === currentStep ? "w-5 h-2.5 bg-[#c9a96e]" :
+                    "w-2.5 h-2.5 bg-[#e8dfd0]"
+                  }`}
+                />
+              ))}
+            </div>
+          </div>
+
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={currentStep}
+              initial={{ x: 60, opacity: 0 }}
+              animate={{ x: 0, opacity: 1 }}
+              exit={{ x: -60, opacity: 0 }}
+              transition={{ duration: 0.25, ease: "easeInOut" }}
+            >
+              <Card className="border-[#e8dfd0] bg-white shadow-lg">
+                <CardContent className="p-8">
+                  <div className="text-center">
+                    <div className="w-16 h-16 rounded-2xl bg-[#fdf5e4] border border-[#e8c87a]/40 flex items-center justify-center mx-auto mb-5">
+                      <step.icon size={28} className="text-[#c9a96e]" />
                     </div>
-                  </CardContent>
-                </Card>
-              </motion.div>
-            ))}
-          </div>
 
-          <div className="mt-8 flex flex-col sm:flex-row items-center justify-center gap-3">
-            <Button
-              className="bg-[#c9a96e] hover:bg-[#b8944f] text-[#2a1a0a] font-semibold gap-2"
-              onClick={() => navigate("/dashboard")}
-            >
-              Go to Dashboard <ArrowRight size={16} />
-            </Button>
-            <Button
-              variant="outline"
-              className="border-[#d4c8b4] text-[#5c3d2e] gap-2"
-              onClick={onReset}
-            >
-              <RotateCcw size={14} /> Retake Wizard
-            </Button>
-          </div>
+                    <Badge variant="outline" className="text-[10px] text-[#8b7b6b] border-[#e8dfd0] mb-3">{step.phase}</Badge>
 
-          <p className="text-center text-xs text-[#8b7b6b] mt-6">
-            This roadmap is saved to your account. You can retake the wizard anytime to update your plan.
-          </p>
+                    <h2 className="font-serif text-2xl text-[#2c1a00] font-semibold mb-3">{step.title}</h2>
+                    <p className="text-sm text-[#6b5f53] leading-relaxed max-w-md mx-auto mb-8">{step.description}</p>
+
+                    {step.toolPath && (
+                      <Button
+                        className="bg-[#c9a96e] hover:bg-[#b8944f] text-[#2a1a0a] font-semibold gap-2 mb-4 w-full max-w-xs mx-auto"
+                        onClick={() => navigate(step.toolPath!)}
+                      >
+                        {step.toolLabel} <ArrowRight size={16} />
+                      </Button>
+                    )}
+
+                    <div className="pt-4 border-t border-[#f0e8d8]">
+                      {!isLastStep ? (
+                        <Button
+                          variant="ghost"
+                          className="text-[#c9a96e] hover:text-[#8b6914] hover:bg-[#fdf5e4] gap-2 font-semibold"
+                          onClick={() => setCurrentStep(s => s + 1)}
+                        >
+                          Next Step <ChevronRight size={16} />
+                        </Button>
+                      ) : (
+                        <Button
+                          className="bg-gradient-to-r from-[#d4b480] to-[#c9a96e] hover:from-[#e0c490] hover:to-[#d4b480] text-[#1a1008] font-bold gap-2"
+                          onClick={() => navigate("/dashboard")}
+                        >
+                          Go to Dashboard <ArrowRight size={16} />
+                        </Button>
+                      )}
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            </motion.div>
+          </AnimatePresence>
+
+          <div className="flex items-center justify-between mt-6 px-2">
+            <div className="flex items-center gap-2 text-xs text-[#8b7b6b]">
+              <BookTypeIcon size={14} className="text-[#c9a96e]" />
+              <span>{answers.bookType}</span>
+              <span className="text-[#d4c8b4]">·</span>
+              <Printer size={14} className="text-[#c9a96e]" />
+              <span>{getFormatLabel(answers.format)}</span>
+              <span className="text-[#d4c8b4]">·</span>
+              <Clock size={14} className="text-[#c9a96e]" />
+              <span>{getTimelineLabel(answers.timeline)}</span>
+            </div>
+          </div>
         </motion.div>
       </div>
     </DashboardLayout>
@@ -351,8 +324,6 @@ function Roadmap({ answers, onReset }: { answers: WizardAnswers; onReset: () => 
 
 export default function GuidedJourney() {
   const { isAuthenticated, loading: authLoading } = useAuth();
-  const [, navigate] = useLocation();
-  const [forceWizard, setForceWizard] = useState(false);
   const [completedAnswers, setCompletedAnswers] = useState<WizardAnswers | null>(null);
 
   const saveMutation = trpc.wizard.saveAnswers.useMutation();
@@ -366,7 +337,6 @@ export default function GuidedJourney() {
   function handleComplete(answers: WizardAnswers) {
     saveMutation.mutate({ answers: answers as unknown as Record<string, unknown> });
     setCompletedAnswers(answers);
-    setForceWizard(false);
   }
 
   if (authLoading || existingAnswers.isLoading) {
@@ -377,35 +347,17 @@ export default function GuidedJourney() {
     );
   }
 
-
-  if (completedAnswers && !forceWizard) {
-    return (
-      <Roadmap
-        answers={completedAnswers}
-        onReset={() => {
-          setCompletedAnswers(null);
-          setForceWizard(true);
-        }}
-      />
-    );
+  if (completedAnswers) {
+    return <Roadmap answers={completedAnswers} />;
   }
 
-  if (hasExistingAnswers && !forceWizard && !completedAnswers) {
-    return (
-      <Roadmap
-        answers={savedAnswers as WizardAnswers}
-        onReset={() => {
-          setForceWizard(true);
-        }}
-      />
-    );
+  if (hasExistingAnswers) {
+    return <Roadmap answers={savedAnswers as WizardAnswers} />;
   }
 
   return (
     <PublishingWizard
       onComplete={handleComplete}
-      onSkip={() => navigate("/dashboard")}
-      initialAnswers={forceWizard && hasExistingAnswers ? savedAnswers : undefined}
     />
   );
 }

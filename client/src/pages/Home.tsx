@@ -19,7 +19,7 @@ import {
   Upload, CheckCircle2, SkipForward, Clock, Sparkles, Copy,
   Layers, BookMarked, Ruler, Zap, BarChart3, Library,
   ChevronRight, ChevronDown, Calendar, Star, TrendingUp, FileText, HelpCircle, LogOut, User, Menu, X, LayoutGrid, Search, Send,
-  Compass, PenTool, Palette, Printer, Quote, Package, RotateCcw,
+  Compass, PenTool, Palette, Printer, Quote, Package,
 } from "lucide-react";
 import { toast } from "sonner";
 import {
@@ -590,14 +590,6 @@ export default function Home() {
                       </p>
                     </div>
                     <div className="flex items-center gap-2 shrink-0">
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        className="border-[#d4c8b4] text-[#5c3d2e] gap-1.5 text-xs"
-                        onClick={() => navigate("/guided-journey")}
-                      >
-                        <RotateCcw size={12} /> Retake Quiz
-                      </Button>
                       <Button
                         size="sm"
                         className="bg-gradient-to-r from-[#c9a96e] to-[#b8944f] hover:from-[#d4b480] hover:to-[#c9a96e] text-[#2a1a0a] font-semibold gap-1.5 text-xs"
