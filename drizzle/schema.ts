@@ -18,6 +18,7 @@ export const users = pgTable("users", {
   loginMethod: varchar("loginMethod", { length: 64 }),
   role: roleEnum("role").default("user").notNull(),
   plan: planEnum("plan").default("starter").notNull(),
+  isAdmin: boolean("isAdmin").default(false).notNull(),
   emailConfirmed: boolean("emailConfirmed").default(false).notNull(),
   emailConfirmToken: varchar("emailConfirmToken", { length: 128 }),
   emailConfirmTokenExpiresAt: timestamp("emailConfirmTokenExpiresAt"),

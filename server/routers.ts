@@ -73,7 +73,7 @@ export const appRouter = router({
       .mutation(async ({ ctx, input }) => {
         const user = await getUserById(ctx.user.id);
         const plan = user?.plan ?? "starter";
-        if (plan === "starter") {
+        if (plan === "starter" && !user?.isAdmin) {
           const existing = await getProjectsByUser(ctx.user.id);
           if (existing.length >= 1) {
             throw new TRPCError({
@@ -113,7 +113,7 @@ export const appRouter = router({
         }
         const user = await getUserById(ctx.user.id);
         const plan = user?.plan ?? "starter";
-        if (plan === "starter") {
+        if (plan === "starter" && !user?.isAdmin) {
           const existing = await getProjectsByUser(ctx.user.id);
           if (existing.length >= 1) {
             throw new TRPCError({

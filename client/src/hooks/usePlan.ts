@@ -58,20 +58,22 @@ export function usePlan() {
   const { user } = useAuth();
 
   const plan: PlanName = (user?.plan as PlanName) ?? "starter";
+  const isAdmin = !!(user as any)?.isAdmin;
 
   const canAccess = useCallback(
-    (feature: PlanFeature) => PLAN_FEATURES[plan].has(feature),
-    [plan]
+    (feature: PlanFeature) => isAdmin || PLAN_FEATURES[plan].has(feature),
+    [plan, isAdmin]
   );
 
   return useMemo(
     () => ({
-      plan,
+      plan: isAdmin ? "publisher" as PlanName : plan,
       canAccess,
-      isStarter: plan === "starter",
-      isPro: plan === "author_pro",
-      isPublisher: plan === "publisher",
-      projectLimit: PROJECT_LIMITS[plan],
+      isAdmin,
+      isStarter: !isAdmin && plan === "starter",
+      isPro: isAdmin || plan === "author_pro",
+      isPublisher: isAdmin || plan === "publisher",
+      projectLimit: isAdmin ? Infinity : PROJECT_LIMITS[plan],
       getFeatureLabel: (f: PlanFeature) => FEATURE_LABELS[f],
       getMinimumPlan: (f: PlanFeature) => MINIMUM_PLAN[f],
       getMinimumPlanLabel: (f: PlanFeature) => {
