@@ -8,6 +8,8 @@ export const errorTypeEnum = pgEnum("error_type", ["format_unsupported", "parse_
 /**
  * Core user table backing auth flow.
  */
+export const planEnum = pgEnum("plan", ["starter", "author_pro", "publisher"]);
+
 export const users = pgTable("users", {
   id: serial("id").primaryKey(),
   openId: varchar("openId", { length: 64 }).notNull().unique(),
@@ -15,6 +17,9 @@ export const users = pgTable("users", {
   email: varchar("email", { length: 320 }),
   loginMethod: varchar("loginMethod", { length: 64 }),
   role: roleEnum("role").default("user").notNull(),
+  plan: planEnum("plan").default("starter").notNull(),
+  stripeCustomerId: varchar("stripeCustomerId", { length: 255 }).unique(),
+  stripeSubscriptionId: varchar("stripeSubscriptionId", { length: 255 }),
   createdAt: timestamp("createdAt").defaultNow().notNull(),
   updatedAt: timestamp("updatedAt").defaultNow().notNull(),
   lastSignedIn: timestamp("lastSignedIn").defaultNow().notNull(),

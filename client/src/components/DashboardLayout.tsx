@@ -24,7 +24,7 @@ import { useIsMobile } from "@/hooks/useMobile";
 import {
   LayoutDashboard, LogOut, PanelLeft,
   BookOpen, Ruler, Layers, BookMarked, Library, HelpCircle, LayoutGrid, Search, FileText,
-  Sun, Moon, Bell, CheckCircle, Upload, Zap,
+  Sun, Moon, Bell, CheckCircle, Upload, Zap, CreditCard,
 } from "lucide-react";
 import { CSSProperties, useCallback, useEffect, useRef, useState } from "react";
 import { useLocation } from "wouter";
@@ -45,6 +45,7 @@ const menuItems = [
   { icon: FileText, label: "Print Specs", path: "/print-specs" },
   { icon: Library, label: "Resources", path: "/resources" },
   { icon: HelpCircle, label: "User Guide", path: "/guide" },
+  { icon: CreditCard, label: "Billing & Plans", path: "/pricing" },
 ];
 
 const SIDEBAR_WIDTH_KEY = "sidebar-width";

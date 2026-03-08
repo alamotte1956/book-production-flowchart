@@ -2,12 +2,27 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Check, X, ArrowRight, BookOpen, Zap, Crown, HelpCircle } from "lucide-react";
+import { Check, X, ArrowRight, BookOpen, Zap, Crown, HelpCircle, Loader2 } from "lucide-react";
 import { getSignUpUrl } from "@/const";
 import { useLocation } from "wouter";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import { trpc } from "@/lib/trpc";
+import { useAuth } from "@/_core/hooks/useAuth";
 
 type BillingCycle = "monthly" | "annual" | "lifetime";
+
+const PRICE_IDS: Record<string, Record<BillingCycle, string>> = {
+  "Author Pro": {
+    monthly: "price_1T8YrzA6rewT2BRR3203CbI4",
+    annual: "price_1T8Ys0A6rewT2BRRpzIWjqWZ",
+    lifetime: "price_1T8Ys0A6rewT2BRRue9XxUEl",
+  },
+  "Publisher": {
+    monthly: "price_1T8Ys0A6rewT2BRRqxBSf5go",
+    annual: "price_1T8Ys0A6rewT2BRRMctmRIJw",
+    lifetime: "price_1T8Ys1A6rewT2BRRg8rdFtLC",
+  },
+};
 
 const tiers = [
   {
@@ -127,6 +142,38 @@ const competitors = [
 export default function Pricing() {
   const [, navigate] = useLocation();
   const [billing, setBilling] = useState<BillingCycle>("lifetime");
+  const [loadingTier, setLoadingTier] = useState<string | null>(null);
+  const { user } = useAuth();
+  const checkoutMutation = trpc.stripe.createCheckoutSession.useMutation();
+
+  const handleSelectPlan = async (tierName: string) => {
+    if (tierName === "Starter") {
+      window.location.href = getSignUpUrl();
+      return;
+    }
+
+    if (!user) {
+      window.location.href = getSignUpUrl();
+      return;
+    }
+
+    const priceId = PRICE_IDS[tierName]?.[billing];
+    if (!priceId) return;
+
+    setLoadingTier(tierName);
+    try {
+      const planName = tierName === "Author Pro" ? "author_pro" as const : "publisher" as const;
+      const result = await checkoutMutation.mutateAsync({
+        priceId,
+        billingCycle: billing,
+        planName,
+      });
+      window.location.href = result.url;
+    } catch (err) {
+      console.error("Checkout error:", err);
+      setLoadingTier(null);
+    }
+  };
 
   return (
     <div className="min-h-screen bg-[#faf6ef]">
@@ -219,7 +266,6 @@ export default function Pricing() {
                   <p className="text-sm text-[#5c4a2a]/70 mt-2">{tier.description}</p>
                 </CardHeader>
                 <CardContent>
-                  <a href={getSignUpUrl()}>
                     <Button
                       className={`w-full mb-6 ${
                         tier.highlight
@@ -227,11 +273,21 @@ export default function Pricing() {
                           : "border-[#c9a96e]/40 text-[#1a1008] hover:bg-[#c9a96e]/10"
                       }`}
                       variant={tier.ctaVariant}
+                      onClick={() => handleSelectPlan(tier.name)}
+                      disabled={loadingTier === tier.name}
                     >
-                      {tier.cta}
-                      <ArrowRight className="ml-2" size={16} />
+                      {loadingTier === tier.name ? (
+                        <>
+                          <Loader2 className="mr-2 animate-spin" size={16} />
+                          Redirecting...
+                        </>
+                      ) : (
+                        <>
+                          {tier.cta}
+                          <ArrowRight className="ml-2" size={16} />
+                        </>
+                      )}
                     </Button>
-                  </a>
                   <ul className="space-y-3">
                     {tier.features.map((feature) => (
                       <li key={feature.name} className="flex items-center gap-2.5 text-sm">

@@ -120,3 +120,17 @@ PostgreSQL via Replit's built-in database. Use `npx drizzle-kit push` to sync sc
 - `production_jobs` — Auto-produce AI typesetting jobs
 - `contact_submissions` — Contact form entries
 - `wizard_sessions` — Publishing wizard answers (userId, answers jsonb, completedAt)
+
+## Stripe Integration
+
+- **Connector**: Replit Stripe connector (conn_stripe_01KK5TMD6QE6QTZXNFCCWSPP6H)
+- **Library**: `stripe` + `stripe-replit-sync` for webhook/sync handling
+- **Schema**: `stripe.*` tables auto-synced (products, prices, customers, subscriptions, etc.) — NEVER INSERT directly
+- **Webhook**: `/api/stripe/webhook` route registered BEFORE `express.json()` with raw body parsing
+- **Products**: Created via `server/seedStripeProducts.ts` (run `npx tsx server/seedStripeProducts.ts`)
+  - Author Pro: monthly ($14.99), annual ($99.99/yr), lifetime ($149)
+  - Publisher: monthly ($39.99), annual ($299.88/yr), lifetime ($399)
+- **User columns**: `plan` (enum: starter/author_pro/publisher), `stripeCustomerId`, `stripeSubscriptionId`
+- **tRPC routes**: `stripe.getSubscription`, `stripe.createCheckoutSession`, `stripe.createBillingPortal`, `stripe.getProducts`, `stripe.getPublishableKey`
+- **Webhook handlers**: `checkout.session.completed` (upgrades plan), `customer.subscription.updated`, `customer.subscription.deleted` (reverts to starter)
+- **Price IDs**: Hardcoded in `client/src/pages/Pricing.tsx` (PRICE_IDS constant) — update if Stripe products are recreated

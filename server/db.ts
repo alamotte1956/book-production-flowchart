@@ -551,3 +551,25 @@ export async function getRecentActivity(userId: number): Promise<ActivityItem[]>
 
   return items.slice(0, 10);
 }
+
+// ─── Stripe helpers ──────────────────────────────────────────────────
+export async function getUserById(userId: number) {
+  const db = await getDb();
+  if (!db) return null;
+  const [user] = await db.select().from(users).where(eq(users.id, userId));
+  return user ?? null;
+}
+
+export async function updateUserStripeInfo(
+  userId: number,
+  info: { stripeCustomerId?: string; stripeSubscriptionId?: string | null; plan?: "starter" | "author_pro" | "publisher" }
+) {
+  const db = await getDb();
+  if (!db) return null;
+  const updateSet: Record<string, unknown> = { updatedAt: new Date() };
+  if (info.stripeCustomerId !== undefined) updateSet.stripeCustomerId = info.stripeCustomerId;
+  if (info.stripeSubscriptionId !== undefined) updateSet.stripeSubscriptionId = info.stripeSubscriptionId;
+  if (info.plan !== undefined) updateSet.plan = info.plan;
+  const [user] = await db.update(users).set(updateSet).where(eq(users.id, userId)).returning();
+  return user ?? null;
+}

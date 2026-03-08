@@ -18,8 +18,10 @@ import { generateIdml } from "./idmlGenerator";
 import { invokeLLM } from "./_core/llm";
 import { lookupByIsbn } from "./isbnLookup";
 import { notifyOwner } from "./_core/notification";
-import { createContactSubmission, saveWizardAnswers, getWizardAnswers, getRecentActivity, getDashboardStats } from "./db";
+import { createContactSubmission, saveWizardAnswers, getWizardAnswers, getRecentActivity, getDashboardStats, getUserById, updateUserStripeInfo } from "./db";
 import { TRPCError } from "@trpc/server";
+import { getUncachableStripeClient, getStripePublishableKey } from "./stripeClient";
+import { sql } from "drizzle-orm";
 
 // ─── Error classification helper (module scope so it's shared by start + retry) ──
 const classifyError = (err: unknown, fileName: string, wordCount?: number | null): "format_unsupported" | "parse_empty" | "pipeline_error" | "unknown" => {
@@ -1024,6 +1026,181 @@ export const appRouter = router({
   dashboard: router({
     stats: protectedProcedure.query(async ({ ctx }) => {
       return getDashboardStats(ctx.user.id);
+    }),
+  }),
+
+  stripe: router({
+    getPublishableKey: publicProcedure.query(async () => {
+      try {
+        return { key: await getStripePublishableKey() };
+      } catch {
+        return { key: null };
+      }
+    }),
+
+    getSubscription: protectedProcedure.query(async ({ ctx }) => {
+      const user = await getUserById(ctx.user.id);
+      if (!user) throw new TRPCError({ code: "NOT_FOUND", message: "User not found" });
+
+      return {
+        plan: user.plan ?? "starter",
+        stripeCustomerId: user.stripeCustomerId,
+        stripeSubscriptionId: user.stripeSubscriptionId,
+      };
+    }),
+
+    createCheckoutSession: protectedProcedure
+      .input(z.object({
+        priceId: z.string(),
+        billingCycle: z.enum(["monthly", "annual", "lifetime"]),
+        planName: z.enum(["author_pro", "publisher"]),
+      }))
+      .mutation(async ({ ctx, input }) => {
+        const stripe = await getUncachableStripeClient();
+
+        const price = await stripe.prices.retrieve(input.priceId, { expand: ['product'] });
+        if (!price.active) {
+          throw new TRPCError({ code: "BAD_REQUEST", message: "Price is not active" });
+        }
+
+        const product = price.product as import('stripe').Stripe.Product;
+        if (!product || typeof product === 'string' || !product.active) {
+          throw new TRPCError({ code: "BAD_REQUEST", message: "Invalid product" });
+        }
+
+        if (product.metadata?.app !== 'easy-book-publishers') {
+          throw new TRPCError({ code: "BAD_REQUEST", message: "Invalid product for this application" });
+        }
+
+        if (product.metadata?.planName !== input.planName) {
+          throw new TRPCError({ code: "BAD_REQUEST", message: "Price does not match requested plan" });
+        }
+
+        const priceBillingCycle = price.metadata?.billingCycle;
+        if (priceBillingCycle && priceBillingCycle !== input.billingCycle) {
+          throw new TRPCError({ code: "BAD_REQUEST", message: "Price does not match requested billing cycle" });
+        }
+
+        const user = await getUserById(ctx.user.id);
+        if (!user) throw new TRPCError({ code: "NOT_FOUND", message: "User not found" });
+
+        let customerId = user.stripeCustomerId;
+        if (!customerId) {
+          const customer = await stripe.customers.create({
+            email: user.email ?? undefined,
+            name: user.name ?? undefined,
+            metadata: { userId: String(user.id), openId: user.openId },
+          });
+          customerId = customer.id;
+          await updateUserStripeInfo(user.id, { stripeCustomerId: customerId });
+        }
+
+        const isLifetime = input.billingCycle === "lifetime";
+        const host = ctx.req.get("host") || "localhost:5000";
+        const protocol = ctx.req.protocol || "https";
+        const baseUrl = `${protocol}://${host}`;
+
+        const validatedPlanName = product.metadata.planName as "author_pro" | "publisher";
+
+        const session = await stripe.checkout.sessions.create({
+          customer: customerId,
+          payment_method_types: ["card"],
+          line_items: [{ price: input.priceId, quantity: 1 }],
+          mode: isLifetime ? "payment" : "subscription",
+          success_url: `${baseUrl}/?checkout=success&plan=${validatedPlanName}`,
+          cancel_url: `${baseUrl}/pricing?checkout=cancelled`,
+          metadata: {
+            userId: String(user.id),
+            planName: validatedPlanName,
+            billingCycle: input.billingCycle,
+          },
+          ...(isLifetime ? {} : {
+            subscription_data: {
+              metadata: {
+                userId: String(user.id),
+                planName: validatedPlanName,
+              },
+            },
+          }),
+        });
+
+        if (!session.url) {
+          throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "Failed to create checkout session" });
+        }
+
+        return { url: session.url };
+      }),
+
+    createBillingPortal: protectedProcedure
+      .mutation(async ({ ctx }) => {
+        const stripe = await getUncachableStripeClient();
+        const user = await getUserById(ctx.user.id);
+        if (!user?.stripeCustomerId) {
+          throw new TRPCError({ code: "BAD_REQUEST", message: "No billing account found" });
+        }
+
+        const host = ctx.req.get("host") || "localhost:5000";
+        const protocol = ctx.req.protocol || "https";
+        const baseUrl = `${protocol}://${host}`;
+
+        const session = await stripe.billingPortal.sessions.create({
+          customer: user.stripeCustomerId,
+          return_url: `${baseUrl}/`,
+        });
+
+        return { url: session.url };
+      }),
+
+    getProducts: publicProcedure.query(async () => {
+      try {
+        const { getDb } = await import("./db");
+        const db = await getDb();
+        if (!db) return { products: [] };
+
+        const result = await db.execute(sql`
+          SELECT 
+            p.id as product_id,
+            p.name as product_name,
+            p.description as product_description,
+            p.metadata as product_metadata,
+            pr.id as price_id,
+            pr.unit_amount,
+            pr.currency,
+            pr.recurring,
+            pr.metadata as price_metadata
+          FROM stripe.products p
+          LEFT JOIN stripe.prices pr ON pr.product = p.id AND pr.active = true
+          WHERE p.active = true
+          ORDER BY p.name, pr.unit_amount
+        `);
+
+        const productsMap = new Map<string, any>();
+        for (const row of result.rows) {
+          const r = row as any;
+          if (!productsMap.has(r.product_id)) {
+            productsMap.set(r.product_id, {
+              id: r.product_id,
+              name: r.product_name,
+              description: r.product_description,
+              metadata: r.product_metadata,
+              prices: [],
+            });
+          }
+          if (r.price_id) {
+            productsMap.get(r.product_id).prices.push({
+              id: r.price_id,
+              unitAmount: r.unit_amount,
+              currency: r.currency,
+              recurring: r.recurring,
+              metadata: r.price_metadata,
+            });
+          }
+        }
+
+        return { products: Array.from(productsMap.values()) };
+      } catch {
+        return { products: [] };
+      }
     }),
   }),
 });
