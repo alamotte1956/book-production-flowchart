@@ -127,11 +127,8 @@ export default function LandingPage() {
             No software to download. Works on any device.
           </p>
           <div className="flex flex-wrap justify-center gap-4 mb-12">
-            <Button onClick={() => navigate("/dashboard")} size="lg" className="bg-gradient-to-r from-[#d4b480] to-[#c9a96e] hover:from-[#e0c490] hover:to-[#d4b480] text-[#1a1008] font-bold text-base px-8 py-6 rounded-xl shadow-xl shadow-[#c9a96e]/20">
-              Start Publishing Free <ArrowRight className="w-5 h-5 ml-2" />
-            </Button>
-            <Button onClick={() => navigate("/guided-journey")} variant="outline" size="lg" className="border-[#c9a96e]/30 text-[#f5d98a] hover:bg-[#c9a96e]/10 px-8 py-6 rounded-xl">
-              Use the Publishing Wizard
+            <Button onClick={() => navigate("/guided-journey")} size="lg" className="bg-gradient-to-r from-[#d4b480] to-[#c9a96e] hover:from-[#e0c490] hover:to-[#d4b480] text-[#1a1008] font-bold text-base px-8 py-6 rounded-xl shadow-xl shadow-[#c9a96e]/20">
+              Start the Publishing Wizard <ArrowRight className="w-5 h-5 ml-2" />
             </Button>
           </div>
           <div className="flex flex-wrap justify-center gap-8 md:gap-12">
