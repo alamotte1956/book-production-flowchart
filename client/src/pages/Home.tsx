@@ -367,8 +367,9 @@ export default function Home() {
               <p
                 className="mt-4 font-serif text-2xl md:text-3xl tracking-widest uppercase"
                 style={{
-                  color: "#c9a96e",
-                  letterSpacing: "0.18em",
+                  color: "transparent",
+                  WebkitTextStroke: "1.5px #c9a96e",
+                  letterSpacing: "0.2em",
                   textShadow: "0 0 30px rgba(201,169,110,0.25)",
                 }}
               >
