@@ -1,10 +1,10 @@
 /**
- * Tests for the ISBN lookup helper and CDP template matcher.
+ * Tests for the ISBN lookup helper and EBP template matcher.
  * Uses vi.mock to stub out the fetch calls so no real network is needed.
  */
 
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import { lookupISBN, matchCDPTemplate } from "./isbnLookup";
+import { lookupISBN, matchEBPTemplate } from "./isbnLookup";
 
 // ─── Mock global fetch ────────────────────────────────────────────────────────
 
@@ -146,11 +146,11 @@ describe("lookupISBN", () => {
   });
 });
 
-// ─── matchCDPTemplate tests ───────────────────────────────────────────────────
+// ─── matchEBPTemplate tests ───────────────────────────────────────────────────
 
-describe("matchCDPTemplate", () => {
+describe("matchEBPTemplate", () => {
   it("returns a template for a Christian living book", () => {
-    const result = matchCDPTemplate({
+    const result = matchEBPTemplate({
       title: "The Purpose Driven Life",
       authors: ["Rick Warren"],
       isbn: "9780310908501",
@@ -173,7 +173,7 @@ describe("matchCDPTemplate", () => {
   });
 
   it("returns a Bible template for a Bible book", () => {
-    const result = matchCDPTemplate({
+    const result = matchEBPTemplate({
       title: "NIV Study Bible",
       authors: ["Zondervan"],
       isbn: "9780310438960",
@@ -189,7 +189,7 @@ describe("matchCDPTemplate", () => {
   });
 
   it("returns a children's template for a children's book", () => {
-    const result = matchCDPTemplate({
+    const result = matchEBPTemplate({
       title: "God Made You Special",
       authors: ["VeggieTales"],
       isbn: "9780310714200",
@@ -205,7 +205,7 @@ describe("matchCDPTemplate", () => {
   });
 
   it("returns a fallback template even for unrecognised subjects", () => {
-    const result = matchCDPTemplate({
+    const result = matchEBPTemplate({
       title: "Unknown Book",
       authors: ["Unknown Author"],
       isbn: "9999999999999",
@@ -223,7 +223,7 @@ describe("matchCDPTemplate", () => {
   });
 
   it("returns a devotional template for a devotional book", () => {
-    const result = matchCDPTemplate({
+    const result = matchEBPTemplate({
       title: "Jesus Calling",
       authors: ["Sarah Young"],
       isbn: "9780718081799",
@@ -243,7 +243,7 @@ describe("matchCDPTemplate", () => {
   });
 
   it("returns a confidence score between 0 and 1", () => {
-    const result = matchCDPTemplate({
+    const result = matchEBPTemplate({
       title: "Some Book",
       authors: ["Some Author"],
       isbn: "9780000000000",

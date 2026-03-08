@@ -1161,7 +1161,7 @@ function AutoProduceInner() {
               <div className="flex items-center gap-3 rounded-lg border border-[#c9a96e]/30 bg-[#fdf9f3] px-4 py-3">
                 <Info className="w-4 h-4 text-[#c9a96e] flex-shrink-0" />
                 <p className="text-sm text-[#5c3d2e]">
-                  Pre-filled from CDP template: <strong className="text-[#3d2b1f]">{templateName}</strong>.
+                  Pre-filled from EBP template: <strong className="text-[#3d2b1f]">{templateName}</strong>.
                   {" "}Style and trim size have been set automatically — you can adjust them below.
                 </p>
                 <button

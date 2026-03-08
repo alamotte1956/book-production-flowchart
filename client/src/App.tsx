@@ -35,7 +35,7 @@ function Router() {
       <Route path={"/isbn-manager"} component={IsbnManager} />
       <Route path={"/guide"} component={UserGuide} />
       <Route path={"/templates"} component={Templates} />
-      <Route path={"/cdp-templates"} component={Templates} />
+      <Route path={"/ebp-templates"} component={Templates} />
       <Route path={"/kpa-templates"} component={Templates} />
       <Route path={"/isbn-lookup"} component={ISBNLookup} />
       <Route path={"/guided-journey"} component={GuidedJourney} />

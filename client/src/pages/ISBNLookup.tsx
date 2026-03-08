@@ -1,7 +1,7 @@
 /**
  * ISBN Lookup Page
  * Users enter any book ISBN to retrieve metadata from Open Library and Google Books,
- * then see the best-matching CDP production template auto-suggested with a one-click
+ * then see the best-matching EBP production template auto-suggested with a one-click
  * "Recreate This Book" button that opens the Publishing Wizard.
  */
 
@@ -19,8 +19,8 @@ import {
 } from "lucide-react";
 import { ErrorDetail } from "@/components/ErrorDetail";
 import { useLocation, Link } from "wouter";
-import CDPProductionWizard from "@/components/CDPProductionWizard";
-import type { CDPTemplate, CDPTemplateCategory } from "../../../shared/cdpTemplates";
+import EBPProductionWizard from "@/components/EBPProductionWizard";
+import type { EBPTemplate, EBPTemplateCategory } from "../../../shared/ebpTemplates";
 import { Award, Palette, Layers } from "lucide-react";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
@@ -55,7 +55,7 @@ type LookupResult = {
   subjects?: string[];
   language?: string;
   source: "open-library" | "google-books" | "combined";
-  suggestedTemplate?: CDPTemplate;
+  suggestedTemplate?: EBPTemplate;
   matchConfidence?: number;
   matchReason?: string;
   kpaMatch?: KPAMatch;
@@ -77,7 +77,7 @@ function BookResultCard({
   onRecreate,
 }: {
   result: LookupResult;
-  onRecreate: (template: CDPTemplate, book: LookupResult) => void;
+  onRecreate: (template: EBPTemplate, book: LookupResult) => void;
 }) {
   const sourceLabel =
     result.source === "combined" ? "Open Library + Google Books"
@@ -246,12 +246,12 @@ function BookResultCard({
                 className="w-full text-white"
                 style={{ backgroundColor: result.kpaMatch.accentColor }}
                 onClick={() => {
-                  // Build a synthetic CDPTemplate from the KP&A match to open the wizard
-                  const syntheticTemplate: CDPTemplate = {
+                  // Build a synthetic EBPTemplate from the KP&A match to open the wizard
+                  const syntheticTemplate: EBPTemplate = {
                     id: result.kpaMatch!.templateId,
                     label: result.kpaMatch!.templateLabel,
                     tagline: `Designed by Koechel Peterson & Associates — ${result.kpaMatch!.category}`,
-                    category: result.kpaMatch!.category as CDPTemplateCategory,
+                    category: result.kpaMatch!.category as EBPTemplateCategory,
                     trimLabel: result.kpaMatch!.trimLabel,
                     trimSizeId: "",
                     styleId: "",
@@ -280,7 +280,7 @@ function BookResultCard({
         </Card>
       )}
 
-      {/* CDP Template suggestion */}
+      {/* EBP Template suggestion */}
       {result.suggestedTemplate && (
         <Card className="border-[#7c3aed]/20 bg-gradient-to-br from-[#faf6ef] to-[#f3eeff]">
           <CardHeader className="pb-3">
@@ -349,12 +349,12 @@ export default function ISBNLookup() {
   const [inputValue, setInputValue] = useState("");
   const [searchIsbn, setSearchIsbn] = useState<string | null>(null);
   const [wizardOpen, setWizardOpen] = useState(false);
-  const [wizardTemplate, setWizardTemplate] = useState<CDPTemplate | null>(null);
+  const [wizardTemplate, setWizardTemplate] = useState<EBPTemplate | null>(null);
   const [wizardBook, setWizardBook] = useState<LookupResult | null>(null);
 
   // ── Recent Lookups (localStorage) ───────────────────────────────────────────
   type RecentEntry = { isbn: string; title: string };
-  const STORAGE_KEY = "cdp-isbn-recent";
+  const STORAGE_KEY = "ebp-isbn-recent";
   const [recentLookups, setRecentLookups] = useState<RecentEntry[]>(() => {
     try {
       const raw = localStorage.getItem(STORAGE_KEY);
@@ -400,7 +400,7 @@ export default function ISBNLookup() {
     if (e.key === "Enter") handleSearch();
   };
 
-  const handleRecreate = (template: CDPTemplate, book: LookupResult) => {
+  const handleRecreate = (template: EBPTemplate, book: LookupResult) => {
     setWizardTemplate(template);
     setWizardBook(book);
     setWizardOpen(true);
@@ -587,7 +587,7 @@ export default function ISBNLookup() {
 
       {/* Publishing Wizard */}
       {wizardOpen && wizardTemplate && (
-        <CDPProductionWizard
+        <EBPProductionWizard
           template={wizardTemplate}
           prefillBook={wizardBook ? {
             title: wizardBook.title,

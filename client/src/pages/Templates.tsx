@@ -2,7 +2,7 @@ import { useState, useMemo } from "react";
 import { useLocation } from "wouter";
 import { usePlan } from "@/hooks/usePlan";
 import { UpgradeGate } from "@/components/UpgradeGate";
-import CDPProductionWizard from "@/components/CDPProductionWizard";
+import EBPProductionWizard from "@/components/EBPProductionWizard";
 import {
   ArrowLeft, BookOpen, Heart, BookMarked, PenLine, ZoomIn, Package, Star, Users,
   Columns, Languages, Gift, LayoutGrid, Cross, ClipboardList, Sun, Sparkles, Image,
@@ -21,12 +21,12 @@ import {
   CollapsibleTrigger,
 } from "@/components/ui/collapsible";
 import {
-  CDP_TEMPLATES,
-  CDP_TEMPLATE_CATEGORIES,
-  getCDPTemplate,
-  type CDPTemplate,
-  type CDPTemplateCategory,
-} from "@shared/cdpTemplates";
+  EBP_TEMPLATES,
+  EBP_TEMPLATE_CATEGORIES,
+  getEBPTemplate,
+  type EBPTemplate,
+  type EBPTemplateCategory,
+} from "@shared/ebpTemplates";
 import {
   KPA_TEMPLATES,
   KPA_TEMPLATE_CATEGORIES,
@@ -37,13 +37,13 @@ import {
 type SourceFilter = "all" | "book" | "kpa";
 
 type UnifiedTemplate =
-  | { source: "book"; data: CDPTemplate }
+  | { source: "book"; data: EBPTemplate }
   | { source: "kpa"; data: KPATemplate };
 
 const ALL_CATEGORIES = [
-  ...CDP_TEMPLATE_CATEGORIES,
+  ...EBP_TEMPLATE_CATEGORIES,
   ...KPA_TEMPLATE_CATEGORIES.filter(
-    (c) => !CDP_TEMPLATE_CATEGORIES.includes(c as any)
+    (c) => !EBP_TEMPLATE_CATEGORIES.includes(c as any)
   ),
 ] as string[];
 
@@ -106,7 +106,7 @@ function DesignCreditBadge({ credit }: { credit: "cover" | "cover+interior" | "f
   );
 }
 
-function BookTemplateCard({ template, onOpenWizard }: { template: CDPTemplate; onOpenWizard: (t: CDPTemplate) => void }) {
+function BookTemplateCard({ template, onOpenWizard }: { template: EBPTemplate; onOpenWizard: (t: EBPTemplate) => void }) {
   const [, navigate] = useLocation();
 
   function handleUseTemplate() {
@@ -248,7 +248,7 @@ function CategorySection({
 }: {
   category: string;
   templates: UnifiedTemplate[];
-  onOpenBookWizard: (t: CDPTemplate) => void;
+  onOpenBookWizard: (t: EBPTemplate) => void;
   onOpenKPAWizard: (templateId: string) => void;
 }) {
   const colors = getColors(category);
@@ -289,10 +289,10 @@ function TemplatesInner() {
   const [search, setSearch] = useState("");
   const [activeCategory, setActiveCategory] = useState<string>("All");
   const [sourceFilter, setSourceFilter] = useState<SourceFilter>("all");
-  const [wizardTemplate, setWizardTemplate] = useState<CDPTemplate | null>(null);
+  const [wizardTemplate, setWizardTemplate] = useState<EBPTemplate | null>(null);
 
   const allUnified: UnifiedTemplate[] = useMemo(() => [
-    ...CDP_TEMPLATES.map((t) => ({ source: "book" as const, data: t })),
+    ...EBP_TEMPLATES.map((t) => ({ source: "book" as const, data: t })),
     ...KPA_TEMPLATES.map((t) => ({ source: "kpa" as const, data: t })),
   ], []);
 
@@ -312,7 +312,7 @@ function TemplatesInner() {
         t.description.toLowerCase().includes(q) ||
         t.tagline.toLowerCase().includes(q) ||
         t.features.some((f) => f.toLowerCase().includes(q)) ||
-        (ut.source === "book" && (ut.data as CDPTemplate).exampleTitles?.some((e) => e.toLowerCase().includes(q))) ||
+        (ut.source === "book" && (ut.data as EBPTemplate).exampleTitles?.some((e) => e.toLowerCase().includes(q))) ||
         (ut.source === "kpa" && (ut.data as KPATemplate).kpaTitles?.some((b) => b.title.toLowerCase().includes(q) || b.author.toLowerCase().includes(q)))
       );
     });
@@ -341,16 +341,16 @@ function TemplatesInner() {
     return counts;
   }, [allUnified, sourceFilter]);
 
-  const totalCount = sourceFilter === "all" ? allUnified.length : sourceFilter === "book" ? CDP_TEMPLATES.length : KPA_TEMPLATES.length;
+  const totalCount = sourceFilter === "all" ? allUnified.length : sourceFilter === "book" ? EBP_TEMPLATES.length : KPA_TEMPLATES.length;
   const totalKPATitles = KPA_TEMPLATES.reduce((sum, t) => sum + t.kpaTitles.length, 0);
 
   const handleOpenKPAWizard = (templateId: string) => {
     const kpa = KPA_TEMPLATES.find((t) => t.id === templateId);
     if (!kpa) return;
-    const cdp = getCDPTemplate(
+    const ebp = getEBPTemplate(
       kpa.isBible ? "study-bible" : kpa.styleId.includes("devotional") ? "daily-devotional" : "christian-living"
     );
-    if (cdp) setWizardTemplate(cdp);
+    if (ebp) setWizardTemplate(ebp);
   };
 
   return (
@@ -399,7 +399,7 @@ function TemplatesInner() {
             </div>
             <div className="flex gap-6 text-center flex-shrink-0">
               <div>
-                <div className="font-serif text-2xl font-bold text-[#f5d98a]">{CDP_TEMPLATES.length + KPA_TEMPLATES.length}</div>
+                <div className="font-serif text-2xl font-bold text-[#f5d98a]">{EBP_TEMPLATES.length + KPA_TEMPLATES.length}</div>
                 <div className="text-xs text-[#c9a96e]/50">Templates</div>
               </div>
               <div>
@@ -425,8 +425,8 @@ function TemplatesInner() {
 
             <div className="flex items-center bg-[#1e1108]/5 rounded-full p-0.5 gap-0.5">
               {([
-                { key: "all" as const, label: "All", count: CDP_TEMPLATES.length + KPA_TEMPLATES.length },
-                { key: "book" as const, label: "Book Templates", count: CDP_TEMPLATES.length },
+                { key: "all" as const, label: "All", count: EBP_TEMPLATES.length + KPA_TEMPLATES.length },
+                { key: "book" as const, label: "Book Templates", count: EBP_TEMPLATES.length },
                 { key: "kpa" as const, label: "KP&A", count: KPA_TEMPLATES.length },
               ]).map((s) => (
                 <button
@@ -533,7 +533,7 @@ function TemplatesInner() {
       </main>
 
       {wizardTemplate && (
-        <CDPProductionWizard template={wizardTemplate} onClose={() => setWizardTemplate(null)} />
+        <EBPProductionWizard template={wizardTemplate} onClose={() => setWizardTemplate(null)} />
       )}
     </div>
   );

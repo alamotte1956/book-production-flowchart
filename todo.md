@@ -531,9 +531,9 @@
 - [ ] Update favicon if appropriate
 
 ## Phase 62: Logo Replacement (Site-wide)
-- [x] Replace old logo CDN URL with new CDPlargelogo.PNG in Home.tsx (6 occurrences)
+- [x] Replace old logo CDN URL with new EBPlargelogo.PNG in Home.tsx (6 occurrences)
 - [x] Replace old logo in JSON-LD logo field
-- [x] Replace old logo in UserGuide.tsx (CDP_LOGO constant)
+- [x] Replace old logo in UserGuide.tsx (EBP_LOGO constant)
 - [x] Replace old logo in PublishingWizard.tsx
 - [x] Verified 0 old logo references remain, 7 new logo references in place
 
@@ -563,46 +563,46 @@
 - [x] ZIP contents cleared when file is changed or cleared
 - [x] All 181 tests pass, TypeScript 0 errors
 
-## Phase 66: CDP Publishing Catalog Integration
+## Phase 66: EBP Publishing Catalog Integration
 - [x] Add Bible edition types to Bible Studio (Youth, Gift, Interlinear, Harmony of the Gospels, Expanded Text)
 - [x] Add Auto-Produce typesetting styles for Christian Living, Devotionals, Children's Christian, Prayer, Pastoral, Biography, Theological, Music/Audio (already in bibleSpecs.ts)
-- [x] Update Resources Hub to include CDP's publisher partners (Harvest House, Tyndale, Zondervan, BronzeBow)
+- [x] Update Resources Hub to include EBP's publisher partners (Harvest House, Tyndale, Zondervan, BronzeBow)
 
-## Phase 67: CDP Book Templates Page
-- [x] Create shared/cdpTemplates.ts with one-click presets for all CDP book types
-- [x] Build CDPTemplates.tsx page with visual cards for each book type
+## Phase 67: EBP Book Templates Page
+- [x] Create shared/ebpTemplates.ts with one-click presets for all EBP book types
+- [x] Build EBPTemplates.tsx page with visual cards for each book type
 - [x] Add "Use This Template" button that pre-fills Auto-Produce settings
 - [x] Wire /cdp-templates route in App.tsx and add to dashboard nav
-- [x] Add CDP Templates link to landing page tools section (TOOLS array + desktop/mobile nav)
-- [x] Update Resources Hub with CDP publisher partners
+- [x] Add EBP Templates link to landing page tools section (TOOLS array + desktop/mobile nav)
+- [x] Update Resources Hub with EBP publisher partners
 
 ## Phase 68: Full Book Recreation Workflow
 - [ ] Build PublishingWizard.tsx — multi-step guided workflow (Template → Project → Manuscript → Typesetting → Cover → Generate)
 - [ ] Add wizard tRPC procedures: wizard.create, wizard.getStep, wizard.updateStep, wizard.complete
 - [ ] Add wizard_sessions table to drizzle schema
-- [ ] Wire "Use This Template" button on CDPTemplates to launch the wizard
+- [ ] Wire "Use This Template" button on EBPTemplates to launch the wizard
 - [ ] Auto-Produce: read ?template= and ?style= URL params to pre-select style on load
 - [ ] Auto-Produce: read ?trim= URL param to pre-select trim size on load
-- [ ] Add CDP genre options to project creation dialog (Christian Living, Devotional, Children's Christian, Prayer, Pastoral, Biography, Academic/Theological, Music/Audio)
+- [ ] Add EBP genre options to project creation dialog (Christian Living, Devotional, Children's Christian, Prayer, Pastoral, Biography, Academic/Theological, Music/Audio)
 - [ ] Add "Recreate This Book" flow with step-by-step checklist per template
-- [ ] Show template-specific production checklist in ProjectTracker when project has a CDP template
+- [ ] Show template-specific production checklist in ProjectTracker when project has a EBP template
 
-## Phase 69: CDP ISBN Research & Real Book Data
-- [ ] Search CDP books by ISBN in Open Library, WorldCat, Google Books, and publisher databases
-- [ ] Compile real CDP titles with ISBN, author, year, trim size, page count, and binding
-- [ ] Update cdpTemplates.ts exampleTitles with real ISBN-verified CDP books
-- [ ] Add isbn field to CDPTemplate type for each verified title
-- [ ] Display ISBN on template cards in CDPTemplates.tsx
+## Phase 69: EBP ISBN Research & Real Book Data
+- [ ] Search EBP books by ISBN in Open Library, WorldCat, Google Books, and publisher databases
+- [ ] Compile real EBP titles with ISBN, author, year, trim size, page count, and binding
+- [ ] Update ebpTemplates.ts exampleTitles with real ISBN-verified EBP books
+- [ ] Add isbn field to EBPTemplate type for each verified title
+- [ ] Display ISBN on template cards in EBPTemplates.tsx
 
 ## Phase 70: ISBN Lookup + Publishing Wizard
 - [x] Add tRPC procedure `book.lookupByIsbn` that queries Open Library and Google Books APIs
 - [x] Return title, author, publisher, year, page count, dimensions, and cover image URL from ISBN
-- [x] Auto-map ISBN lookup results to nearest CDP template (trim size, style, binding)
+- [x] Auto-map ISBN lookup results to nearest EBP template (trim size, style, binding)
 - [x] Build ISBNLookup.tsx component with input field, loading state, and result card
-- [x] Build CDPProductionWizard.tsx multi-step modal: template confirm → book details → typesetting → manuscript → launch
-- [x] Wire "Use This Template" button on CDPTemplates page to open CDPProductionWizard
+- [x] Build EBPProductionWizard.tsx multi-step modal: template confirm → book details → typesetting → manuscript → launch
+- [x] Wire "Use This Template" button on EBPTemplates page to open EBPProductionWizard
 - [x] Add /isbn-lookup route to App.tsx and dashboard nav
-- [x] Write vitest tests for lookupISBN and matchCDPTemplate (12 tests, all passing)
+- [x] Write vitest tests for lookupISBN and matchEBPTemplate (12 tests, all passing)
 - [x] All 193 tests pass across 7 test files
 
 ## Phase 22 (implemented): Auto-Select Scripture Style
@@ -622,7 +622,7 @@
 - [x] Extract production specs (trim size, binding, genre, page count, ISBN) for each title
 - [x] Create shared/kpaTemplates.ts with 12 templates covering 11 categories and 25+ verified KP&A-designed titles
 - [x] Build KPATemplates.tsx page with category filter, collapsible title lists, and design credit badges (cover / cover+interior / full)
-- [x] Wire CDPProductionWizard into KPATemplates.tsx ("Use This Template" button)
+- [x] Wire EBPProductionWizard into KPATemplates.tsx ("Use This Template" button)
 - [x] Wire /kpa-templates route into App.tsx
 - [x] Add KP&A Templates to desktop nav and mobile drawer in Home.tsx
 - [x] Add KP&A Templates to TOOLS array in Home.tsx
@@ -633,7 +633,7 @@
 - [x] Return kpaMatch field in IsbnLookupResult (templateId, templateLabel, designCredit, title, author, publisher, year, accentColor, features, trimLabel)
 - [x] Update ISBNLookup.tsx to render a KP&A amber-toned banner card when kpaMatch is present
 - [x] KP&A card shows design credit badge (Full Design / Cover+Interior / Cover Design), template category, features, and "Use KP&A Template" button
-- [x] "Use KP&A Template" opens CDPProductionWizard with book metadata pre-filled
+- [x] "Use KP&A Template" opens EBPProductionWizard with book metadata pre-filled
 - [x] Write 5 vitest tests for KP&A ISBN match logic (203 total tests passing)
 
 ## Phase 73: ISBN Lookup Example List
@@ -682,7 +682,7 @@
 - [x] Zero TypeScript errors
 
 ## Phase 83: Comprehensive Error Handling
-- [x] Audited all error paths in ISBNLookup, AutoProduce, Bible Studio, CDPProductionWizard, and tRPC routers
+- [x] Audited all error paths in ISBNLookup, AutoProduce, Bible Studio, EBPProductionWizard, and tRPC routers
 - [x] Added structured TRPCError with BAD_REQUEST / NOT_FOUND / INTERNAL_SERVER_ERROR codes in server/routers.ts book.lookupByIsbn procedure
 - [x] Built reusable ErrorDetail component (client/src/components/ErrorDetail.tsx): shows error code, message, raw JSON, copy-to-clipboard button
 - [x] Wired ErrorDetail into ISBNLookup.tsx replacing the basic error block

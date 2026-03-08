@@ -1,10 +1,10 @@
 /**
  * ISBN Lookup Service
  * Queries Open Library and Google Books APIs to retrieve book metadata,
- * then auto-maps the result to the nearest CDP production template.
+ * then auto-maps the result to the nearest EBP production template.
  */
 
-import { CDP_TEMPLATES, CDPTemplate } from "../shared/cdpTemplates";
+import { EBP_TEMPLATES, EBPTemplate } from "../shared/ebpTemplates";
 import { KPA_ALL_TITLES, KPATemplate, KPA_TEMPLATES } from "../shared/kpaTemplates";
 import { TRIM_SIZES } from "./typesettingStyles";
 
@@ -30,8 +30,8 @@ export type IsbnLookupResult = {
   language?: string;
   /** Source that returned the data */
   source: "open-library" | "google-books" | "combined";
-  /** The best-matching CDP template for this book */
-  suggestedTemplate?: CDPTemplate;
+  /** The best-matching EBP template for this book */
+  suggestedTemplate?: EBPTemplate;
   /** Confidence score 0–1 for the template match */
   matchConfidence?: number;
   /** Human-readable explanation of why this template was chosen */
@@ -183,23 +183,23 @@ function parseDimensions(dimStr: string): { widthIn?: number; heightIn?: number 
   return {};
 }
 
-// ─── CDP Template Matcher ─────────────────────────────────────────────────────
+// ─── EBP Template Matcher ─────────────────────────────────────────────────────
 
 /**
- * Given book metadata, returns the best-matching CDP template and a confidence score.
+ * Given book metadata, returns the best-matching EBP template and a confidence score.
  * Scoring factors:
  *   - Trim size proximity (40 pts max)
  *   - Page count within range (20 pts max)
  *   - Subject keyword match (40 pts max)
  */
-export function matchCDPTemplate(book: Partial<IsbnLookupResult>): {
-  template: CDPTemplate;
+export function matchEBPTemplate(book: Partial<IsbnLookupResult>): {
+  template: EBPTemplate;
   confidence: number;
   reason: string;
 } {
-  const scores: Array<{ template: CDPTemplate; score: number; reasons: string[] }> = [];
+  const scores: Array<{ template: EBPTemplate; score: number; reasons: string[] }> = [];
 
-  for (const template of CDP_TEMPLATES) {
+  for (const template of EBP_TEMPLATES) {
     let score = 0;
     const reasons: string[] = [];
 
@@ -369,8 +369,8 @@ export async function lookupByIsbn(isbn: string): Promise<IsbnLookupResult> {
     }
   }
 
-  // Match to CDP template
-  const { template, confidence, reason } = matchCDPTemplate(merged);
+  // Match to EBP template
+  const { template, confidence, reason } = matchEBPTemplate(merged);
 
   return {
     ...merged,

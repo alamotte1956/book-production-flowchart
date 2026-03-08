@@ -1,11 +1,11 @@
 /**
- * CDP Book Templates
+ * EBP Book Templates
  * One-click presets for every book type Easy Book Publishers has historically produced.
  * Each template pre-fills the Auto-Produce and Bible Studio settings so users can recreate
  * a professionally-styled book in a single click.
  */
 
-export type CDPTemplateCategory =
+export type EBPTemplateCategory =
   | "Bible Editions"
   | "Christian Living"
   | "Devotionals & Inspiration"
@@ -16,10 +16,10 @@ export type CDPTemplateCategory =
   | "Academic & Theological"
   | "Music & Audio";
 
-export type CDPTemplate = {
+export type EBPTemplate = {
   id: string;
   label: string;
-  category: CDPTemplateCategory;
+  category: EBPTemplateCategory;
   description: string;
   /** Short tagline shown on the card */
   tagline: string;
@@ -43,7 +43,7 @@ export type CDPTemplate = {
   pageCountRange: [number, number];
   /** Key formatting features for this template */
   features: string[];
-  /** Example CDP titles that match this template */
+  /** Example EBP titles that match this template */
   exampleTitles: string[];
   /** Recommended trim size label for display */
   trimLabel: string;
@@ -53,7 +53,7 @@ export type CDPTemplate = {
 
 // ─── Bible Edition Templates ──────────────────────────────────────────────────
 
-export const CDP_TEMPLATES: CDPTemplate[] = [
+export const EBP_TEMPLATES: EBPTemplate[] = [
   // ── Bible Editions ──────────────────────────────────────────────────────────
   {
     id: "study-bible",
@@ -933,17 +933,17 @@ export const CDP_TEMPLATES: CDPTemplate[] = [
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
-export function getCDPTemplatesByCategory(
-  category: CDPTemplateCategory
-): CDPTemplate[] {
-  return CDP_TEMPLATES.filter((t) => t.category === category);
+export function getEBPTemplatesByCategory(
+  category: EBPTemplateCategory
+): EBPTemplate[] {
+  return EBP_TEMPLATES.filter((t) => t.category === category);
 }
 
-export function getCDPTemplate(id: string): CDPTemplate | undefined {
-  return CDP_TEMPLATES.find((t) => t.id === id);
+export function getEBPTemplate(id: string): EBPTemplate | undefined {
+  return EBP_TEMPLATES.find((t) => t.id === id);
 }
 
-export const CDP_TEMPLATE_CATEGORIES: CDPTemplateCategory[] = [
+export const EBP_TEMPLATE_CATEGORIES: EBPTemplateCategory[] = [
   "Bible Editions",
   "Christian Living",
   "Devotionals & Inspiration",

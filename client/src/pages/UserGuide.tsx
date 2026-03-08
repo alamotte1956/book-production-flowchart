@@ -8,7 +8,7 @@ import { BookOpen, ChevronRight, ChevronDown, ArrowLeft, BookMarked, Layers, Rul
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 
-const CDP_LOGO = "https://d2xsxph8kpxj0f.cloudfront.net/310519663211654017/kGjPju6hKCvCsjZhgUHyqj/CDPlargelogo_25428631.PNG";
+const EBP_LOGO = "https://d2xsxph8kpxj0f.cloudfront.net/310519663211654017/kGjPju6hKCvCsjZhgUHyqj/CDPlargelogo_25428631.PNG";
 
 interface Section {
   id: string;
@@ -534,7 +534,7 @@ export default function UserGuide() {
             </button>
             <span className="text-[#c9a96e]/20">|</span>
             <div className="flex items-center gap-2">
-              <img src={CDP_LOGO} alt="Easy Book Publishers" className="w-6 h-6 rounded object-cover" />
+              <img src={EBP_LOGO} alt="Easy Book Publishers" className="w-6 h-6 rounded object-cover" />
               <span className="font-serif text-base text-[#f5efe0]">User Guide</span>
             </div>
           </div>
@@ -555,7 +555,7 @@ export default function UserGuide() {
         <div className="max-w-4xl mx-auto text-center">
           <div className="flex items-center justify-center gap-3 mb-5">
             <div className="h-px w-12 bg-[#c9a96e]/40" />
-            <img src={CDP_LOGO} alt="Easy Book Publishers" className="w-12 h-12 rounded-xl object-cover" />
+            <img src={EBP_LOGO} alt="Easy Book Publishers" className="w-12 h-12 rounded-xl object-cover" />
             <div className="h-px w-12 bg-[#c9a96e]/40" />
           </div>
           <h1

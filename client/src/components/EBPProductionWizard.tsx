@@ -1,6 +1,6 @@
 /**
- * CDP Production Wizard
- * A 5-step guided modal that takes a CDP template and walks the user through
+ * EBP Production Wizard
+ * A 5-step guided modal that takes a EBP template and walks the user through
  * every step needed to recreate a book in that style:
  *   Step 1 — Template Confirmation
  *   Step 2 — Book Details (title, author, or ISBN prefill)
@@ -29,7 +29,7 @@ import {
   Sparkles, Upload, Loader2, BookMarked, Rocket, X,
   AlertCircle, User, Hash,
 } from "lucide-react";
-import type { CDPTemplate } from "../../../shared/cdpTemplates";
+import type { EBPTemplate } from "../../../shared/ebpTemplates";
 
 // ─── Shared bibleSpecs imports ────────────────────────────────────────────────
 // We import the arrays directly from the shared module so the wizard always
@@ -38,8 +38,8 @@ import { TYPESETTING_STYLES, TRIM_SIZES } from "../../../shared/bibleSpecs";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
-export type CDPProductionWizardProps = {
-  template: CDPTemplate;
+export type EBPProductionWizardProps = {
+  template: EBPTemplate;
   /** Optional pre-filled book metadata (e.g. from ISBN lookup) */
   prefillBook?: {
     title?: string;
@@ -102,11 +102,11 @@ function StepIndicator({ current }: { current: WizardStep }) {
 
 // ─── Main Component ───────────────────────────────────────────────────────────
 
-export default function CDPProductionWizard({
+export default function EBPProductionWizard({
   template,
   prefillBook,
   onClose,
-}: CDPProductionWizardProps) {
+}: EBPProductionWizardProps) {
   const [, navigate] = useLocation();
   const { user } = useAuth();
 
@@ -290,11 +290,11 @@ export default function CDPProductionWizard({
             </p>
             <div className="space-y-3">
               <div>
-                <Label htmlFor="cdpwiz-title" className="text-sm font-medium text-[#3b2a1a]">
+                <Label htmlFor="ebpwiz-title" className="text-sm font-medium text-[#3b2a1a]">
                   Book Title <span className="text-red-500">*</span>
                 </Label>
                 <Input
-                  id="cdpwiz-title"
+                  id="ebpwiz-title"
                   value={title}
                   onChange={e => setTitle(e.target.value)}
                   placeholder="e.g. The Purpose Driven Life"
@@ -302,13 +302,13 @@ export default function CDPProductionWizard({
                 />
               </div>
               <div>
-                <Label htmlFor="cdpwiz-author" className="text-sm font-medium text-[#3b2a1a]">
+                <Label htmlFor="ebpwiz-author" className="text-sm font-medium text-[#3b2a1a]">
                   Author
                 </Label>
                 <div className="relative mt-1">
                   <User className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-[#b0a090]" />
                   <Input
-                    id="cdpwiz-author"
+                    id="ebpwiz-author"
                     value={author}
                     onChange={e => setAuthor(e.target.value)}
                     placeholder="e.g. Rick Warren"
@@ -317,13 +317,13 @@ export default function CDPProductionWizard({
                 </div>
               </div>
               <div>
-                <Label htmlFor="cdpwiz-isbn" className="text-sm font-medium text-[#3b2a1a]">
+                <Label htmlFor="ebpwiz-isbn" className="text-sm font-medium text-[#3b2a1a]">
                   ISBN (optional)
                 </Label>
                 <div className="relative mt-1">
                   <Hash className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-[#b0a090]" />
                   <Input
-                    id="cdpwiz-isbn"
+                    id="ebpwiz-isbn"
                     value={isbn}
                     onChange={e => setIsbn(e.target.value)}
                     placeholder="e.g. 9780310908501"

@@ -343,7 +343,7 @@ export const TYPESETTING_STYLES: TypesettingStyle[] = [
     headingColor: "#1a1a1a",
     googleFontsUrl: "https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,600;1,400&display=swap",
   },
-  // ─── Christian Publishing styles (CDP specialties) ────────────────────────
+  // ─── Christian Publishing styles (EBP specialties) ────────────────────────
   {
     id: "christian-living",
     label: "Christian Living / Discipleship",

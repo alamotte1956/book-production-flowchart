@@ -3,7 +3,7 @@
  *
  * A catalog of all books designed by KP&A, organized by category.
  * Each card shows the actual KP&A-designed titles and lets users
- * launch the CDP Production Wizard with the matching template pre-filled.
+ * launch the EBP Production Wizard with the matching template pre-filled.
  */
 
 import { useState } from "react";
@@ -48,8 +48,8 @@ import {
   type KPATemplate,
   type KPATemplateCategory,
 } from "@shared/kpaTemplates";
-import CDPProductionWizard from "@/components/CDPProductionWizard";
-import { getCDPTemplate } from "@shared/cdpTemplates";
+import EBPProductionWizard from "@/components/EBPProductionWizard";
+import { getEBPTemplate } from "@shared/ebpTemplates";
 
 // ─── Icon map ─────────────────────────────────────────────────────────────────
 
@@ -286,16 +286,16 @@ export default function KPATemplates() {
 
   const totalTitles = KPA_TEMPLATES.reduce((sum, t) => sum + t.kpaTitles.length, 0);
 
-  // Map KPA template to CDP template for wizard
-  const wizardCDPTemplate = wizardTemplateId
+  // Map KPA template to EBP template for wizard
+  const wizardEBPTemplate = wizardTemplateId
     ? (() => {
         const kpa = KPA_TEMPLATES.find((t) => t.id === wizardTemplateId);
         if (!kpa) return null;
-        // Try to find a matching CDP template by styleId
-        const cdp = getCDPTemplate(
+        // Try to find a matching EBP template by styleId
+        const ebp = getEBPTemplate(
           kpa.isBible ? "study-bible" : kpa.styleId.includes("devotional") ? "daily-devotional" : "christian-living"
         );
-        return cdp ?? null;
+        return ebp ?? null;
       })()
     : null;
 
@@ -409,7 +409,7 @@ export default function KPATemplates() {
                 ISBN Lookup
               </Button>
             </Link>
-            <Link href="/cdp-templates">
+            <Link href="/ebp-templates">
               <Button variant="outline" size="sm" className="gap-1 text-xs border-[#e8dfd0] text-[#5c3d2e] hover:bg-[#faf6ef]">
                 <BookOpen className="w-3 h-3" />
                 Book Templates
@@ -419,10 +419,10 @@ export default function KPATemplates() {
         </div>
       </div>
 
-      {/* CDP Production Wizard */}
-      {wizardTemplateId && wizardCDPTemplate && (
-        <CDPProductionWizard
-          template={wizardCDPTemplate}
+      {/* EBP Production Wizard */}
+      {wizardTemplateId && wizardEBPTemplate && (
+        <EBPProductionWizard
+          template={wizardEBPTemplate}
           onClose={() => setWizardTemplateId(null)}
         />
       )}

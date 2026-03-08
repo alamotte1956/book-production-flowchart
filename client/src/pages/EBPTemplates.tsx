@@ -6,7 +6,7 @@
  */
 import { useState } from "react";
 import { Link, useLocation } from "wouter";
-import CDPProductionWizard from "@/components/CDPProductionWizard";
+import EBPProductionWizard from "@/components/EBPProductionWizard";
 import {
   ArrowLeft, BookOpen, Heart, BookMarked, PenLine, ZoomIn, Package, Star, Users,
   Columns, Languages, Gift, LayoutGrid, Cross, ClipboardList, Sun, Sparkles, Image,
@@ -20,12 +20,12 @@ import { Input } from "@/components/ui/input";
 import { Separator } from "@/components/ui/separator";
 import { toast } from "sonner";
 import {
-  CDP_TEMPLATES,
-  CDP_TEMPLATE_CATEGORIES,
-  getCDPTemplatesByCategory,
-  type CDPTemplate,
-  type CDPTemplateCategory,
-} from "@shared/cdpTemplates";
+  EBP_TEMPLATES,
+  EBP_TEMPLATE_CATEGORIES,
+  getEBPTemplatesByCategory,
+  type EBPTemplate,
+  type EBPTemplateCategory,
+} from "@shared/ebpTemplates";
 
 // ─── Icon map ─────────────────────────────────────────────────────────────────
 
@@ -46,7 +46,7 @@ function TemplateIcon({ name, size = 20, className, color }: { name: string; siz
 
 // ─── Category color map ───────────────────────────────────────────────────────
 
-const CATEGORY_COLORS: Record<CDPTemplateCategory, { bg: string; text: string; border: string; dot: string }> = {
+const CATEGORY_COLORS: Record<EBPTemplateCategory, { bg: string; text: string; border: string; dot: string }> = {
   "Bible Editions":            { bg: "bg-amber-50",   text: "text-amber-800",  border: "border-amber-200",  dot: "bg-amber-500" },
   "Christian Living":          { bg: "bg-purple-50",  text: "text-purple-800", border: "border-purple-200", dot: "bg-purple-500" },
   "Devotionals & Inspiration": { bg: "bg-rose-50",    text: "text-rose-800",   border: "border-rose-200",   dot: "bg-rose-500" },
@@ -60,7 +60,7 @@ const CATEGORY_COLORS: Record<CDPTemplateCategory, { bg: string; text: string; b
 
 // ─── Template Card ────────────────────────────────────────────────────────────
 
-function TemplateCard({ template, onOpenWizard }: { template: CDPTemplate; onOpenWizard: (t: CDPTemplate) => void }) {
+function TemplateCard({ template, onOpenWizard }: { template: EBPTemplate; onOpenWizard: (t: EBPTemplate) => void }) {
   const [, navigate] = useLocation();
   const colors = CATEGORY_COLORS[template.category];
 
@@ -143,7 +143,7 @@ function TemplateCard({ template, onOpenWizard }: { template: CDPTemplate; onOpe
 
 // ─── Category Section ─────────────────────────────────────────────────────────
 
-function CategorySection({ category, templates, onOpenWizard }: { category: CDPTemplateCategory; templates: CDPTemplate[]; onOpenWizard: (t: CDPTemplate) => void }) {
+function CategorySection({ category, templates, onOpenWizard }: { category: EBPTemplateCategory; templates: EBPTemplate[]; onOpenWizard: (t: EBPTemplate) => void }) {
   const colors = CATEGORY_COLORS[category];
   return (
     <section className="mb-12">
@@ -165,13 +165,13 @@ function CategorySection({ category, templates, onOpenWizard }: { category: CDPT
 
 // ─── Main Page ────────────────────────────────────────────────────────────────
 
-export default function CDPTemplates() {
+export default function EBPTemplates() {
   const [, navigate] = useLocation();
   const [search, setSearch] = useState("");
-  const [activeCategory, setActiveCategory] = useState<CDPTemplateCategory | "All">("All");
-  const [wizardTemplate, setWizardTemplate] = useState<CDPTemplate | null>(null);
+  const [activeCategory, setActiveCategory] = useState<EBPTemplateCategory | "All">("All");
+  const [wizardTemplate, setWizardTemplate] = useState<EBPTemplate | null>(null);
 
-  const filtered = CDP_TEMPLATES.filter((t) => {
+  const filtered = EBP_TEMPLATES.filter((t) => {
     const matchesCategory = activeCategory === "All" || t.category === activeCategory;
     const q = search.toLowerCase();
     const matchesSearch =
@@ -184,7 +184,7 @@ export default function CDPTemplates() {
     return matchesCategory && matchesSearch;
   });
 
-  const groupedByCategory = CDP_TEMPLATE_CATEGORIES.map((cat) => ({
+  const groupedByCategory = EBP_TEMPLATE_CATEGORIES.map((cat) => ({
     category: cat,
     templates: filtered.filter((t) => t.category === cat),
   })).filter((g) => g.templates.length > 0);
@@ -231,7 +231,7 @@ export default function CDPTemplates() {
         <div className="max-w-7xl mx-auto">
           <div className="flex items-center gap-2 mb-3">
             <img
-              src="https://d2xsxph8kpxj0f.cloudfront.net/310519663211654017/kGjPju6hKCvCsjZhgUHyqj/CDPlargelogo_25428631.PNG"
+              src="https://d2xsxph8kpxj0f.cloudfront.net/310519663211654017/kGjPju6hKCvCsjZhgUHyqj/EBPlargelogo_25428631.PNG"
               alt="Easy Book Publishers"
               className="h-8 w-auto object-contain opacity-80"
             />
@@ -244,11 +244,11 @@ export default function CDPTemplates() {
             theological commentaries, and hymnals. Select a template to pre-fill all formatting settings.
           </p>
           <div className="flex flex-wrap gap-3 mt-5 text-xs text-[#c9a96e]/50">
-            <span className="flex items-center gap-1.5"><BookOpen size={12} />{CDP_TEMPLATES.filter(t => t.isBible).length} Bible Edition Templates</span>
+            <span className="flex items-center gap-1.5"><BookOpen size={12} />{EBP_TEMPLATES.filter(t => t.isBible).length} Bible Edition Templates</span>
             <span className="text-[#c9a96e]/20">·</span>
-            <span className="flex items-center gap-1.5"><BookMarked size={12} />{CDP_TEMPLATES.filter(t => !t.isBible).length} Christian Literature Templates</span>
+            <span className="flex items-center gap-1.5"><BookMarked size={12} />{EBP_TEMPLATES.filter(t => !t.isBible).length} Christian Literature Templates</span>
             <span className="text-[#c9a96e]/20">·</span>
-            <span className="flex items-center gap-1.5"><Filter size={12} />{CDP_TEMPLATE_CATEGORIES.length} Categories</span>
+            <span className="flex items-center gap-1.5"><Filter size={12} />{EBP_TEMPLATE_CATEGORIES.length} Categories</span>
           </div>
         </div>
       </div>
@@ -274,11 +274,11 @@ export default function CDPTemplates() {
                   : "bg-white text-[#5c3d2e] border-[#e8dfd0] hover:border-[#c9a96e]/50"
               }`}
             >
-              All ({CDP_TEMPLATES.length})
+              All ({EBP_TEMPLATES.length})
             </button>
-            {CDP_TEMPLATE_CATEGORIES.map((cat) => {
+            {EBP_TEMPLATE_CATEGORIES.map((cat) => {
               const colors = CATEGORY_COLORS[cat];
-              const count = CDP_TEMPLATES.filter(t => t.category === cat).length;
+              const count = EBP_TEMPLATES.filter(t => t.category === cat).length;
               const isActive = activeCategory === cat;
               return (
                 <button
@@ -380,9 +380,9 @@ export default function CDPTemplates() {
         </div>
       </main>
 
-      {/* CDP Production Wizard modal */}
+      {/* EBP Production Wizard modal */}
       {wizardTemplate && (
-        <CDPProductionWizard
+        <EBPProductionWizard
           template={wizardTemplate}
           onClose={() => setWizardTemplate(null)}
         />

@@ -884,7 +884,7 @@ export const appRouter = router({
     /**
      * Looks up a book by ISBN using Open Library and Google Books APIs.
      * Returns title, author, publisher, page count, dimensions, cover image,
-     * and the best-matching CDP production template.
+     * and the best-matching EBP production template.
      */
     lookupByIsbn: publicProcedure
       .input(z.object({
