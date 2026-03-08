@@ -20,7 +20,7 @@ interface Section {
 function SectionCard({ section, isOpen, onToggle }: { section: Section; isOpen: boolean; onToggle: () => void }) {
   const Icon = section.icon;
   return (
-    <div className="border border-[#e8ddd0] rounded-xl overflow-hidden bg-white shadow-sm">
+    <div className="border border-[#e8ddd0] rounded-xl overflow-hidden bg-white shadow-sm guide-section-card">
       <button
         onClick={onToggle}
         className="w-full flex items-center justify-between px-6 py-5 text-left hover:bg-[#faf6ef] transition-colors"
@@ -477,10 +477,52 @@ export default function UserGuide() {
   const expandAll = () => setOpenSections(new Set(sections.map(s => s.id)));
   const collapseAll = () => setOpenSections(new Set());
 
+  const handleDownloadPdf = useCallback(() => {
+    setOpenSections(new Set(sections.map(s => s.id)));
+
+    document.getElementById("guide-print-styles")?.remove();
+
+    const style = document.createElement("style");
+    style.id = "guide-print-styles";
+    style.textContent = `
+      @media print {
+        @page { size: letter; margin: 0.6in; }
+        body { background: #fff !important; }
+        header, nav, .no-print, [data-sidebar], [data-radix-popper-content-wrapper] { display: none !important; }
+        .guide-print-hide { display: none !important; }
+        .guide-hero-print { padding: 24px 0 !important; background: #fff !important; color: #2a1a0a !important; }
+        .guide-hero-print h1 { color: #2a1a0a !important; text-shadow: none !important; font-size: 28px !important; }
+        .guide-hero-print p { color: #5c3d2e !important; text-shadow: none !important; }
+        .guide-hero-print strong { color: #2a1a0a !important; }
+        .guide-section-card { break-inside: avoid-page; page-break-inside: avoid; }
+        .guide-footer-print { background: #fff !important; border: 1px solid #e8dfd0 !important; color: #3a2a1a !important; }
+        .guide-footer-print p:first-child { color: #8b5e3c !important; }
+        .guide-footer-print p:nth-child(2) { color: #8b7b6b !important; }
+      }
+    `;
+    document.head.appendChild(style);
+
+    const origTitle = document.title;
+    document.title = "Easy Book Publishers - Self-Publishing Platform Guide";
+
+    const cleanup = () => {
+      style.remove();
+      document.title = origTitle;
+      window.removeEventListener("afterprint", cleanup);
+    };
+    window.addEventListener("afterprint", cleanup);
+
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        setTimeout(() => window.print(), 600);
+      });
+    });
+  }, []);
+
   return (
     <div className="min-h-screen bg-[#faf6ef]">
       {/* Header */}
-      <header className="bg-[#1e1108] text-[#f5efe0] border-b border-[#c9a96e]/10 sticky top-0 z-10">
+      <header className="bg-[#1e1108] text-[#f5efe0] border-b border-[#c9a96e]/10 sticky top-0 z-10 guide-print-hide">
         <div className="max-w-4xl mx-auto px-6 py-4 flex items-center justify-between">
           <div className="flex items-center gap-3">
             <button
@@ -497,20 +539,19 @@ export default function UserGuide() {
             </div>
           </div>
           <div className="flex items-center gap-2">
-            <a
-              href="/cdp-publishing-guide.pdf"
-              download
+            <button
+              onClick={handleDownloadPdf}
               className="flex items-center gap-1.5 text-xs text-[#c9a96e]/60 hover:text-[#c9a96e] transition-colors px-3 py-1.5 rounded-md hover:bg-[#c9a96e]/10"
             >
               <Download size={13} />
               Download PDF
-            </a>
+            </button>
           </div>
         </div>
       </header>
 
       {/* Hero */}
-      <div className="bg-[#2a1a0a] text-[#f5efe0] py-14 px-6">
+      <div className="bg-[#2a1a0a] text-[#f5efe0] py-14 px-6 guide-hero-print">
         <div className="max-w-4xl mx-auto text-center">
           <div className="flex items-center justify-center gap-3 mb-5">
             <div className="h-px w-12 bg-[#c9a96e]/40" />
@@ -547,7 +588,7 @@ export default function UserGuide() {
       </div>
 
       {/* Controls */}
-      <div className="max-w-4xl mx-auto px-6 py-5 flex items-center justify-between">
+      <div className="max-w-4xl mx-auto px-6 py-5 flex items-center justify-between guide-print-hide">
         <p className="text-sm text-[#8b7b6b]">Click any chapter to expand it. All chapters can be open simultaneously.</p>
         <div className="flex gap-2">
           <Button variant="outline" size="sm" onClick={expandAll} className="text-xs border-[#c9a96e]/30 text-[#5c3d2e] hover:bg-[#faf6ef]">
@@ -560,7 +601,7 @@ export default function UserGuide() {
       </div>
 
       {/* Table of Contents */}
-      <div className="max-w-4xl mx-auto px-6 pb-4">
+      <div className="max-w-4xl mx-auto px-6 pb-4 guide-print-hide">
         <div className="border border-[#e8ddd0] rounded-xl overflow-hidden bg-white shadow-sm">
           <div className="px-6 py-4 flex items-center gap-3 border-b border-[#e8ddd0] bg-[#faf6ef]/50">
             <div className="w-9 h-9 rounded-lg bg-[#c9a96e]/15 flex items-center justify-center flex-shrink-0">
@@ -600,7 +641,7 @@ export default function UserGuide() {
         ))}
 
         {/* Related Tools — internal backlinks */}
-        <div className="mt-8 p-6 bg-[#faf6ef] rounded-xl border border-[#e8dfd0]">
+        <div className="mt-8 p-6 bg-[#faf6ef] rounded-xl border border-[#e8dfd0] guide-print-hide">
           <h2 className="font-serif text-xl text-[#3a2a1a] text-center mb-1">Self-Publishing Tools</h2>
           <p className="text-xs text-[#8b7b6b] text-center mb-5">Jump directly to any tool in the platform.</p>
           <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
@@ -625,7 +666,7 @@ export default function UserGuide() {
         </div>
 
         {/* Footer note */}
-        <div className="mt-8 p-6 bg-[#2a1a0a] rounded-xl text-center">
+        <div className="mt-8 p-6 bg-[#2a1a0a] rounded-xl text-center guide-footer-print">
           <p className="text-[#c9a96e] font-serif text-lg mb-1">Easy Book Publishers</p>
           <p className="text-[#8b7b6b] text-sm">A creator, designer, and publisher's dream platform.</p>
           <div className="mt-4 flex items-center justify-center gap-4">
