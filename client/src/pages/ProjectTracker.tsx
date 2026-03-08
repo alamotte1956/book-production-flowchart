@@ -151,8 +151,8 @@ function InputSlot({
   const handleFileSelect = useCallback(async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
-    if (file.size > 20 * 1024 * 1024) {
-      toast.error("File too large (max 20 MB)");
+    if (file.size > 50 * 1024 * 1024) {
+      toast.error("File too large (max 50 MB)");
       return;
     }
     const reader = new FileReader();
