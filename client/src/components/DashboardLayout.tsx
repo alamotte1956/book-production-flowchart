@@ -18,7 +18,7 @@ import { useIsMobile } from "@/hooks/useMobile";
 import { usePlan, type PlanFeature } from "@/hooks/usePlan";
 import {
   LayoutDashboard, PanelLeft,
-  BookOpen, Ruler, Layers, BookMarked, Library, HelpCircle, LayoutGrid, Search, FileText,
+  HelpCircle,
   Sun, Moon, Bell, CheckCircle, Upload, Zap, CreditCard, Lock, ArrowUpRight,
 } from "lucide-react";
 import { CSSProperties, useCallback, useEffect, useRef, useState } from "react";
@@ -30,15 +30,7 @@ import { trpc } from "@/lib/trpc";
 import SiteFooter from "./SiteFooter";
 
 const menuItems: { icon: any; label: string; path: string; gatedFeature: PlanFeature | null }[] = [
-  { icon: LayoutDashboard, label: "Dashboard", path: "/", gatedFeature: null },
-  { icon: LayoutGrid, label: "Templates", path: "/templates", gatedFeature: "templates" },
-  { icon: BookOpen, label: "Bible Studio", path: "/bible-studio", gatedFeature: null },
-  { icon: Ruler, label: "Spine Calculator", path: "/spine-calculator", gatedFeature: null },
-  { icon: Layers, label: "Cover Designer", path: "/cover-designer", gatedFeature: null },
-  { icon: BookMarked, label: "ISBN & Metadata", path: "/isbn-manager", gatedFeature: null },
-  { icon: Search, label: "ISBN Lookup", path: "/isbn-lookup", gatedFeature: null },
-  { icon: FileText, label: "Print Specs", path: "/print-specs", gatedFeature: null },
-  { icon: Library, label: "Resources", path: "/resources", gatedFeature: null },
+  { icon: LayoutDashboard, label: "Dashboard", path: "/dashboard", gatedFeature: null },
   { icon: HelpCircle, label: "User Guide", path: "/guide", gatedFeature: null },
   { icon: CreditCard, label: "Billing & Plans", path: "/pricing", gatedFeature: null },
 ];
@@ -213,7 +205,7 @@ function DashboardLayoutContent({
   setSidebarWidth,
 }: DashboardLayoutContentProps) {
   const { user } = useAuth();
-  const { isStarter, isPro, isPublisher, plan, canAccess } = usePlan();
+  const { isPublisher, plan, canAccess } = usePlan();
   const { theme, toggleTheme } = useTheme();
   const [location, setLocation] = useLocation();
   const { state, toggleSidebar } = useSidebar();
@@ -289,14 +281,11 @@ function DashboardLayoutContent({
 
           <SidebarContent className="gap-0 bg-cream/30">
             <SidebarMenu className="px-2 py-2">
-              {menuItems.map((item, index) => {
+              {menuItems.map((item) => {
                 const isActive = location === item.path;
                 const isLocked = item.gatedFeature !== null && !canAccess(item.gatedFeature);
                 return (
                   <SidebarMenuItem key={item.path}>
-                    {index === 1 && (
-                      <div className="my-2 h-px bg-gold/15" />
-                    )}
                     <SidebarMenuButton
                       isActive={isActive}
                       onClick={() => setLocation(item.path)}

@@ -1,10 +1,5 @@
-/**
- * Home Page — Easy Book Publishers
- * Authenticated: Publisher Command Center dashboard
- * Unauthenticated: Artisan storybook landing page
- */
 import { useAuth } from "@/_core/hooks/useAuth";
-import { usePlan, type PlanFeature } from "@/hooks/usePlan";
+import { usePlan } from "@/hooks/usePlan";
 import { trpc } from "@/lib/trpc";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -16,25 +11,19 @@ import { Progress } from "@/components/ui/progress";
 import { Badge } from "@/components/ui/badge";
 import {
   BookOpen, Plus, Trash2, ArrowRight, Loader2, Lock,
-  Upload, CheckCircle2, SkipForward, Clock, Sparkles, Copy,
-  Layers, BookMarked, Ruler, Zap, BarChart3, Library,
-  ChevronRight, ChevronDown, Calendar, Star, TrendingUp, FileText, HelpCircle, LogOut, User, Menu, X, LayoutGrid, Search, Send,
-  Compass, PenTool, Palette, Printer, Quote, Package,
+  CheckCircle2, Clock, Sparkles, Copy,
+  Layers, Star,
+  Send,
+  Compass, Printer,
 } from "lucide-react";
 import { toast } from "sonner";
-import {
-  DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel,
-  DropdownMenuSeparator, DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
 import { useState, useEffect } from "react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useLocation } from "wouter";
 import { motion } from "framer-motion";
 import { phases } from "@/data/flowchartData";
-import WhatsNext from "@/components/WhatsNext";
-import { getNextPrompts } from "@shared/prompts";
 import type { WizardAnswers } from "@/components/PublishingWizard";
-import SiteFooter from "@/components/SiteFooter";
+import DashboardLayout from "@/components/DashboardLayout";
 
 function getWizardFormatLabel(format: string) {
   switch (format) {
@@ -64,10 +53,7 @@ function getWizardExperienceLabel(exp: string) {
   }
 }
 
-
-
 const totalSteps = phases.reduce((acc, p) => acc + p.steps.length, 0);
-const totalInputs = phases.reduce((acc, p) => acc + p.steps.reduce((a, s) => a + s.inputs.length, 0), 0);
 
 const GENRES = [
   "Literary Fiction", "Commercial Fiction", "Mystery / Thriller", "Science Fiction",
@@ -80,16 +66,8 @@ const GENRES = [
   "Other",
 ];
 
-const features = [
-  { icon: Upload, title: "Create & Upload Your Manuscript", desc: "Start your self-publishing journey by attaching manuscripts, contracts, cover art, and proofs at every production step." },
-  { icon: CheckCircle2, title: "Design Your Book Online", desc: "Use our online publishing tools to design layouts, configure typesetting, and track every phase of your book's design." },
-  { icon: SkipForward, title: "Flexible Publishing Workflow", desc: "Not every self-publishing project needs the same steps. Skip what doesn't apply and focus on what matters for your book." },
-  { icon: Clock, title: "Publishing Deadlines & Milestones", desc: "Set target dates per phase and stay on schedule from manuscript creation through final publishing and distribution." },
-];
-
 const PAGE_TITLE = "Publisher Dashboard — Easy Book Publishers";
-const PAGE_DESCRIPTION = "Your publishing command center. Access all tools, manage book projects, and track your 30-step production workflow.";
-const PAGE_KEYWORDS = "self-publishing, online publishing, book design, publishing platform, Bible publishing, easy book publishers";
+const PAGE_DESCRIPTION = "Your publishing command center. Manage book projects and track your 30-step production workflow.";
 
 function setMetaTag(name: string, content: string) {
   let el = document.querySelector<HTMLMetaElement>(`meta[name="${name}"]`);
@@ -101,132 +79,15 @@ function setMetaTag(name: string, content: string) {
   el.setAttribute("content", content);
 }
 
-// ─── Tool Hub definition ──────────────────────────────────────────────────────
-const TOOLS = [
-  {
-    id: "new-project",
-    path: null,
-    icon: Plus,
-    label: "New Book Project",
-    desc: "Start a new project and track all 30 production steps from manuscript to shelf.",
-    badge: "Start",
-    badgeColor: "bg-emerald-100 text-emerald-800",
-    dark: true,
-    cta: true,
-    gatedFeature: null as string | null,
-  },
-  {
-    id: "auto-produce",
-    path: null,
-    icon: Zap,
-    label: "Auto-Produce",
-    desc: "Generate typeset PDF and EPUB previews instantly with AI-powered layout engine.",
-    badge: "AI",
-    badgeColor: "bg-purple-100 text-purple-800",
-    dark: false,
-    gatedFeature: "ai_typesetting" as string | null,
-  },
-  {
-    id: "spine-calculator",
-    path: "/spine-calculator",
-    icon: Ruler,
-    label: "Spine Calculator",
-    desc: "Calculate exact spine width from page count, paper type, and binding method.",
-    badge: "Print",
-    badgeColor: "bg-blue-100 text-blue-800",
-    dark: false,
-    gatedFeature: null,
-  },
-  {
-    id: "cover-designer",
-    path: "/cover-designer",
-    icon: Layers,
-    label: "Cover Designer",
-    desc: "Full-wrap cover dimensions, bleed, safe zones, and print-ready spec sheet export.",
-    badge: "Design",
-    badgeColor: "bg-rose-100 text-rose-800",
-    dark: false,
-    gatedFeature: null,
-  },
-  {
-    id: "isbn-manager",
-    path: "/isbn-manager",
-    icon: BookMarked,
-    label: "ISBN & Metadata",
-    desc: "Manage ISBN, LCCN, BISAC codes, and export ONIX 3.0 XML for distributors.",
-    badge: "Metadata",
-    badgeColor: "bg-green-100 text-green-800",
-    dark: false,
-    gatedFeature: null,
-  },
-  {
-    id: "timeline",
-    path: null,
-    icon: Calendar,
-    label: "Production Timeline",
-    desc: "Gantt-style timeline with per-step due dates and deadline tracking.",
-    badge: "Planning",
-    badgeColor: "bg-sky-100 text-sky-800",
-    dark: false,
-    gatedFeature: "timeline",
-  },
-  {
-    id: "resources",
-    path: "/resources",
-    icon: Library,
-    label: "Resources Hub",
-    desc: "43 curated tools across every production phase — Scrivener, IngramSpark, NetGalley, and more.",
-    badge: "Reference",
-    badgeColor: "bg-orange-100 text-orange-800",
-    dark: false,
-    gatedFeature: null,
-  },
-  {
-    id: "templates",
-    path: "/templates",
-    icon: LayoutGrid,
-    label: "Book Templates",
-    desc: "One-click presets for every book type — Bibles, devotionals, children's books, theological works, and more.",
-    badge: "Templates",
-    badgeColor: "bg-amber-100 text-amber-800",
-    dark: false,
-    gatedFeature: "templates",
-  },
-  {
-    id: "isbn-lookup",
-    path: "/isbn-lookup",
-    icon: Search,
-    label: "ISBN Book Lookup",
-    desc: "Enter any ISBN to retrieve a book's production specs and get an instant template recommendation for recreating it.",
-    badge: "Lookup",
-    badgeColor: "bg-indigo-100 text-indigo-800",
-    dark: false,
-    gatedFeature: null,
-  },
-  {
-    id: "bible-studio",
-    path: "/bible-studio",
-    icon: BookOpen,
-    label: "Bible Design Studio",
-    desc: "Configure any Bible edition — trim, paper, binding, typesetting style, and special features.",
-    badge: "Bible",
-    badgeColor: "bg-amber-100 text-amber-800",
-    dark: false,
-    gatedFeature: null,
-  },
-];
-
 export default function Home() {
-  const { user, isAuthenticated, loading: authLoading, logout } = useAuth();
-  const { isStarter, projectLimit, canAccess } = usePlan();
+  const { user, isAuthenticated, loading: authLoading } = useAuth();
+  const { isStarter, projectLimit } = usePlan();
   const [, navigate] = useLocation();
   const [open, setOpen] = useState(false);
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   useEffect(() => {
     document.title = PAGE_TITLE;
     setMetaTag("description", PAGE_DESCRIPTION);
-    setMetaTag("keywords", PAGE_KEYWORDS);
     setMetaTag("robots", "index, follow");
   }, []);
 
@@ -292,21 +153,9 @@ export default function Home() {
     },
   });
 
-  const activityQuery = trpc.activity.recent.useQuery(undefined, { enabled: isAuthenticated });
-  const statsQuery = trpc.dashboard.stats.useQuery(undefined, { enabled: isAuthenticated });
   const wizardAnswersQuery = trpc.wizard.getAnswers.useQuery(undefined, { enabled: isAuthenticated });
   const hasWizardSession = !!wizardAnswersQuery.data?.answers && !!(wizardAnswersQuery.data.answers as Record<string, unknown>).bookType;
 
-  // ─── Guided prompts context (must be before any early returns to satisfy React hooks rules) ───
-  const projectList0 = projectsQuery.data ?? [];
-  const firstProjectForPrompts = projectList0[0];
-  const promptContextQuery = trpc.prompts.getContext.useQuery(
-    { projectId: firstProjectForPrompts?.id ?? 0 },
-    { enabled: isAuthenticated && !!firstProjectForPrompts }
-  );
-
-
-  // Loading
   if (authLoading || projectsQuery.isLoading) {
     return (
       <div className="min-h-screen bg-[#f3efe6] flex items-center justify-center">
@@ -317,217 +166,9 @@ export default function Home() {
 
   const projectList = projectsQuery.data ?? [];
 
-  // ─── Compute "What's Next?" prompts ──────────────────────────────────────────
-  const firstProject = firstProjectForPrompts;
-
-  const whatsNextPrompts = getNextPrompts(
-    (promptContextQuery.data
-      ? { ...promptContextQuery.data, overallPhase: promptContextQuery.data.overallPhase as "setup" | "design" | "production" | "distribution" | "complete" }
-      : {
-          hasProjects: projectList.length > 0,
-          hasBibleSpecs: false,
-          hasSpineCalc: false,
-          hasCoverSpec: false,
-          hasIsbn: false,
-          hasManuscript: false,
-          hasCompletedJob: false,
-          hasFailedJob: false,
-          completedStepCount: 0,
-          totalStepCount: 0,
-          hasTimeline: false,
-          overallPhase: "setup" as const,
-        }
-    )
-  );
-
-  // ─── Authenticated Publisher Command Center ──────────────────────────────────
   return (
-    <div className="min-h-screen bg-gradient-to-b from-[#f3efe6] to-[#f0e8d8]">
-      {mobileMenuOpen && (
-        <div
-          className="fixed inset-0 z-40 bg-black/60 md:hidden"
-          onClick={() => setMobileMenuOpen(false)}
-        />
-      )}
-
-      <div
-        className={`fixed top-0 right-0 h-full w-72 z-50 bg-[#1a1008] border-l border-[#c9a96e]/15 transform transition-transform duration-300 ease-in-out md:hidden ${
-          mobileMenuOpen ? "translate-x-0" : "translate-x-full"
-        }`}
-      >
-        <div className="flex items-center justify-between px-5 py-4 border-b border-[#c9a96e]/10">
-          <a href="/" className="flex items-center gap-2.5">
-            <img
-              src="https://d2xsxph8kpxj0f.cloudfront.net/310519663211654017/kGjPju6hKCvCsjZhgUHyqj/CDPlargelogo_25428631.PNG"
-              alt="Easy Book Publishers"
-              className="h-10 w-auto object-contain"
-            />
-            <span className="font-serif text-[#f5d98a] text-sm tracking-wide">Menu</span>
-          </a>
-          <button
-            onClick={() => setMobileMenuOpen(false)}
-            className="w-8 h-8 flex items-center justify-center rounded-md text-[#c9a96e]/80 hover:text-[#c9a96e] hover:bg-[#c9a96e]/10 transition-colors"
-            aria-label="Close menu"
-          >
-            <X size={18} />
-          </button>
-        </div>
-
-        <div className="px-5 py-4 border-b border-[#c9a96e]/10">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-full bg-gradient-to-br from-[#c9a96e]/30 to-[#c9a96e]/10 flex items-center justify-center shrink-0 border border-[#c9a96e]/20">
-              <span className="text-sm font-bold text-[#f5d98a]">
-                {(user?.name || user?.email || "?")[0].toUpperCase()}
-              </span>
-            </div>
-            <div className="min-w-0">
-              <p className="text-sm text-[#ede7d8] font-semibold truncate">{user?.name || "Account"}</p>
-              <p className="text-xs text-[#c9a96e]/65 truncate">{user?.email || ""}</p>
-            </div>
-          </div>
-        </div>
-
-        <nav className="px-3 py-4 flex flex-col gap-1">
-          {[
-            { label: "Templates", path: "/templates", icon: LayoutGrid, badge: "All" },
-            { label: "Bible Design Studio", path: "/bible-studio", icon: BookOpen, badge: "Bible" },
-            { label: "Spine Calculator", path: "/spine-calculator", icon: Ruler, badge: "Print" },
-            { label: "Cover Designer", path: "/cover-designer", icon: Layers, badge: "Design" },
-            { label: "ISBN & Metadata", path: "/isbn-manager", icon: BookMarked, badge: "Meta" },
-            { label: "Resources Hub", path: "/resources", icon: Library, badge: "Ref" },
-            { label: "User Guide", path: "/guide", icon: HelpCircle, badge: null },
-          ].map(item => (
-            <button
-              key={item.path}
-              onClick={() => { navigate(item.path); setMobileMenuOpen(false); }}
-              className="flex items-center gap-3 w-full text-left px-3 py-3 rounded-lg text-[#c9a96e]/90 hover:text-[#ede7d8] hover:bg-[#c9a96e]/10 transition-all group"
-            >
-              <item.icon size={16} className="shrink-0 text-[#c9a96e]/75 group-hover:text-[#c9a96e]" />
-              <span className="text-sm font-serif flex-1">{item.label}</span>
-              {item.badge && (
-                <span className="text-[10px] px-1.5 py-0.5 rounded bg-[#c9a96e]/10 text-[#c9a96e]/80 font-medium">{item.badge}</span>
-              )}
-            </button>
-          ))}
-        </nav>
-
-        <div className="absolute bottom-0 left-0 right-0 px-3 py-4 border-t border-[#c9a96e]/10">
-          <button
-            onClick={() => { logout(); setMobileMenuOpen(false); }}
-            className="flex items-center gap-3 w-full px-3 py-3 rounded-lg text-red-400/70 hover:text-red-400 hover:bg-red-900/15 transition-all"
-          >
-            <LogOut size={16} className="shrink-0" />
-            <span className="text-sm font-serif">Sign Out</span>
-          </button>
-        </div>
-      </div>
-
-      <header className="bg-gradient-to-r from-[#1a1008] via-[#1e1108] to-[#1a1008] text-[#ede7d8] border-b border-[#c9a96e]/15 shadow-lg shadow-[#1a1008]/20">
-        <div className="max-w-7xl mx-auto px-6 py-5 flex items-center justify-between">
-          <a href="/" className="flex items-center gap-4 group">
-            <div className="flex items-center gap-3">
-              <img
-                src="https://d2xsxph8kpxj0f.cloudfront.net/310519663211654017/kGjPju6hKCvCsjZhgUHyqj/CDPlargelogo_25428631.PNG"
-                alt="Easy Book Publishers"
-                className="h-11 w-auto object-contain"
-              />
-              <div>
-                <h1 className="font-serif text-xl leading-tight text-[#f5d98a] tracking-wide group-hover:text-[#ffe6a0] transition-colors" style={{ textShadow: "0 0 30px rgba(245,217,138,0.3)" }}>Publisher Command Center</h1>
-                <p className="text-[10px] text-[#c9a96e]/75 uppercase tracking-[0.2em] hidden sm:block font-serif">Easy Book Publishers</p>
-              </div>
-            </div>
-          </a>
-
-          <nav className="hidden md:flex items-center gap-0.5">
-            {[
-              { label: "Templates", path: "/templates", icon: LayoutGrid },
-              { label: "Bible Studio", path: "/bible-studio", icon: BookOpen },
-              { label: "Spine Calc", path: "/spine-calculator", icon: Ruler },
-              { label: "Cover Designer", path: "/cover-designer", icon: Layers },
-              { label: "ISBN", path: "/isbn-manager", icon: BookMarked },
-              { label: "Resources", path: "/resources", icon: Library },
-              { label: "Guide", path: "/guide", icon: HelpCircle },
-            ].map(item => (
-              <button
-                key={item.path}
-                onClick={() => navigate(item.path)}
-                className="flex items-center gap-1.5 text-xs font-serif text-[#c9a96e]/80 hover:text-[#f5d98a] hover:bg-[#c9a96e]/10 px-3 py-2 rounded-lg transition-all"
-              >
-                <item.icon size={13} />
-                {item.label}
-              </button>
-            ))}
-          </nav>
-
-          <div className="flex items-center gap-2">
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <button className="w-9 h-9 rounded-full bg-gradient-to-br from-[#c9a96e]/25 to-[#c9a96e]/10 hover:from-[#c9a96e]/35 hover:to-[#c9a96e]/20 flex items-center justify-center transition-all outline-none border border-[#c9a96e]/20" aria-label="Account menu">
-                  <span className="text-sm font-bold text-[#f5d98a]">
-                    {(user?.name || user?.email || "?")[0].toUpperCase()}
-                  </span>
-                </button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="w-56 bg-[#2a1a0a] border-[#c9a96e]/20 text-[#ede7d8] shadow-xl">
-                <DropdownMenuLabel className="text-[#c9a96e]/90 text-xs font-serif">
-                  <div className="flex items-center gap-2">
-                    <User size={13} />
-                    <span className="truncate">{user?.name || user?.email || "Account"}</span>
-                  </div>
-                </DropdownMenuLabel>
-                <DropdownMenuSeparator className="bg-[#c9a96e]/15" />
-                <DropdownMenuItem
-                  className="text-xs font-serif text-[#ede7d8] hover:bg-[#c9a96e]/10 focus:bg-[#c9a96e]/10 cursor-pointer"
-                  onClick={() => navigate("/guide")}
-                >
-                  <HelpCircle size={13} className="mr-2 text-[#c9a96e]/80" />
-                  User Guide
-                </DropdownMenuItem>
-                <DropdownMenuSeparator className="bg-[#c9a96e]/15" />
-                <DropdownMenuItem
-                  className="text-xs font-serif text-red-400 hover:bg-red-900/20 focus:bg-red-900/20 cursor-pointer"
-                  onClick={() => logout()}
-                >
-                  <LogOut size={13} className="mr-2" />
-                  Sign Out
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
-
-            <button
-              className="md:hidden w-8 h-8 flex items-center justify-center rounded-md text-[#c9a96e]/90 hover:text-[#c9a96e] hover:bg-[#c9a96e]/10 transition-colors"
-              onClick={() => setMobileMenuOpen(true)}
-              aria-label="Open menu"
-            >
-              <Menu size={18} />
-            </button>
-          </div>
-        </div>
-      </header>
-
-      <div className="bg-gradient-to-r from-[#2a1a0a] via-[#33200e] to-[#2a1a0a] border-b border-[#c9a96e]/10">
-        <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between gap-6 overflow-x-auto">
-          {[
-            { label: "Total Projects", value: statsQuery.data?.totalProjects ?? projectList.length, icon: FileText, color: "text-[#f5d98a]" },
-            { label: "Steps Completed", value: statsQuery.data?.stepsCompleted ?? 0, icon: CheckCircle2, color: "text-[#c9a96e]" },
-            { label: "Files Produced", value: statsQuery.data?.filesProduced ?? 0, icon: Upload, color: "text-[#d4b896]" },
-            { label: "Production Jobs", value: statsQuery.data?.productionJobsRun ?? 0, icon: Zap, color: "text-[#c9a96e]/80" },
-          ].map((stat, idx) => (
-            <div key={stat.label} className="flex items-center gap-3 shrink-0">
-              <div className="w-9 h-9 rounded-lg bg-[#c9a96e]/10 flex items-center justify-center">
-                <stat.icon size={16} className={stat.color} />
-              </div>
-              <div>
-                <p className="text-xl font-bold text-[#ede7d8] leading-none font-serif">{stat.value}</p>
-                <p className="text-[10px] text-[#c9a96e]/75 uppercase tracking-wider font-serif">{stat.label}</p>
-              </div>
-              {idx < 3 && <div className="hidden sm:block h-8 w-px bg-[#c9a96e]/10 ml-3" />}
-            </div>
-          ))}
-        </div>
-      </div>
-
-      <main className="max-w-7xl mx-auto px-6 py-10">
+    <DashboardLayout>
+      <div className="max-w-4xl mx-auto py-8 px-4">
 
         {!hasWizardSession && (
           <motion.section
@@ -554,7 +195,7 @@ export default function Home() {
                   onClick={() => navigate("/guided-journey")}
                 >
                   <Sparkles size={16} />
-                  Use the Wizard
+                  Start the Publishing Wizard
                   <ArrowRight size={16} />
                 </Button>
               </div>
@@ -635,169 +276,9 @@ export default function Home() {
           );
         })()}
 
-        <section className="mb-12">
+        <section className="mb-10">
           <div className="flex items-center justify-between mb-6">
             <div>
-              <div className="flex items-center gap-2 mb-1">
-                <div className="h-px w-8 bg-[#c9a96e]/40" />
-                <span className="text-[10px] font-semibold uppercase tracking-[0.2em] text-[#c9a96e]">Professional Suite</span>
-              </div>
-              <h2 className="font-serif text-2xl text-[#2c1a00]">Publisher Tools Hub</h2>
-              <p className="text-sm text-[#7a6e60] mt-1">Everything you need to create, design, and publish your book</p>
-            </div>
-          </div>
-
-          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
-            {TOOLS.map((tool, i) => {
-              const isToolLocked = tool.gatedFeature !== null && !canAccess(tool.gatedFeature as PlanFeature);
-              return (
-              <motion.div
-                key={tool.id}
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: i * 0.04 }}
-              >
-                <div
-                  className={`rounded-xl p-5 border cursor-pointer group transition-all h-full relative ${
-                    tool.dark
-                      ? "bg-gradient-to-br from-[#2c1a00] to-[#1a1008] border-[#4a3828] hover:border-[#c9a96e]/50 shadow-md"
-                      : tool.cta
-                      ? "bg-gradient-to-br from-[#c9a96e] to-[#b8944f] border-[#c9a96e] hover:from-[#d4b480] hover:to-[#c9a96e] shadow-md shadow-[#c9a96e]/20"
-                      : "bg-white/90 backdrop-blur-sm border-[#e8dfd0] hover:shadow-lg hover:border-[#c9a96e]/40 hover:-translate-y-0.5"
-                  }`}
-                  onClick={() => {
-                    if (isToolLocked) { navigate("/pricing"); return; }
-                    if (tool.path) navigate(tool.path);
-                    else if (tool.id === "new-project" || tool.id === "auto-produce") setOpen(true);
-                    else if (tool.id === "timeline" && projectList.length > 0) navigate(`/timeline/${projectList[0].id}`);
-                    else if (tool.id === "timeline") setOpen(true);
-                  }}
-                >
-                  <div className="flex items-start justify-between mb-3">
-                    <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${
-                      tool.dark ? "bg-[#c9a96e]/15 border border-[#c9a96e]/20" : tool.cta ? "bg-[#2a1a0a]/10" : "bg-gradient-to-br from-[#f5ede0] to-[#e8dfd0]"
-                    }`}>
-                      {isToolLocked ? (
-                        <Lock size={18} className="text-[#c9a96e]/80" />
-                      ) : (
-                        <tool.icon size={18} className={tool.dark ? "text-[#f5d98a]" : tool.cta ? "text-[#2a1a0a]" : "text-[#8b5e3c]"} />
-                      )}
-                    </div>
-                    <span className={`text-[9px] px-2 py-0.5 rounded-full font-semibold uppercase tracking-wider ${
-                      isToolLocked ? "bg-[#c9a96e]/15 text-[#c9a96e]" : tool.cta ? "bg-[#2a1a0a]/10 text-[#2a1a0a]" : tool.badgeColor
-                    }`}>
-                      {isToolLocked ? "Pro" : tool.badge}
-                    </span>
-                  </div>
-                  <h3 className={`font-serif text-sm font-semibold leading-tight mb-1.5 ${
-                    tool.dark ? "text-[#ede7d8] group-hover:text-[#f5d98a]" : tool.cta ? "text-[#2a1a0a]" : "text-[#3a2a1a] group-hover:text-[#5c3d2e]"
-                  } transition-colors`}>
-                    {tool.label}
-                  </h3>
-                  <p className={`text-[11px] leading-relaxed ${
-                    tool.dark ? "text-[#a08060]" : tool.cta ? "text-[#2a1a0a]/70" : "text-[#7a6e60]"
-                  }`}>
-                    {tool.desc}
-                  </p>
-                  <div className={`flex items-center gap-1 mt-3 text-[11px] font-semibold ${
-                    isToolLocked ? "text-[#c9a96e]/80" : tool.dark ? "text-[#c9a96e]" : tool.cta ? "text-[#2a1a0a]" : "text-[#c9a96e]"
-                  }`}>
-                    {isToolLocked ? "Upgrade" : "Open"} <ChevronRight size={11} className="group-hover:translate-x-0.5 transition-transform" />
-                  </div>
-                </div>
-              </motion.div>
-            );
-            })}
-          </div>
-        </section>
-
-        {whatsNextPrompts.length > 0 && (
-          <section className="mb-12">
-            <WhatsNext
-              prompts={whatsNextPrompts}
-              title={firstProject ? `What's Next for "${firstProject.title}"?` : "What's Next?"}
-            />
-          </section>
-        )}
-
-        {activityQuery.data && activityQuery.data.length > 0 && (
-          <section className="mb-12">
-            <div className="flex items-center gap-2 mb-1">
-              <div className="h-px w-8 bg-[#c9a96e]/40" />
-              <span className="text-[10px] font-semibold uppercase tracking-[0.2em] text-[#c9a96e]">Activity</span>
-            </div>
-            <h2 className="font-serif text-2xl text-[#2c1a00] mb-1">Recent Activity</h2>
-            <p className="text-sm text-[#7a6e60] mb-5">Your latest publishing actions across all projects</p>
-            <div className="bg-white/90 backdrop-blur-sm rounded-2xl border border-[#e8dfd0] shadow-sm overflow-hidden">
-              {activityQuery.data.map((item, idx) => (
-                <div
-                  key={`${item.type}-${item.projectId}-${idx}`}
-                  className={`flex items-center gap-4 px-5 py-3.5 hover:bg-[#f3efe6]/60 transition-colors cursor-pointer ${
-                    idx < activityQuery.data!.length - 1 ? "border-b border-[#f0e8d8]" : ""
-                  }`}
-                  onClick={() => navigate(`/project/${item.projectId}`)}
-                >
-                  <div className={`w-8 h-8 rounded-lg flex items-center justify-center shrink-0 ${
-                    item.type === "step_completion" ? "bg-emerald-50 border border-emerald-200" :
-                    item.type === "file_upload" ? "bg-blue-50 border border-blue-200" :
-                    "bg-purple-50 border border-purple-200"
-                  }`}>
-                    {item.type === "step_completion" ? <CheckCircle2 size={14} className="text-emerald-600" /> :
-                     item.type === "file_upload" ? <Upload size={14} className="text-blue-600" /> :
-                     <Zap size={14} className="text-purple-600" />}
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <p className="text-sm text-[#3a2a1a] truncate">{item.detail}</p>
-                    <p className="text-[11px] text-[#8b7b6b] truncate">{item.projectTitle}</p>
-                  </div>
-                  <span className="text-[11px] text-[#8b7b6b] shrink-0 whitespace-nowrap">
-                    {new Date(item.timestamp).toLocaleDateString("en-US", { month: "short", day: "numeric" })}
-                    {" "}
-                    {new Date(item.timestamp).toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit" })}
-                  </span>
-                </div>
-              ))}
-            </div>
-          </section>
-        )}
-
-        {isStarter && (
-          <section className="mb-8">
-            <div className="rounded-2xl border border-[#c9a96e]/25 bg-gradient-to-r from-[#c9a96e]/5 via-white to-[#c9a96e]/5 p-6">
-              <div className="flex items-start gap-4">
-                <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-[#c9a96e]/20 to-[#c9a96e]/5 flex items-center justify-center shrink-0">
-                  <Sparkles size={22} className="text-[#c9a96e]" />
-                </div>
-                <div className="flex-1 min-w-0">
-                  <h3 className="font-serif text-lg text-[#2c1a00] mb-1">Unlock Pro Publishing Tools</h3>
-                  <p className="text-sm text-[#7a6e60] mb-3">
-                    Upgrade to Author Pro for AI-powered typesetting, KDP-ready exports, production timelines, 42 book templates, and unlimited projects.
-                  </p>
-                  <div className="flex flex-wrap gap-2 mb-4">
-                    {["AI Typesetting", "KDP Export", "Timeline", "Templates", "Unlimited Projects"].map(f => (
-                      <span key={f} className="text-[11px] px-2.5 py-1 rounded-full bg-[#c9a96e]/10 text-[#8b5e3c] font-medium border border-[#c9a96e]/15">{f}</span>
-                    ))}
-                  </div>
-                  <Button
-                    onClick={() => navigate("/pricing")}
-                    size="sm"
-                    className="bg-gradient-to-r from-[#c9a96e] to-[#b8944f] hover:from-[#d4b480] hover:to-[#c9a96e] text-[#1a1008] font-semibold gap-2 shadow-sm"
-                  >
-                    View Plans & Pricing <ArrowRight size={14} />
-                  </Button>
-                </div>
-              </div>
-            </div>
-          </section>
-        )}
-
-        <section>
-          <div className="flex items-center justify-between mb-6">
-            <div>
-              <div className="flex items-center gap-2 mb-1">
-                <div className="h-px w-8 bg-[#c9a96e]/40" />
-                <span className="text-[10px] font-semibold uppercase tracking-[0.2em] text-[#c9a96e]">Library</span>
-              </div>
               <h2 className="font-serif text-2xl text-[#2c1a00]">Your Book Projects</h2>
               <p className="text-sm text-[#7a6e60] mt-1">
                 {projectList.length} project{projectList.length !== 1 ? "s" : ""} · {phases.length} phases · {totalSteps} steps each
@@ -820,10 +301,6 @@ export default function Home() {
               )}
               <DialogContent className="bg-gradient-to-b from-[#f3efe6] to-[#f5ede0] border-[#c9a96e]/20 shadow-2xl max-w-lg">
                 <DialogHeader>
-                  <div className="flex items-center gap-2 mb-1">
-                    <div className="h-px w-8 bg-[#c9a96e]/40" />
-                    <span className="text-[10px] font-semibold uppercase tracking-[0.2em] text-[#c9a96e]">New Project</span>
-                  </div>
                   <DialogTitle className="font-serif text-2xl text-[#3a2a1a]">Start a New Book Project</DialogTitle>
                   <p className="text-sm text-[#7a6e60] mt-1">Fill in your book details to begin tracking production across all {totalSteps} steps.</p>
                 </DialogHeader>
@@ -912,7 +389,7 @@ export default function Home() {
               </Button>
             </motion.div>
           ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
               {projectList.map((project, i) => (
                 <motion.div key={project.id} initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.05 }}>
                   <Card
@@ -980,17 +457,9 @@ export default function Home() {
                         <span className="text-[11px] text-[#8b7b6b]">
                           Created {new Date(project.createdAt).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}
                         </span>
-                        <div className="flex items-center gap-3">
-                          <button
-                            className="text-[11px] text-[#8b7b6b] hover:text-[#5c3d2e] transition-colors font-medium"
-                            onClick={(e) => { e.stopPropagation(); navigate(`/timeline/${project.id}`); }}
-                          >
-                            Timeline
-                          </button>
-                          <span className="flex items-center gap-0.5 text-[11px] text-[#c9a96e] font-semibold group-hover:translate-x-0.5 transition-transform">
-                            Open <ArrowRight size={11} />
-                          </span>
-                        </div>
+                        <span className="flex items-center gap-0.5 text-[11px] text-[#c9a96e] font-semibold group-hover:translate-x-0.5 transition-transform">
+                          Open <ArrowRight size={11} />
+                        </span>
                       </div>
                     </CardContent>
                   </Card>
@@ -1000,17 +469,12 @@ export default function Home() {
           )}
         </section>
 
-        <section id="contact-section" className="mb-12">
+        <section id="contact-section" className="mb-8">
           <div className="rounded-xl border border-[#e8dfd0] bg-white/90 backdrop-blur-sm p-8">
             <div className="max-w-2xl mx-auto">
               <div className="text-center mb-6">
-                <div className="flex items-center justify-center gap-2 mb-2">
-                  <div className="h-px w-8 bg-[#c9a96e]/40" />
-                  <span className="text-[10px] font-semibold uppercase tracking-[0.2em] text-[#c9a96e]">Support</span>
-                  <div className="h-px w-8 bg-[#c9a96e]/40" />
-                </div>
                 <h2 className="font-serif text-2xl text-[#2c1a00]">Get in Touch</h2>
-                <p className="text-sm text-[#7a6e60] mt-1">Questions about your project? Need help with a tool? We're here to help.</p>
+                <p className="text-sm text-[#7a6e60] mt-1">Questions about your project? Need help? We're here to help.</p>
               </div>
 
               {contactSent ? (
@@ -1084,9 +548,8 @@ export default function Home() {
             </div>
           </div>
         </section>
-      </main>
 
-      <SiteFooter />
-    </div>
+      </div>
+    </DashboardLayout>
   );
 }
