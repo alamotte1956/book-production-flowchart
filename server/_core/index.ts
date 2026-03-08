@@ -2,12 +2,14 @@ import "dotenv/config";
 import express from "express";
 import { createServer } from "http";
 import net from "net";
+import path from "path";
 import { createExpressMiddleware } from "@trpc/server/adapters/express";
 import { setupAuth, registerAuthRoutes } from "../replit_integrations/auth";
 import { appRouter } from "../routers";
 import { createContext } from "./context";
 import { serveStatic, setupVite } from "./vite";
 import { WebhookHandlers } from "../webhookHandlers";
+import { getLocalStorageDir } from "../storage";
 
 function isPortAvailable(port: number): Promise<boolean> {
   return new Promise(resolve => {
@@ -90,6 +92,37 @@ async function startServer() {
 
   app.use(express.json({ limit: "50mb" }));
   app.use(express.urlencoded({ limit: "50mb", extended: true }));
+
+  const CONTENT_TYPE_MAP: Record<string, string> = {
+    ".pdf": "application/pdf",
+    ".epub": "application/epub+zip",
+    ".idml": "application/vnd.adobe.indesign-idml-package",
+    ".zip": "application/zip",
+    ".docx": "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+    ".txt": "text/plain",
+  };
+  app.get("/api/files/*", async (req, res) => {
+    const rawPath = (req.params[0] || "").replace(/^\/+/, "");
+    if (!rawPath || rawPath.includes("..") || path.isAbsolute(rawPath)) {
+      return res.status(400).json({ error: "Invalid path" });
+    }
+    const storageDir = getLocalStorageDir();
+    const filePath = path.resolve(storageDir, rawPath);
+    if (!filePath.startsWith(storageDir)) {
+      return res.status(400).json({ error: "Invalid path" });
+    }
+    const { existsSync, createReadStream } = await import("fs");
+    if (!existsSync(filePath)) {
+      return res.status(404).json({ error: "File not found" });
+    }
+    const ext = path.extname(filePath).toLowerCase();
+    const contentType = CONTENT_TYPE_MAP[ext] || "application/octet-stream";
+    const fileName = path.basename(filePath);
+    res.setHeader("Content-Type", contentType);
+    res.setHeader("Content-Disposition", `attachment; filename="${fileName}"`);
+    const stream = createReadStream(filePath);
+    stream.pipe(res);
+  });
 
   await setupAuth(app);
   registerAuthRoutes(app);

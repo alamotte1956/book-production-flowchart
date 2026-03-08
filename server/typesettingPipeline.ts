@@ -452,9 +452,20 @@ export function generateBookHtml(
 export async function renderToPdf(html: string, trim: TrimSize, bleedOverrides?: KdpTrimOverrides): Promise<Buffer> {
   return runStage("pdf-rendering", async () => {
     // /usr/bin/chromium-browser is a shell wrapper; puppeteer-core v24+ requires the actual binary
-    const chromiumPath =
-      process.env.CHROMIUM_PATH ||
-      "/usr/lib/chromium-browser/chromium-browser";
+    const chromiumPath = await (async () => {
+      if (process.env.CHROMIUM_PATH) return process.env.CHROMIUM_PATH;
+      const fs = await import("fs");
+      const candidates = [
+        "/nix/store/qa9cnw4v5xkxyip6mb9kxqfq1z4x2dx1-chromium-138.0.7204.100/bin/chromium",
+        "/usr/bin/chromium",
+        "/usr/bin/chromium-browser",
+        "/usr/lib/chromium-browser/chromium-browser",
+      ];
+      for (const c of candidates) {
+        if (fs.existsSync(c)) return c;
+      }
+      return "chromium";
+    })();
 
     let browser: Awaited<ReturnType<typeof puppeteer.launch>>;
     try {

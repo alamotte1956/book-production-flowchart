@@ -10,6 +10,8 @@ A full-stack book production workflow management platform ("Manuscript to Master
 - **Backend**: Node.js, Express, tRPC
 - **Database**: PostgreSQL (Drizzle ORM with `pg` driver)
 - **Auth**: Replit Auth (OpenID Connect via passport)
+- **PDF Rendering**: Puppeteer + Chromium (Nix system package)
+- **File Storage**: Local disk fallback (`.local-storage/`) when Forge API not configured; served via `/api/files/*`
 - **Package Manager**: pnpm
 
 ## Architecture
@@ -74,7 +76,12 @@ PostgreSQL via Replit's built-in database. Use `npx drizzle-kit push` to sync sc
 - **9-Phase/30-Step Workflow Tracker**: Full book production pipeline from concept to publication
 - **Inline Editing**: Title, author, and genre editable inline in project tracker header
 - **Publishing Wizard**: 7-step onboarding wizard at `/guided-journey` with personalized roadmap
-- **Auto-Produce**: AI typesetting with PDF/EPUB/IDML generation, auto-selects scripture style for Bible projects
+- **Auto-Produce**: AI typesetting pipeline producing real production files:
+  - **Interior PDF**: Puppeteer/Chromium rendered, press-ready with proper typography
+  - **KDP Print-Ready PDF**: Amazon-compliant with 0.125" bleed, gutter margins scaled by page count
+  - **EPUB**: Standards-compliant ebook via epub-gen-memory with TOC, copyright page, metadata
+  - **IDML (InDesign)**: Real Adobe InDesign Interchange format with paragraph/character styles, master spreads, and proper layout
+  - Auto-selects scripture style for Bible projects
 - **Bible Design Studio**: Full Bible edition configurator with spec sheet export
 - **Spine Calculator**: PPI-based spine width calculation with spec sheets
 - **Cover Designer**: Dimensional cover spec generation

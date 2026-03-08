@@ -1,7 +1,12 @@
-// Preconfigured storage helpers for Manus WebDev templates
-// Uses the Biz-provided storage proxy (Authorization: Bearer <token>)
-
 import { ENV } from './_core/env';
+import * as fs from 'fs';
+import * as path from 'path';
+
+const LOCAL_STORAGE_DIR = path.resolve(process.cwd(), '.local-storage');
+
+function useLocalStorage(): boolean {
+  return !ENV.forgeApiUrl || !ENV.forgeApiKey;
+}
 
 type StorageConfig = { baseUrl: string; apiKey: string };
 
@@ -67,11 +72,39 @@ function buildAuthHeaders(apiKey: string): HeadersInit {
   return { Authorization: `Bearer ${apiKey}` };
 }
 
+function localPut(
+  relKey: string,
+  data: Buffer | Uint8Array | string,
+): { key: string; url: string } {
+  const key = normalizeKey(relKey);
+  const filePath = path.join(LOCAL_STORAGE_DIR, key);
+  const dir = path.dirname(filePath);
+  fs.mkdirSync(dir, { recursive: true });
+
+  if (typeof data === "string") {
+    fs.writeFileSync(filePath, data, "utf-8");
+  } else {
+    fs.writeFileSync(filePath, Buffer.from(data));
+  }
+
+  const url = `/api/files/${key}`;
+  return { key, url };
+}
+
+function localGet(relKey: string): { key: string; url: string } {
+  const key = normalizeKey(relKey);
+  return { key, url: `/api/files/${key}` };
+}
+
 export async function storagePut(
   relKey: string,
   data: Buffer | Uint8Array | string,
   contentType = "application/octet-stream"
 ): Promise<{ key: string; url: string }> {
+  if (useLocalStorage()) {
+    return localPut(relKey, data);
+  }
+
   const { baseUrl, apiKey } = getStorageConfig();
   const key = normalizeKey(relKey);
   const uploadUrl = buildUploadUrl(baseUrl, key);
@@ -93,10 +126,18 @@ export async function storagePut(
 }
 
 export async function storageGet(relKey: string): Promise<{ key: string; url: string; }> {
+  if (useLocalStorage()) {
+    return localGet(relKey);
+  }
+
   const { baseUrl, apiKey } = getStorageConfig();
   const key = normalizeKey(relKey);
   return {
     key,
     url: await buildDownloadUrl(baseUrl, key, apiKey),
   };
+}
+
+export function getLocalStorageDir(): string {
+  return LOCAL_STORAGE_DIR;
 }
