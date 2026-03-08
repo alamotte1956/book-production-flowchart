@@ -1,5 +1,6 @@
 import { eq, and } from "drizzle-orm";
-import { drizzle } from "drizzle-orm/mysql2";
+import { drizzle } from "drizzle-orm/node-postgres";
+import { Pool } from "pg";
 import {
   InsertUser, users,
   projects, InsertProject, Project,
@@ -17,7 +18,8 @@ let _db: ReturnType<typeof drizzle> | null = null;
 export async function getDb() {
   if (!_db && process.env.DATABASE_URL) {
     try {
-      _db = drizzle(process.env.DATABASE_URL);
+      const pool = new Pool({ connectionString: process.env.DATABASE_URL });
+      _db = drizzle(pool);
     } catch (error) {
       console.warn("[Database] Failed to connect:", error);
       _db = null;
@@ -76,7 +78,8 @@ export async function upsertUser(user: InsertUser): Promise<void> {
       updateSet.lastSignedIn = new Date();
     }
 
-    await db.insert(users).values(values).onDuplicateKeyUpdate({
+    await db.insert(users).values(values).onConflictDoUpdate({
+      target: users.openId,
       set: updateSet,
     });
   } catch (error) {
@@ -102,8 +105,7 @@ export async function getUserByOpenId(openId: string) {
 export async function createProject(data: Omit<InsertProject, "id" | "createdAt" | "updatedAt">): Promise<Project> {
   const db = await getDb();
   if (!db) throw new Error("Database not available");
-  const [result] = await db.insert(projects).values(data).$returningId();
-  const [project] = await db.select().from(projects).where(eq(projects.id, result.id));
+  const [project] = await db.insert(projects).values(data).returning();
   return project;
 }
 
@@ -150,24 +152,23 @@ export async function upsertStepStatus(
     .limit(1);
 
   if (existing.length > 0) {
-    await db.update(stepStatuses)
+    const [updated] = await db.update(stepStatuses)
       .set({
         status,
         notes: notes ?? existing[0].notes,
         completedAt: status === "complete" ? new Date() : null,
       })
-      .where(eq(stepStatuses.id, existing[0].id));
-    const [updated] = await db.select().from(stepStatuses).where(eq(stepStatuses.id, existing[0].id));
+      .where(eq(stepStatuses.id, existing[0].id))
+      .returning();
     return updated;
   } else {
-    const [result] = await db.insert(stepStatuses).values({
+    const [created] = await db.insert(stepStatuses).values({
       projectId,
       stepId,
       status,
       notes,
       completedAt: status === "complete" ? new Date() : null,
-    }).$returningId();
-    const [created] = await db.select().from(stepStatuses).where(eq(stepStatuses.id, result.id));
+    }).returning();
     return created;
   }
 }
@@ -198,8 +199,7 @@ export async function getFilesByStepInput(
 export async function createUploadedFile(data: Omit<InsertUploadedFile, "id" | "uploadedAt">): Promise<UploadedFile> {
   const db = await getDb();
   if (!db) throw new Error("Database not available");
-  const [result] = await db.insert(uploadedFiles).values(data).$returningId();
-  const [file] = await db.select().from(uploadedFiles).where(eq(uploadedFiles.id, result.id));
+  const [file] = await db.insert(uploadedFiles).values(data).returning();
   return file;
 }
 
@@ -228,18 +228,16 @@ export async function upsertStepDates(
     const updateSet: Record<string, unknown> = {};
     if (startDate !== undefined) updateSet.startDate = startDate;
     if (targetDate !== undefined) updateSet.targetDate = targetDate;
-    await db.update(stepStatuses).set(updateSet).where(eq(stepStatuses.id, existing[0].id));
-    const [updated] = await db.select().from(stepStatuses).where(eq(stepStatuses.id, existing[0].id));
+    const [updated] = await db.update(stepStatuses).set(updateSet).where(eq(stepStatuses.id, existing[0].id)).returning();
     return updated;
   } else {
-    const [result] = await db.insert(stepStatuses).values({
+    const [created] = await db.insert(stepStatuses).values({
       projectId,
       stepId,
       status: "pending",
       startDate: startDate ?? null,
       targetDate: targetDate ?? null,
-    }).$returningId();
-    const [created] = await db.select().from(stepStatuses).where(eq(stepStatuses.id, result.id));
+    }).returning();
     return created;
   }
 }
@@ -250,8 +248,7 @@ export async function updateProjectDeadline(
 ): Promise<Project> {
   const db = await getDb();
   if (!db) throw new Error("Database not available");
-  await db.update(projects).set({ productionDeadline }).where(eq(projects.id, projectId));
-  const [updated] = await db.select().from(projects).where(eq(projects.id, projectId));
+  const [updated] = await db.update(projects).set({ productionDeadline }).where(eq(projects.id, projectId)).returning();
   return updated;
 }
 
@@ -261,8 +258,7 @@ export async function updateProjectGenre(
 ): Promise<Project> {
   const db = await getDb();
   if (!db) throw new Error("Database not available");
-  await db.update(projects).set({ genre }).where(eq(projects.id, projectId));
-  const [updated] = await db.select().from(projects).where(eq(projects.id, projectId));
+  const [updated] = await db.update(projects).set({ genre }).where(eq(projects.id, projectId)).returning();
   return updated;
 }
 
@@ -275,8 +271,7 @@ export async function updateProjectMeta(
   const set: Partial<{ title: string; author: string | null }> = {};
   if (fields.title !== undefined) set.title = fields.title;
   if (fields.author !== undefined) set.author = fields.author;
-  await db.update(projects).set(set).where(eq(projects.id, projectId));
-  const [updated] = await db.select().from(projects).where(eq(projects.id, projectId));
+  const [updated] = await db.update(projects).set(set).where(eq(projects.id, projectId)).returning();
   return updated;
 }
 
@@ -289,8 +284,7 @@ export async function updateProjectBibleSpecs(
   const set: Partial<{ bibleEditionType: string | null; bibleTranslation: string | null }> = {};
   if (fields.bibleEditionType !== undefined) set.bibleEditionType = fields.bibleEditionType;
   if (fields.bibleTranslation !== undefined) set.bibleTranslation = fields.bibleTranslation;
-  await db.update(projects).set(set).where(eq(projects.id, projectId));
-  const [updated] = await db.select().from(projects).where(eq(projects.id, projectId));
+  const [updated] = await db.update(projects).set(set).where(eq(projects.id, projectId)).returning();
   return updated;
 }
 
@@ -315,14 +309,13 @@ export async function upsertPhaseDueDate(
     .limit(1);
 
   if (existing.length > 0) {
-    await db.update(phaseDueDates)
+    const [updated] = await db.update(phaseDueDates)
       .set({ dueDate })
-      .where(eq(phaseDueDates.id, existing[0].id));
-    const [updated] = await db.select().from(phaseDueDates).where(eq(phaseDueDates.id, existing[0].id));
+      .where(eq(phaseDueDates.id, existing[0].id))
+      .returning();
     return updated;
   } else {
-    const [result] = await db.insert(phaseDueDates).values({ projectId, phaseId, dueDate }).$returningId();
-    const [created] = await db.select().from(phaseDueDates).where(eq(phaseDueDates.id, result.id));
+    const [created] = await db.insert(phaseDueDates).values({ projectId, phaseId, dueDate }).returning();
     return created;
   }
 }
@@ -342,8 +335,7 @@ export async function createProductionJob(
 ): Promise<ProductionJob> {
   const db = await getDb();
   if (!db) throw new Error("Database not available");
-  const [result] = await db.insert(productionJobs).values(data).$returningId();
-  const [job] = await db.select().from(productionJobs).where(eq(productionJobs.id, result.id));
+  const [job] = await db.insert(productionJobs).values(data).returning();
   return job;
 }
 
@@ -366,8 +358,7 @@ export async function updateProductionJob(
 ): Promise<ProductionJob> {
   const db = await getDb();
   if (!db) throw new Error("Database not available");
-  await db.update(productionJobs).set(data).where(eq(productionJobs.id, jobId));
-  const [updated] = await db.select().from(productionJobs).where(eq(productionJobs.id, jobId));
+  const [updated] = await db.update(productionJobs).set(data).where(eq(productionJobs.id, jobId)).returning();
   return updated;
 }
 
@@ -378,11 +369,6 @@ export async function createContactSubmission(
 ): Promise<ContactSubmission> {
   const db = await getDb();
   if (!db) throw new Error("Database not available");
-  const [result] = await db.insert(contactSubmissions).values(data).$returningId();
-  const [submission] = await db
-    .select()
-    .from(contactSubmissions)
-    .where(eq(contactSubmissions.id, result.id))
-    .limit(1);
+  const [submission] = await db.insert(contactSubmissions).values(data).returning();
   return submission;
 }
