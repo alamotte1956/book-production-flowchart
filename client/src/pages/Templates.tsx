@@ -10,7 +10,7 @@ import {
   Columns, Languages, Gift, LayoutGrid, Cross, ClipboardList, Sun, Sparkles, Image,
   HandMetal, NotebookPen, Church, Mic, User, Globe, GraduationCap, Library, Music, Music2,
   ChevronRight, Check, Filter, Search, ArrowRight, Ruler, Layers, HelpCircle,
-  Crown, Dumbbell, BookText, BookHeart, ChevronDown, ChevronUp,
+  Crown, Dumbbell, BookText, BookHeart,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
@@ -18,35 +18,16 @@ import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Separator } from "@/components/ui/separator";
 import {
-  Collapsible,
-  CollapsibleContent,
-  CollapsibleTrigger,
-} from "@/components/ui/collapsible";
-import {
   EBP_TEMPLATES,
   EBP_TEMPLATE_CATEGORIES,
-  getEBPTemplate,
   type EBPTemplate,
   type EBPTemplateCategory,
 } from "@shared/ebpTemplates";
-import {
-  KPA_TEMPLATES,
-  KPA_TEMPLATE_CATEGORIES,
-  type KPATemplate,
-  type KPATemplateCategory,
-} from "@shared/kpaTemplates";
-
-type SourceFilter = "all" | "book" | "kpa";
-
 type UnifiedTemplate =
-  | { source: "book"; data: EBPTemplate }
-  | { source: "kpa"; data: KPATemplate };
+  | { source: "book"; data: EBPTemplate };
 
 const ALL_CATEGORIES = [
   ...EBP_TEMPLATE_CATEGORIES,
-  ...KPA_TEMPLATE_CATEGORIES.filter(
-    (c) => !EBP_TEMPLATE_CATEGORIES.includes(c as any)
-  ),
 ] as string[];
 
 const ICON_MAP: Record<string, React.ComponentType<{ size?: number; className?: string }>> = {
@@ -94,19 +75,6 @@ function getColors(category: string) {
   return CATEGORY_COLORS[category] ?? DEFAULT_COLOR;
 }
 
-function DesignCreditBadge({ credit }: { credit: "cover" | "cover+interior" | "full" }) {
-  const labels = { cover: "Cover Design", "cover+interior": "Cover + Interior", full: "Full Design" };
-  const colors = {
-    cover: "bg-[#2980b9]/10 text-[#2980b9] border-[#2980b9]/20",
-    "cover+interior": "bg-[#7c5cbf]/10 text-[#7c5cbf] border-[#7c5cbf]/20",
-    full: "bg-[#4a6741]/10 text-[#4a6741] border-[#4a6741]/20",
-  };
-  return (
-    <span className={`inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-medium border ${colors[credit]}`}>
-      {labels[credit]}
-    </span>
-  );
-}
 
 function BookTemplateCard({ template, onOpenWizard }: { template: EBPTemplate; onOpenWizard: (t: EBPTemplate) => void }) {
   const [, navigate] = useLocation();
@@ -174,84 +142,14 @@ function BookTemplateCard({ template, onOpenWizard }: { template: EBPTemplate; o
   );
 }
 
-function KPATemplateCard({ template, onOpenWizard }: { template: KPATemplate; onOpenWizard: (templateId: string) => void }) {
-  const [titlesOpen, setTitlesOpen] = useState(false);
-
-  return (
-    <Card className="flex flex-col border border-[#e8dfd0] bg-white hover:border-[#c9a96e]/50 transition-all hover:shadow-md overflow-hidden">
-      <div className="h-1 w-full" style={{ backgroundColor: template.accentColor }} />
-      <CardHeader className="pb-3 pt-4 px-5">
-        <div className="flex items-start justify-between gap-2">
-          <div className="w-10 h-10 rounded-lg flex items-center justify-center flex-shrink-0" style={{ backgroundColor: template.accentColor + "20" }}>
-            <TemplateIcon name={template.icon} size={18} color={template.accentColor} />
-          </div>
-          <div className="flex flex-col items-end gap-1">
-            {template.isBible && (
-              <Badge variant="secondary" className="text-[10px] px-1.5 py-0 bg-[#c9a96e]/15 text-[#8b6914] border-0">Bible</Badge>
-            )}
-            <Badge variant="outline" className="text-[10px] px-1.5 py-0 bg-[#7c3aed]/5 text-[#7c3aed] border-[#7c3aed]/30">KP&A</Badge>
-          </div>
-        </div>
-        <CardTitle className="font-serif text-sm mt-2 text-[#3a2a1a]">{template.label}</CardTitle>
-        <CardDescription className="text-xs leading-relaxed text-[#7a6e60]">{template.tagline}</CardDescription>
-      </CardHeader>
-      <CardContent className="px-5 pb-4 flex flex-col gap-3 flex-1">
-        <div className="flex flex-wrap gap-1.5 text-[11px] text-[#7a6e60]">
-          <span className="bg-[#faf6ef] px-2 py-0.5 rounded">{template.trimLabel}</span>
-          <span className="bg-[#faf6ef] px-2 py-0.5 rounded">{template.pageCountRange[0]}–{template.pageCountRange[1]} pp</span>
-          <span className="bg-[#faf6ef] px-2 py-0.5 rounded capitalize">{template.bindingTypeId.replace(/-/g, " ")}</span>
-        </div>
-        <ul className="space-y-1">
-          {template.features.slice(0, 4).map((f) => (
-            <li key={f} className="flex items-start gap-1.5 text-xs text-[#5c3d2e]">
-              <span className="w-1 h-1 rounded-full mt-1.5 flex-shrink-0" style={{ backgroundColor: template.accentColor }} />
-              {f}
-            </li>
-          ))}
-        </ul>
-        <Collapsible open={titlesOpen} onOpenChange={setTitlesOpen}>
-          <CollapsibleTrigger asChild>
-            <button className="flex items-center gap-1 text-xs text-[#8b7b6b] hover:text-[#5c3d2e] transition-colors mt-1">
-              {titlesOpen ? <ChevronUp className="w-3 h-3" /> : <ChevronDown className="w-3 h-3" />}
-              {template.kpaTitles.length} KP&A title{template.kpaTitles.length !== 1 ? "s" : ""}
-            </button>
-          </CollapsibleTrigger>
-          <CollapsibleContent>
-            <div className="mt-2 space-y-2 border-l-2 pl-3" style={{ borderColor: template.accentColor + "40" }}>
-              {template.kpaTitles.map((book) => (
-                <div key={book.title} className="text-xs">
-                  <div className="font-medium text-[#3a2a1a] leading-tight">{book.title}</div>
-                  <div className="text-[#7a6e60] mt-0.5">
-                    {book.author} · {book.publisher} · {book.year}
-                    {book.pages ? ` · ${book.pages} pp` : ""}
-                  </div>
-                  <div className="mt-0.5"><DesignCreditBadge credit={book.designCredit} /></div>
-                </div>
-              ))}
-            </div>
-          </CollapsibleContent>
-        </Collapsible>
-        <div className="mt-auto pt-2">
-          <Button size="sm" className="w-full text-xs h-8 text-white" style={{ backgroundColor: template.accentColor }} onClick={() => onOpenWizard(template.id)}>
-            <Sparkles className="w-3 h-3 mr-1" />
-            Use This Template
-          </Button>
-        </div>
-      </CardContent>
-    </Card>
-  );
-}
-
 function CategorySection({
   category,
   templates,
   onOpenBookWizard,
-  onOpenKPAWizard,
 }: {
   category: string;
   templates: UnifiedTemplate[];
   onOpenBookWizard: (t: EBPTemplate) => void;
-  onOpenKPAWizard: (templateId: string) => void;
 }) {
   const colors = getColors(category);
   return (
@@ -264,13 +162,9 @@ function CategorySection({
         </span>
       </div>
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-        {templates.map((ut) =>
-          ut.source === "book" ? (
-            <BookTemplateCard key={ut.data.id} template={ut.data} onOpenWizard={onOpenBookWizard} />
-          ) : (
-            <KPATemplateCard key={ut.data.id} template={ut.data} onOpenWizard={onOpenKPAWizard} />
-          )
-        )}
+        {templates.map((ut) => (
+          <BookTemplateCard key={ut.data.id} template={ut.data} onOpenWizard={onOpenBookWizard} />
+        ))}
       </div>
     </section>
   );
@@ -290,20 +184,15 @@ function TemplatesInner() {
   const [, navigate] = useLocation();
   const [search, setSearch] = useState("");
   const [activeCategory, setActiveCategory] = useState<string>("All");
-  const [sourceFilter, setSourceFilter] = useState<SourceFilter>("all");
   const [wizardTemplate, setWizardTemplate] = useState<EBPTemplate | null>(null);
 
   const allUnified: UnifiedTemplate[] = useMemo(() => [
     ...EBP_TEMPLATES.map((t) => ({ source: "book" as const, data: t })),
-    ...KPA_TEMPLATES.map((t) => ({ source: "kpa" as const, data: t })),
   ], []);
 
   const filtered = useMemo(() => {
     const q = search.toLowerCase();
     return allUnified.filter((ut) => {
-      if (sourceFilter === "book" && ut.source !== "book") return false;
-      if (sourceFilter === "kpa" && ut.source !== "kpa") return false;
-
       const cat = ut.data.category;
       if (activeCategory !== "All" && cat !== activeCategory) return false;
 
@@ -314,11 +203,10 @@ function TemplatesInner() {
         t.description.toLowerCase().includes(q) ||
         t.tagline.toLowerCase().includes(q) ||
         t.features.some((f) => f.toLowerCase().includes(q)) ||
-        (ut.source === "book" && (ut.data as EBPTemplate).exampleTitles?.some((e) => e.toLowerCase().includes(q))) ||
-        (ut.source === "kpa" && (ut.data as KPATemplate).kpaTitles?.some((b) => b.title.toLowerCase().includes(q) || b.author.toLowerCase().includes(q)))
+        (ut.data as EBPTemplate).exampleTitles?.some((e) => e.toLowerCase().includes(q))
       );
     });
-  }, [allUnified, search, activeCategory, sourceFilter]);
+  }, [allUnified, search, activeCategory]);
 
   const visibleCategories = useMemo(() => {
     const cats = new Set(filtered.map((ut) => ut.data.category));
@@ -332,28 +220,13 @@ function TemplatesInner() {
 
   const categoryCounts = useMemo(() => {
     const counts: Record<string, number> = {};
-    const sourceFiltered = allUnified.filter((ut) => {
-      if (sourceFilter === "book" && ut.source !== "book") return false;
-      if (sourceFilter === "kpa" && ut.source !== "kpa") return false;
-      return true;
-    });
-    for (const ut of sourceFiltered) {
+    for (const ut of allUnified) {
       counts[ut.data.category] = (counts[ut.data.category] || 0) + 1;
     }
     return counts;
-  }, [allUnified, sourceFilter]);
+  }, [allUnified]);
 
-  const totalCount = sourceFilter === "all" ? allUnified.length : sourceFilter === "book" ? EBP_TEMPLATES.length : KPA_TEMPLATES.length;
-  const totalKPATitles = KPA_TEMPLATES.reduce((sum, t) => sum + t.kpaTitles.length, 0);
-
-  const handleOpenKPAWizard = (templateId: string) => {
-    const kpa = KPA_TEMPLATES.find((t) => t.id === templateId);
-    if (!kpa) return;
-    const ebp = getEBPTemplate(
-      kpa.isBible ? "study-bible" : kpa.styleId.includes("devotional") ? "daily-devotional" : "christian-living"
-    );
-    if (ebp) setWizardTemplate(ebp);
-  };
+  const totalCount = allUnified.length;
 
   return (
     <div className="min-h-screen bg-[#faf6ef]">
@@ -395,22 +268,17 @@ function TemplatesInner() {
               <h1 className="font-serif text-3xl md:text-4xl text-[#f5d98a] mb-3">Book Templates</h1>
               <p className="text-[#c9a96e]/90 text-sm max-w-2xl leading-relaxed">
                 One-click presets for every book type — from Study Bibles and Devotional Bibles to Christian Living books,
-                children's titles, theological commentaries, and hymnals. Includes both Easy Book Publishers originals
-                and Koechel Peterson & Associates (KP&A) design templates. Select a template to pre-fill all formatting settings.
+                children's titles, theological commentaries, and hymnals. Select a template to pre-fill all formatting settings.
               </p>
             </div>
             <div className="flex gap-6 text-center flex-shrink-0">
               <div>
-                <div className="font-serif text-2xl font-bold text-[#f5d98a]">{EBP_TEMPLATES.length + KPA_TEMPLATES.length}</div>
+                <div className="font-serif text-2xl font-bold text-[#f5d98a]">{EBP_TEMPLATES.length}</div>
                 <div className="text-xs text-[#c9a96e]/75">Templates</div>
               </div>
               <div>
                 <div className="font-serif text-2xl font-bold text-[#f5d98a]">{ALL_CATEGORIES.length}</div>
                 <div className="text-xs text-[#c9a96e]/75">Categories</div>
-              </div>
-              <div>
-                <div className="font-serif text-2xl font-bold text-[#f5d98a]">{totalKPATitles}</div>
-                <div className="text-xs text-[#c9a96e]/75">KP&A Titles</div>
               </div>
             </div>
           </div>
@@ -425,25 +293,6 @@ function TemplatesInner() {
               <Input placeholder="Search templates…" value={search} onChange={(e) => setSearch(e.target.value)} className="pl-8 h-8 text-xs border-[#e8dfd0] bg-white" />
             </div>
 
-            <div className="flex items-center bg-[#1e1108]/5 rounded-full p-0.5 gap-0.5">
-              {([
-                { key: "all" as const, label: "All", count: EBP_TEMPLATES.length + KPA_TEMPLATES.length },
-                { key: "book" as const, label: "Book Templates", count: EBP_TEMPLATES.length },
-                { key: "kpa" as const, label: "KP&A", count: KPA_TEMPLATES.length },
-              ]).map((s) => (
-                <button
-                  key={s.key}
-                  onClick={() => { setSourceFilter(s.key); setActiveCategory("All"); }}
-                  className={`px-3 py-1 rounded-full text-xs font-medium transition-all ${
-                    sourceFilter === s.key
-                      ? "bg-[#1e1108] text-[#f5d98a] shadow-sm"
-                      : "text-[#5c3d2e]/70 hover:text-[#5c3d2e]"
-                  }`}
-                >
-                  {s.label} ({s.count})
-                </button>
-              ))}
-            </div>
           </div>
 
           <div className="flex flex-wrap gap-1.5">
@@ -484,13 +333,13 @@ function TemplatesInner() {
           <div className="text-center py-20">
             <BookOpen size={40} className="mx-auto text-[#d0c8bc] mb-4" />
             <p className="text-[#7a6e60] text-sm">No templates match your search.</p>
-            <button onClick={() => { setSearch(""); setActiveCategory("All"); setSourceFilter("all"); }} className="mt-3 text-xs text-[#c9a96e] hover:underline">
+            <button onClick={() => { setSearch(""); setActiveCategory("All"); }} className="mt-3 text-xs text-[#c9a96e] hover:underline">
               Clear filters
             </button>
           </div>
         ) : (
           groupedByCategory.map(({ category, templates }) => (
-            <CategorySection key={category} category={category} templates={templates} onOpenBookWizard={setWizardTemplate} onOpenKPAWizard={handleOpenKPAWizard} />
+            <CategorySection key={category} category={category} templates={templates} onOpenBookWizard={setWizardTemplate} />
           ))
         )}
 

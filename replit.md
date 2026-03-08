@@ -107,7 +107,7 @@ PostgreSQL via Replit's built-in database. Use `npx drizzle-kit push` to sync sc
 - **Expanded Format Support**: 26 manuscript formats supported (DOCX, DOC, ODT, RTF, TXT, MD, HTML, CSV, JSON, YAML, etc.) with format badges in upload UI
 - **WhatsNext in Project Tracker**: Collapsible sidebar with contextual next-step suggestions
 - **Recent Activity Feed**: Dashboard feed showing latest step completions, uploads, and production jobs
-- **Unified Templates Library**: Single `/templates` page combining Book Templates (EBP) and KP&A design templates with source filter (All/Book/KP&A), category filters, and search
+- **Templates Library**: Single `/templates` page with 29 EBP book templates, category filters, and search
 - **Template-to-AutoProduce Flow**: Book Templates "Use This Template" pre-fills Auto-Produce style/trim via URL params
 - **Spine Calculator**: Interactive spine width calculator with visual diagram, paper PPI, binding type, cover boards
 - **Dashboard Command Center**: Stats bar (projects, steps, files, jobs) with real-time aggregated data

@@ -40,7 +40,7 @@ const FEATURE_LABELS: Record<PlanFeature, string> = {
   ai_typesetting: "AI Typesetting (PDF + EPUB)",
   kdp_export: "Amazon KDP-Ready Export",
   timeline: "Production Timeline",
-  templates: "Book & KP&A Templates",
+  templates: "Book & Design Templates",
   unlimited_projects: "Unlimited Book Projects",
   priority_support: "Priority Email Support",
 };

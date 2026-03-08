@@ -186,7 +186,7 @@ const TOOLS = [
     path: "/templates",
     icon: LayoutGrid,
     label: "Book Templates",
-    desc: "One-click presets for every book type — Bibles, devotionals, children's books, theological works, and KP&A design templates.",
+    desc: "One-click presets for every book type — Bibles, devotionals, children's books, theological works, and more.",
     badge: "Templates",
     badgeColor: "bg-amber-100 text-amber-800",
     dark: false,

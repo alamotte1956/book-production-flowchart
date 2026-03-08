@@ -25,7 +25,7 @@ const tools = [
   { icon: Ruler, label: "Spine Calculator", desc: "Calculate exact spine width from page count, paper type, and binding.", path: "/spine-calculator", badge: "Print" },
   { icon: Layers, label: "Cover Designer", desc: "Full-wrap cover dimensions, bleed, safe zones, and spec sheet export.", path: "/cover-designer", badge: "Design" },
   { icon: BookMarked, label: "ISBN & Metadata", desc: "Manage ISBN, BISAC codes, and export ONIX 3.0 XML for distributors.", path: "/isbn-manager", badge: "Metadata" },
-  { icon: LayoutGrid, label: "40+ Templates", desc: "One-click presets for Bibles, devotionals, novels, children's books, and more.", path: "/templates", badge: "Templates" },
+  { icon: LayoutGrid, label: "29 Templates", desc: "One-click presets for Bibles, devotionals, novels, children's books, and more.", path: "/templates", badge: "Templates" },
   { icon: Search, label: "ISBN Book Lookup", desc: "Look up any book by ISBN and get instant template recommendations.", path: "/isbn-lookup", badge: "Lookup" },
   { icon: Library, label: "Resources Hub", desc: "43 curated publishing tools — Scrivener, IngramSpark, NetGalley, and more.", path: "/resources", badge: "Reference" },
 ];
@@ -46,7 +46,7 @@ const testimonials = [
 
 const stats = [
   { value: "30+", label: "Manuscript Formats" },
-  { value: "40+", label: "Book Templates" },
+  { value: "29", label: "Book Templates" },
   { value: "9", label: "Production Phases" },
   { value: "30", label: "Workflow Steps" },
 ];
@@ -255,7 +255,7 @@ export default function LandingPage() {
           {[
             { icon: Sparkles, title: "Dashboard", desc: "Access all tools, projects, and your publishing workflow.", path: "/dashboard", cta: "Open Dashboard" },
             { icon: BookOpen, title: "Publishing Wizard", desc: "New here? Take our guided quiz to get a personalized roadmap.", path: "/guided-journey", cta: "Start Wizard" },
-            { icon: LayoutGrid, title: "Browse Templates", desc: "Explore 40+ book templates for every genre and format.", path: "/templates", cta: "View Templates" },
+            { icon: LayoutGrid, title: "Browse Templates", desc: "Explore 29 book templates for every genre and format.", path: "/templates", cta: "View Templates" },
             { icon: FileText, title: "Pricing & Plans", desc: "Free Starter plan, Author Pro, and Publisher tiers.", path: "/pricing", cta: "See Plans" },
           ].map((item) => (
             <Card

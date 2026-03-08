@@ -48,7 +48,6 @@ function Router() {
       <Route path={"/guide"} component={UserGuide} />
       <Route path={"/templates"} component={Templates} />
       <Route path={"/ebp-templates"} component={Templates} />
-      <Route path={"/kpa-templates"} component={Templates} />
       <Route path={"/isbn-lookup"} component={ISBNLookup} />
       <Route path={"/guided-journey"} component={GuidedJourney} />
       <Route path={"/print-specs"} component={PrintSpecs} />
