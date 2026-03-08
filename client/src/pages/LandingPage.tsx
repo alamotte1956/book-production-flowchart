@@ -115,8 +115,7 @@ export default function LandingPage() {
       <section className="relative overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-br from-[#1a1008] via-[#2a1a10] to-[#1a1008]" />
         <div className="absolute inset-0 opacity-10" style={{ backgroundImage: `url(${HERO_URL})`, backgroundSize: "cover", backgroundPosition: "center" }} />
-        <div className="relative max-w-7xl mx-auto px-6 pt-6 md:pt-8 pb-24 md:pb-32 text-center">
-          <Badge className="bg-[#c9a96e]/15 text-[#f5d98a] border-[#c9a96e]/30 mb-6">All-in-One Self-Publishing Platform</Badge>
+        <div className="relative max-w-7xl mx-auto px-6 pt-2 md:pt-3 pb-24 md:pb-32 text-center">
           <h1 className="font-serif text-5xl md:text-7xl lg:text-8xl text-[#f5d98a] mb-4 leading-tight tracking-tight">
             Easy Book Publishers
           </h1>
