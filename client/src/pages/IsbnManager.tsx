@@ -12,7 +12,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
-import { ArrowLeft, BookMarked, Copy, Check, Download, Info, Plus, X } from "lucide-react";
+import { ArrowLeft, BookMarked, Copy, Check, Download, ExternalLink, Info, Plus, X } from "lucide-react";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { toast } from "sonner";
 
@@ -498,6 +498,13 @@ ${bisacElements}
                     </div>
                   </div>
                 </div>
+                <p className="text-xs text-[#8b7b6b] flex items-center gap-1 pt-1">
+                  Need ISBNs?{" "}
+                  <a href="https://www.myidentifiers.com/identify-protect-your-book/isbn/buy-isbn" target="_blank" rel="noopener noreferrer" className="text-[#c9a96e] hover:text-[#b8923e] underline inline-flex items-center gap-0.5">
+                    Purchase from Bowker <ExternalLink className="w-3 h-3" />
+                  </a>
+                  {" "}— $125 single / $295 for 10
+                </p>
               </CardContent>
             </Card>
 

@@ -530,7 +530,7 @@ function TimelineInner() {
               { href: "/spine-calculator", label: "Spine Calculator" },
               { href: "/cover-designer", label: "Cover Designer" },
               { href: "/isbn-manager", label: "ISBN & Metadata" },
-              { href: "/auto-produce", label: "Auto-Produce" },
+              { href: "/auto-produce/0", label: "Auto-Produce" },
               { href: "/resources", label: "Resources Hub" },
               { href: "/guide", label: "User Guide" },
             ].map(({ href, label }) => (

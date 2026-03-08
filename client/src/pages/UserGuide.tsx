@@ -651,7 +651,7 @@ export default function UserGuide() {
               { href: "/cover-designer", icon: <Layers size={16} />, label: "Cover Designer" },
               { href: "/isbn-manager", icon: <Barcode size={16} />, label: "ISBN & Metadata" },
               { href: "/timeline", icon: <Calendar size={16} />, label: "Production Timeline" },
-              { href: "/auto-produce", icon: <Zap size={16} />, label: "Auto-Produce" },
+              { href: "/auto-produce/0", icon: <Zap size={16} />, label: "Auto-Produce" },
             ].map(({ href, icon, label }) => (
               <Link key={href} href={href}
                 className="group flex items-center gap-2 bg-white rounded-lg border border-[#e8dfd0] px-3 py-2.5 hover:border-[#c9a96e]/60 hover:shadow-sm transition-all duration-200">

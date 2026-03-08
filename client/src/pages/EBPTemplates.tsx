@@ -361,7 +361,7 @@ export default function EBPTemplates() {
           <div className="flex flex-wrap gap-3">
             {[
               { label: "Bible Design Studio", path: "/bible-studio" },
-              { label: "Auto-Produce", path: "/" },
+              { label: "Auto-Produce", path: "/auto-produce/0" },
               { label: "ISBN Lookup", path: "/isbn-lookup" },
               { label: "Spine Calculator", path: "/spine-calculator" },
               { label: "Cover Designer", path: "/cover-designer" },

@@ -1,7 +1,7 @@
 import { Toaster } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import NotFound from "@/pages/NotFound";
-import { Route, Switch } from "wouter";
+import { Route, Switch, Redirect } from "wouter";
 import ErrorBoundary from "./components/ErrorBoundary";
 import { ThemeProvider } from "./contexts/ThemeContext";
 import Home from "./pages/Home";
@@ -28,7 +28,9 @@ function Router() {
       <Route path={"/project/:id"} component={ProjectTracker} />
       <Route path={"/resources"} component={Resources} />
       <Route path={"/timeline/:id"} component={Timeline} />
+      <Route path={"/timeline"}><Redirect to="/timeline/0" /></Route>
       <Route path={"/auto-produce/:id"} component={AutoProduce} />
+      <Route path={"/auto-produce"}><Redirect to="/auto-produce/0" /></Route>
       <Route path={"/bible-studio"} component={BibleStudio} />
       <Route path={"/spine-calculator"} component={SpineCalculator} />
       <Route path={"/cover-designer"} component={CoverDesigner} />
