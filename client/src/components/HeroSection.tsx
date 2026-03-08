@@ -45,7 +45,7 @@ export default function HeroSection() {
 
         {/* Title */}
         <motion.h1
-          className="font-serif text-4xl sm:text-5xl md:text-7xl font-bold text-[#faf6ef] leading-tight mb-4"
+          className="font-serif text-4xl sm:text-5xl md:text-7xl font-bold text-[#f3efe6] leading-tight mb-4"
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, delay: 0.4 }}

@@ -9,7 +9,7 @@ export default function PrivacyTerms() {
   const [, navigate] = useLocation();
 
   return (
-    <div className="min-h-screen bg-[#faf6ef]">
+    <div className="min-h-screen bg-[#f3efe6]">
       <nav className="sticky top-0 z-50 bg-[#1a1008]/90 backdrop-blur-sm border-b border-[#c9a96e]/15">
         <div className="max-w-6xl mx-auto px-6 py-3 flex items-center justify-between">
           <button onClick={() => navigate("/")} className="flex items-center gap-2.5">

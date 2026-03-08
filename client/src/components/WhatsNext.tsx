@@ -151,7 +151,7 @@ export default function WhatsNext({
   }
 
   return (
-    <div className={`rounded-2xl border border-[#c9a96e]/30 bg-gradient-to-br from-[#faf6ef] to-[#f5ede0] p-5 shadow-sm ${className}`}>
+    <div className={`rounded-2xl border border-[#c9a96e]/30 bg-gradient-to-br from-[#f3efe6] to-[#f5ede0] p-5 shadow-sm ${className}`}>
       {/* Header */}
       <div className="flex items-center gap-2 mb-4">
         <div className="w-7 h-7 rounded-lg bg-[#2c1810] flex items-center justify-center">

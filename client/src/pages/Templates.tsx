@@ -229,8 +229,8 @@ function TemplatesInner() {
   const totalCount = allUnified.length;
 
   return (
-    <div className="min-h-screen bg-[#faf6ef]">
-      <header className="bg-[#1e1108] text-[#f5efe0] border-b border-[#c9a96e]/10">
+    <div className="min-h-screen bg-[#f3efe6]">
+      <header className="bg-[#1e1108] text-[#ede7d8] border-b border-[#c9a96e]/10">
         <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
           <div className="flex items-center gap-3">
             <button onClick={() => navigate("/dashboard")} className="flex items-center gap-1.5 text-[#c9a96e]/80 hover:text-[#c9a96e] text-xs transition-colors">
@@ -238,7 +238,7 @@ function TemplatesInner() {
               Dashboard
             </button>
             <span className="text-[#c9a96e]/20">/</span>
-            <span className="text-[#f5efe0] text-sm font-medium">Templates</span>
+            <span className="text-[#ede7d8] text-sm font-medium">Templates</span>
           </div>
           <nav className="hidden md:flex items-center gap-1">
             {[
@@ -257,7 +257,7 @@ function TemplatesInner() {
         </div>
       </header>
 
-      <div className="bg-gradient-to-b from-[#1e1108] to-[#2a1a0a] text-[#f5efe0] px-6 py-10">
+      <div className="bg-gradient-to-b from-[#1e1108] to-[#2a1a0a] text-[#ede7d8] px-6 py-10">
         <div className="max-w-7xl mx-auto">
           <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
             <div>
@@ -285,7 +285,7 @@ function TemplatesInner() {
         </div>
       </div>
 
-      <div className="sticky top-0 z-20 bg-[#faf6ef]/95 backdrop-blur border-b border-[#e8dfd0] shadow-sm">
+      <div className="sticky top-0 z-20 bg-[#f3efe6]/95 backdrop-blur border-b border-[#e8dfd0] shadow-sm">
         <div className="max-w-7xl mx-auto px-6 py-3 flex flex-col gap-3">
           <div className="flex flex-col sm:flex-row gap-3 items-start sm:items-center">
             <div className="relative flex-1 max-w-xs">

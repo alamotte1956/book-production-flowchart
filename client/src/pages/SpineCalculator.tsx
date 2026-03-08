@@ -686,7 +686,7 @@ export default function SpineCalculator() {
                 </div>
               </CardHeader>
               <CardContent>
-                <pre className="text-[10px] font-mono text-[#5c3d2e] bg-[#faf6ef] rounded-lg p-4 overflow-x-auto whitespace-pre leading-relaxed border border-[#e8dfd0]">
+                <pre className="text-[10px] font-mono text-[#5c3d2e] bg-[#f3efe6] rounded-lg p-4 overflow-x-auto whitespace-pre leading-relaxed border border-[#e8dfd0]">
                   {specSheet}
                 </pre>
               </CardContent>

@@ -42,25 +42,25 @@
   --color-sidebar-ring: var(--sidebar-ring);
   --font-serif: 'Lora', Georgia, serif;
   --font-sans: 'Source Sans 3', system-ui, sans-serif;
-  --color-parchment: oklch(0.97 0.01 80);
+  --color-parchment: oklch(0.95 0.012 80);
   --color-walnut: oklch(0.38 0.06 50);
   --color-burgundy: oklch(0.38 0.12 15);
   --color-gold: oklch(0.72 0.1 75);
   --color-forest: oklch(0.38 0.06 160);
-  --color-cream: oklch(0.95 0.015 85);
+  --color-cream: oklch(0.93 0.018 85);
 }
 
 :root {
   --radius: 0.5rem;
-  --background: oklch(0.97 0.01 80);
+  --background: oklch(0.95 0.012 80);
   --foreground: oklch(0.25 0.04 50);
-  --card: oklch(0.95 0.015 85);
+  --card: oklch(0.93 0.018 85);
   --card-foreground: oklch(0.25 0.04 50);
-  --popover: oklch(0.97 0.01 80);
+  --popover: oklch(0.95 0.012 80);
   --popover-foreground: oklch(0.25 0.04 50);
   --primary: oklch(0.38 0.12 15);
-  --primary-foreground: oklch(0.97 0.01 80);
-  --secondary: oklch(0.92 0.02 80);
+  --primary-foreground: oklch(0.95 0.012 80);
+  --secondary: oklch(0.90 0.02 80);
   --secondary-foreground: oklch(0.38 0.06 50);
   --muted: oklch(0.93 0.015 80);
   --muted-foreground: oklch(0.45 0.04 50);

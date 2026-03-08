@@ -190,9 +190,9 @@ export default function EBPTemplates() {
   })).filter((g) => g.templates.length > 0);
 
   return (
-    <div className="min-h-screen bg-[#faf6ef]">
+    <div className="min-h-screen bg-[#f3efe6]">
       {/* Header */}
-      <header className="bg-[#1e1108] text-[#f5efe0] border-b border-[#c9a96e]/10">
+      <header className="bg-[#1e1108] text-[#ede7d8] border-b border-[#c9a96e]/10">
         <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
           <div className="flex items-center gap-3">
             <button
@@ -203,7 +203,7 @@ export default function EBPTemplates() {
               Dashboard
             </button>
             <span className="text-[#c9a96e]/20">/</span>
-            <span className="text-[#f5efe0] text-sm font-medium">Book Templates</span>
+            <span className="text-[#ede7d8] text-sm font-medium">Book Templates</span>
           </div>
           <nav className="hidden md:flex items-center gap-1">
             {[
@@ -227,7 +227,7 @@ export default function EBPTemplates() {
       </header>
 
       {/* Page hero */}
-      <div className="bg-gradient-to-b from-[#1e1108] to-[#2a1a0a] text-[#f5efe0] px-6 py-10">
+      <div className="bg-gradient-to-b from-[#1e1108] to-[#2a1a0a] text-[#ede7d8] px-6 py-10">
         <div className="max-w-7xl mx-auto">
           <div className="flex items-center gap-2 mb-3">
             <img
@@ -253,7 +253,7 @@ export default function EBPTemplates() {
         </div>
       </div>
 
-      <div className="sticky top-0 z-20 bg-[#faf6ef]/95 backdrop-blur border-b border-[#e8dfd0] shadow-sm">
+      <div className="sticky top-0 z-20 bg-[#f3efe6]/95 backdrop-blur border-b border-[#e8dfd0] shadow-sm">
         <div className="max-w-7xl mx-auto px-6 py-3 flex flex-col sm:flex-row gap-3 items-start sm:items-center">
           <div className="relative flex-1 max-w-xs">
             <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-[#8b7b6b]" />

@@ -68,7 +68,7 @@ const STATUS_STYLES: Record<string, { label: string; color: string; bg: string; 
   "overdue":     { label: "Overdue",     color: "#c0392b", bg: "#fdf0ef", icon: <AlertTriangle size={12} /> },
   "due-soon":    { label: "Due Soon",    color: "#d68910", bg: "#fef9ec", icon: <Clock size={12} /> },
   "on-track":    { label: "On Track",    color: "#2471a3", bg: "#eaf4fb", icon: <Calendar size={12} /> },
-  "unscheduled": { label: "Unscheduled", color: "#a89880", bg: "#faf6ef", icon: <Circle size={12} /> },
+  "unscheduled": { label: "Unscheduled", color: "#a89880", bg: "#f3efe6", icon: <Circle size={12} /> },
 };
 
 // ─── Component ───────────────────────────────────────────────────
@@ -150,7 +150,7 @@ function TimelineInner() {
 
   if (authLoading || isLoading) {
     return (
-      <div className="min-h-screen bg-[#faf6ef] flex items-center justify-center">
+      <div className="min-h-screen bg-[#f3efe6] flex items-center justify-center">
         <div className="text-center">
           <div className="w-8 h-8 border-2 border-[#c9a96e] border-t-transparent rounded-full animate-spin mx-auto mb-3" />
           <p className="text-sm text-[#7a6e60]">Loading timeline…</p>
@@ -161,7 +161,7 @@ function TimelineInner() {
 
   if (!data) {
     return (
-      <div className="min-h-screen bg-[#faf6ef] flex items-center justify-center">
+      <div className="min-h-screen bg-[#f3efe6] flex items-center justify-center">
         <p className="text-[#7a6e60]">Project not found.</p>
       </div>
     );
@@ -173,9 +173,9 @@ function TimelineInner() {
     : "unscheduled";
 
   return (
-    <div className="min-h-screen bg-[#faf6ef]">
+    <div className="min-h-screen bg-[#f3efe6]">
       {/* ── Header ── */}
-      <header className="sticky top-0 z-50 bg-[#2a1a0a] text-[#f5efe0] shadow-lg">
+      <header className="sticky top-0 z-50 bg-[#2a1a0a] text-[#ede7d8] shadow-lg">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 py-3 flex items-center gap-3">
           <Button
             variant="ghost" size="icon"
@@ -203,7 +203,7 @@ function TimelineInner() {
                 <input
                   type="date"
                   defaultValue={formatDateInput(project.productionDeadline)}
-                  className="text-xs bg-[#3a2a1a] border border-[#c9a96e]/30 rounded px-2 py-1 text-[#f5efe0]"
+                  className="text-xs bg-[#3a2a1a] border border-[#c9a96e]/30 rounded px-2 py-1 text-[#ede7d8]"
                   autoFocus
                 />
                 <Button type="submit" size="sm" className="h-7 text-xs bg-[#c9a96e] text-[#2a1a0a] hover:bg-[#a07840]">
@@ -295,7 +295,7 @@ function TimelineInner() {
                   {/* Phase header */}
                   <button
                     onClick={() => togglePhase(phase.id)}
-                    className="w-full flex items-center gap-3 px-4 py-3 hover:bg-[#faf6ef] transition-colors text-left"
+                    className="w-full flex items-center gap-3 px-4 py-3 hover:bg-[#f3efe6] transition-colors text-left"
                   >
                     <div
                       className="w-7 h-7 rounded-full flex items-center justify-center text-white text-xs font-bold shrink-0"
@@ -330,7 +330,7 @@ function TimelineInner() {
                     <div className="border-t border-[#e8dfd0]">
                       <table className="w-full text-xs">
                         <thead>
-                          <tr className="bg-[#faf6ef] text-[#8b7b6b] uppercase tracking-wide">
+                          <tr className="bg-[#f3efe6] text-[#8b7b6b] uppercase tracking-wide">
                             <th className="text-left px-4 py-2 font-semibold">Step</th>
                             <th className="text-left px-3 py-2 font-semibold hidden sm:table-cell">Est. Duration</th>
                             <th className="text-left px-3 py-2 font-semibold hidden md:table-cell">Start Date</th>
@@ -348,7 +348,7 @@ function TimelineInner() {
                             return (
                               <tr
                                 key={step.id}
-                                className={`border-t border-[#f0e8dc] hover:bg-[#faf6ef]/50 transition-colors ${idx % 2 === 0 ? "" : "bg-[#fdfaf5]"}`}
+                                className={`border-t border-[#f0e8dc] hover:bg-[#f3efe6]/50 transition-colors ${idx % 2 === 0 ? "" : "bg-[#fdfaf5]"}`}
                               >
                                 {/* Step name */}
                                 <td className="px-4 py-2.5">
@@ -450,7 +450,7 @@ function TimelineInner() {
                   {/* Phase header */}
                   <button
                     onClick={() => togglePhase(phase.id)}
-                    className="w-full flex items-center gap-3 px-4 py-3 hover:bg-[#faf6ef] transition-colors text-left"
+                    className="w-full flex items-center gap-3 px-4 py-3 hover:bg-[#f3efe6] transition-colors text-left"
                   >
                     <div
                       className="w-7 h-7 rounded-full flex items-center justify-center text-white text-xs font-bold shrink-0"
@@ -522,7 +522,7 @@ function TimelineInner() {
       </div>
 
       {/* Related Tools footer backlinks */}
-      <div className="border-t border-[#e8dfd0] bg-[#faf6ef] px-6 py-6">
+      <div className="border-t border-[#e8dfd0] bg-[#f3efe6] px-6 py-6">
         <div className="max-w-5xl mx-auto">
           <p className="text-xs text-[#7a6e60] mb-3 font-semibold uppercase tracking-wide">Other Self-Publishing Tools</p>
           <div className="flex flex-wrap gap-2">

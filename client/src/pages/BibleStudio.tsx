@@ -751,7 +751,7 @@ export default function BibleStudio() {
   const bibleStyles = getBibleStyles();
 
   return (
-    <div className="min-h-screen bg-[#faf6ef]">
+    <div className="min-h-screen bg-[#f3efe6]">
       {/* Header */}
       <header className="bg-[#2c1a00] text-white px-6 py-4 flex items-center gap-4 sticky top-0 z-30 shadow-lg border-b border-[#4a3828]">
         <button
@@ -947,7 +947,7 @@ export default function BibleStudio() {
                             className={`text-left p-3 rounded-lg border transition-all ${
                               config[key] === face.id
                                 ? "border-[#8b5e3c] bg-[#fdf5ec] shadow-sm"
-                                : "border-[#e8ddd0] bg-white hover:border-[#c9a96e] hover:bg-[#faf6ef]"
+                                : "border-[#e8ddd0] bg-white hover:border-[#c9a96e] hover:bg-[#f3efe6]"
                             }`}
                           >
                             <div className="flex items-start justify-between gap-2">
@@ -1133,7 +1133,7 @@ export default function BibleStudio() {
       </div>
 
       {/* Related Tools footer backlinks */}
-      <div className="border-t border-[#e8dfd0] bg-[#faf6ef] px-6 py-6">
+      <div className="border-t border-[#e8dfd0] bg-[#f3efe6] px-6 py-6">
         <div className="max-w-5xl mx-auto">
           <p className="text-xs text-[#7a6e60] mb-3 font-semibold uppercase tracking-wide">Other Self-Publishing Tools</p>
           <div className="flex flex-wrap gap-2">

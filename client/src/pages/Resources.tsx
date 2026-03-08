@@ -549,9 +549,9 @@ export default function Resources() {
   }, []);
 
   return (
-    <div className="min-h-screen bg-[#faf6ef]">
+    <div className="min-h-screen bg-[#f3efe6]">
       {/* Header */}
-      <header className="sticky top-0 z-50 bg-[#2a1a0a] text-[#f5efe0] shadow-lg">
+      <header className="sticky top-0 z-50 bg-[#2a1a0a] text-[#ede7d8] shadow-lg">
         <div className="max-w-6xl mx-auto px-6 py-4 flex items-center gap-4">
           <Button
             variant="ghost" size="icon"
@@ -601,7 +601,7 @@ export default function Resources() {
                 onClick={() => setActiveCategory(filter.id)}
                 className={`px-3 py-1.5 rounded-full text-sm font-medium transition-all duration-200 ${
                   activeCategory === filter.id
-                    ? "bg-[#2a1a0a] text-[#f5efe0] shadow-sm"
+                    ? "bg-[#2a1a0a] text-[#ede7d8] shadow-sm"
                     : "bg-white border border-[#e8dfd0] text-[#5c3d2e] hover:border-[#c9a96e]/50 hover:bg-[#c9a96e]/5"
                 }`}
               >

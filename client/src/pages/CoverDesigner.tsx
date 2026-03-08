@@ -431,7 +431,7 @@ export default function CoverDesigner() {
   };
 
   return (
-    <div className="min-h-screen bg-[#faf6ef]">
+    <div className="min-h-screen bg-[#f3efe6]">
       {/* Header */}
       <header className="bg-[#2a1a0a] text-white px-6 py-4 flex items-center gap-4 sticky top-0 z-30 shadow-lg">
         <button
@@ -938,7 +938,7 @@ export default function CoverDesigner() {
       </div>
 
       {/* Related Tools footer backlinks */}
-      <div className="border-t border-[#e8dfd0] bg-[#faf6ef] px-6 py-6">
+      <div className="border-t border-[#e8dfd0] bg-[#f3efe6] px-6 py-6">
         <div className="max-w-5xl mx-auto">
           <p className="text-xs text-[#7a6e60] mb-3 font-semibold uppercase tracking-wide">Other Self-Publishing Tools</p>
           <div className="flex flex-wrap gap-2">

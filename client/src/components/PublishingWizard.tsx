@@ -200,7 +200,7 @@ export default function PublishingWizard({ onComplete, onSkip, initialAnswers }:
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-[#faf6ef] via-[#f5ede0] to-[#faf6ef] flex items-center justify-center p-4">
+    <div className="min-h-screen bg-gradient-to-br from-[#f3efe6] via-[#f5ede0] to-[#f3efe6] flex items-center justify-center p-4">
       <div className="w-full max-w-2xl">
 
         {/* Header */}

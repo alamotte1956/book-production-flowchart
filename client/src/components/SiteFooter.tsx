@@ -54,7 +54,7 @@ export default function SiteFooter() {
                 className="w-8 h-8 opacity-80"
               />
               <div>
-                <h3 className="font-serif text-lg text-[#f5efe0] leading-tight group-hover:text-[#f5d98a] transition-colors">Easy Book Publishers</h3>
+                <h3 className="font-serif text-lg text-[#ede7d8] leading-tight group-hover:text-[#f5d98a] transition-colors">Easy Book Publishers</h3>
                 <p className="text-[10px] uppercase tracking-[0.15em] text-[#c9a96e]">Manuscript to Masterpiece</p>
               </div>
             </a>
@@ -75,13 +75,13 @@ export default function SiteFooter() {
 
           {footerSections.map((section) => (
             <div key={section.title}>
-              <h4 className="font-serif text-sm text-[#f5efe0] font-semibold mb-3 uppercase tracking-wider">{section.title}</h4>
+              <h4 className="font-serif text-sm text-[#ede7d8] font-semibold mb-3 uppercase tracking-wider">{section.title}</h4>
               <ul className="space-y-2">
                 {section.links.map((link) => (
                   <li key={link.href}>
                     <a
                       href={link.href}
-                      className="text-sm text-[#c4b8a0] hover:text-[#f5efe0] transition-colors flex items-center gap-2 group"
+                      className="text-sm text-[#c4b8a0] hover:text-[#ede7d8] transition-colors flex items-center gap-2 group"
                     >
                       <link.icon className="w-3.5 h-3.5 text-[#c9a96e]/75 group-hover:text-[#c9a96e] transition-colors" />
                       {link.label}

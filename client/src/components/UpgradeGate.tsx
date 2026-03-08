@@ -67,7 +67,7 @@ export function UpgradeGate({ feature, children, inline = false }: UpgradeGatePr
           <Button
             variant="outline"
             onClick={() => navigate("/dashboard")}
-            className="w-full border-[#c9a96e]/30 text-[#5c3d2e] hover:bg-[#faf6ef]"
+            className="w-full border-[#c9a96e]/30 text-[#5c3d2e] hover:bg-[#f3efe6]"
           >
             Back to Dashboard
           </Button>

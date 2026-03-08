@@ -80,7 +80,7 @@ export default function AffiliateProgram() {
   };
 
   return (
-    <div className="min-h-screen bg-[#faf6ef]">
+    <div className="min-h-screen bg-[#f3efe6]">
       <nav className="sticky top-0 z-50 bg-[#1a1008]/90 backdrop-blur-sm border-b border-[#c9a96e]/15">
         <div className="max-w-6xl mx-auto px-6 py-3 flex items-center justify-between">
           <button onClick={() => navigate("/")} className="flex items-center gap-2.5">
@@ -290,26 +290,26 @@ export default function AffiliateProgram() {
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       <div className="space-y-2">
                         <Label htmlFor="aff-name" className="text-[#3a2a14]">Full Name *</Label>
-                        <Input id="aff-name" value={name} onChange={(e) => setName(e.target.value)} placeholder="Your name" required className="bg-[#faf6ef] border-[#c9a96e]/30" />
+                        <Input id="aff-name" value={name} onChange={(e) => setName(e.target.value)} placeholder="Your name" required className="bg-[#f3efe6] border-[#c9a96e]/30" />
                       </div>
                       <div className="space-y-2">
                         <Label htmlFor="aff-email" className="text-[#3a2a14]">Email Address *</Label>
-                        <Input id="aff-email" type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="you@example.com" required className="bg-[#faf6ef] border-[#c9a96e]/30" />
+                        <Input id="aff-email" type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="you@example.com" required className="bg-[#f3efe6] border-[#c9a96e]/30" />
                       </div>
                     </div>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       <div className="space-y-2">
                         <Label htmlFor="aff-website" className="text-[#3a2a14]">Website / Blog URL</Label>
-                        <Input id="aff-website" value={website} onChange={(e) => setWebsite(e.target.value)} placeholder="https://yourblog.com" className="bg-[#faf6ef] border-[#c9a96e]/30" />
+                        <Input id="aff-website" value={website} onChange={(e) => setWebsite(e.target.value)} placeholder="https://yourblog.com" className="bg-[#f3efe6] border-[#c9a96e]/30" />
                       </div>
                       <div className="space-y-2">
                         <Label htmlFor="aff-paypal" className="text-[#3a2a14]">PayPal Email (for payouts)</Label>
-                        <Input id="aff-paypal" type="email" value={paypalEmail} onChange={(e) => setPaypalEmail(e.target.value)} placeholder="paypal@example.com" className="bg-[#faf6ef] border-[#c9a96e]/30" />
+                        <Input id="aff-paypal" type="email" value={paypalEmail} onChange={(e) => setPaypalEmail(e.target.value)} placeholder="paypal@example.com" className="bg-[#f3efe6] border-[#c9a96e]/30" />
                       </div>
                     </div>
                     <div className="space-y-2">
                       <Label htmlFor="aff-promo" className="text-[#3a2a14]">How do you plan to promote Easy Book Publishers?</Label>
-                      <Textarea id="aff-promo" value={promotionMethod} onChange={(e) => setPromotionMethod(e.target.value)} placeholder="Blog reviews, YouTube tutorials, social media posts, email newsletter..." rows={3} className="bg-[#faf6ef] border-[#c9a96e]/30 resize-none" />
+                      <Textarea id="aff-promo" value={promotionMethod} onChange={(e) => setPromotionMethod(e.target.value)} placeholder="Blog reviews, YouTube tutorials, social media posts, email newsletter..." rows={3} className="bg-[#f3efe6] border-[#c9a96e]/30 resize-none" />
                     </div>
                     <Button type="submit" disabled={applyMutation.isPending || !name.trim() || !email.trim()} className="w-full bg-gradient-to-r from-[#d4b480] to-[#c9a96e] hover:from-[#e0c490] hover:to-[#d4b480] text-[#1a1008] font-bold py-3 rounded-xl shadow-lg">
                       {applyMutation.isPending ? (

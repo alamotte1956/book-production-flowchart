@@ -73,7 +73,7 @@ function BookResultCard({
   return (
     <div className="space-y-6">
       {/* Book metadata card */}
-      <Card className="border-[#c9a96e]/30 bg-[#faf6ef]">
+      <Card className="border-[#c9a96e]/30 bg-[#f3efe6]">
         <CardContent className="p-6">
           <div className="flex gap-5">
             {/* Cover image */}
@@ -170,7 +170,7 @@ function BookResultCard({
 
       {/* EBP Template suggestion */}
       {result.suggestedTemplate && (
-        <Card className="border-[#7c3aed]/20 bg-gradient-to-br from-[#faf6ef] to-[#f3eeff]">
+        <Card className="border-[#7c3aed]/20 bg-gradient-to-br from-[#f3efe6] to-[#f3eeff]">
           <CardHeader className="pb-3">
             <div className="flex items-center justify-between">
               <CardTitle className="flex items-center gap-2 text-base text-[#3b2a1a]">
@@ -304,7 +304,7 @@ export default function ISBNLookup() {
   ];
 
   return (
-    <div className="min-h-screen bg-[#faf6ef]">
+    <div className="min-h-screen bg-[#f3efe6]">
       {/* Header */}
       <div className="bg-[#2c1a00] text-white px-6 py-8 border-b border-[#4a3828]">
         <div className="max-w-2xl mx-auto">
@@ -365,7 +365,7 @@ export default function ISBNLookup() {
 
         {/* Recent Lookups */}
         {recentLookups.length > 0 && (
-          <div className="mt-4 border border-[#c9a96e]/20 rounded-lg bg-white/60 px-4 py-3">
+          <div className="mt-4 border border-[#c9a96e]/20 rounded-lg bg-white/70 px-4 py-3">
             <div className="flex items-center justify-between mb-2">
               <span className="text-xs font-medium text-[#7a6e60] tracking-wide uppercase">Recent Lookups</span>
               <button
@@ -444,7 +444,7 @@ export default function ISBNLookup() {
       </div>
 
       {/* Related Tools footer backlinks */}
-      <div className="border-t border-[#e8dfd0] bg-[#faf6ef] px-6 py-6">
+      <div className="border-t border-[#e8dfd0] bg-[#f3efe6] px-6 py-6">
         <div className="max-w-2xl mx-auto">
           <p className="text-xs text-[#7a6e60] mb-3 font-semibold uppercase tracking-wide">Other Self-Publishing Tools</p>
           <div className="flex flex-wrap gap-2">

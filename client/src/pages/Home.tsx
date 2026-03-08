@@ -309,7 +309,7 @@ export default function Home() {
   // Loading
   if (authLoading || projectsQuery.isLoading) {
     return (
-      <div className="min-h-screen bg-[#faf6ef] flex items-center justify-center">
+      <div className="min-h-screen bg-[#f3efe6] flex items-center justify-center">
         <Loader2 className="animate-spin text-[#c9a96e]" size={32} />
       </div>
     );
@@ -342,7 +342,7 @@ export default function Home() {
 
   // ─── Authenticated Publisher Command Center ──────────────────────────────────
   return (
-    <div className="min-h-screen bg-gradient-to-b from-[#faf6ef] to-[#f0e8d8]">
+    <div className="min-h-screen bg-gradient-to-b from-[#f3efe6] to-[#f0e8d8]">
       {mobileMenuOpen && (
         <div
           className="fixed inset-0 z-40 bg-black/60 md:hidden"
@@ -381,7 +381,7 @@ export default function Home() {
               </span>
             </div>
             <div className="min-w-0">
-              <p className="text-sm text-[#f5efe0] font-semibold truncate">{user?.name || "Account"}</p>
+              <p className="text-sm text-[#ede7d8] font-semibold truncate">{user?.name || "Account"}</p>
               <p className="text-xs text-[#c9a96e]/65 truncate">{user?.email || ""}</p>
             </div>
           </div>
@@ -400,7 +400,7 @@ export default function Home() {
             <button
               key={item.path}
               onClick={() => { navigate(item.path); setMobileMenuOpen(false); }}
-              className="flex items-center gap-3 w-full text-left px-3 py-3 rounded-lg text-[#c9a96e]/90 hover:text-[#f5efe0] hover:bg-[#c9a96e]/10 transition-all group"
+              className="flex items-center gap-3 w-full text-left px-3 py-3 rounded-lg text-[#c9a96e]/90 hover:text-[#ede7d8] hover:bg-[#c9a96e]/10 transition-all group"
             >
               <item.icon size={16} className="shrink-0 text-[#c9a96e]/75 group-hover:text-[#c9a96e]" />
               <span className="text-sm font-serif flex-1">{item.label}</span>
@@ -422,7 +422,7 @@ export default function Home() {
         </div>
       </div>
 
-      <header className="bg-gradient-to-r from-[#1a1008] via-[#1e1108] to-[#1a1008] text-[#f5efe0] border-b border-[#c9a96e]/15 shadow-lg shadow-[#1a1008]/20">
+      <header className="bg-gradient-to-r from-[#1a1008] via-[#1e1108] to-[#1a1008] text-[#ede7d8] border-b border-[#c9a96e]/15 shadow-lg shadow-[#1a1008]/20">
         <div className="max-w-7xl mx-auto px-6 py-5 flex items-center justify-between">
           <a href="/" className="flex items-center gap-4 group">
             <div className="flex items-center gap-3">
@@ -468,7 +468,7 @@ export default function Home() {
                   </span>
                 </button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="w-56 bg-[#2a1a0a] border-[#c9a96e]/20 text-[#f5efe0] shadow-xl">
+              <DropdownMenuContent align="end" className="w-56 bg-[#2a1a0a] border-[#c9a96e]/20 text-[#ede7d8] shadow-xl">
                 <DropdownMenuLabel className="text-[#c9a96e]/90 text-xs font-serif">
                   <div className="flex items-center gap-2">
                     <User size={13} />
@@ -477,7 +477,7 @@ export default function Home() {
                 </DropdownMenuLabel>
                 <DropdownMenuSeparator className="bg-[#c9a96e]/15" />
                 <DropdownMenuItem
-                  className="text-xs font-serif text-[#f5efe0] hover:bg-[#c9a96e]/10 focus:bg-[#c9a96e]/10 cursor-pointer"
+                  className="text-xs font-serif text-[#ede7d8] hover:bg-[#c9a96e]/10 focus:bg-[#c9a96e]/10 cursor-pointer"
                   onClick={() => navigate("/guide")}
                 >
                   <HelpCircle size={13} className="mr-2 text-[#c9a96e]/80" />
@@ -518,7 +518,7 @@ export default function Home() {
                 <stat.icon size={16} className={stat.color} />
               </div>
               <div>
-                <p className="text-xl font-bold text-[#f5efe0] leading-none font-serif">{stat.value}</p>
+                <p className="text-xl font-bold text-[#ede7d8] leading-none font-serif">{stat.value}</p>
                 <p className="text-[10px] text-[#c9a96e]/75 uppercase tracking-wider font-serif">{stat.label}</p>
               </div>
               {idx < 3 && <div className="hidden sm:block h-8 w-px bg-[#c9a96e]/10 ml-3" />}
@@ -698,7 +698,7 @@ export default function Home() {
                     </span>
                   </div>
                   <h3 className={`font-serif text-sm font-semibold leading-tight mb-1.5 ${
-                    tool.dark ? "text-[#f5efe0] group-hover:text-[#f5d98a]" : tool.cta ? "text-[#2a1a0a]" : "text-[#3a2a1a] group-hover:text-[#5c3d2e]"
+                    tool.dark ? "text-[#ede7d8] group-hover:text-[#f5d98a]" : tool.cta ? "text-[#2a1a0a]" : "text-[#3a2a1a] group-hover:text-[#5c3d2e]"
                   } transition-colors`}>
                     {tool.label}
                   </h3>
@@ -740,7 +740,7 @@ export default function Home() {
               {activityQuery.data.map((item, idx) => (
                 <div
                   key={`${item.type}-${item.projectId}-${idx}`}
-                  className={`flex items-center gap-4 px-5 py-3.5 hover:bg-[#faf6ef]/60 transition-colors cursor-pointer ${
+                  className={`flex items-center gap-4 px-5 py-3.5 hover:bg-[#f3efe6]/60 transition-colors cursor-pointer ${
                     idx < activityQuery.data!.length - 1 ? "border-b border-[#f0e8d8]" : ""
                   }`}
                   onClick={() => navigate(`/project/${item.projectId}`)}
@@ -826,7 +826,7 @@ export default function Home() {
                 </Button>
               </DialogTrigger>
               )}
-              <DialogContent className="bg-gradient-to-b from-[#faf6ef] to-[#f5ede0] border-[#c9a96e]/20 shadow-2xl max-w-lg">
+              <DialogContent className="bg-gradient-to-b from-[#f3efe6] to-[#f5ede0] border-[#c9a96e]/20 shadow-2xl max-w-lg">
                 <DialogHeader>
                   <div className="flex items-center gap-2 mb-1">
                     <div className="h-px w-8 bg-[#c9a96e]/40" />
@@ -909,7 +909,7 @@ export default function Home() {
           </div>
 
           {projectList.length === 0 ? (
-            <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} className="text-center py-24 bg-gradient-to-br from-white/90 to-[#faf6ef]/90 backdrop-blur-sm rounded-2xl border border-[#c9a96e]/20 shadow-sm">
+            <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} className="text-center py-24 bg-gradient-to-br from-white/90 to-[#f3efe6]/90 backdrop-blur-sm rounded-2xl border border-[#c9a96e]/20 shadow-sm">
               <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-[#f5ede0] to-[#e8dfd0] flex items-center justify-center mx-auto mb-6 shadow-sm">
                 <BookOpen size={32} className="text-[#c9a96e]" />
               </div>
@@ -1043,7 +1043,7 @@ export default function Home() {
                         value={contactName}
                         onChange={(e) => setContactName(e.target.value)}
                         placeholder="Your name"
-                        className="border-[#e8dfd0] bg-[#faf6ef]/50 focus:border-[#c9a96e] focus:ring-[#c9a96e]/20"
+                        className="border-[#e8dfd0] bg-[#f3efe6]/50 focus:border-[#c9a96e] focus:ring-[#c9a96e]/20"
                       />
                     </div>
                     <div>
@@ -1053,7 +1053,7 @@ export default function Home() {
                         onChange={(e) => setContactEmail(e.target.value)}
                         placeholder="you@example.com"
                         type="email"
-                        className="border-[#e8dfd0] bg-[#faf6ef]/50 focus:border-[#c9a96e] focus:ring-[#c9a96e]/20"
+                        className="border-[#e8dfd0] bg-[#f3efe6]/50 focus:border-[#c9a96e] focus:ring-[#c9a96e]/20"
                       />
                     </div>
                   </div>
@@ -1063,7 +1063,7 @@ export default function Home() {
                       value={contactSubject}
                       onChange={(e) => setContactSubject(e.target.value)}
                       placeholder="How can we help?"
-                      className="border-[#e8dfd0] bg-[#faf6ef]/50 focus:border-[#c9a96e] focus:ring-[#c9a96e]/20"
+                      className="border-[#e8dfd0] bg-[#f3efe6]/50 focus:border-[#c9a96e] focus:ring-[#c9a96e]/20"
                     />
                   </div>
                   <div>
@@ -1073,13 +1073,13 @@ export default function Home() {
                       onChange={(e) => setContactMessage(e.target.value)}
                       placeholder="Tell us about your question or project..."
                       rows={4}
-                      className="border-[#e8dfd0] bg-[#faf6ef]/50 focus:border-[#c9a96e] focus:ring-[#c9a96e]/20 resize-none"
+                      className="border-[#e8dfd0] bg-[#f3efe6]/50 focus:border-[#c9a96e] focus:ring-[#c9a96e]/20 resize-none"
                     />
                   </div>
                   <Button
                     onClick={() => contactMutation.mutate({ name: contactName, email: contactEmail, subject: contactSubject, message: contactMessage })}
                     disabled={!contactName || !contactEmail || !contactMessage || contactMutation.isPending}
-                    className="bg-gradient-to-r from-[#5c3d2e] to-[#3a2a1a] hover:from-[#6b4a3a] hover:to-[#4a3828] text-[#f5efe0] w-full sm:w-auto sm:self-end"
+                    className="bg-gradient-to-r from-[#5c3d2e] to-[#3a2a1a] hover:from-[#6b4a3a] hover:to-[#4a3828] text-[#ede7d8] w-full sm:w-auto sm:self-end"
                   >
                     {contactMutation.isPending ? (
                       <><Loader2 className="w-4 h-4 animate-spin mr-2" /> Sending...</>

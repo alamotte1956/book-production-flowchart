@@ -181,7 +181,7 @@ function InputSlot({
             <input ref={fileInputRef} type="file" className="hidden" onChange={handleFileSelect} />
             <Button
               variant="outline" size="sm"
-              className="shrink-0 border-[#c9a96e]/40 text-[#7a6e60] hover:bg-[#f5efe0] hover:text-[#5c3d2e]"
+              className="shrink-0 border-[#c9a96e]/40 text-[#7a6e60] hover:bg-[#ede7d8] hover:text-[#5c3d2e]"
               onClick={() => fileInputRef.current?.click()}
               disabled={uploadMutation.isPending}
             >
@@ -1309,7 +1309,7 @@ function generateProjectSummaryHTML({
       <div style="font-size:12px;color:#a89880;margin-top:4px;">Exported on ${now}</div>
     </div>
 
-    <div style="background:linear-gradient(135deg,#faf6ef,#f5efe0);border:1px solid #e8dfd0;border-radius:12px;padding:24px;margin-bottom:32px;text-align:center;">
+    <div style="background:linear-gradient(135deg,#f3efe6,#ede7d8);border:1px solid #e8dfd0;border-radius:12px;padding:24px;margin-bottom:32px;text-align:center;">
       <div style="font-family:Georgia,serif;font-size:36px;font-weight:700;color:#c9a96e;">${overallPct}%</div>
       <div style="font-size:14px;color:#5c3d2e;margin-top:4px;">Overall Progress</div>
       <div style="background:#c9a96e20;border-radius:6px;height:10px;overflow:hidden;margin:12px auto 0;max-width:400px;">
@@ -1416,7 +1416,7 @@ function GettingStartedChecklist({
       exit={{ opacity: 0, y: -16 }}
       transition={{ duration: 0.4, ease: "easeOut" }}
     >
-      <Card className="border-[#c9a96e]/40 bg-gradient-to-br from-[#fdf9f3] to-[#f5efe0] shadow-md mb-8 overflow-hidden">
+      <Card className="border-[#c9a96e]/40 bg-gradient-to-br from-[#fdf9f3] to-[#ede7d8] shadow-md mb-8 overflow-hidden">
         <CardContent className="p-6">
           <div className="flex items-center gap-3 mb-4">
             <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#c9a96e] to-[#e0c48a] flex items-center justify-center shadow-sm">
@@ -1568,7 +1568,7 @@ export default function ProjectTracker() {
 
   if (authLoading || isLoading) {
     return (
-      <div className="min-h-screen bg-[#faf6ef] flex items-center justify-center">
+      <div className="min-h-screen bg-[#f3efe6] flex items-center justify-center">
         <Loader2 className="animate-spin text-[#c9a96e]" size={32} />
       </div>
     );
@@ -1577,7 +1577,7 @@ export default function ProjectTracker() {
 
   if (error || !data) {
     return (
-      <div className="min-h-screen bg-[#faf6ef] flex items-center justify-center">
+      <div className="min-h-screen bg-[#f3efe6] flex items-center justify-center">
         <div className="text-center">
           <p className="text-[#7a6e60]">Project not found</p>
           <Button variant="outline" className="mt-4" onClick={() => navigate("/dashboard")}>
@@ -1593,9 +1593,9 @@ export default function ProjectTracker() {
   let stepOffset = 0;
 
   return (
-    <div className="min-h-screen bg-[#faf6ef]">
+    <div className="min-h-screen bg-[#f3efe6]">
       {/* Header */}
-      <header className="sticky top-0 z-50 bg-gradient-to-r from-[#2a1a0a] via-[#3a2414] to-[#2a1a0a] text-[#f5efe0] shadow-lg print:static print:bg-white print:text-[#3a2a1a] print:shadow-none print:border-b print:border-[#e8dfd0]">
+      <header className="sticky top-0 z-50 bg-gradient-to-r from-[#2a1a0a] via-[#3a2414] to-[#2a1a0a] text-[#ede7d8] shadow-lg print:static print:bg-white print:text-[#3a2a1a] print:shadow-none print:border-b print:border-[#e8dfd0]">
         <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGNpcmNsZSBjeD0iMjAiIGN5PSIyMCIgcj0iMSIgZmlsbD0icmdiYSgyMDEsMTY5LDExMCwwLjA1KSIvPjwvc3ZnPg==')] opacity-50 print:hidden" />
         <div className="max-w-6xl mx-auto px-6 py-4 flex items-center gap-4 relative">
           <Button
@@ -1786,7 +1786,7 @@ export default function ProjectTracker() {
 
       {/* Genre filter info banner */}
       {hiddenStepIds.size > 0 && !printMode && (
-        <div className="bg-gradient-to-r from-[#f5ede4] to-[#faf6ef] border-b border-[#d4b896]/30 print:hidden">
+        <div className="bg-gradient-to-r from-[#f5ede4] to-[#f3efe6] border-b border-[#d4b896]/30 print:hidden">
           <div className="max-w-6xl mx-auto px-6 py-2.5 flex items-center gap-3">
             <Eye size={14} className="text-[#8b5e3c] shrink-0" />
             <p className="text-xs text-[#5c3d2e] flex-1">

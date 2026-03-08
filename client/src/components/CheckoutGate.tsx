@@ -83,7 +83,7 @@ export default function CheckoutGate({ open, onClose, onConfirmed, planName }: C
 
   return (
     <Dialog open={open} onOpenChange={(isOpen) => !isOpen && handleClose()}>
-      <DialogContent className="sm:max-w-md bg-[#faf6ef] border-[#c9a96e]/30">
+      <DialogContent className="sm:max-w-md bg-[#f3efe6] border-[#c9a96e]/30">
         <DialogHeader>
           <DialogTitle className="font-serif text-xl text-[#1a1008] flex items-center gap-2">
             <ShieldCheck className="w-5 h-5 text-[#c9a96e]" />

@@ -58,7 +58,7 @@ export default function AffiliateDashboard() {
 
   if (!affiliateCode) {
     return (
-      <div className="min-h-screen bg-[#faf6ef]">
+      <div className="min-h-screen bg-[#f3efe6]">
         <nav className="sticky top-0 z-50 bg-[#1a1008]/90 backdrop-blur-sm border-b border-[#c9a96e]/15">
           <div className="max-w-6xl mx-auto px-6 py-3 flex items-center justify-between">
             <button onClick={() => navigate("/")} className="flex items-center gap-2.5">
@@ -76,7 +76,7 @@ export default function AffiliateDashboard() {
           <Card className="bg-white border-[#c9a96e]/15">
             <CardContent className="p-6">
               <form onSubmit={handleLogin} className="space-y-4">
-                <Input value={inputCode} onChange={(e) => setInputCode(e.target.value)} placeholder="Your affiliate code" required className="bg-[#faf6ef] border-[#c9a96e]/30" />
+                <Input value={inputCode} onChange={(e) => setInputCode(e.target.value)} placeholder="Your affiliate code" required className="bg-[#f3efe6] border-[#c9a96e]/30" />
                 <Button type="submit" className="w-full bg-[#c9a96e] hover:bg-[#b8944f] text-[#1a1008] font-semibold">
                   Access Dashboard <ArrowRight className="w-4 h-4 ml-2" />
                 </Button>
@@ -94,7 +94,7 @@ export default function AffiliateDashboard() {
 
   if (dashboardQuery.isLoading) {
     return (
-      <div className="min-h-screen bg-[#faf6ef] flex items-center justify-center">
+      <div className="min-h-screen bg-[#f3efe6] flex items-center justify-center">
         <Loader2 className="w-8 h-8 animate-spin text-[#c9a96e]" />
       </div>
     );
@@ -102,7 +102,7 @@ export default function AffiliateDashboard() {
 
   if (dashboardQuery.error) {
     return (
-      <div className="min-h-screen bg-[#faf6ef]">
+      <div className="min-h-screen bg-[#f3efe6]">
         <nav className="sticky top-0 z-50 bg-[#1a1008]/90 backdrop-blur-sm border-b border-[#c9a96e]/15">
           <div className="max-w-6xl mx-auto px-6 py-3 flex items-center justify-between">
             <button onClick={() => navigate("/")} className="flex items-center gap-2.5">
@@ -131,7 +131,7 @@ export default function AffiliateDashboard() {
     : "0.0";
 
   return (
-    <div className="min-h-screen bg-[#faf6ef]">
+    <div className="min-h-screen bg-[#f3efe6]">
       <nav className="sticky top-0 z-50 bg-[#1a1008]/90 backdrop-blur-sm border-b border-[#c9a96e]/15">
         <div className="max-w-6xl mx-auto px-6 py-3 flex items-center justify-between">
           <button onClick={() => navigate("/")} className="flex items-center gap-2.5">
@@ -235,7 +235,7 @@ export default function AffiliateDashboard() {
               </CardHeader>
               <CardContent className="space-y-3">
                 <div className="flex items-center gap-2">
-                  <Input value={refLink} readOnly className="font-mono text-sm bg-[#faf6ef]" />
+                  <Input value={refLink} readOnly className="font-mono text-sm bg-[#f3efe6]" />
                   <Button onClick={() => handleCopy(refLink)} className="bg-[#c9a96e] hover:bg-[#b8944f] text-[#1a1008] shrink-0">
                     <Copy className="w-4 h-4 mr-1" /> Copy
                   </Button>
@@ -256,7 +256,7 @@ export default function AffiliateDashboard() {
                     { label: "Auto-Produce", url: `https://easybookpublishers.replit.app/auto-produce/0?ref=${affiliate.affiliateCode}` },
                     { label: "Bible Studio", url: `https://easybookpublishers.replit.app/bible-studio?ref=${affiliate.affiliateCode}` },
                   ].map((link) => (
-                    <div key={link.label} className="flex items-center justify-between bg-[#faf6ef] rounded-lg px-3 py-2">
+                    <div key={link.label} className="flex items-center justify-between bg-[#f3efe6] rounded-lg px-3 py-2">
                       <span className="text-sm text-[#3a2a14]">{link.label}</span>
                       <div className="flex gap-1">
                         <Button onClick={() => handleCopy(link.url)} variant="ghost" size="sm" className="h-7 px-2">
@@ -286,7 +286,7 @@ export default function AffiliateDashboard() {
               </CardHeader>
               <CardContent className="space-y-3">
                 {marketingQuery.data.socialCopy.map((copy, i) => (
-                  <div key={i} className="bg-[#faf6ef] rounded-lg p-3 flex items-start gap-2">
+                  <div key={i} className="bg-[#f3efe6] rounded-lg p-3 flex items-start gap-2">
                     <p className="text-sm text-[#3a2a14] flex-1">{copy}</p>
                     <Button onClick={() => handleCopy(copy)} variant="ghost" size="sm" className="shrink-0">
                       <Copy className="w-3.5 h-3.5" />
@@ -303,7 +303,7 @@ export default function AffiliateDashboard() {
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="bg-[#faf6ef] rounded-lg p-4 relative">
+                <div className="bg-[#f3efe6] rounded-lg p-4 relative">
                   <pre className="text-sm text-[#3a2a14] whitespace-pre-wrap font-sans">{marketingQuery.data.emailTemplate}</pre>
                   <Button onClick={() => handleCopy(marketingQuery.data!.emailTemplate)} variant="ghost" size="sm" className="absolute top-2 right-2">
                     <Copy className="w-3.5 h-3.5" />
@@ -320,7 +320,7 @@ export default function AffiliateDashboard() {
               </CardHeader>
               <CardContent className="space-y-2">
                 {marketingQuery.data.textLinks.map((link) => (
-                  <div key={link.label} className="flex items-center justify-between bg-[#faf6ef] rounded-lg px-3 py-2">
+                  <div key={link.label} className="flex items-center justify-between bg-[#f3efe6] rounded-lg px-3 py-2">
                     <div>
                       <span className="text-sm font-medium text-[#3a2a14]">{link.label}</span>
                       <span className="text-xs text-[#5c4a2a]/70 ml-2 font-mono">{link.url}</span>
@@ -338,7 +338,7 @@ export default function AffiliateDashboard() {
               <CardContent>
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
                   {marketingQuery.data.bannerSizes.map((banner) => (
-                    <div key={banner.size} className="bg-[#faf6ef] rounded-lg p-3 text-center">
+                    <div key={banner.size} className="bg-[#f3efe6] rounded-lg p-3 text-center">
                       <div className="text-sm font-mono text-[#1a1008]">{banner.size}</div>
                       <div className="text-xs text-[#5c4a2a]/70">{banner.label}</div>
                     </div>

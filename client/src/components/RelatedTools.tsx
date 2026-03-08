@@ -36,7 +36,7 @@ export default function RelatedTools({ currentPage, maxItems = 6 }: RelatedTools
           <a
             key={tool.key}
             href={tool.href}
-            className="flex items-start gap-3 p-3 rounded-lg border border-[#e8dfd0] bg-white/60 hover:bg-[#f5efe0] hover:border-[#c9a96e]/40 transition-all group"
+            className="flex items-start gap-3 p-3 rounded-lg border border-[#e8dfd0] bg-white/60 hover:bg-[#ede7d8] hover:border-[#c9a96e]/40 transition-all group"
           >
             <tool.icon className="w-5 h-5 mt-0.5 text-[#c9a96e] flex-shrink-0 group-hover:text-[#8b6914] transition-colors" />
             <div>

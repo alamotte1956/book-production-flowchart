@@ -209,7 +209,7 @@ export default function Pricing() {
   };
 
   return (
-    <div className="min-h-screen bg-[#faf6ef]">
+    <div className="min-h-screen bg-[#f3efe6]">
       <nav className="sticky top-0 z-50 bg-[#1a1008]/90 backdrop-blur-sm border-b border-[#c9a96e]/15">
         <div className="max-w-6xl mx-auto px-6 py-3 flex items-center justify-between">
           <button onClick={() => navigate("/")} className="flex items-center gap-2.5">
@@ -346,7 +346,7 @@ export default function Pricing() {
           </p>
           <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-2">
             {competitors.map((c) => (
-              <div key={c.name} className="border border-[#e8dfd0] rounded-xl p-5 bg-[#faf6ef]/50">
+              <div key={c.name} className="border border-[#e8dfd0] rounded-xl p-5 bg-[#f3efe6]/50">
                 <p className="font-serif font-bold text-[#1a1008] text-lg">{c.name}</p>
                 <p className="text-[#8b6914] font-semibold text-sm mt-1">{c.price}</p>
                 <p className="text-xs text-[#5c4a2a]/70 mt-2">{c.scope}</p>

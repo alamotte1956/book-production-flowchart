@@ -87,7 +87,7 @@ export class GlobalErrorBoundary extends Component<Props, State> {
     const { error, errorInfo, copied } = this.state;
 
     return (
-      <div className="min-h-screen bg-[#faf6ef] flex items-center justify-center p-6">
+      <div className="min-h-screen bg-[#f3efe6] flex items-center justify-center p-6">
         <div className="max-w-xl w-full rounded-xl border border-red-200 bg-white shadow-lg overflow-hidden">
           {/* Header */}
           <div className="flex items-center gap-3 px-6 py-4 bg-red-50 border-b border-red-200">
@@ -130,7 +130,7 @@ export class GlobalErrorBoundary extends Component<Props, State> {
               </button>
               <button
                 onClick={() => window.location.reload()}
-                className="inline-flex items-center gap-2 rounded-md border border-[#c9a96e] text-[#5c3d2e] hover:bg-[#faf6ef] text-sm px-4 py-2 transition-colors"
+                className="inline-flex items-center gap-2 rounded-md border border-[#c9a96e] text-[#5c3d2e] hover:bg-[#f3efe6] text-sm px-4 py-2 transition-colors"
               >
                 <RefreshCw className="w-4 h-4" />
                 Reload Page

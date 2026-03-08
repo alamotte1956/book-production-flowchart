@@ -73,7 +73,7 @@ export default function BookmarkSidebar() {
             {/* Collapse button */}
             <button
               onClick={() => setIsCollapsed(true)}
-              className="absolute -right-3 top-1/2 -translate-y-1/2 w-6 h-12 bg-white border-2 rounded-r-md flex items-center justify-center shadow-md hover:bg-[#faf6ef] transition-colors"
+              className="absolute -right-3 top-1/2 -translate-y-1/2 w-6 h-12 bg-white border-2 rounded-r-md flex items-center justify-center shadow-md hover:bg-[#f3efe6] transition-colors"
               style={{ borderColor: "#c9a96e", borderLeft: "none" }}
             >
               <ChevronLeft size={14} className="text-[#5c3d2e]" />
@@ -96,7 +96,7 @@ export default function BookmarkSidebar() {
                     key={phase.id}
                     onClick={() => scrollToPhase(phase.id)}
                     className={`w-full flex items-center gap-2.5 px-2.5 py-2 rounded-lg text-left transition-all duration-200 group ${
-                      isActive ? "bg-[#faf6ef]" : "hover:bg-[#faf6ef]/50"
+                      isActive ? "bg-[#f3efe6]" : "hover:bg-[#f3efe6]/50"
                     }`}
                   >
                     <span
@@ -136,7 +136,7 @@ export default function BookmarkSidebar() {
             exit={{ x: -40 }}
             transition={{ type: "spring", stiffness: 300, damping: 30 }}
             onClick={() => setIsCollapsed(false)}
-            className="bg-white/95 backdrop-blur-md border-2 rounded-r-xl shadow-lg p-2.5 hover:bg-[#faf6ef] transition-colors"
+            className="bg-white/95 backdrop-blur-md border-2 rounded-r-xl shadow-lg p-2.5 hover:bg-[#f3efe6] transition-colors"
             style={{ borderColor: "#c9a96e", borderLeft: "none" }}
           >
             <div className="flex flex-col items-center gap-1.5">

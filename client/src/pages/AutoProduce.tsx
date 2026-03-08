@@ -413,7 +413,7 @@ function JobCard({ jobId, projectId }: { jobId: number; projectId: number }) {
             ...(estimatedPages ? [{ label: "Est. Pages", value: `~${estimatedPages}`, icon: <BookOpen className="w-3 h-3" /> }] : []),
             ...(job.chapterCount ? [{ label: "Chapters", value: String(job.chapterCount), icon: <FileText className="w-3 h-3" /> }] : []),
           ].map((detail) => (
-            <div key={detail.label} className="flex items-center gap-1.5 bg-[#faf6ef] rounded-md px-2.5 py-1.5 border border-[#e8dfd0]/50">
+            <div key={detail.label} className="flex items-center gap-1.5 bg-[#f3efe6] rounded-md px-2.5 py-1.5 border border-[#e8dfd0]/50">
               <span className="text-[#b09880]">{detail.icon}</span>
               <div className="min-w-0">
                 <p className="text-[10px] text-[#a09080] uppercase tracking-wider font-medium leading-none">{detail.label}</p>
@@ -606,7 +606,7 @@ function JobCard({ jobId, projectId }: { jobId: number; projectId: number }) {
                     <Terminal className="w-3 h-3" />
                     Diagnostic Information
                   </p>
-                  <div className="font-mono text-xs text-red-800 space-y-1 bg-white/60 rounded border border-red-200 p-3">
+                  <div className="font-mono text-xs text-red-800 space-y-1 bg-white/70 rounded border border-red-200 p-3">
                     <div className="flex gap-2">
                       <span className="text-red-500 w-28 flex-shrink-0">Job ID</span>
                       <span>#{job.id}</span>
@@ -1094,7 +1094,7 @@ function AutoProduceInner() {
 
   if (authLoading) {
     return (
-      <div className="min-h-screen bg-[#faf6ef] flex items-center justify-center">
+      <div className="min-h-screen bg-[#f3efe6] flex items-center justify-center">
         <Loader2 className="w-8 h-8 animate-spin text-[#8b5e3c]" />
       </div>
     );
@@ -1107,7 +1107,7 @@ function AutoProduceInner() {
   const canSubmit = hasInput && trimSizeId && styleId && !isSubmitting && projectId > 0;
 
   return (
-    <div className="min-h-screen bg-[#faf6ef]">
+    <div className="min-h-screen bg-[#f3efe6]">
       {/* Header */}
       <header className="bg-[#2a1a0a] text-[#f5ede4] px-6 py-4 shadow-lg sticky top-0 z-30">
         <div className="max-w-5xl mx-auto flex items-center justify-between">
@@ -1539,7 +1539,7 @@ function AutoProduceInner() {
       />
 
       {/* Related Tools footer backlinks */}
-      <div className="border-t border-[#e8dfd0] bg-[#faf6ef] px-6 py-6">
+      <div className="border-t border-[#e8dfd0] bg-[#f3efe6] px-6 py-6">
         <div className="max-w-5xl mx-auto">
           <p className="text-xs text-[#7a6e60] mb-3 font-semibold uppercase tracking-wide">Other Self-Publishing Tools</p>
           <div className="flex flex-wrap gap-2">

@@ -56,7 +56,7 @@ export default function LandingPage() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   return (
-    <div className="min-h-screen bg-[#faf6ef]">
+    <div className="min-h-screen bg-[#f3efe6]">
       <nav className="sticky top-0 z-50 bg-[#1a1008]/95 backdrop-blur-sm border-b border-[#c9a96e]/15">
         <div className="max-w-7xl mx-auto px-6 py-3 flex items-center justify-between">
           <a href="/" className="flex items-center gap-2.5">
@@ -119,7 +119,7 @@ export default function LandingPage() {
           <h1 className="font-serif text-5xl md:text-7xl lg:text-8xl text-[#f5d98a] mb-4 leading-tight tracking-tight">
             Easy Book Publishers
           </h1>
-          <p className="font-serif text-2xl md:text-4xl lg:text-5xl text-[#f5efe0] mb-6 leading-tight">
+          <p className="font-serif text-2xl md:text-4xl lg:text-5xl text-[#ede7d8] mb-6 leading-tight">
             From Manuscript to <span className="text-[#f5d98a]">Masterpiece</span>
           </p>
           <p className="text-lg md:text-xl text-[#d4c8b4] max-w-2xl mx-auto mb-10">
@@ -169,7 +169,7 @@ export default function LandingPage() {
         <div className="max-w-7xl mx-auto px-6">
           <div className="text-center mb-14">
             <Badge className="bg-[#c9a96e]/15 text-[#f5d98a] border-[#c9a96e]/30 mb-3">Professional Suite</Badge>
-            <h2 className="font-serif text-3xl md:text-4xl text-[#f5efe0] mb-3">Publisher Tools Hub</h2>
+            <h2 className="font-serif text-3xl md:text-4xl text-[#ede7d8] mb-3">Publisher Tools Hub</h2>
             <p className="text-[#d4c8b4]/80 max-w-xl mx-auto">Everything you need to create, design, and publish your book — all in one platform.</p>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5">
@@ -186,7 +186,7 @@ export default function LandingPage() {
                     </div>
                     <Badge variant="outline" className="text-[10px] border-[#c9a96e]/20 text-[#c9a96e]/90">{tool.badge}</Badge>
                   </div>
-                  <h3 className="font-serif text-[#f5efe0] font-semibold mb-1 group-hover:text-[#f5d98a] transition-colors">{tool.label}</h3>
+                  <h3 className="font-serif text-[#ede7d8] font-semibold mb-1 group-hover:text-[#f5d98a] transition-colors">{tool.label}</h3>
                   <p className="text-xs text-[#d4c8b4]/70 leading-relaxed">{tool.desc}</p>
                   <div className="mt-3 text-[#c9a96e] text-xs flex items-center gap-1 group-hover:gap-2 transition-all">
                     Open <ChevronRight className="w-3 h-3" />
@@ -222,7 +222,7 @@ export default function LandingPage() {
         </div>
       </section>
 
-      <section className="bg-gradient-to-b from-[#faf6ef] to-[#f0e8d8] py-20">
+      <section className="bg-gradient-to-b from-[#f3efe6] to-[#f0e8d8] py-20">
         <div className="max-w-5xl mx-auto px-6">
           <div className="text-center mb-14">
             <Badge className="bg-[#c9a96e]/10 text-[#8b6914] border-[#c9a96e]/30 mb-3">What People Say</Badge>

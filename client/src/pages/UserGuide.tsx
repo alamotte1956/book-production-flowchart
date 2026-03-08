@@ -25,7 +25,7 @@ function SectionCard({ section, isOpen, onToggle }: { section: Section; isOpen: 
     <div className="border border-[#e8ddd0] rounded-xl overflow-hidden bg-white shadow-sm guide-section-card">
       <button
         onClick={onToggle}
-        className="w-full flex items-center justify-between px-6 py-5 text-left hover:bg-[#faf6ef] transition-colors"
+        className="w-full flex items-center justify-between px-6 py-5 text-left hover:bg-[#f3efe6] transition-colors"
       >
         <div className="flex items-center gap-3">
           <div className="w-9 h-9 rounded-lg bg-[#c9a96e]/15 flex items-center justify-center flex-shrink-0">
@@ -49,7 +49,7 @@ function InfoTable({ rows }: { rows: [string, string][] }) {
     <table className="w-full text-sm border-collapse mt-3 mb-4">
       <tbody>
         {rows.map(([label, value], i) => (
-          <tr key={i} className={i % 2 === 0 ? "bg-[#faf6ef]" : "bg-white"}>
+          <tr key={i} className={i % 2 === 0 ? "bg-[#f3efe6]" : "bg-white"}>
             <td className="px-4 py-2 font-semibold text-[#5c3d2e] w-1/3 border border-[#e8ddd0]">{label}</td>
             <td className="px-4 py-2 text-[#3a2a1a] border border-[#e8ddd0]">{value}</td>
           </tr>
@@ -522,9 +522,9 @@ export default function UserGuide() {
   }, []);
 
   return (
-    <div className="min-h-screen bg-[#faf6ef]">
+    <div className="min-h-screen bg-[#f3efe6]">
       {/* Header */}
-      <header className="bg-[#1e1108] text-[#f5efe0] border-b border-[#c9a96e]/10 sticky top-0 z-10 guide-print-hide">
+      <header className="bg-[#1e1108] text-[#ede7d8] border-b border-[#c9a96e]/10 sticky top-0 z-10 guide-print-hide">
         <div className="max-w-4xl mx-auto px-6 py-4 flex items-center justify-between">
           <div className="flex items-center gap-3">
             <button
@@ -537,7 +537,7 @@ export default function UserGuide() {
             <span className="text-[#c9a96e]/20">|</span>
             <div className="flex items-center gap-2">
               <img src={EBP_LOGO} alt="Easy Book Publishers" className="w-6 h-6 rounded object-cover" />
-              <span className="font-serif text-base text-[#f5efe0]">User Guide</span>
+              <span className="font-serif text-base text-[#ede7d8]">User Guide</span>
             </div>
           </div>
           <div className="flex items-center gap-2">
@@ -553,7 +553,7 @@ export default function UserGuide() {
       </header>
 
       {/* Hero */}
-      <div className="bg-[#2a1a0a] text-[#f5efe0] py-14 px-6 guide-hero-print">
+      <div className="bg-[#2a1a0a] text-[#ede7d8] py-14 px-6 guide-hero-print">
         <div className="max-w-4xl mx-auto text-center">
           <div className="flex items-center justify-center gap-3 mb-5">
             <div className="h-px w-12 bg-[#c9a96e]/40" />
@@ -580,11 +580,11 @@ export default function UserGuide() {
             Everything you need to create, design, and publish your book — from first idea to finished, print-ready volume using our online publishing platform.
           </p>
           <div className="mt-6 flex items-center justify-center gap-6 text-[#c9a96e]/90 text-sm">
-            <span><strong className="text-[#f5efe0]">13</strong> Chapters</span>
+            <span><strong className="text-[#ede7d8]">13</strong> Chapters</span>
             <span className="text-[#c9a96e]/30">|</span>
-            <span><strong className="text-[#f5efe0]">9</strong> Production Phases</span>
+            <span><strong className="text-[#ede7d8]">9</strong> Production Phases</span>
             <span className="text-[#c9a96e]/30">|</span>
-            <span><strong className="text-[#f5efe0]">8</strong> Professional Tools</span>
+            <span><strong className="text-[#ede7d8]">8</strong> Professional Tools</span>
           </div>
         </div>
       </div>
@@ -593,10 +593,10 @@ export default function UserGuide() {
       <div className="max-w-4xl mx-auto px-6 py-5 flex items-center justify-between guide-print-hide">
         <p className="text-sm text-[#7a6e60]">Click any chapter to expand it. All chapters can be open simultaneously.</p>
         <div className="flex gap-2">
-          <Button variant="outline" size="sm" onClick={expandAll} className="text-xs border-[#c9a96e]/30 text-[#5c3d2e] hover:bg-[#faf6ef]">
+          <Button variant="outline" size="sm" onClick={expandAll} className="text-xs border-[#c9a96e]/30 text-[#5c3d2e] hover:bg-[#f3efe6]">
             Expand All
           </Button>
-          <Button variant="outline" size="sm" onClick={collapseAll} className="text-xs border-[#c9a96e]/30 text-[#5c3d2e] hover:bg-[#faf6ef]">
+          <Button variant="outline" size="sm" onClick={collapseAll} className="text-xs border-[#c9a96e]/30 text-[#5c3d2e] hover:bg-[#f3efe6]">
             Collapse All
           </Button>
         </div>
@@ -605,7 +605,7 @@ export default function UserGuide() {
       {/* Table of Contents */}
       <div className="max-w-4xl mx-auto px-6 pb-4 guide-print-hide">
         <div className="border border-[#e8ddd0] rounded-xl overflow-hidden bg-white shadow-sm">
-          <div className="px-6 py-4 flex items-center gap-3 border-b border-[#e8ddd0] bg-[#faf6ef]/50">
+          <div className="px-6 py-4 flex items-center gap-3 border-b border-[#e8ddd0] bg-[#f3efe6]/50">
             <div className="w-9 h-9 rounded-lg bg-[#c9a96e]/15 flex items-center justify-center flex-shrink-0">
               <List size={18} className="text-[#c9a96e]" />
             </div>
@@ -618,7 +618,7 @@ export default function UserGuide() {
                 <button
                   key={section.id}
                   onClick={() => scrollToSection(section.id)}
-                  className="flex items-center gap-2.5 px-3 py-2 rounded-lg text-left hover:bg-[#faf6ef] transition-colors group"
+                  className="flex items-center gap-2.5 px-3 py-2 rounded-lg text-left hover:bg-[#f3efe6] transition-colors group"
                 >
                   <span className="w-6 h-6 rounded-full bg-[#c9a96e]/10 flex items-center justify-center text-xs font-semibold text-[#c9a96e] flex-shrink-0">{index + 1}</span>
                   <Icon size={14} className="text-[#7a6e60] group-hover:text-[#c9a96e] transition-colors flex-shrink-0" />
@@ -643,7 +643,7 @@ export default function UserGuide() {
         ))}
 
         {/* Related Tools — internal backlinks */}
-        <div className="mt-8 p-6 bg-[#faf6ef] rounded-xl border border-[#e8dfd0] guide-print-hide">
+        <div className="mt-8 p-6 bg-[#f3efe6] rounded-xl border border-[#e8dfd0] guide-print-hide">
           <h2 className="font-serif text-xl text-[#3a2a1a] text-center mb-1">Self-Publishing Tools</h2>
           <p className="text-xs text-[#7a6e60] text-center mb-5">Jump directly to any tool in the platform.</p>
           <div className="grid grid-cols-2 md:grid-cols-3 gap-3">

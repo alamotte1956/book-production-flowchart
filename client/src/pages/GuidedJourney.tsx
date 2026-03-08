@@ -369,7 +369,7 @@ export default function GuidedJourney() {
 
   if (authLoading || existingAnswers.isLoading) {
     return (
-      <div className="min-h-screen bg-[#faf6ef] flex items-center justify-center">
+      <div className="min-h-screen bg-[#f3efe6] flex items-center justify-center">
         <div className="animate-spin w-8 h-8 border-2 border-[#c9a96e] border-t-transparent rounded-full" />
       </div>
     );

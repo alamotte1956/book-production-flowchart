@@ -403,7 +403,7 @@ export default function EBPProductionWizard({
               className={`border-2 border-dashed rounded-xl p-8 text-center cursor-pointer transition-colors ${
                 selectedFile
                   ? "border-emerald-400 bg-emerald-50"
-                  : "border-[#c9a96e]/40 bg-[#faf6ef] hover:border-[#c9a96e] hover:bg-[#f5efe5]"
+                  : "border-[#c9a96e]/40 bg-[#f3efe6] hover:border-[#c9a96e] hover:bg-[#f5efe5]"
               }`}
               onClick={() => fileInputRef.current?.click()}
             >
@@ -591,7 +591,7 @@ export default function EBPProductionWizard({
 
   return (
     <Dialog open onOpenChange={open => { if (!open) onClose(); }}>
-      <DialogContent className="max-w-lg max-h-[90vh] overflow-y-auto bg-[#faf6ef] border-[#c9a96e]/30">
+      <DialogContent className="max-w-lg max-h-[90vh] overflow-y-auto bg-[#f3efe6] border-[#c9a96e]/30">
         <DialogHeader>
           <div className="flex items-center justify-between">
             <DialogTitle className="font-serif text-[#3b2a1a] flex items-center gap-2">
