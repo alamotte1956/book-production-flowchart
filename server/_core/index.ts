@@ -68,7 +68,31 @@ async function initStripe() {
   }
 }
 
+async function cleanupLegacyData() {
+  if (!process.env.DATABASE_URL) return;
+  try {
+    const { Pool } = await import("pg");
+    const pool = new Pool({ connectionString: process.env.DATABASE_URL });
+    const check = await pool.query(
+      "SELECT COUNT(*) as cnt FROM wizard_sessions WHERE answers::text LIKE '%Eye Care%'"
+    );
+    if (parseInt(check.rows[0].cnt) > 0) {
+      await pool.query("DELETE FROM wizard_sessions");
+      await pool.query("DELETE FROM step_statuses");
+      await pool.query("DELETE FROM phase_due_dates");
+      await pool.query("DELETE FROM production_jobs");
+      await pool.query("DELETE FROM uploaded_files");
+      await pool.query("DELETE FROM projects");
+      console.log("[Cleanup] Legacy demo data cleared");
+    }
+    await pool.end();
+  } catch (err) {
+    console.warn("[Cleanup] Error:", err);
+  }
+}
+
 async function startServer() {
+  await cleanupLegacyData();
   const app = express();
   const server = createServer(app);
 

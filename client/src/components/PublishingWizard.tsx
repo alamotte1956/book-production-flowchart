@@ -183,6 +183,9 @@ export default function PublishingWizard({ onComplete, initialAnswers }: Props) 
             />
             <span className="font-serif text-lg text-[#5c3d2e]">Easy Book Publishers</span>
           </div>
+          <h1 className="font-serif text-3xl md:text-4xl text-[#2c1a00] leading-tight">
+            Let's Publish Your Book
+          </h1>
           <p className="text-[#7a6e60] mt-2 text-sm">
             Answer {totalSteps} quick questions and we'll build your personalized publishing roadmap.
           </p>
