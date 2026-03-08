@@ -1,10 +1,10 @@
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Mail, CheckCircle2, Loader2, ShieldCheck } from "lucide-react";
+import { Mail, CheckCircle2, Loader2, ShieldCheck, RefreshCw } from "lucide-react";
 import { trpc } from "@/lib/trpc";
 import { toast } from "sonner";
 
@@ -23,8 +23,22 @@ export default function CheckoutGate({ open, onClose, onConfirmed, planName }: C
   const [confirmToken, setConfirmToken] = useState("");
   const [confirmUrl, setConfirmUrl] = useState<string | null>(null);
 
+  const [showResend, setShowResend] = useState(false);
+  const resendTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
   const registerMutation = trpc.account.register.useMutation();
   const confirmMutation = trpc.account.confirmEmail.useMutation();
+  const resendMutation = trpc.account.resendConfirmation.useMutation();
+
+  useEffect(() => {
+    if (step === "confirm") {
+      setShowResend(false);
+      resendTimerRef.current = setTimeout(() => setShowResend(true), 120000);
+    }
+    return () => {
+      if (resendTimerRef.current) clearTimeout(resendTimerRef.current);
+    };
+  }, [step]);
 
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -71,6 +85,26 @@ export default function CheckoutGate({ open, onClose, onConfirmed, planName }: C
     }
   };
 
+  const handleResend = async () => {
+    if (!email.trim()) return;
+    try {
+      const result = await resendMutation.mutateAsync({ email: email.trim() });
+      if (result.status === "already_confirmed" && result.checkoutToken) {
+        setStep("done");
+        toast.success("Email already verified! Proceeding to checkout...");
+        setTimeout(() => onConfirmed(result.checkoutToken), 800);
+      } else {
+        setConfirmUrl((result as any).confirmUrl ?? null);
+        setShowResend(false);
+        if (resendTimerRef.current) clearTimeout(resendTimerRef.current);
+        resendTimerRef.current = setTimeout(() => setShowResend(true), 120000);
+        toast.success("Confirmation email resent. Please check your inbox.");
+      }
+    } catch (err: any) {
+      toast.error(err.message || "Failed to resend. Please try again.");
+    }
+  };
+
   const handleClose = () => {
     setStep("register");
     setName("");
@@ -78,6 +112,8 @@ export default function CheckoutGate({ open, onClose, onConfirmed, planName }: C
     setAgreedTerms(false);
     setConfirmToken("");
     setConfirmUrl(null);
+    setShowResend(false);
+    if (resendTimerRef.current) clearTimeout(resendTimerRef.current);
     onClose();
   };
 
@@ -191,6 +227,21 @@ export default function CheckoutGate({ open, onClose, onConfirmed, planName }: C
                 <><CheckCircle2 className="w-4 h-4 mr-2" /> Confirm Email</>
               )}
             </Button>
+            {showResend && (
+              <Button
+                type="button"
+                variant="outline"
+                onClick={handleResend}
+                disabled={resendMutation.isPending}
+                className="w-full border-[#c9a96e]/40 text-[#5c4a2a] hover:bg-[#c9a96e]/10"
+              >
+                {resendMutation.isPending ? (
+                  <><Loader2 className="w-4 h-4 animate-spin mr-2" /> Resending...</>
+                ) : (
+                  <><RefreshCw className="w-4 h-4 mr-2" /> Resend Confirmation Email</>
+                )}
+              </Button>
+            )}
           </form>
         )}
 

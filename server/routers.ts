@@ -1102,6 +1102,32 @@ export const appRouter = router({
         return { success: true, checkoutToken, email: user.email };
       }),
 
+    resendConfirmation: publicProcedure
+      .input(z.object({ email: z.string().email() }))
+      .mutation(async ({ input }) => {
+        const existing = await getUserByEmail(input.email);
+        if (!existing) {
+          throw new TRPCError({ code: "NOT_FOUND", message: "No account found with that email" });
+        }
+        if (existing.emailConfirmed) {
+          return { status: "already_confirmed" as const, checkoutToken: existing.checkoutToken ?? "" };
+        }
+
+        const token = nanoid(48);
+        await createEmailUser({
+          name: existing.name ?? "",
+          email: input.email,
+          confirmToken: token,
+        });
+
+        const isDev = process.env.NODE_ENV === "development";
+        if (isDev) {
+          console.log(`[Email Confirmation][DEV][RESEND] User ${input.email} → /confirm-email?token=${token}`);
+        }
+
+        return { status: "resent" as const, ...(isDev ? { confirmUrl: `/confirm-email?token=${token}` } : {}) };
+      }),
+
     checkEmail: publicProcedure
       .input(z.object({ email: z.string().email() }))
       .query(async ({ input }) => {

@@ -68,22 +68,28 @@ async function initStripe() {
   }
 }
 
-async function cleanupLegacyData() {
+async function cleanupLegacyDemoData() {
   if (!process.env.DATABASE_URL) return;
   try {
     const { Pool } = await import("pg");
     const pool = new Pool({ connectionString: process.env.DATABASE_URL });
-    const check = await pool.query(
-      "SELECT COUNT(*) as cnt FROM wizard_sessions WHERE answers::text LIKE '%Eye Care%'"
+    const { rows } = await pool.query(
+      "SELECT id FROM wizard_sessions WHERE answers::text LIKE '%Eye Care%'"
     );
-    if (parseInt(check.rows[0].cnt) > 0) {
-      await pool.query("DELETE FROM wizard_sessions");
-      await pool.query("DELETE FROM step_statuses");
-      await pool.query("DELETE FROM phase_due_dates");
-      await pool.query("DELETE FROM production_jobs");
-      await pool.query("DELETE FROM uploaded_files");
-      await pool.query("DELETE FROM projects");
-      console.log("[Cleanup] Legacy demo data cleared");
+    for (const row of rows) {
+      await pool.query("DELETE FROM wizard_sessions WHERE id = $1", [row.id]);
+      console.log(`[Cleanup] Removed legacy wizard session id=${row.id}`);
+    }
+    const { rows: legacyProjects } = await pool.query(
+      "SELECT id FROM projects WHERE title LIKE '%Eye Care%'"
+    );
+    for (const row of legacyProjects) {
+      await pool.query("DELETE FROM step_statuses WHERE project_id = $1", [row.id]);
+      await pool.query("DELETE FROM phase_due_dates WHERE project_id = $1", [row.id]);
+      await pool.query("DELETE FROM production_jobs WHERE project_id = $1", [row.id]);
+      await pool.query("DELETE FROM uploaded_files WHERE project_id = $1", [row.id]);
+      await pool.query("DELETE FROM projects WHERE id = $1", [row.id]);
+      console.log(`[Cleanup] Removed legacy project id=${row.id}`);
     }
     await pool.end();
   } catch (err) {
@@ -92,7 +98,7 @@ async function cleanupLegacyData() {
 }
 
 async function startServer() {
-  await cleanupLegacyData();
+  await cleanupLegacyDemoData();
   const app = express();
   const server = createServer(app);
 
