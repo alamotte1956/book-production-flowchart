@@ -34,6 +34,7 @@ import { phases } from "@/data/flowchartData";
 import WhatsNext from "@/components/WhatsNext";
 import { getNextPrompts } from "@shared/prompts";
 import type { WizardAnswers } from "@/components/PublishingWizard";
+import SiteFooter from "@/components/SiteFooter";
 
 function getWizardFormatLabel(format: string) {
   switch (format) {
@@ -1159,6 +1160,8 @@ export default function Home() {
           </div>
         </section>
       </main>
+
+      <SiteFooter />
     </div>
   );
 }

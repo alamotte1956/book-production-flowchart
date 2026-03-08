@@ -9,6 +9,8 @@ import { ArrowLeft, ExternalLink, TrendingUp, BookOpen, Users, DollarSign, Star,
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
+import RelatedTools from "@/components/RelatedTools";
+import SiteFooter from "@/components/SiteFooter";
 
 // ─── Types ──────────────────────────────────────────────────────
 
@@ -805,7 +807,10 @@ export default function Resources() {
             Resources are curated based on industry adoption, community trust, and practical value. Inclusion does not constitute endorsement.
           </p>
         </div>
+
+        <RelatedTools currentPage="resources" />
       </div>
+      <SiteFooter />
     </div>
   );
 }

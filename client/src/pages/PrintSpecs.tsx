@@ -12,6 +12,7 @@ import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip
 import { toast } from "sonner";
 import { exportSpecSheetAsPdf } from "@/lib/exportPdf";
 import DashboardLayout from "@/components/DashboardLayout";
+import RelatedTools from "@/components/RelatedTools";
 
 const TRIM_SIZES = [
   { id: "4.25x6.875", name: "4.25\" × 6.875\" — Mass Market Paperback", w: 4.25, h: 6.875 },
@@ -656,6 +657,8 @@ export default function PrintSpecs() {
           </div>
         </div>
       </div>
+
+      <RelatedTools currentPage="print-specs" />
     </DashboardLayout>
   );
 }

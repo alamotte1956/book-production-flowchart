@@ -9,6 +9,8 @@ import { useState, useMemo } from "react";
 import { Link, useLocation } from "wouter";
 import { ArrowLeft, BookOpen, Printer, FileDown, ChevronRight, Info, Check, Sparkles, Wand2, Copy, RefreshCw, ChevronDown } from "lucide-react";
 import WhatsNext from "@/components/WhatsNext";
+import RelatedTools from "@/components/RelatedTools";
+import SiteFooter from "@/components/SiteFooter";
 import type { NextPrompt } from "@shared/prompts";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -1152,6 +1154,11 @@ export default function BibleStudio() {
           </div>
         </div>
       </div>
+
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <RelatedTools currentPage="bible-studio" />
+      </div>
+      <SiteFooter />
     </div>
   );
 }

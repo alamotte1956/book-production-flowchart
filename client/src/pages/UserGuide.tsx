@@ -7,6 +7,8 @@ import { Link, useLocation } from "wouter";
 import { BookOpen, ChevronRight, ChevronDown, ArrowLeft, BookMarked, Layers, Ruler, Zap, BarChart3, Library, FileText, HelpCircle, Download, Barcode, Calendar, List } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import RelatedTools from "@/components/RelatedTools";
+import SiteFooter from "@/components/SiteFooter";
 
 const EBP_LOGO = "https://d2xsxph8kpxj0f.cloudfront.net/310519663211654017/kGjPju6hKCvCsjZhgUHyqj/CDPlargelogo_25428631.PNG";
 
@@ -676,7 +678,10 @@ export default function UserGuide() {
             <Badge className="bg-[#c9a96e]/20 text-[#c9a96e] border-[#c9a96e]/30 text-xs">8 Pro Tools</Badge>
           </div>
         </div>
+
+        <RelatedTools currentPage="guide" />
       </div>
+      <SiteFooter />
     </div>
   );
 }

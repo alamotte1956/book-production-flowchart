@@ -17,6 +17,7 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 import DashboardLayout from "@/components/DashboardLayout";
+import RelatedTools from "@/components/RelatedTools";
 import WhatsNext from "@/components/WhatsNext";
 import type { NextPrompt } from "@shared/prompts";
 
@@ -712,6 +713,8 @@ export default function SpineCalculator() {
       </div>
 
       </div>
+
+      <RelatedTools currentPage="spine-calculator" />
     </DashboardLayout>
   );
 }

@@ -119,6 +119,8 @@ PostgreSQL via Replit's built-in database. Use `npx drizzle-kit push` to sync sc
 - **Getting Started Checklist**: New projects show 6-step onboarding checklist, auto-hides after 3 completed steps
 - **Resources Search & Filter**: Search bar with text highlighting, category filter pills (Writing, Editorial, Design, etc.)
 - **Contact Form**: Public contact form on landing page (backend wired to contact_submissions table)
+- **SEO Footer**: Global `SiteFooter` component with links to all 14 public pages, export format badges, and copyright. Added to every page (via DashboardLayout for sidebar pages, directly for standalone pages)
+- **Related Tools Cross-Linking**: `RelatedTools` component shows 6 contextual tool links on every tool page for internal SEO link equity
 
 ## Database Tables
 

@@ -8,6 +8,7 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/comp
 import { trpc } from "@/lib/trpc";
 import { useAuth } from "@/_core/hooks/useAuth";
 import { toast } from "sonner";
+import SiteFooter from "@/components/SiteFooter";
 
 type BillingCycle = "monthly" | "annual" | "lifetime";
 
@@ -430,6 +431,8 @@ export default function Pricing() {
           </Button>
         </div>
       </div>
+
+      <SiteFooter />
     </div>
   );
 }

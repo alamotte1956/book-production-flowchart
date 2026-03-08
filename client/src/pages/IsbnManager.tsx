@@ -13,6 +13,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { ArrowLeft, BookMarked, Copy, Check, Download, ExternalLink, Info, Plus, X } from "lucide-react";
+import RelatedTools from "@/components/RelatedTools";
+import SiteFooter from "@/components/SiteFooter";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { toast } from "sonner";
 
@@ -736,6 +738,11 @@ ${bisacElements}
           </div>
         </div>
       </div>
+
+      <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+        <RelatedTools currentPage="isbn-manager" />
+      </div>
+      <SiteFooter />
     </div>
   );
 }

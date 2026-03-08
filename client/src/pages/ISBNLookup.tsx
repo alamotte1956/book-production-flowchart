@@ -6,6 +6,8 @@
  */
 
 import { useState, useCallback, useEffect } from "react";
+import RelatedTools from "@/components/RelatedTools";
+import SiteFooter from "@/components/SiteFooter";
 import { trpc } from "@/lib/trpc";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -612,6 +614,11 @@ export default function ISBNLookup() {
           onClose={() => setWizardOpen(false)}
         />
       )}
+
+      <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+        <RelatedTools currentPage="isbn-lookup" />
+      </div>
+      <SiteFooter />
     </div>
   );
 }

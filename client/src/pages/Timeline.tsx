@@ -20,6 +20,7 @@ import {
   ArrowLeft, Calendar, Clock, AlertTriangle, CheckCircle2,
   SkipForward, Circle, LayoutList, BarChart2, Target, ChevronDown, ChevronRight
 } from "lucide-react";
+import SiteFooter from "@/components/SiteFooter";
 
 // ─── Types ────────────────────────────────────────────────────────
 
@@ -542,6 +543,7 @@ function TimelineInner() {
           </div>
         </div>
       </div>
+      <SiteFooter />
     </div>
   );
 }

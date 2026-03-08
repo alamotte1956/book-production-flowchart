@@ -27,6 +27,7 @@ import { DashboardLayoutSkeleton } from './DashboardLayoutSkeleton';
 import { useTheme } from "@/contexts/ThemeContext";
 import { Button } from "./ui/button";
 import { trpc } from "@/lib/trpc";
+import SiteFooter from "./SiteFooter";
 
 const menuItems: { icon: any; label: string; path: string; gatedFeature: PlanFeature | null }[] = [
   { icon: LayoutDashboard, label: "Dashboard", path: "/", gatedFeature: null },
@@ -390,6 +391,7 @@ function DashboardLayoutContent({
           </div>
         )}
         <main className="flex-1 p-4 bg-parchment/50">{children}</main>
+        <SiteFooter />
       </SidebarInset>
     </>
   );

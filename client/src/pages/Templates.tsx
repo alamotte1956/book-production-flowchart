@@ -3,6 +3,8 @@ import { useLocation } from "wouter";
 import { usePlan } from "@/hooks/usePlan";
 import { UpgradeGate } from "@/components/UpgradeGate";
 import EBPProductionWizard from "@/components/EBPProductionWizard";
+import RelatedTools from "@/components/RelatedTools";
+import SiteFooter from "@/components/SiteFooter";
 import {
   ArrowLeft, BookOpen, Heart, BookMarked, PenLine, ZoomIn, Package, Star, Users,
   Columns, Languages, Gift, LayoutGrid, Cross, ClipboardList, Sun, Sparkles, Image,
@@ -535,6 +537,11 @@ function TemplatesInner() {
       {wizardTemplate && (
         <EBPProductionWizard template={wizardTemplate} onClose={() => setWizardTemplate(null)} />
       )}
+
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <RelatedTools currentPage="templates" />
+      </div>
+      <SiteFooter />
     </div>
   );
 }

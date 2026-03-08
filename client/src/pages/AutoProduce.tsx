@@ -31,6 +31,7 @@ import WhatsNext from "@/components/WhatsNext";
 import type { NextPrompt } from "@shared/prompts";
 import { isKdpCompatible } from "@shared/bibleSpecs";
 import JSZip from "jszip";
+import SiteFooter from "@/components/SiteFooter";
 
 const MAX_FILE_SIZE_MB = 50;
 const ACCEPTED_TYPES = [
@@ -1559,6 +1560,7 @@ function AutoProduceInner() {
           </div>
         </div>
       </div>
+      <SiteFooter />
     </div>
   );
 }
