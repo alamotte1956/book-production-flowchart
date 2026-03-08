@@ -132,7 +132,7 @@ export default function LandingPage() {
               Start Publishing Free <ArrowRight className="w-5 h-5 ml-2" />
             </Button>
             <Button onClick={() => navigate("/guided-journey")} variant="outline" size="lg" className="border-[#c9a96e]/30 text-[#f5d98a] hover:bg-[#c9a96e]/10 px-8 py-6 rounded-xl">
-              Take the Publishing Wizard
+              Use the Publishing Wizard
             </Button>
           </div>
           <div className="flex flex-wrap justify-center gap-8 md:gap-12">

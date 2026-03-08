@@ -554,7 +554,7 @@ export default function Home() {
                   onClick={() => navigate("/guided-journey")}
                 >
                   <Sparkles size={16} />
-                  Take the Wizard
+                  Use the Wizard
                   <ArrowRight size={16} />
                 </Button>
               </div>
