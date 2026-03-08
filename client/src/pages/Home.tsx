@@ -309,6 +309,7 @@ export default function Home() {
   });
 
   const activityQuery = trpc.activity.recent.useQuery(undefined, { enabled: isAuthenticated });
+  const statsQuery = trpc.dashboard.stats.useQuery(undefined, { enabled: isAuthenticated });
   const wizardAnswersQuery = trpc.wizard.getAnswers.useQuery(undefined, { enabled: isAuthenticated });
   const hasWizardSession = !!wizardAnswersQuery.data?.answers && !!(wizardAnswersQuery.data.answers as Record<string, unknown>).bookType;
 
@@ -911,10 +912,10 @@ export default function Home() {
       <div className="bg-gradient-to-r from-[#2a1a0a] via-[#33200e] to-[#2a1a0a] border-b border-[#c9a96e]/10">
         <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between gap-6 overflow-x-auto">
           {[
-            { label: "Active Projects", value: projectList.length, icon: FileText, color: "text-[#f5d98a]" },
-            { label: "Production Phases", value: phases.length, icon: BarChart3, color: "text-[#c9a96e]" },
-            { label: "Steps per Project", value: totalSteps, icon: CheckCircle2, color: "text-[#d4b896]" },
-            { label: "Tracked Inputs", value: totalInputs, icon: TrendingUp, color: "text-[#c9a96e]/80" },
+            { label: "Total Projects", value: statsQuery.data?.totalProjects ?? projectList.length, icon: FileText, color: "text-[#f5d98a]" },
+            { label: "Steps Completed", value: statsQuery.data?.stepsCompleted ?? 0, icon: CheckCircle2, color: "text-[#c9a96e]" },
+            { label: "Files Produced", value: statsQuery.data?.filesProduced ?? 0, icon: Upload, color: "text-[#d4b896]" },
+            { label: "Production Jobs", value: statsQuery.data?.productionJobsRun ?? 0, icon: Zap, color: "text-[#c9a96e]/80" },
           ].map((stat, idx) => (
             <div key={stat.label} className="flex items-center gap-3 shrink-0">
               <div className="w-9 h-9 rounded-lg bg-[#c9a96e]/10 flex items-center justify-center">

@@ -4,7 +4,6 @@
  * and generate complete binding specifications for any Bible edition.
  */
 import { useState, useMemo } from "react";
-import { Link, useLocation } from "wouter";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
@@ -13,11 +12,10 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Separator } from "@/components/ui/separator";
 import { Badge } from "@/components/ui/badge";
 import {
-  ArrowLeft, Ruler, BookOpen, Printer, Download, Copy, Check,
-  Info, AlertTriangle, ChevronRight,
+  Ruler, Copy, Check, AlertTriangle,
 } from "lucide-react";
-import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { toast } from "sonner";
+import DashboardLayout from "@/components/DashboardLayout";
 import WhatsNext from "@/components/WhatsNext";
 import type { NextPrompt } from "@shared/prompts";
 
@@ -128,7 +126,6 @@ function calcSpine(
 
 // ─── Component ────────────────────────────────────────────────────────────────
 export default function SpineCalculator() {
-  const [, navigate] = useLocation();
 
   // Inputs
   const [pageCount, setPageCount] = useState<string>("1200");
@@ -247,40 +244,32 @@ export default function SpineCalculator() {
   }
 
   return (
-    <div className="min-h-screen bg-[#faf6ef]">
-      {/* Header */}
-      <header className="bg-[#2a1a0a] text-white px-6 py-4 flex items-center gap-4 sticky top-0 z-30 shadow-lg">
-        <button
-          onClick={() => navigate("/")}
-          className="text-[#c9a96e] hover:text-white transition-colors p-1 rounded"
-        >
-          <ArrowLeft className="w-5 h-5" />
-        </button>
-        <div className="flex items-center gap-3">
-          <div className="w-9 h-9 rounded-lg bg-[#c9a96e]/20 flex items-center justify-center">
-            <Ruler size={18} className="text-[#c9a96e]" />
+    <DashboardLayout>
+      <div className="max-w-6xl mx-auto">
+        <div className="flex items-center justify-between mb-6">
+          <div className="flex items-center gap-3">
+            <Ruler className="w-6 h-6 text-burgundy" />
+            <div>
+              <h1 className="text-2xl font-serif font-bold text-walnut">Spine Calculator</h1>
+              <p className="text-sm text-walnut/60">Calculate spine width and generate binding specifications</p>
+            </div>
           </div>
-          <div>
-            <h1 className="text-lg font-serif font-bold leading-tight">Spine Width Calculator</h1>
-            <p className="text-xs text-[#a08060]">Bible binding specification tool</p>
+          <div className="flex items-center gap-2">
+            {pages > 0 && ppi > 0 && (
+              <Button
+                size="sm"
+                variant="outline"
+                className="border-gold/30 text-walnut hover:bg-gold/10 gap-1.5 text-xs"
+                onClick={handleCopy}
+              >
+                {copied ? <Check size={14} /> : <Copy size={14} />}
+                {copied ? "Copied!" : "Copy Spec"}
+              </Button>
+            )}
           </div>
         </div>
-        <div className="ml-auto flex items-center gap-2">
-          {pages > 0 && ppi > 0 && (
-            <Button
-              size="sm"
-              variant="outline"
-              className="border-[#c9a96e] text-[#c9a96e] hover:bg-[#3d2810] gap-1.5 text-xs"
-              onClick={handleCopy}
-            >
-              {copied ? <Check size={14} /> : <Copy size={14} />}
-              {copied ? "Copied!" : "Copy Spec"}
-            </Button>
-          )}
-        </div>
-      </header>
 
-      <div className="max-w-6xl mx-auto px-6 py-8 grid grid-cols-1 lg:grid-cols-2 gap-8">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
         {/* ── Left column: inputs ── */}
         <div className="space-y-6">
 
@@ -639,28 +628,7 @@ export default function SpineCalculator() {
         </div>
       </div>
 
-      {/* Related Tools footer backlinks */}
-      <div className="border-t border-[#e8dfd0] bg-[#faf6ef] px-6 py-6">
-        <div className="max-w-5xl mx-auto">
-          <p className="text-xs text-[#8b7b6b] mb-3 font-semibold uppercase tracking-wide">Other Self-Publishing Tools</p>
-          <div className="flex flex-wrap gap-2">
-            {[
-              { href: "/bible-studio", label: "Bible Design Studio" },
-              { href: "/cover-designer", label: "Cover Designer" },
-              { href: "/isbn-manager", label: "ISBN & Metadata" },
-              { href: "/timeline", label: "Production Timeline" },
-              { href: "/auto-produce", label: "Auto-Produce" },
-              { href: "/resources", label: "Resources Hub" },
-              { href: "/guide", label: "User Guide" },
-            ].map(({ href, label }) => (
-              <Link key={href} href={href}
-                className="text-xs px-3 py-1.5 rounded-full border border-[#d4c8b4] text-[#5c3d2e] hover:bg-[#c9a96e]/10 hover:border-[#c9a96e]/50 transition-colors">
-                {label}
-              </Link>
-            ))}
-          </div>
-        </div>
       </div>
-    </div>
+    </DashboardLayout>
   );
 }

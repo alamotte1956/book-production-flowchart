@@ -18,7 +18,7 @@ import { generateIdml } from "./idmlGenerator";
 import { invokeLLM } from "./_core/llm";
 import { lookupByIsbn } from "./isbnLookup";
 import { notifyOwner } from "./_core/notification";
-import { createContactSubmission, saveWizardAnswers, getWizardAnswers, getRecentActivity } from "./db";
+import { createContactSubmission, saveWizardAnswers, getWizardAnswers, getRecentActivity, getDashboardStats } from "./db";
 import { TRPCError } from "@trpc/server";
 
 // ─── Error classification helper (module scope so it's shared by start + retry) ──
@@ -1019,6 +1019,12 @@ export const appRouter = router({
       .query(async ({ ctx }) => {
         return getWizardAnswers(ctx.user.id) ?? null;
       }),
+  }),
+
+  dashboard: router({
+    stats: protectedProcedure.query(async ({ ctx }) => {
+      return getDashboardStats(ctx.user.id);
+    }),
   }),
 });
 

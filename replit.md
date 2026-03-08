@@ -95,6 +95,10 @@ PostgreSQL via Replit's built-in database. Use `npx drizzle-kit push` to sync sc
 - **WhatsNext in Project Tracker**: Collapsible sidebar with contextual next-step suggestions
 - **Recent Activity Feed**: Dashboard feed showing latest step completions, uploads, and production jobs
 - **Template-to-AutoProduce Flow**: CDP Templates "Use This Template" pre-fills Auto-Produce style/trim via URL params
+- **Spine Calculator**: Interactive spine width calculator with visual diagram, paper PPI, binding type, cover boards
+- **Dashboard Command Center**: Stats bar (projects, steps, files, jobs) with real-time aggregated data
+- **User Guide**: 13-chapter comprehensive guide with TOC, expand/collapse, Print Specs chapter, FAQ
+- **Polished Auto-Produce Results**: Animated progress, detail chips, file type icons, status indicators
 - **Contact Form**: Public contact form on landing page
 
 ## Database Tables

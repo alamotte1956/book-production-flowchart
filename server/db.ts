@@ -409,6 +409,51 @@ export async function getWizardAnswers(userId: number): Promise<WizardSession | 
   return session ?? null;
 }
 
+export type DashboardStats = {
+  totalProjects: number;
+  stepsCompleted: number;
+  filesProduced: number;
+  productionJobsRun: number;
+};
+
+export async function getDashboardStats(userId: number): Promise<DashboardStats> {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  const userProjects = await db.select({ id: projects.id })
+    .from(projects)
+    .where(eq(projects.userId, userId));
+
+  if (userProjects.length === 0) {
+    return { totalProjects: 0, stepsCompleted: 0, filesProduced: 0, productionJobsRun: 0 };
+  }
+
+  const projectIds = userProjects.map(p => p.id);
+  const inClause = sql`${sql.join(projectIds.map(id => sql`${id}`), sql`, `)}`;
+
+  const [stepsResult, filesResult, jobsResult] = await Promise.all([
+    db.select({ count: sql<number>`count(*)::int` })
+      .from(stepStatuses)
+      .where(and(
+        sql`${stepStatuses.projectId} IN (${inClause})`,
+        eq(stepStatuses.status, "complete"),
+      )),
+    db.select({ count: sql<number>`count(*)::int` })
+      .from(uploadedFiles)
+      .where(sql`${uploadedFiles.projectId} IN (${inClause})`),
+    db.select({ count: sql<number>`count(*)::int` })
+      .from(productionJobs)
+      .where(sql`${productionJobs.projectId} IN (${inClause})`),
+  ]);
+
+  return {
+    totalProjects: userProjects.length,
+    stepsCompleted: stepsResult[0]?.count ?? 0,
+    filesProduced: filesResult[0]?.count ?? 0,
+    productionJobsRun: jobsResult[0]?.count ?? 0,
+  };
+}
+
 export type ActivityItem = {
   type: "step_completion" | "file_upload" | "production_job";
   projectId: number;

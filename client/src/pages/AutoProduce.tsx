@@ -298,6 +298,28 @@ function StylePreviewModal({ open, onClose, styleId, trimSizeId }: StylePreviewM
 
 // ─── Job Status Card ─────────────────────────────────────────────────────────
 
+function ProcessingSkeleton() {
+  return (
+    <div className="space-y-3 animate-pulse">
+      <div className="flex gap-3">
+        <div className="h-10 bg-[#e8dfd0]/60 rounded-lg flex-1" />
+        <div className="h-10 bg-[#e8dfd0]/60 rounded-lg flex-1" />
+      </div>
+      <div className="h-4 bg-[#e8dfd0]/40 rounded w-3/4" />
+      <div className="h-4 bg-[#e8dfd0]/40 rounded w-1/2" />
+    </div>
+  );
+}
+
+function fileTypeIcon(ext: string) {
+  switch (ext) {
+    case "pdf": return <File className="w-4 h-4" />;
+    case "epub": return <BookOpen className="w-4 h-4" />;
+    case "idml": return <FileCode className="w-4 h-4" />;
+    default: return <FileDown className="w-4 h-4" />;
+  }
+}
+
 function JobCard({ jobId, projectId }: { jobId: number; projectId: number }) {
   const [enabled, setEnabled] = useState(true);
   const [showTechDetails, setShowTechDetails] = useState(false);
@@ -334,258 +356,323 @@ function JobCard({ jobId, projectId }: { jobId: number; projectId: number }) {
 
   const pct = progressPercent(job.status);
   const isActive = job.status === "queued" || job.status === "processing";
+  const estimatedPages = job.wordCount ? Math.ceil(job.wordCount / 250) : null;
 
   return (
-    <Card className="border border-[#e8dfd0] bg-white shadow-sm">
+    <Card className={`border shadow-sm transition-all duration-300 ${
+      isActive
+        ? "border-[#c9a96e]/50 bg-gradient-to-br from-white to-[#fdf9f3] shadow-md ring-1 ring-[#c9a96e]/20"
+        : job.status === "complete"
+          ? "border-green-200/60 bg-gradient-to-br from-white to-green-50/30 shadow-sm"
+          : "border-red-200/60 bg-white shadow-sm"
+    }`}>
       <CardHeader className="pb-3">
         <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            {isActive ? (
-              <Loader2 className="w-4 h-4 text-[#8b5e3c] animate-spin" />
-            ) : job.status === "complete" ? (
-              <CheckCircle2 className="w-4 h-4 text-green-600" />
-            ) : (
-              <AlertCircle className="w-4 h-4 text-red-500" />
-            )}
-            <CardTitle className="text-sm font-semibold text-[#2c1a00]">
-              {job.manuscriptFileName ?? "Manuscript"}
-            </CardTitle>
+          <div className="flex items-center gap-3">
+            <div className={`w-9 h-9 rounded-full flex items-center justify-center flex-shrink-0 ${
+              isActive
+                ? "bg-[#c9a96e]/15 ring-2 ring-[#c9a96e]/30"
+                : job.status === "complete"
+                  ? "bg-green-100 ring-2 ring-green-200"
+                  : "bg-red-100 ring-2 ring-red-200"
+            }`}>
+              {isActive ? (
+                <Loader2 className="w-4.5 h-4.5 text-[#8b5e3c] animate-spin" />
+              ) : job.status === "complete" ? (
+                <CheckCircle2 className="w-4.5 h-4.5 text-green-600" />
+              ) : (
+                <AlertCircle className="w-4.5 h-4.5 text-red-500" />
+              )}
+            </div>
+            <div className="min-w-0">
+              <CardTitle className="text-sm font-semibold text-[#2c1a00] truncate">
+                {job.manuscriptFileName ?? "Manuscript"}
+              </CardTitle>
+              <p className="text-xs text-[#a09080] mt-0.5">
+                Job #{job.id} · {new Date(job.createdAt).toLocaleDateString(undefined, { month: "short", day: "numeric", year: "numeric" })}
+              </p>
+            </div>
           </div>
-          <Badge variant={statusColor(job.status)} className="text-xs">
+          <Badge variant={statusColor(job.status)} className={`text-xs font-semibold gap-1.5 ${
+            isActive ? "animate-pulse" : ""
+          }`}>
+            {isActive && <span className="relative flex h-2 w-2"><span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-current opacity-75" /><span className="relative inline-flex rounded-full h-2 w-2 bg-current" /></span>}
+            {job.status === "complete" && <CheckCircle2 className="w-3 h-3" />}
+            {job.status === "error" && <AlertCircle className="w-3 h-3" />}
             {statusLabel(job.status)}
           </Badge>
         </div>
-        <div className="flex gap-4 text-xs text-[#8b7b6b] mt-1">
-          <span>Trim: <strong>{job.trimSizeId}</strong></span>
-          <span>Style: <strong>{job.styleId}</strong></span>
-          {job.wordCount ? <span>{job.wordCount.toLocaleString()} words</span> : null}
-          {job.chapterCount ? <span>{job.chapterCount} chapters</span> : null}
+
+        <div className="mt-3 grid grid-cols-2 sm:grid-cols-4 gap-2">
+          {[
+            { label: "Trim Size", value: job.trimSizeId, icon: <FileText className="w-3 h-3" /> },
+            { label: "Style", value: job.styleId, icon: <Sparkles className="w-3 h-3" /> },
+            ...(job.wordCount ? [{ label: "Words", value: job.wordCount.toLocaleString(), icon: <FileText className="w-3 h-3" /> }] : []),
+            ...(estimatedPages ? [{ label: "Est. Pages", value: `~${estimatedPages}`, icon: <BookOpen className="w-3 h-3" /> }] : []),
+            ...(job.chapterCount ? [{ label: "Chapters", value: String(job.chapterCount), icon: <FileText className="w-3 h-3" /> }] : []),
+          ].map((detail) => (
+            <div key={detail.label} className="flex items-center gap-1.5 bg-[#faf6ef] rounded-md px-2.5 py-1.5 border border-[#e8dfd0]/50">
+              <span className="text-[#b09880]">{detail.icon}</span>
+              <div className="min-w-0">
+                <p className="text-[10px] text-[#a09080] uppercase tracking-wider font-medium leading-none">{detail.label}</p>
+                <p className="text-xs font-semibold text-[#3d2b1f] truncate">{detail.value}</p>
+              </div>
+            </div>
+          ))}
         </div>
       </CardHeader>
       <CardContent className="space-y-3">
-        <div>
-          <div className="flex justify-between text-xs text-[#8b7b6b] mb-1">
-            <span>{isActive ? "AI is typesetting your manuscript…" : job.status === "complete" ? "Production complete" : "Production failed"}</span>
-            <span>{pct}%</span>
-          </div>
-          <Progress value={pct} className="h-2" />
-        </div>
-
-        {job.status === "error" && (
-          <div className="rounded-lg border border-red-200 bg-red-50 overflow-hidden">
-            {/* Error header */}
-            <div className="flex items-start gap-3 p-4">
-              <div className="flex-shrink-0 mt-0.5">
-                <div className="w-8 h-8 rounded-full bg-red-100 flex items-center justify-center">
-                  <AlertCircle className="w-4 h-4 text-red-600" />
-                </div>
-              </div>
-              <div className="flex-1 min-w-0">
-                <p className="text-sm font-semibold text-red-800 mb-1">Production Failed</p>
-                {job.errorMessage && (
-                  <p className="text-sm text-red-700 break-words leading-relaxed">
-                    {job.errorMessage}
-                  </p>
-                )}
+        {isActive && (
+          <div className="space-y-2">
+            <div className="flex justify-between text-xs text-[#8b7b6b] mb-1">
+              <span className="flex items-center gap-1.5">
+                <Wand2 className="w-3 h-3 text-[#c9a96e]" />
+                {job.status === "queued" ? "Preparing your manuscript…" : "AI is typesetting your manuscript…"}
+              </span>
+              <span className="font-medium">{pct}%</span>
+            </div>
+            <div className="relative">
+              <Progress value={pct} className="h-2.5 bg-[#e8dfd0]/40" />
+              <div className="absolute inset-0 rounded-full overflow-hidden">
+                <div
+                  className="h-full bg-gradient-to-r from-[#c9a96e]/20 to-[#c9a96e]/40 animate-pulse rounded-full transition-all duration-1000"
+                  style={{ width: `${pct}%` }}
+                />
               </div>
             </div>
-
-            {(job.errorType === "format_unsupported" || job.errorType === "parse_empty") && (
-              <div className="mx-4 mb-3 rounded-lg border border-amber-300 bg-amber-50 p-4">
-                <div className="flex items-start gap-3">
-                  <div className="flex-shrink-0 mt-0.5">
-                    <div className="w-8 h-8 rounded-full bg-amber-100 flex items-center justify-center">
-                      <FileText className="w-4 h-4 text-amber-700" />
-                    </div>
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <p className="text-sm font-semibold text-amber-900 mb-1">
-                      {job.errorType === "format_unsupported"
-                        ? "Unsupported File Format"
-                        : "No Text Could Be Extracted"}
-                    </p>
-                    <p className="text-sm text-amber-800 mb-2">
-                      {job.errorType === "format_unsupported"
-                        ? <>The file <strong className="font-mono">{job.manuscriptFileName ?? "uploaded file"}</strong>{(() => { const ext = (job.manuscriptFileName ?? "").split(".").pop()?.toLowerCase(); return ext ? <> (.<span className="font-mono">{ext}</span>)</> : null; })()} is in a format that Auto-Produce cannot process directly.</>
-                        : <>No readable text was found in <strong className="font-mono">{job.manuscriptFileName ?? "the uploaded file"}</strong>{(() => { const ext = (job.manuscriptFileName ?? "").split(".").pop()?.toLowerCase(); return ext ? <> (.<span className="font-mono">{ext}</span>)</> : null; })()} . The file may be image-only, password-protected, or empty.</>
-                      }
-                    </p>
-                    <p className="text-xs font-semibold text-amber-800 mb-2">Convert your file using one of these tools, then re-upload:</p>
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                      {[
-                        { name: "Microsoft Word", desc: "Open → File → Save As → .docx" },
-                        { name: "Google Docs", desc: "Upload → File → Download as → .docx" },
-                        { name: "LibreOffice Writer", desc: "Free & open-source — export to .docx or .pdf" },
-                        { name: "Pandoc (CLI)", desc: "pandoc input.ext -o output.docx" },
-                      ].map(tool => (
-                        <div key={tool.name} className="flex items-start gap-2 bg-white/70 rounded border border-amber-200 px-3 py-2">
-                          <CheckCircle2 className="w-3.5 h-3.5 text-amber-600 mt-0.5 flex-shrink-0" />
-                          <div>
-                            <p className="text-xs font-semibold text-amber-900">{tool.name}</p>
-                            <p className="text-xs text-amber-700">{tool.desc}</p>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                    <p className="text-xs text-amber-700 mt-2">
-                      Supported formats: <strong>.docx</strong>, <strong>.pdf</strong>, <strong>.txt</strong>, <strong>.md</strong>, <strong>.html</strong>, <strong>.rtf</strong>, <strong>.csv</strong>, <strong>.json</strong>, <strong>.xlsx</strong>, <strong>.odt</strong>, <strong>.epub</strong>
-                    </p>
-                  </div>
-                </div>
-              </div>
-            )}
-
-            {/* Action bar */}
-            <div className="flex items-center gap-2 px-4 pb-3 flex-wrap">
-              {(job.retryCount ?? 0) >= 3 ? (
-                <div className="flex items-center gap-2 text-xs text-red-700 bg-red-100 border border-red-200 rounded-md px-3 py-2">
-                  <AlertCircle className="w-3.5 h-3.5 flex-shrink-0" />
-                  <span>
-                    <strong>Max retries reached</strong> (3 of 3 attempts used). Please upload a corrected manuscript file to start a new job.
-                  </span>
-                </div>
-              ) : (
-                <Button
-                  size="sm"
-                  variant="default"
-                  className="bg-red-600 hover:bg-red-700 text-white gap-2 text-xs"
-                  disabled={retryMutation.isPending}
-                  onClick={() => retryMutation.mutate({ jobId: job.id })}
-                >
-                  {retryMutation.isPending ? (
-                    <Loader2 className="w-3 h-3 animate-spin" />
-                  ) : (
-                    <RefreshCw className="w-3 h-3" />
-                  )}
-                  {retryMutation.isPending
-                    ? "Retrying…"
-                    : `Retry Job (${(job.retryCount ?? 0) + 1} of 3)`}
-                </Button>
-              )}
-              {job.errorMessage && (
-                <Button
-                  size="sm"
-                  variant="outline"
-                  className="border-red-200 text-red-700 hover:bg-red-100 gap-2 text-xs"
-                  onClick={() => {
-                    const report = JSON.stringify({
-                      context: "Auto-Produce",
-                      timestamp: new Date().toISOString(),
-                      jobId: job.id,
-                      file: job.manuscriptFileName ?? "(unknown)",
-                      trimSizeId: job.trimSizeId,
-                      styleId: job.styleId,
-                      wordCount: job.wordCount ?? 0,
-                      chapterCount: job.chapterCount ?? 0,
-                      retryCount: job.retryCount ?? 0,
-                      failedStage: (job as { failedStage?: string }).failedStage ?? null,
-                      errorType: job.errorType ?? null,
-                      errorMessage: job.errorMessage,
-                      failedAt: new Date(job.updatedAt).toISOString(),
-                    }, null, 2);
-                    navigator.clipboard.writeText(report).catch(() => {
-                      const ta = document.createElement("textarea");
-                      ta.value = report;
-                      document.body.appendChild(ta);
-                      ta.select();
-                      document.execCommand("copy");
-                      document.body.removeChild(ta);
-                    });
-                    toast.success("Full error report copied to clipboard");
-                  }}
-                >
-                  <Copy className="w-3 h-3" />
-                  Copy Error Report
-                </Button>
-              )}
-              <Button
-                size="sm"
-                variant="ghost"
-                className="text-red-600 hover:text-red-800 hover:bg-red-100 gap-1 text-xs ml-auto"
-                onClick={() => setShowTechDetails(v => !v)}
-              >
-                <Terminal className="w-3 h-3" />
-                Technical Details
-                {showTechDetails ? <ChevronUp className="w-3 h-3" /> : <ChevronDown className="w-3 h-3" />}
-              </Button>
-            </div>
-
-            {/* Collapsible technical details */}
-            {showTechDetails && (
-              <div className="border-t border-red-200 bg-red-900/5 px-4 py-3">
-                <p className="text-xs font-semibold text-red-800 mb-2 flex items-center gap-1.5">
-                  <Terminal className="w-3 h-3" />
-                  Diagnostic Information
-                </p>
-                <div className="font-mono text-xs text-red-800 space-y-1 bg-white/60 rounded border border-red-200 p-3">
-                  <div className="flex gap-2">
-                    <span className="text-red-500 w-28 flex-shrink-0">Job ID</span>
-                    <span>#{job.id}</span>
-                  </div>
-                  <div className="flex gap-2">
-                    <span className="text-red-500 w-28 flex-shrink-0">File</span>
-                    <span className="break-all">{job.manuscriptFileName ?? "(unknown)"}</span>
-                  </div>
-                  <div className="flex gap-2">
-                    <span className="text-red-500 w-28 flex-shrink-0">Trim Size</span>
-                    <span>{job.trimSizeId}</span>
-                  </div>
-                  <div className="flex gap-2">
-                    <span className="text-red-500 w-28 flex-shrink-0">Style</span>
-                    <span>{job.styleId}</span>
-                  </div>
-                  <div className="flex gap-2">
-                    <span className="text-red-500 w-28 flex-shrink-0">Failed At</span>
-                    <span>{new Date(job.updatedAt).toLocaleString()}</span>
-                  </div>
-                  <div className="flex gap-2">
-                    <span className="text-red-500 w-28 flex-shrink-0">Retry Attempts</span>
-                    <span className={(job.retryCount ?? 0) >= 3 ? "text-red-600 font-semibold" : ""}>
-                      {job.retryCount ?? 0} of 3{(job.retryCount ?? 0) >= 3 ? " — limit reached" : ""}
-                    </span>
-                  </div>
-                  <div className="flex gap-2">
-                    <span className="text-red-500 w-28 flex-shrink-0">Error Type</span>
-                    <span className="font-semibold">{job.errorType ?? "unknown"}</span>
-                  </div>
-                  {(job as { failedStage?: string }).failedStage && (
-                    <div className="flex gap-2">
-                      <span className="text-red-500 w-28 flex-shrink-0">Failed Stage</span>
-                      <span className="font-semibold text-red-700">{(job as { failedStage?: string }).failedStage}</span>
-                    </div>
-                  )}
-                  {job.wordCount ? (
-                    <div className="flex gap-2">
-                      <span className="text-red-500 w-28 flex-shrink-0">Words Parsed</span>
-                      <span>{job.wordCount.toLocaleString()} (parsing succeeded)</span>
-                    </div>
-                  ) : (
-                    <div className="flex gap-2">
-                      <span className="text-red-500 w-28 flex-shrink-0">Words Parsed</span>
-                      <span className="text-red-600">0 (failed during parsing)</span>
-                    </div>
-                  )}
-                  {job.errorMessage && (
-                    <div className="mt-2 pt-2 border-t border-red-200">
-                      <p className="text-red-500 mb-1">Full Error Message</p>
-                      <p className="text-red-800 break-all whitespace-pre-wrap">{job.errorMessage}</p>
-                    </div>
-                  )}
-                </div>
-                <p className="text-xs text-red-600 mt-2">
-                  <strong>Tip:</strong> The <em>Failed Stage</em> field tells you exactly where the pipeline stopped.
-                  {" "}"chapter-detection" → LLM issue (retry or simplify the file).
-                  {" "}"pdf-rendering" → Chromium issue (retry usually resolves this).
-                  {" "}"epub-generation" → EPUB packaging issue (retry or switch to PDF-only).
-                  {" "}"config-resolution" → Invalid trim/style ID (contact support).
-                  {" "}Use <strong>Copy Error Report</strong> to share the full report with support.
-                </p>
-              </div>
-            )}
+            <ProcessingSkeleton />
           </div>
         )}
 
-        {/* Show new retry job card if retry was triggered */}
+        {job.status === "complete" && (
+          <div className="flex justify-between text-xs text-green-700 mb-1">
+            <span className="flex items-center gap-1.5">
+              <CheckCircle2 className="w-3 h-3" />
+              Production complete
+            </span>
+            <span className="font-medium">100%</span>
+          </div>
+        )}
+
+        {job.status === "error" && (
+          <>
+            <div className="flex justify-between text-xs text-red-600 mb-1">
+              <span className="flex items-center gap-1.5">
+                <AlertCircle className="w-3 h-3" />
+                Production failed
+              </span>
+            </div>
+            <div className="rounded-lg border border-red-200 bg-red-50 overflow-hidden">
+              <div className="flex items-start gap-3 p-4">
+                <div className="flex-shrink-0 mt-0.5">
+                  <div className="w-8 h-8 rounded-full bg-red-100 flex items-center justify-center">
+                    <AlertCircle className="w-4 h-4 text-red-600" />
+                  </div>
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm font-semibold text-red-800 mb-1">Production Failed</p>
+                  {job.errorMessage && (
+                    <p className="text-sm text-red-700 break-words leading-relaxed">
+                      {job.errorMessage}
+                    </p>
+                  )}
+                </div>
+              </div>
+
+              {(job.errorType === "format_unsupported" || job.errorType === "parse_empty") && (
+                <div className="mx-4 mb-3 rounded-lg border border-amber-300 bg-amber-50 p-4">
+                  <div className="flex items-start gap-3">
+                    <div className="flex-shrink-0 mt-0.5">
+                      <div className="w-8 h-8 rounded-full bg-amber-100 flex items-center justify-center">
+                        <FileText className="w-4 h-4 text-amber-700" />
+                      </div>
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm font-semibold text-amber-900 mb-1">
+                        {job.errorType === "format_unsupported"
+                          ? "Unsupported File Format"
+                          : "No Text Could Be Extracted"}
+                      </p>
+                      <p className="text-sm text-amber-800 mb-2">
+                        {job.errorType === "format_unsupported"
+                          ? <>The file <strong className="font-mono">{job.manuscriptFileName ?? "uploaded file"}</strong>{(() => { const ext = (job.manuscriptFileName ?? "").split(".").pop()?.toLowerCase(); return ext ? <> (.<span className="font-mono">{ext}</span>)</> : null; })()} is in a format that Auto-Produce cannot process directly.</>
+                          : <>No readable text was found in <strong className="font-mono">{job.manuscriptFileName ?? "the uploaded file"}</strong>{(() => { const ext = (job.manuscriptFileName ?? "").split(".").pop()?.toLowerCase(); return ext ? <> (.<span className="font-mono">{ext}</span>)</> : null; })()} . The file may be image-only, password-protected, or empty.</>
+                        }
+                      </p>
+                      <p className="text-xs font-semibold text-amber-800 mb-2">Convert your file using one of these tools, then re-upload:</p>
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                        {[
+                          { name: "Microsoft Word", desc: "Open → File → Save As → .docx" },
+                          { name: "Google Docs", desc: "Upload → File → Download as → .docx" },
+                          { name: "LibreOffice Writer", desc: "Free & open-source — export to .docx or .pdf" },
+                          { name: "Pandoc (CLI)", desc: "pandoc input.ext -o output.docx" },
+                        ].map(tool => (
+                          <div key={tool.name} className="flex items-start gap-2 bg-white/70 rounded border border-amber-200 px-3 py-2">
+                            <CheckCircle2 className="w-3.5 h-3.5 text-amber-600 mt-0.5 flex-shrink-0" />
+                            <div>
+                              <p className="text-xs font-semibold text-amber-900">{tool.name}</p>
+                              <p className="text-xs text-amber-700">{tool.desc}</p>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                      <p className="text-xs text-amber-700 mt-2">
+                        Supported formats: <strong>.docx</strong>, <strong>.pdf</strong>, <strong>.txt</strong>, <strong>.md</strong>, <strong>.html</strong>, <strong>.rtf</strong>, <strong>.csv</strong>, <strong>.json</strong>, <strong>.xlsx</strong>, <strong>.odt</strong>, <strong>.epub</strong>
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              <div className="flex items-center gap-2 px-4 pb-3 flex-wrap">
+                {(job.retryCount ?? 0) >= 3 ? (
+                  <div className="flex items-center gap-2 text-xs text-red-700 bg-red-100 border border-red-200 rounded-md px-3 py-2">
+                    <AlertCircle className="w-3.5 h-3.5 flex-shrink-0" />
+                    <span>
+                      <strong>Max retries reached</strong> (3 of 3 attempts used). Please upload a corrected manuscript file to start a new job.
+                    </span>
+                  </div>
+                ) : (
+                  <Button
+                    size="sm"
+                    variant="default"
+                    className="bg-red-600 hover:bg-red-700 text-white gap-2 text-xs"
+                    disabled={retryMutation.isPending}
+                    onClick={() => retryMutation.mutate({ jobId: job.id })}
+                  >
+                    {retryMutation.isPending ? (
+                      <Loader2 className="w-3 h-3 animate-spin" />
+                    ) : (
+                      <RefreshCw className="w-3 h-3" />
+                    )}
+                    {retryMutation.isPending
+                      ? "Retrying…"
+                      : `Retry Job (${(job.retryCount ?? 0) + 1} of 3)`}
+                  </Button>
+                )}
+                {job.errorMessage && (
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    className="border-red-200 text-red-700 hover:bg-red-100 gap-2 text-xs"
+                    onClick={() => {
+                      const report = JSON.stringify({
+                        context: "Auto-Produce",
+                        timestamp: new Date().toISOString(),
+                        jobId: job.id,
+                        file: job.manuscriptFileName ?? "(unknown)",
+                        trimSizeId: job.trimSizeId,
+                        styleId: job.styleId,
+                        wordCount: job.wordCount ?? 0,
+                        chapterCount: job.chapterCount ?? 0,
+                        retryCount: job.retryCount ?? 0,
+                        failedStage: (job as { failedStage?: string }).failedStage ?? null,
+                        errorType: job.errorType ?? null,
+                        errorMessage: job.errorMessage,
+                        failedAt: new Date(job.updatedAt).toISOString(),
+                      }, null, 2);
+                      navigator.clipboard.writeText(report).catch(() => {
+                        const ta = document.createElement("textarea");
+                        ta.value = report;
+                        document.body.appendChild(ta);
+                        ta.select();
+                        document.execCommand("copy");
+                        document.body.removeChild(ta);
+                      });
+                      toast.success("Full error report copied to clipboard");
+                    }}
+                  >
+                    <Copy className="w-3 h-3" />
+                    Copy Error Report
+                  </Button>
+                )}
+                <Button
+                  size="sm"
+                  variant="ghost"
+                  className="text-red-600 hover:text-red-800 hover:bg-red-100 gap-1 text-xs ml-auto"
+                  onClick={() => setShowTechDetails(v => !v)}
+                >
+                  <Terminal className="w-3 h-3" />
+                  Technical Details
+                  {showTechDetails ? <ChevronUp className="w-3 h-3" /> : <ChevronDown className="w-3 h-3" />}
+                </Button>
+              </div>
+
+              {showTechDetails && (
+                <div className="border-t border-red-200 bg-red-900/5 px-4 py-3">
+                  <p className="text-xs font-semibold text-red-800 mb-2 flex items-center gap-1.5">
+                    <Terminal className="w-3 h-3" />
+                    Diagnostic Information
+                  </p>
+                  <div className="font-mono text-xs text-red-800 space-y-1 bg-white/60 rounded border border-red-200 p-3">
+                    <div className="flex gap-2">
+                      <span className="text-red-500 w-28 flex-shrink-0">Job ID</span>
+                      <span>#{job.id}</span>
+                    </div>
+                    <div className="flex gap-2">
+                      <span className="text-red-500 w-28 flex-shrink-0">File</span>
+                      <span className="break-all">{job.manuscriptFileName ?? "(unknown)"}</span>
+                    </div>
+                    <div className="flex gap-2">
+                      <span className="text-red-500 w-28 flex-shrink-0">Trim Size</span>
+                      <span>{job.trimSizeId}</span>
+                    </div>
+                    <div className="flex gap-2">
+                      <span className="text-red-500 w-28 flex-shrink-0">Style</span>
+                      <span>{job.styleId}</span>
+                    </div>
+                    <div className="flex gap-2">
+                      <span className="text-red-500 w-28 flex-shrink-0">Failed At</span>
+                      <span>{new Date(job.updatedAt).toLocaleString()}</span>
+                    </div>
+                    <div className="flex gap-2">
+                      <span className="text-red-500 w-28 flex-shrink-0">Retry Attempts</span>
+                      <span className={(job.retryCount ?? 0) >= 3 ? "text-red-600 font-semibold" : ""}>
+                        {job.retryCount ?? 0} of 3{(job.retryCount ?? 0) >= 3 ? " — limit reached" : ""}
+                      </span>
+                    </div>
+                    <div className="flex gap-2">
+                      <span className="text-red-500 w-28 flex-shrink-0">Error Type</span>
+                      <span className="font-semibold">{job.errorType ?? "unknown"}</span>
+                    </div>
+                    {(job as { failedStage?: string }).failedStage && (
+                      <div className="flex gap-2">
+                        <span className="text-red-500 w-28 flex-shrink-0">Failed Stage</span>
+                        <span className="font-semibold text-red-700">{(job as { failedStage?: string }).failedStage}</span>
+                      </div>
+                    )}
+                    {job.wordCount ? (
+                      <div className="flex gap-2">
+                        <span className="text-red-500 w-28 flex-shrink-0">Words Parsed</span>
+                        <span>{job.wordCount.toLocaleString()} (parsing succeeded)</span>
+                      </div>
+                    ) : (
+                      <div className="flex gap-2">
+                        <span className="text-red-500 w-28 flex-shrink-0">Words Parsed</span>
+                        <span className="text-red-600">0 (failed during parsing)</span>
+                      </div>
+                    )}
+                    {job.errorMessage && (
+                      <div className="mt-2 pt-2 border-t border-red-200">
+                        <p className="text-red-500 mb-1">Full Error Message</p>
+                        <p className="text-red-800 break-all whitespace-pre-wrap">{job.errorMessage}</p>
+                      </div>
+                    )}
+                  </div>
+                  <p className="text-xs text-red-600 mt-2">
+                    <strong>Tip:</strong> The <em>Failed Stage</em> field tells you exactly where the pipeline stopped.
+                    {" "}"chapter-detection" → LLM issue (retry or simplify the file).
+                    {" "}"pdf-rendering" → Chromium issue (retry usually resolves this).
+                    {" "}"epub-generation" → EPUB packaging issue (retry or switch to PDF-only).
+                    {" "}"config-resolution" → Invalid trim/style ID (contact support).
+                    {" "}Use <strong>Copy Error Report</strong> to share the full report with support.
+                  </p>
+                </div>
+              )}
+            </div>
+          </>
+        )}
+
         {retryJobId && retryJobId !== job.id && (
           <div className="rounded-md bg-amber-50 border border-amber-200 p-3 text-xs text-amber-800 flex items-center gap-2">
             <RefreshCw className="w-3 h-3 flex-shrink-0" />
@@ -602,75 +689,93 @@ function JobCard({ jobId, projectId }: { jobId: number; projectId: number }) {
           const hasEpubFormat = !!job.epubUrl;
           const allChecksPass = kdpTrim && hasBleed && hasFontEmbedding && hasPdfFormat && hasEpubFormat;
 
+          const downloadItems = [
+            ...(hasKdpPdf ? [{
+              url: job.kdpPdfUrl!,
+              label: "Print PDF",
+              sublabel: "KDP-Ready · Bleed included",
+              icon: fileTypeIcon("pdf"),
+              primary: true,
+              accent: "bg-[#8b5e3c] hover:bg-[#7a4f30]",
+            }] : []),
+            ...(!hasKdpPdf && job.pdfUrl ? [{
+              url: job.pdfUrl,
+              label: "Interior PDF",
+              sublabel: "Press-ready format",
+              icon: fileTypeIcon("pdf"),
+              primary: true,
+              accent: "bg-[#8b5e3c] hover:bg-[#7a4f30]",
+            }] : []),
+            ...(job.epubUrl ? [{
+              url: job.epubUrl,
+              label: "Kindle EPUB",
+              sublabel: "Ebook format",
+              icon: fileTypeIcon("epub"),
+              primary: true,
+              accent: "bg-[#5c3d8a] hover:bg-[#4a2d6e]",
+            }] : []),
+          ];
+
+          const secondaryItems = [
+            ...(hasKdpPdf && job.pdfUrl ? [{
+              url: job.pdfUrl,
+              label: "Screen PDF (no bleed)",
+              icon: fileTypeIcon("pdf"),
+            }] : []),
+            ...(typeof (job as Record<string, unknown>).idmlUrl === 'string' ? [{
+              url: (job as Record<string, unknown>).idmlUrl as string,
+              label: "InDesign (.idml)",
+              icon: fileTypeIcon("idml"),
+            }] : []),
+          ];
+
           return (
-            <div className="flex flex-col gap-3 pt-1">
-              <div className="flex gap-3">
-                {hasKdpPdf && (
-                  <a
-                    href={job.kdpPdfUrl!}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="flex-1"
-                  >
-                    <Button variant="default" size="sm" className="w-full bg-[#8b5e3c] hover:bg-[#7a4f30] text-white gap-2">
-                      <FileDown className="w-4 h-4" />
-                      Download Print PDF (KDP-Ready)
-                    </Button>
-                  </a>
-                )}
-                {!hasKdpPdf && job.pdfUrl && (
-                  <a
-                    href={job.pdfUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="flex-1"
-                  >
-                    <Button variant="default" size="sm" className="w-full bg-[#8b5e3c] hover:bg-[#7a4f30] text-white gap-2">
-                      <FileDown className="w-4 h-4" />
-                      Download Interior PDF
-                    </Button>
-                  </a>
-                )}
-                {job.epubUrl && (
-                  <a
-                    href={job.epubUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="flex-1"
-                  >
-                    <Button variant="default" size="sm" className="w-full bg-[#5c3d8a] hover:bg-[#4a2d6e] text-white gap-2">
-                      <BookOpen className="w-4 h-4" />
-                      Download Kindle EPUB
-                    </Button>
-                  </a>
+            <div className="flex flex-col gap-4 pt-1">
+              <div className="rounded-lg border border-[#e8dfd0] bg-gradient-to-br from-[#fdf9f3] to-white p-4">
+                <p className="text-xs font-semibold text-[#8b7b6b] uppercase tracking-wider mb-3 flex items-center gap-1.5">
+                  <Download className="w-3.5 h-3.5" />
+                  Download Files
+                </p>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                  {downloadItems.map((item) => (
+                    <a
+                      key={item.label}
+                      href={item.url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="group flex items-center gap-3 rounded-lg border border-[#d4b896]/40 bg-white p-3 transition-all hover:shadow-md hover:border-[#c9a96e]/60 hover:-translate-y-0.5"
+                    >
+                      <div className={`w-10 h-10 rounded-lg flex items-center justify-center text-white flex-shrink-0 ${item.accent} transition-transform group-hover:scale-105`}>
+                        {item.icon}
+                      </div>
+                      <div className="min-w-0 flex-1">
+                        <p className="text-sm font-semibold text-[#3d2b1f]">{item.label}</p>
+                        <p className="text-xs text-[#a09080]">{item.sublabel}</p>
+                      </div>
+                      <Download className="w-4 h-4 text-[#c9a96e] opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0" />
+                    </a>
+                  ))}
+                </div>
+                {secondaryItems.length > 0 && (
+                  <div className="mt-2 flex flex-wrap gap-2">
+                    {secondaryItems.map((item) => (
+                      <a
+                        key={item.label}
+                        href={item.url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                      >
+                        <Button variant="outline" size="sm" className="border-[#d4b896] text-[#8b7b6b] hover:bg-[#f5ede4] gap-2 text-xs">
+                          {item.icon}
+                          {item.label}
+                        </Button>
+                      </a>
+                    ))}
+                  </div>
                 )}
               </div>
-              {hasKdpPdf && job.pdfUrl && (
-                <a
-                  href={job.pdfUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  <Button variant="outline" size="sm" className="w-full border-[#d4b896] text-[#8b7b6b] hover:bg-[#f5ede4] gap-2">
-                    <FileDown className="w-4 h-4" />
-                    Download Screen PDF (no bleed)
-                  </Button>
-                </a>
-              )}
-              {typeof (job as Record<string, unknown>).idmlUrl === 'string' && (
-                <a
-                  href={(job as Record<string, unknown>).idmlUrl as string}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  <Button variant="outline" size="sm" className="w-full border-[#5c3d2e] text-[#5c3d2e] hover:bg-[#f5ede4] gap-2">
-                    <FileDown className="w-4 h-4" />
-                    Download InDesign (.idml)
-                  </Button>
-                </a>
-              )}
 
-              <div className="rounded-lg border border-[#e8dfd0] bg-[#fdf9f3] p-4 mt-1">
+              <div className="rounded-lg border border-[#e8dfd0] bg-[#fdf9f3] p-4">
                 <div className="flex items-center justify-between mb-3">
                   <div className="flex items-center gap-2">
                     <ShieldCheck className="w-4 h-4 text-[#8b5e3c]" />
@@ -743,7 +848,7 @@ function JobCard({ jobId, projectId }: { jobId: number; projectId: number }) {
 
               <WhatsNext
                 compact
-                className="mt-2"
+                className="mt-1"
                 prompts={[
                   {
                     id: "after_produce_cover",
@@ -760,9 +865,17 @@ function JobCard({ jobId, projectId }: { jobId: number; projectId: number }) {
           );
         })()}
 
-        <p className="text-xs text-[#b09880]">
-          Started {new Date(job.createdAt).toLocaleString()}
-        </p>
+        <div className="flex items-center justify-between pt-1">
+          <p className="text-xs text-[#b09880]">
+            Started {new Date(job.createdAt).toLocaleString()}
+          </p>
+          {job.status === "complete" && (
+            <p className="text-xs text-green-600 flex items-center gap-1">
+              <Clock className="w-3 h-3" />
+              Completed {new Date(job.updatedAt).toLocaleString()}
+            </p>
+          )}
+        </div>
       </CardContent>
     </Card>
   );

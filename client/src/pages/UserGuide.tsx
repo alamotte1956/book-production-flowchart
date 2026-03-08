@@ -2,9 +2,9 @@
  * User Guide Page — Create Design Publish LLC
  * Full instruction book rendered as a navigable web page.
  */
-import { useState } from "react";
+import { useCallback, useRef, useState } from "react";
 import { Link, useLocation } from "wouter";
-import { BookOpen, ChevronRight, ChevronDown, ArrowLeft, BookMarked, Layers, Ruler, Zap, BarChart3, Library, FileText, HelpCircle, Download, Barcode, Calendar } from "lucide-react";
+import { BookOpen, ChevronRight, ChevronDown, ArrowLeft, BookMarked, Layers, Ruler, Zap, BarChart3, Library, FileText, HelpCircle, Download, Barcode, Calendar, List } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 
@@ -342,8 +342,79 @@ const sections: Section[] = [
     ),
   },
   {
+    id: "print-specs",
+    title: "Chapter 11 — Print Specs Generator",
+    icon: FileText,
+    content: (
+      <div>
+        <p className="mb-4">The Print Specs Generator builds a complete, press-ready file specification sheet for your printer. It covers every detail your print vendor needs — trim size, bleed, color mode, resolution, PDF standard, and a preflight checklist — so your files are accepted on the first submission.</p>
+        <h4 className="font-serif text-base font-semibold text-[#2c1a00] mb-2">How to Generate Print Specs</h4>
+        <Step num={1} title="Select Trim Size" desc="Choose from standard sizes (5×8, 5.5×8.5, 6×9, 7×10, 8.5×11) or enter custom dimensions." />
+        <Step num={2} title="Select Interior Color" desc="Black & White, Full Color, or Spot Color (Pantone). This determines the color profile and ink specifications." />
+        <Step num={3} title="Enter Bleed Settings" desc="Standard bleed is 0.125 in (3mm). Full-bleed photo books may use 0.25 in (6mm). Enter values for top, bottom, inside, and outside." />
+        <Step num={4} title="Set Resolution & Color Mode" desc="Interior: 300 DPI minimum, CMYK for color, Grayscale for B&W. Cover: 300 DPI, CMYK always." />
+        <Step num={5} title="Generate Spec Sheet" desc="Click 'Generate Specs' to produce a downloadable specification document with all settings." />
+        <h4 className="font-serif text-base font-semibold text-[#2c1a00] mb-2 mt-4">Key Print Specifications</h4>
+        <InfoTable rows={[
+          ["PDF Standard", "PDF/X-1a (most compatible) or PDF/X-4 (supports transparency and ICC profiles)"],
+          ["Color Mode", "CMYK for print. Never submit RGB files — colors will shift during conversion."],
+          ["Resolution", "300 DPI minimum for all images. 600 DPI recommended for line art and text."],
+          ["Fonts", "All fonts must be embedded or converted to outlines. No linked or substituted fonts."],
+          ["Bleed", "0.125 in standard. Extend all background images and colors to the bleed edge."],
+          ["Safe Zone", "Keep all text and critical content at least 0.25 in inside the trim edge."],
+          ["Spine Text", "Only use spine text if the spine is 0.5 in or wider (approximately 100+ pages)."],
+        ]} />
+        <h4 className="font-serif text-base font-semibold text-[#2c1a00] mb-2 mt-4">Preflight Checklist</h4>
+        <InfoTable rows={[
+          ["Fonts embedded", "Verify all fonts are embedded (not linked) in the PDF."],
+          ["Images 300 DPI+", "No image in the document should be below 300 DPI at print size."],
+          ["CMYK color mode", "All colors are in CMYK. No RGB or spot colors (unless specified)."],
+          ["Bleed extends", "Background images and colors extend to the bleed edge on all sides."],
+          ["No white hairlines", "Check for thin white lines at page edges caused by misaligned objects."],
+          ["Page count even", "Total page count must be divisible by 2 (or by 16 for signature printing)."],
+        ]} />
+      </div>
+    ),
+  },
+  {
+    id: "faq",
+    title: "Chapter 12 — Frequently Asked Questions",
+    icon: HelpCircle,
+    content: (
+      <div>
+        <h4 className="font-serif text-base font-semibold text-[#2c1a00] mb-2">General</h4>
+        <InfoTable rows={[
+          ["Is the platform free to use?", "Yes. All tools on the platform are free. You only pay for printing, ISBNs, and distribution services from third-party vendors."],
+          ["Do I need an account?", "Yes. Sign in with your Manus account to save projects, track progress, and access all tools."],
+          ["Can I use this for non-Bible books?", "Absolutely. The platform supports any book type — fiction, nonfiction, children's, poetry, academic, and more. Bible Studio is one specialized tool among many."],
+          ["Is my data saved?", "Yes. All project data, step progress, and uploaded files are saved to your account and persist across sessions."],
+        ]} />
+        <h4 className="font-serif text-base font-semibold text-[#2c1a00] mb-2 mt-4">Auto-Produce</h4>
+        <InfoTable rows={[
+          ["What file formats can I upload?", "Plain text (.txt), Microsoft Word (.docx), and USFM files are supported. Maximum file size is 50MB."],
+          ["How long does production take?", "Most jobs complete in 30 seconds to 5 minutes depending on file size and complexity."],
+          ["Can I re-run a job with different settings?", "Yes. Start a new production run with updated settings. Previous runs are preserved in your job history."],
+          ["What if my job fails?", "The error panel shows the cause and a Retry button. You can retry up to 3 times before starting a new job."],
+        ]} />
+        <h4 className="font-serif text-base font-semibold text-[#2c1a00] mb-2 mt-4">ISBN & Metadata</h4>
+        <InfoTable rows={[
+          ["Where do I buy an ISBN?", "In the US, purchase from Bowker (myidentifiers.com). Single ISBN: $125. Block of 10: $295."],
+          ["Do I need separate ISBNs for each format?", "Yes. Hardcover, paperback, EPUB, and PDF each require their own ISBN."],
+          ["What is ONIX 3.0?", "ONIX is the industry-standard XML format for sharing book metadata with distributors, retailers, and libraries."],
+        ]} />
+        <h4 className="font-serif text-base font-semibold text-[#2c1a00] mb-2 mt-4">Cover Design & Print</h4>
+        <InfoTable rows={[
+          ["What bleed should I use?", "Standard bleed is 0.125 inches (3mm) on all sides. Use 0.25 inches for full-bleed image covers."],
+          ["How do I calculate spine width?", "Use the Spine Calculator tool. Enter your page count, paper type, and binding method to get the exact spine width."],
+          ["What PDF standard should I use?", "PDF/X-1a is the safest choice for maximum printer compatibility. PDF/X-4 supports transparency if needed."],
+          ["What resolution do I need?", "300 DPI minimum for all images. 600 DPI recommended for line art and fine text."],
+        ]} />
+      </div>
+    ),
+  },
+  {
     id: "glossary",
-    title: "Chapter 11 — Publishing Glossary",
+    title: "Chapter 13 — Publishing Glossary",
     icon: BookOpen,
     content: (
       <div>
@@ -378,6 +449,7 @@ const sections: Section[] = [
 export default function UserGuide() {
   const [, navigate] = useLocation();
   const [openSections, setOpenSections] = useState<Set<string>>(new Set(["overview"]));
+  const sectionRefs = useRef<Record<string, HTMLDivElement | null>>({});
 
   const toggleSection = (id: string) => {
     setOpenSections(prev => {
@@ -390,6 +462,17 @@ export default function UserGuide() {
       return next;
     });
   };
+
+  const scrollToSection = useCallback((id: string) => {
+    setOpenSections(prev => {
+      const next = new Set(prev);
+      next.add(id);
+      return next;
+    });
+    requestAnimationFrame(() => {
+      sectionRefs.current[id]?.scrollIntoView({ behavior: "smooth", block: "start" });
+    });
+  }, []);
 
   const expandAll = () => setOpenSections(new Set(sections.map(s => s.id)));
   const collapseAll = () => setOpenSections(new Set());
@@ -454,7 +537,7 @@ export default function UserGuide() {
             Everything you need to create, design, and publish your book — from first idea to finished, print-ready volume using our online publishing platform.
           </p>
           <div className="mt-6 flex items-center justify-center gap-6 text-[#c9a96e]/70 text-sm">
-            <span><strong className="text-[#f5efe0]">11</strong> Chapters</span>
+            <span><strong className="text-[#f5efe0]">13</strong> Chapters</span>
             <span className="text-[#c9a96e]/30">|</span>
             <span><strong className="text-[#f5efe0]">9</strong> Production Phases</span>
             <span className="text-[#c9a96e]/30">|</span>
@@ -476,15 +559,44 @@ export default function UserGuide() {
         </div>
       </div>
 
+      {/* Table of Contents */}
+      <div className="max-w-4xl mx-auto px-6 pb-4">
+        <div className="border border-[#e8ddd0] rounded-xl overflow-hidden bg-white shadow-sm">
+          <div className="px-6 py-4 flex items-center gap-3 border-b border-[#e8ddd0] bg-[#faf6ef]/50">
+            <div className="w-9 h-9 rounded-lg bg-[#c9a96e]/15 flex items-center justify-center flex-shrink-0">
+              <List size={18} className="text-[#c9a96e]" />
+            </div>
+            <span className="font-serif text-lg text-[#2c1a00] font-medium">Table of Contents</span>
+          </div>
+          <div className="px-6 py-4 grid grid-cols-1 md:grid-cols-2 gap-1">
+            {sections.map((section, index) => {
+              const Icon = section.icon;
+              return (
+                <button
+                  key={section.id}
+                  onClick={() => scrollToSection(section.id)}
+                  className="flex items-center gap-2.5 px-3 py-2 rounded-lg text-left hover:bg-[#faf6ef] transition-colors group"
+                >
+                  <span className="w-6 h-6 rounded-full bg-[#c9a96e]/10 flex items-center justify-center text-xs font-semibold text-[#c9a96e] flex-shrink-0">{index + 1}</span>
+                  <Icon size={14} className="text-[#8b7b6b] group-hover:text-[#c9a96e] transition-colors flex-shrink-0" />
+                  <span className="text-sm text-[#3a2a1a] group-hover:text-[#2c1a00] transition-colors">{section.title.replace(/^Chapter \d+ — /, "")}</span>
+                </button>
+              );
+            })}
+          </div>
+        </div>
+      </div>
+
       {/* Sections */}
       <div className="max-w-4xl mx-auto px-6 pb-16 space-y-3">
         {sections.map(section => (
-          <SectionCard
-            key={section.id}
-            section={section}
-            isOpen={openSections.has(section.id)}
-            onToggle={() => toggleSection(section.id)}
-          />
+          <div key={section.id} ref={el => { sectionRefs.current[section.id] = el; }} id={`section-${section.id}`}>
+            <SectionCard
+              section={section}
+              isOpen={openSections.has(section.id)}
+              onToggle={() => toggleSection(section.id)}
+            />
+          </div>
         ))}
 
         {/* Related Tools — internal backlinks */}
