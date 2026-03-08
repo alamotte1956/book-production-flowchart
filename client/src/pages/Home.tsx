@@ -356,14 +356,14 @@ export default function Home() {
         }`}
       >
         <div className="flex items-center justify-between px-5 py-4 border-b border-[#c9a96e]/10">
-          <div className="flex items-center gap-2.5">
+          <a href="/" className="flex items-center gap-2.5">
             <img
               src="https://d2xsxph8kpxj0f.cloudfront.net/310519663211654017/kGjPju6hKCvCsjZhgUHyqj/CDPlargelogo_25428631.PNG"
               alt="Easy Book Publishers"
               className="h-10 w-auto object-contain"
             />
             <span className="font-serif text-[#f5d98a] text-sm tracking-wide">Menu</span>
-          </div>
+          </a>
           <button
             onClick={() => setMobileMenuOpen(false)}
             className="w-8 h-8 flex items-center justify-center rounded-md text-[#c9a96e]/60 hover:text-[#c9a96e] hover:bg-[#c9a96e]/10 transition-colors"
@@ -424,7 +424,7 @@ export default function Home() {
 
       <header className="bg-gradient-to-r from-[#1a1008] via-[#1e1108] to-[#1a1008] text-[#f5efe0] border-b border-[#c9a96e]/15 shadow-lg shadow-[#1a1008]/20">
         <div className="max-w-7xl mx-auto px-6 py-5 flex items-center justify-between">
-          <div className="flex items-center gap-4">
+          <a href="/" className="flex items-center gap-4 group">
             <div className="flex items-center gap-3">
               <img
                 src="https://d2xsxph8kpxj0f.cloudfront.net/310519663211654017/kGjPju6hKCvCsjZhgUHyqj/CDPlargelogo_25428631.PNG"
@@ -432,11 +432,11 @@ export default function Home() {
                 className="h-11 w-auto object-contain"
               />
               <div>
-                <h1 className="font-serif text-xl leading-tight text-[#f5d98a] tracking-wide" style={{ textShadow: "0 0 30px rgba(245,217,138,0.3)" }}>Publisher Command Center</h1>
+                <h1 className="font-serif text-xl leading-tight text-[#f5d98a] tracking-wide group-hover:text-[#ffe6a0] transition-colors" style={{ textShadow: "0 0 30px rgba(245,217,138,0.3)" }}>Publisher Command Center</h1>
                 <p className="text-[10px] text-[#c9a96e]/50 uppercase tracking-[0.2em] hidden sm:block font-serif">Easy Book Publishers</p>
               </div>
             </div>
-          </div>
+          </a>
 
           <nav className="hidden md:flex items-center gap-0.5">
             {[

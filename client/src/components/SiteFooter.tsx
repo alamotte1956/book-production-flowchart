@@ -47,17 +47,17 @@ export default function SiteFooter() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-10">
           <div>
-            <div className="flex items-center gap-3 mb-4">
+            <a href="/" className="flex items-center gap-3 mb-4 group">
               <img
                 src="https://cdn-icons-png.flaticon.com/512/2232/2232688.png"
                 alt="Easy Book Publishers"
                 className="w-8 h-8 opacity-80"
               />
               <div>
-                <h3 className="font-serif text-lg text-[#f5efe0] leading-tight">Easy Book Publishers</h3>
+                <h3 className="font-serif text-lg text-[#f5efe0] leading-tight group-hover:text-[#f5d98a] transition-colors">Easy Book Publishers</h3>
                 <p className="text-[10px] uppercase tracking-[0.15em] text-[#c9a96e]">Manuscript to Masterpiece</p>
               </div>
-            </div>
+            </a>
             <p className="text-sm text-[#a89878] leading-relaxed mb-4">
               The all-in-one self-publishing platform. Design, typeset, and produce print-ready books with professional tools — no software to download, works on any device.
             </p>

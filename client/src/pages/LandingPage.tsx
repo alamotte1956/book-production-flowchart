@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { useLocation } from "wouter";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -5,7 +6,7 @@ import { Badge } from "@/components/ui/badge";
 import {
   BookOpen, Zap, Ruler, Layers, BookMarked, LayoutGrid, Library,
   ArrowRight, CheckCircle2, Star, FileText, Upload, Sparkles, Printer,
-  Globe, Users, Search, ChevronRight,
+  Globe, Users, Search, ChevronRight, Menu, X,
 } from "lucide-react";
 import SiteFooter from "@/components/SiteFooter";
 
@@ -52,12 +53,13 @@ const stats = [
 
 export default function LandingPage() {
   const [, navigate] = useLocation();
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   return (
     <div className="min-h-screen bg-[#faf6ef]">
       <nav className="sticky top-0 z-50 bg-[#1a1008]/95 backdrop-blur-sm border-b border-[#c9a96e]/15">
         <div className="max-w-7xl mx-auto px-6 py-3 flex items-center justify-between">
-          <div className="flex items-center gap-2.5">
+          <a href="/" className="flex items-center gap-2.5">
             <img
               src="https://d2xsxph8kpxj0f.cloudfront.net/310519663211654017/kGjPju6hKCvCsjZhgUHyqj/CDPlargelogo_25428631.PNG"
               alt="Easy Book Publishers"
@@ -67,7 +69,7 @@ export default function LandingPage() {
               <span className="font-serif text-[#f5d98a] text-lg tracking-wide">Easy Book Publishers</span>
               <p className="text-[9px] uppercase tracking-[0.15em] text-[#c9a96e]/60 -mt-0.5">Manuscript to Masterpiece</p>
             </div>
-          </div>
+          </a>
           <div className="hidden md:flex items-center gap-6 text-sm">
             <a href="#tools" className="text-[#d4c8b4] hover:text-[#f5d98a] transition-colors">Tools</a>
             <a href="#how-it-works" className="text-[#d4c8b4] hover:text-[#f5d98a] transition-colors">How It Works</a>
@@ -79,11 +81,35 @@ export default function LandingPage() {
             <Button onClick={() => navigate("/pricing")} variant="outline" size="sm" className="border-[#c9a96e]/30 text-[#f5d98a] hover:bg-[#c9a96e]/10 hidden sm:flex">
               Pricing
             </Button>
-            <Button onClick={() => navigate("/dashboard")} className="bg-[#c9a96e] hover:bg-[#b8944f] text-[#1a1008] font-semibold" size="sm">
+            <Button onClick={() => navigate("/dashboard")} className="bg-[#c9a96e] hover:bg-[#b8944f] text-[#1a1008] font-semibold hidden sm:flex" size="sm">
               Open Dashboard
             </Button>
+            <button
+              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+              className="md:hidden text-[#c9a96e] p-1.5 rounded-lg hover:bg-[#c9a96e]/10 transition-colors"
+              aria-label={mobileMenuOpen ? "Close menu" : "Open menu"}
+              aria-expanded={mobileMenuOpen}
+            >
+              {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+            </button>
           </div>
         </div>
+        {mobileMenuOpen && (
+          <div className="md:hidden border-t border-[#c9a96e]/10 bg-[#1a1008]/98">
+            <div className="max-w-7xl mx-auto px-6 py-4 flex flex-col gap-3">
+              <a href="#tools" onClick={() => setMobileMenuOpen(false)} className="text-[#d4c8b4] hover:text-[#f5d98a] transition-colors py-2 text-sm">Tools</a>
+              <a href="#how-it-works" onClick={() => setMobileMenuOpen(false)} className="text-[#d4c8b4] hover:text-[#f5d98a] transition-colors py-2 text-sm">How It Works</a>
+              <a href="#output" onClick={() => setMobileMenuOpen(false)} className="text-[#d4c8b4] hover:text-[#f5d98a] transition-colors py-2 text-sm">Output</a>
+              <button onClick={() => { navigate("/pricing"); setMobileMenuOpen(false); }} className="text-left text-[#d4c8b4] hover:text-[#f5d98a] transition-colors py-2 text-sm">Pricing</button>
+              <button onClick={() => { navigate("/affiliates"); setMobileMenuOpen(false); }} className="text-left text-[#d4c8b4] hover:text-[#f5d98a] transition-colors py-2 text-sm">Affiliates</button>
+              <div className="flex gap-3 pt-2 border-t border-[#c9a96e]/10">
+                <Button onClick={() => { navigate("/dashboard"); setMobileMenuOpen(false); }} className="bg-[#c9a96e] hover:bg-[#b8944f] text-[#1a1008] font-semibold flex-1" size="sm">
+                  Open Dashboard
+                </Button>
+              </div>
+            </div>
+          </div>
+        )}
       </nav>
 
       <section className="relative overflow-hidden">
