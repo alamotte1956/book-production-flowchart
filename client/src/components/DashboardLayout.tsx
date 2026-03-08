@@ -15,7 +15,7 @@ import {
 } from "@/components/ui/sidebar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { useIsMobile } from "@/hooks/useMobile";
-import { usePlan } from "@/hooks/usePlan";
+import { usePlan, type PlanFeature } from "@/hooks/usePlan";
 import {
   LayoutDashboard, PanelLeft,
   BookOpen, Ruler, Layers, BookMarked, Library, HelpCircle, LayoutGrid, Search, FileText,
@@ -28,18 +28,18 @@ import { useTheme } from "@/contexts/ThemeContext";
 import { Button } from "./ui/button";
 import { trpc } from "@/lib/trpc";
 
-const menuItems = [
-  { icon: LayoutDashboard, label: "Dashboard", path: "/", proOnly: false },
-  { icon: LayoutGrid, label: "Templates", path: "/templates", proOnly: true },
-  { icon: BookOpen, label: "Bible Studio", path: "/bible-studio", proOnly: false },
-  { icon: Ruler, label: "Spine Calculator", path: "/spine-calculator", proOnly: false },
-  { icon: Layers, label: "Cover Designer", path: "/cover-designer", proOnly: false },
-  { icon: BookMarked, label: "ISBN & Metadata", path: "/isbn-manager", proOnly: false },
-  { icon: Search, label: "ISBN Lookup", path: "/isbn-lookup", proOnly: false },
-  { icon: FileText, label: "Print Specs", path: "/print-specs", proOnly: false },
-  { icon: Library, label: "Resources", path: "/resources", proOnly: false },
-  { icon: HelpCircle, label: "User Guide", path: "/guide", proOnly: false },
-  { icon: CreditCard, label: "Billing & Plans", path: "/pricing", proOnly: false },
+const menuItems: { icon: any; label: string; path: string; gatedFeature: PlanFeature | null }[] = [
+  { icon: LayoutDashboard, label: "Dashboard", path: "/", gatedFeature: null },
+  { icon: LayoutGrid, label: "Templates", path: "/templates", gatedFeature: "templates" },
+  { icon: BookOpen, label: "Bible Studio", path: "/bible-studio", gatedFeature: null },
+  { icon: Ruler, label: "Spine Calculator", path: "/spine-calculator", gatedFeature: null },
+  { icon: Layers, label: "Cover Designer", path: "/cover-designer", gatedFeature: null },
+  { icon: BookMarked, label: "ISBN & Metadata", path: "/isbn-manager", gatedFeature: null },
+  { icon: Search, label: "ISBN Lookup", path: "/isbn-lookup", gatedFeature: null },
+  { icon: FileText, label: "Print Specs", path: "/print-specs", gatedFeature: null },
+  { icon: Library, label: "Resources", path: "/resources", gatedFeature: null },
+  { icon: HelpCircle, label: "User Guide", path: "/guide", gatedFeature: null },
+  { icon: CreditCard, label: "Billing & Plans", path: "/pricing", gatedFeature: null },
 ];
 
 const SIDEBAR_WIDTH_KEY = "sidebar-width";
@@ -212,7 +212,7 @@ function DashboardLayoutContent({
   setSidebarWidth,
 }: DashboardLayoutContentProps) {
   const { user } = useAuth();
-  const { isStarter, isPro, isPublisher, plan } = usePlan();
+  const { isStarter, isPro, isPublisher, plan, canAccess } = usePlan();
   const { theme, toggleTheme } = useTheme();
   const [location, setLocation] = useLocation();
   const { state, toggleSidebar } = useSidebar();
@@ -290,7 +290,7 @@ function DashboardLayoutContent({
             <SidebarMenu className="px-2 py-2">
               {menuItems.map((item, index) => {
                 const isActive = location === item.path;
-                const isLocked = item.proOnly && isStarter;
+                const isLocked = item.gatedFeature !== null && !canAccess(item.gatedFeature);
                 return (
                   <SidebarMenuItem key={item.path}>
                     {index === 1 && (
