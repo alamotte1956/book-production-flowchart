@@ -64,7 +64,7 @@ function getWizardExperienceLabel(exp: string) {
   }
 }
 
-const HERO_URL = "https://d2xsxph8kpxj0f.cloudfront.net/310519663211654017/kGjPju6hKCvCsjZhgUHyqj/hero-banner-cxQRR1jXLBmcXxFPJoqxWN.webp";
+
 
 const totalSteps = phases.reduce((acc, p) => acc + p.steps.length, 0);
 const totalInputs = phases.reduce((acc, p) => acc + p.steps.reduce((a, s) => a + s.inputs.length, 0), 0);
@@ -87,8 +87,8 @@ const features = [
   { icon: Clock, title: "Publishing Deadlines & Milestones", desc: "Set target dates per phase and stay on schedule from manuscript creation through final publishing and distribution." },
 ];
 
-const PAGE_TITLE = "Easy Book Publishers — Self-Publishing Platform";
-const PAGE_DESCRIPTION = "Create, design, and publish your book with our all-in-one self-publishing platform. AI typesetting, cover design, ISBN tools, and a 30-step workflow.";
+const PAGE_TITLE = "Publisher Dashboard — Easy Book Publishers";
+const PAGE_DESCRIPTION = "Your publishing command center. Access all tools, manage book projects, and track your 30-step production workflow.";
 const PAGE_KEYWORDS = "self-publishing, online publishing, book design, publishing platform, Bible publishing, easy book publishers";
 
 function setMetaTag(name: string, content: string) {
@@ -99,65 +99,6 @@ function setMetaTag(name: string, content: string) {
     document.head.appendChild(el);
   }
   el.setAttribute("content", content);
-}
-
-const SITE_URL = "https://easybookpublishers.com";
-
-const jsonLdSoftwareApp = {
-  "@context": "https://schema.org",
-  "@type": "SoftwareApplication",
-  "name": "Easy Book Publishers — Self-Publishing & Online Publishing Platform",
-  "url": SITE_URL,
-  "description": PAGE_DESCRIPTION,
-  "applicationCategory": "ProductivityApplication",
-  "operatingSystem": "Web",
-  "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
-  "featureList": [
-    "Self-publishing workflow with 30 production steps",
-    "Online publishing tools for independent authors and small presses",
-    "Create, design, and publish books from manuscript to print",
-    "Bible Design Studio for scripture publishing",
-    "AI-powered typesetting and PDF/EPUB generation",
-    "Cover Designer with full-wrap spec generation",
-    "ISBN & ONIX 3.0 metadata manager for publishing distribution",
-    "Resources & Success Hub with 43 curated self-publishing tools",
-  ],
-  "screenshot": HERO_URL,
-  "creator": { "@type": "Organization", "name": "Easy Book Publishers", "url": SITE_URL },
-};
-
-const jsonLdWebSite = {
-  "@context": "https://schema.org",
-  "@type": "WebSite",
-  "name": "Easy Book Publishers",
-  "url": SITE_URL,
-  "description": PAGE_DESCRIPTION,
-  "potentialAction": {
-    "@type": "SearchAction",
-    "target": { "@type": "EntryPoint", "urlTemplate": `${SITE_URL}/resources?q={search_term_string}` },
-    "query-input": "required name=search_term_string",
-  },
-};
-
-const jsonLdOrganization = {
-  "@context": "https://schema.org",
-  "@type": "Organization",
-  "name": "Easy Book Publishers",
-  "url": SITE_URL,
-  "logo": "https://d2xsxph8kpxj0f.cloudfront.net/310519663211654017/kGjPju6hKCvCsjZhgUHyqj/CDPlargelogo_25428631.PNG",
-  "sameAs": [SITE_URL],
-  "description": "Easy Book Publishers builds self-publishing and online publishing tools that help independent authors and small presses create, design, and publish professional books — from first draft to finished product.",
-};
-
-function injectJsonLd(id: string, data: object) {
-  let el = document.getElementById(id) as HTMLScriptElement | null;
-  if (!el) {
-    el = document.createElement("script");
-    el.id = id;
-    el.type = "application/ld+json";
-    document.head.appendChild(el);
-  }
-  el.textContent = JSON.stringify(data);
 }
 
 // ─── Tool Hub definition ──────────────────────────────────────────────────────
@@ -287,14 +228,6 @@ export default function Home() {
     setMetaTag("description", PAGE_DESCRIPTION);
     setMetaTag("keywords", PAGE_KEYWORDS);
     setMetaTag("robots", "index, follow");
-    injectJsonLd("jsonld-software-app", jsonLdSoftwareApp);
-    injectJsonLd("jsonld-website", jsonLdWebSite);
-    injectJsonLd("jsonld-organization", jsonLdOrganization);
-    return () => {
-      ["jsonld-software-app", "jsonld-website", "jsonld-organization"].forEach(id => {
-        document.getElementById(id)?.remove();
-      });
-    };
   }, []);
 
   useEffect(() => {
@@ -303,10 +236,10 @@ export default function Home() {
     const plan = params.get("plan");
     if (checkout === "success") {
       toast.success(`Welcome to ${plan ? plan.replace("_", " ").replace(/\b\w/g, c => c.toUpperCase()) : "your new plan"}! Your premium features are now unlocked.`);
-      window.history.replaceState({}, "", "/");
+      window.history.replaceState({}, "", "/dashboard");
     } else if (checkout === "cancelled") {
       toast("Checkout was cancelled. You can upgrade anytime from the Pricing page.");
-      window.history.replaceState({}, "", "/");
+      window.history.replaceState({}, "", "/dashboard");
     }
   }, []);
 

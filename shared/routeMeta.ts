@@ -366,6 +366,30 @@ export const ROUTE_META: Array<{ path: string; meta: RouteMeta }> = [
     },
   },
   {
+    path: "/dashboard",
+    meta: {
+      title: "Publisher Dashboard — Easy Book Publishers",
+      description:
+        "Your publishing command center. Access all tools, manage book projects, and track your 30-step production workflow.",
+      keywords:
+        "publishing dashboard, book projects, self-publishing tools, production workflow, Easy Book Publishers",
+      canonical: `${BASE}/dashboard`,
+      ogImage: OG_IMAGE,
+      ogType: "website",
+      twitterCard: "summary",
+      siteName: SITE_NAME,
+      jsonLd: {
+        "@context": "https://schema.org",
+        "@type": "WebPage",
+        name: "Publisher Dashboard",
+        description: "Your publishing command center with all tools, projects, and production workflow tracking.",
+        url: `${BASE}/dashboard`,
+        isPartOf: { "@id": `${BASE}/#website` },
+        provider: ORG_SCHEMA,
+      },
+    },
+  },
+  {
     path: "/",
     meta: {
       title: "Easy Book Publishers — Manuscript to Masterpiece",
