@@ -324,7 +324,7 @@ export const ROUTE_META: Array<{ path: string; meta: RouteMeta }> = [
     meta: {
       title: "Pricing — Easy Book Publishers",
       description:
-        "Simple, transparent pricing for self-publishing. Starter (free), Author Pro ($149), and Publisher ($399) plans with AI typesetting, EPUB/PDF export, and team features.",
+        "Simple, transparent pricing for self-publishing. Starter (free), Author Pro ($132), and Publisher ($349) plans with AI typesetting, EPUB/PDF export, IDML, and team features.",
       keywords:
         "pricing, self-publishing plans, book publishing pricing, online publishing, publishing platform",
       canonical: `${BASE}/pricing`,
@@ -336,7 +336,7 @@ export const ROUTE_META: Array<{ path: string; meta: RouteMeta }> = [
         "@context": "https://schema.org",
         "@type": "WebPage",
         name: "Pricing — Easy Book Publishers",
-        description: "Transparent pricing for self-publishing — Starter (free), Author Pro ($149), and Publisher ($399).",
+        description: "Transparent pricing for self-publishing — Starter (free), Author Pro ($132), and Publisher ($349).",
         url: `${BASE}/pricing`,
         provider: ORG_SCHEMA,
       },
@@ -411,8 +411,8 @@ export const ROUTE_META: Array<{ path: string; meta: RouteMeta }> = [
             operatingSystem: "Web",
             offers: [
               { "@type": "Offer", name: "Starter", price: "0", priceCurrency: "USD", description: "Free forever — 1 book project, basic tools" },
-              { "@type": "Offer", name: "Author Pro", price: "149", priceCurrency: "USD", description: "Full publishing toolkit with AI typesetting" },
-              { "@type": "Offer", name: "Publisher", price: "399", priceCurrency: "USD", description: "For publishing houses and prolific authors" },
+              { "@type": "Offer", name: "Author Pro", price: "132", priceCurrency: "USD", description: "Full publishing toolkit with AI typesetting, IDML, and KDP export" },
+              { "@type": "Offer", name: "Publisher", price: "349", priceCurrency: "USD", description: "For publishing houses and prolific authors with custom branding" },
             ],
             featureList: [
               "AI-powered book typesetting",
@@ -446,7 +446,7 @@ export const ROUTE_META: Array<{ path: string; meta: RouteMeta }> = [
                 name: "Is Easy Book Publishers free to use?",
                 acceptedAnswer: {
                   "@type": "Answer",
-                  text: "Yes, the Starter plan is free forever and includes 1 book project with access to the Bible Design Studio, Spine Calculator, Cover Designer, ISBN Manager, Print Specs, and Resources Hub. Paid plans (Author Pro at $149 and Publisher at $399) unlock AI typesetting, templates, and unlimited projects.",
+                  text: "Yes, the Starter plan is free forever and includes 1 book project with access to the Bible Design Studio, Spine Calculator, Cover Designer, ISBN Manager, Print Specs, and Resources Hub. Paid plans (Author Pro at $132 and Publisher at $349) unlock AI typesetting, 40+ templates, IDML export, and unlimited projects.",
                 },
               },
               {

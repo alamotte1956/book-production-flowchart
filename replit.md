@@ -115,7 +115,7 @@ PostgreSQL via Replit's built-in database. Use `npx drizzle-kit push` to sync sc
 - **Guided Journey Dashboard**: New users see "Start Your Publishing Journey" CTA, wizard-completers see roadmap summary with retake option
 - **Project Duplication**: Duplicate button in Project Tracker creates project copy with "(Copy)" suffix
 - **Notification Center**: Bell icon in sidebar with unread count, popover dropdown, localStorage-based read tracking
-- **Pricing Page**: Three tiers (Starter free, Author Pro $149 lifetime, Publisher $399 lifetime) with billing toggle, competitor comparison, and FAQ
+- **Pricing Page**: Three tiers (Starter free, Author Pro $132 lifetime, Publisher $349 lifetime) with billing toggle, competitor comparison, and FAQ
 - **Getting Started Checklist**: New projects show 6-step onboarding checklist, auto-hides after 3 completed steps
 - **Resources Search & Filter**: Search bar with text highlighting, category filter pills (Writing, Editorial, Design, etc.)
 - **Contact Form**: Public contact form on landing page (backend wired to contact_submissions table)
@@ -139,12 +139,12 @@ PostgreSQL via Replit's built-in database. Use `npx drizzle-kit push` to sync sc
 - **Schema**: `stripe.*` tables auto-synced (products, prices, customers, subscriptions, etc.) — NEVER INSERT directly
 - **Webhook**: `/api/stripe/webhook` route registered BEFORE `express.json()` with raw body parsing
 - **Products**: Created via `server/seedStripeProducts.ts` (run `npx tsx server/seedStripeProducts.ts`)
-  - Author Pro: monthly ($14.99), annual ($99.99/yr), lifetime ($149)
-  - Publisher: monthly ($39.99), annual ($299.88/yr), lifetime ($399)
+  - Author Pro: monthly ($12.99), annual ($107.88/yr), lifetime ($132)
+  - Publisher: monthly ($34.99), annual ($299.88/yr), lifetime ($349)
 - **User columns**: `plan` (enum: starter/author_pro/publisher), `stripeCustomerId`, `stripeSubscriptionId`
 - **tRPC routes**: `stripe.getSubscription`, `stripe.createCheckoutSession`, `stripe.createBillingPortal`, `stripe.getProducts`, `stripe.getPublishableKey`
 - **Webhook handlers**: `checkout.session.completed` (upgrades plan), `customer.subscription.updated`, `customer.subscription.deleted` (reverts to starter)
-- **Price IDs**: Hardcoded in `client/src/pages/Pricing.tsx` (PRICE_IDS constant) — update if Stripe products are recreated
+- **Price IDs**: Hardcoded in `client/src/pages/Pricing.tsx` (PRICE_IDS constant) — update if Stripe products are recreated. NOTE: To apply new pricing ($132/$349), delete existing Stripe products first, re-run seed script, then update PRICE_IDS with new IDs
 
 ## Feature Gating
 

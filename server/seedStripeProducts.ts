@@ -30,29 +30,29 @@ async function seedProducts() {
 
   const authorProMonthly = await stripe.prices.create({
     product: authorPro.id,
-    unit_amount: 1499,
+    unit_amount: 1299,
     currency: 'usd',
     recurring: { interval: 'month' },
     metadata: { billingCycle: 'monthly', planName: 'author_pro' },
   });
-  console.log(`  Monthly: ${authorProMonthly.id} — $14.99/mo`);
+  console.log(`  Monthly: ${authorProMonthly.id} — $12.99/mo`);
 
   const authorProAnnual = await stripe.prices.create({
     product: authorPro.id,
-    unit_amount: 9999,
+    unit_amount: 10788,
     currency: 'usd',
     recurring: { interval: 'year' },
     metadata: { billingCycle: 'annual', planName: 'author_pro' },
   });
-  console.log(`  Annual: ${authorProAnnual.id} — $99.99/yr ($9.99/mo)`);
+  console.log(`  Annual: ${authorProAnnual.id} — $107.88/yr ($8.99/mo)`);
 
   const authorProLifetime = await stripe.prices.create({
     product: authorPro.id,
-    unit_amount: 14900,
+    unit_amount: 13200,
     currency: 'usd',
     metadata: { billingCycle: 'lifetime', planName: 'author_pro' },
   });
-  console.log(`  Lifetime: ${authorProLifetime.id} — $149.00`);
+  console.log(`  Lifetime: ${authorProLifetime.id} — $132.00`);
 
   const publisher = await stripe.products.create({
     name: 'Publisher',
@@ -66,12 +66,12 @@ async function seedProducts() {
 
   const publisherMonthly = await stripe.prices.create({
     product: publisher.id,
-    unit_amount: 3999,
+    unit_amount: 3499,
     currency: 'usd',
     recurring: { interval: 'month' },
     metadata: { billingCycle: 'monthly', planName: 'publisher' },
   });
-  console.log(`  Monthly: ${publisherMonthly.id} — $39.99/mo`);
+  console.log(`  Monthly: ${publisherMonthly.id} — $34.99/mo`);
 
   const publisherAnnual = await stripe.prices.create({
     product: publisher.id,
@@ -80,15 +80,15 @@ async function seedProducts() {
     recurring: { interval: 'year' },
     metadata: { billingCycle: 'annual', planName: 'publisher' },
   });
-  console.log(`  Annual: ${publisherAnnual.id} — $299.88/yr ($29.99/mo)`);
+  console.log(`  Annual: ${publisherAnnual.id} — $299.88/yr ($24.99/mo)`);
 
   const publisherLifetime = await stripe.prices.create({
     product: publisher.id,
-    unit_amount: 39900,
+    unit_amount: 34900,
     currency: 'usd',
     metadata: { billingCycle: 'lifetime', planName: 'publisher' },
   });
-  console.log(`  Lifetime: ${publisherLifetime.id} — $399.00`);
+  console.log(`  Lifetime: ${publisherLifetime.id} — $349.00`);
 
   console.log('\nDone! Products and prices created in Stripe.');
   console.log('Webhooks will automatically sync them to the database.');
