@@ -4,6 +4,7 @@
  * Unauthenticated: Artisan storybook landing page
  */
 import { useAuth } from "@/_core/hooks/useAuth";
+import { usePlan } from "@/hooks/usePlan";
 import { trpc } from "@/lib/trpc";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -14,7 +15,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Progress } from "@/components/ui/progress";
 import { Badge } from "@/components/ui/badge";
 import {
-  BookOpen, Plus, Trash2, ArrowRight, Loader2,
+  BookOpen, Plus, Trash2, ArrowRight, Loader2, Lock,
   Upload, CheckCircle2, SkipForward, Clock, Sparkles, Copy,
   Layers, BookMarked, Ruler, Zap, BarChart3, Library,
   ChevronRight, ChevronDown, Calendar, Star, TrendingUp, FileText, HelpCircle, LogOut, User, Menu, X, LayoutGrid, Search, Send,
@@ -264,6 +265,7 @@ const TOOLS = [
 
 export default function Home() {
   const { user, isAuthenticated, loading: authLoading, logout } = useAuth();
+  const { isStarter, projectLimit } = usePlan();
   const [, navigate] = useLocation();
   const [open, setOpen] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -313,6 +315,12 @@ export default function Home() {
       setOpen(false);
       setTitle(""); setAuthor(""); setGenre(""); setBibleEditionType(""); setBibleTranslation(""); setNotes("");
       navigate(`/project/${project.id}`);
+    },
+    onError: (err) => {
+      if (err.data?.code === "FORBIDDEN") {
+        setOpen(false);
+        navigate("/pricing");
+      }
     },
   });
   const utils = trpc.useUtils();
@@ -795,6 +803,36 @@ export default function Home() {
           </section>
         )}
 
+        {isStarter && (
+          <section className="mb-8">
+            <div className="rounded-2xl border border-[#c9a96e]/25 bg-gradient-to-r from-[#c9a96e]/5 via-white to-[#c9a96e]/5 p-6">
+              <div className="flex items-start gap-4">
+                <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-[#c9a96e]/20 to-[#c9a96e]/5 flex items-center justify-center shrink-0">
+                  <Sparkles size={22} className="text-[#c9a96e]" />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <h3 className="font-serif text-lg text-[#2c1a00] mb-1">Unlock Pro Publishing Tools</h3>
+                  <p className="text-sm text-[#8b7b6b] mb-3">
+                    Upgrade to Author Pro for AI-powered typesetting, KDP-ready exports, production timelines, 42 book templates, and unlimited projects.
+                  </p>
+                  <div className="flex flex-wrap gap-2 mb-4">
+                    {["AI Typesetting", "KDP Export", "Timeline", "Templates", "Unlimited Projects"].map(f => (
+                      <span key={f} className="text-[11px] px-2.5 py-1 rounded-full bg-[#c9a96e]/10 text-[#8b5e3c] font-medium border border-[#c9a96e]/15">{f}</span>
+                    ))}
+                  </div>
+                  <Button
+                    onClick={() => navigate("/pricing")}
+                    size="sm"
+                    className="bg-gradient-to-r from-[#c9a96e] to-[#b8944f] hover:from-[#d4b480] hover:to-[#c9a96e] text-[#1a1008] font-semibold gap-2 shadow-sm"
+                  >
+                    View Plans & Pricing <ArrowRight size={14} />
+                  </Button>
+                </div>
+              </div>
+            </div>
+          </section>
+        )}
+
         <section>
           <div className="flex items-center justify-between mb-6">
             <div>
@@ -808,11 +846,20 @@ export default function Home() {
               </p>
             </div>
             <Dialog open={open} onOpenChange={setOpen}>
+              {isStarter && projectList.length >= projectLimit ? (
+                <Button
+                  onClick={() => navigate("/pricing")}
+                  className="bg-gradient-to-r from-[#c9a96e] to-[#b8944f] hover:from-[#d4b480] hover:to-[#c9a96e] text-[#2a1a0a] font-semibold gap-2 shadow-md shadow-[#c9a96e]/15 px-5 py-2.5"
+                >
+                  <Lock size={16} /> Upgrade for More Projects
+                </Button>
+              ) : (
               <DialogTrigger asChild>
                 <Button className="bg-gradient-to-r from-[#c9a96e] to-[#b8944f] hover:from-[#d4b480] hover:to-[#c9a96e] text-[#2a1a0a] font-semibold gap-2 shadow-md shadow-[#c9a96e]/15 px-5 py-2.5">
                   <Plus size={16} /> New Project
                 </Button>
               </DialogTrigger>
+              )}
               <DialogContent className="bg-gradient-to-b from-[#faf6ef] to-[#f5ede0] border-[#c9a96e]/20 shadow-2xl max-w-lg">
                 <DialogHeader>
                   <div className="flex items-center gap-2 mb-1">

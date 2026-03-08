@@ -1,5 +1,7 @@
 import { useState, useMemo } from "react";
 import { useLocation } from "wouter";
+import { usePlan } from "@/hooks/usePlan";
+import { UpgradeGate } from "@/components/UpgradeGate";
 import CDPProductionWizard from "@/components/CDPProductionWizard";
 import {
   ArrowLeft, BookOpen, Heart, BookMarked, PenLine, ZoomIn, Package, Star, Users,
@@ -272,7 +274,17 @@ function CategorySection({
   );
 }
 
-export default function Templates() {
+function TemplatesGate() {
+  const { canAccess } = usePlan();
+  if (!canAccess("templates")) {
+    return <UpgradeGate feature="templates"><span /></UpgradeGate>;
+  }
+  return <TemplatesInner />;
+}
+
+export default TemplatesGate;
+
+function TemplatesInner() {
   const [, navigate] = useLocation();
   const [search, setSearch] = useState("");
   const [activeCategory, setActiveCategory] = useState<string>("All");

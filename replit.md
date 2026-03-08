@@ -1,4 +1,4 @@
-# Easy Book Publishers LLC — Book Production Tracker
+# Easy Book Publishers — Book Production Tracker
 
 ## Project Overview
 
@@ -134,3 +134,14 @@ PostgreSQL via Replit's built-in database. Use `npx drizzle-kit push` to sync sc
 - **tRPC routes**: `stripe.getSubscription`, `stripe.createCheckoutSession`, `stripe.createBillingPortal`, `stripe.getProducts`, `stripe.getPublishableKey`
 - **Webhook handlers**: `checkout.session.completed` (upgrades plan), `customer.subscription.updated`, `customer.subscription.deleted` (reverts to starter)
 - **Price IDs**: Hardcoded in `client/src/pages/Pricing.tsx` (PRICE_IDS constant) — update if Stripe products are recreated
+
+## Feature Gating
+
+- **Hook**: `client/src/hooks/usePlan.ts` — `usePlan()` returns `{ plan, canAccess(feature), isStarter, isPro, isPublisher, projectLimit }`
+- **Gate Component**: `client/src/components/UpgradeGate.tsx` — full-page or inline upgrade prompt
+- **Gated Features** (require Author Pro+): `ai_typesetting`, `kdp_export`, `timeline`, `templates`, `unlimited_projects`
+- **Publisher-only**: `priority_support`
+- **Starter limits**: 1 book project (enforced on backend in `server/routers.ts` project.create and project.duplicate)
+- **Gated pages**: AutoProduce, Timeline, Templates use wrapper Gate components that render UpgradeGate for Starter users
+- **Sidebar**: Lock icons on gated items for Starter users, plan label under user name, "Upgrade Plan" CTA in footer
+- **Dashboard**: "Unlock Pro Publishing Tools" teaser banner for Starter users, "Upgrade for More Projects" button when project limit reached

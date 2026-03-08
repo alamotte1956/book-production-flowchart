@@ -71,6 +71,17 @@ export const appRouter = router({
         notes: z.string().optional(),
       }))
       .mutation(async ({ ctx, input }) => {
+        const user = await getUserById(ctx.user.id);
+        const plan = user?.plan ?? "starter";
+        if (plan === "starter") {
+          const existing = await getProjectsByUser(ctx.user.id);
+          if (existing.length >= 1) {
+            throw new TRPCError({
+              code: "FORBIDDEN",
+              message: "Starter plan is limited to 1 book project. Upgrade to Author Pro for unlimited projects.",
+            });
+          }
+        }
         return createProject({
           userId: ctx.user.id,
           title: input.title,
@@ -99,6 +110,17 @@ export const appRouter = router({
         const source = await getProjectById(input.projectId);
         if (!source || source.userId !== ctx.user.id) {
           throw new Error("Project not found");
+        }
+        const user = await getUserById(ctx.user.id);
+        const plan = user?.plan ?? "starter";
+        if (plan === "starter") {
+          const existing = await getProjectsByUser(ctx.user.id);
+          if (existing.length >= 1) {
+            throw new TRPCError({
+              code: "FORBIDDEN",
+              message: "Starter plan is limited to 1 book project. Upgrade to Author Pro for unlimited projects.",
+            });
+          }
         }
         return createProject({
           userId: ctx.user.id,
@@ -576,6 +598,13 @@ export const appRouter = router({
         fileBase64: z.string(),
       }))
       .mutation(async ({ ctx, input }) => {
+        const user = await getUserById(ctx.user.id);
+        if ((user?.plan ?? "starter") === "starter") {
+          throw new TRPCError({
+            code: "FORBIDDEN",
+            message: "AI Typesetting requires Author Pro or Publisher plan. Upgrade to access this feature.",
+          });
+        }
         const project = await getProjectById(input.projectId);
         if (!project || project.userId !== ctx.user.id) {
           throw new Error("Project not found");

@@ -15,10 +15,11 @@ import {
 } from "@/components/ui/sidebar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { useIsMobile } from "@/hooks/useMobile";
+import { usePlan } from "@/hooks/usePlan";
 import {
   LayoutDashboard, PanelLeft,
   BookOpen, Ruler, Layers, BookMarked, Library, HelpCircle, LayoutGrid, Search, FileText,
-  Sun, Moon, Bell, CheckCircle, Upload, Zap, CreditCard,
+  Sun, Moon, Bell, CheckCircle, Upload, Zap, CreditCard, Lock, ArrowUpRight,
 } from "lucide-react";
 import { CSSProperties, useCallback, useEffect, useRef, useState } from "react";
 import { useLocation } from "wouter";
@@ -28,17 +29,17 @@ import { Button } from "./ui/button";
 import { trpc } from "@/lib/trpc";
 
 const menuItems = [
-  { icon: LayoutDashboard, label: "Dashboard", path: "/" },
-  { icon: LayoutGrid, label: "Templates", path: "/templates" },
-  { icon: BookOpen, label: "Bible Studio", path: "/bible-studio" },
-  { icon: Ruler, label: "Spine Calculator", path: "/spine-calculator" },
-  { icon: Layers, label: "Cover Designer", path: "/cover-designer" },
-  { icon: BookMarked, label: "ISBN & Metadata", path: "/isbn-manager" },
-  { icon: Search, label: "ISBN Lookup", path: "/isbn-lookup" },
-  { icon: FileText, label: "Print Specs", path: "/print-specs" },
-  { icon: Library, label: "Resources", path: "/resources" },
-  { icon: HelpCircle, label: "User Guide", path: "/guide" },
-  { icon: CreditCard, label: "Billing & Plans", path: "/pricing" },
+  { icon: LayoutDashboard, label: "Dashboard", path: "/", proOnly: false },
+  { icon: LayoutGrid, label: "Templates", path: "/templates", proOnly: true },
+  { icon: BookOpen, label: "Bible Studio", path: "/bible-studio", proOnly: false },
+  { icon: Ruler, label: "Spine Calculator", path: "/spine-calculator", proOnly: false },
+  { icon: Layers, label: "Cover Designer", path: "/cover-designer", proOnly: false },
+  { icon: BookMarked, label: "ISBN & Metadata", path: "/isbn-manager", proOnly: false },
+  { icon: Search, label: "ISBN Lookup", path: "/isbn-lookup", proOnly: false },
+  { icon: FileText, label: "Print Specs", path: "/print-specs", proOnly: false },
+  { icon: Library, label: "Resources", path: "/resources", proOnly: false },
+  { icon: HelpCircle, label: "User Guide", path: "/guide", proOnly: false },
+  { icon: CreditCard, label: "Billing & Plans", path: "/pricing", proOnly: false },
 ];
 
 const SIDEBAR_WIDTH_KEY = "sidebar-width";
@@ -211,6 +212,7 @@ function DashboardLayoutContent({
   setSidebarWidth,
 }: DashboardLayoutContentProps) {
   const { user } = useAuth();
+  const { isStarter, isPro, isPublisher, plan } = usePlan();
   const { theme, toggleTheme } = useTheme();
   const [location, setLocation] = useLocation();
   const { state, toggleSidebar } = useSidebar();
@@ -288,6 +290,7 @@ function DashboardLayoutContent({
             <SidebarMenu className="px-2 py-2">
               {menuItems.map((item, index) => {
                 const isActive = location === item.path;
+                const isLocked = item.proOnly && isStarter;
                 return (
                   <SidebarMenuItem key={item.path}>
                     {index === 1 && (
@@ -296,7 +299,7 @@ function DashboardLayoutContent({
                     <SidebarMenuButton
                       isActive={isActive}
                       onClick={() => setLocation(item.path)}
-                      tooltip={item.label}
+                      tooltip={isLocked ? `${item.label} (Pro)` : item.label}
                       className={`h-10 transition-all font-normal rounded-lg ${
                         isActive
                           ? "bg-burgundy/10 text-burgundy font-medium"
@@ -306,7 +309,10 @@ function DashboardLayoutContent({
                       <item.icon
                         className={`h-4 w-4 ${isActive ? "text-burgundy" : "text-walnut/60"}`}
                       />
-                      <span className="tracking-wide text-[13px]">{item.label}</span>
+                      <span className="tracking-wide text-[13px] flex-1">{item.label}</span>
+                      {isLocked && !isCollapsed && (
+                        <Lock className="h-3 w-3 text-[#c9a96e]/50 shrink-0" />
+                      )}
                     </SidebarMenuButton>
                   </SidebarMenuItem>
                 );
@@ -331,6 +337,15 @@ function DashboardLayoutContent({
                 </span>
               )}
             </button>
+            {!isPublisher && !isCollapsed && (
+              <button
+                onClick={() => setLocation("/pricing")}
+                className="flex items-center gap-2 rounded-lg px-3 py-2 bg-gradient-to-r from-[#c9a96e]/10 to-[#c9a96e]/5 hover:from-[#c9a96e]/20 hover:to-[#c9a96e]/10 border border-[#c9a96e]/20 transition-colors w-full text-left mb-1"
+              >
+                <ArrowUpRight className="h-3.5 w-3.5 text-[#c9a96e] shrink-0" />
+                <span className="tracking-wide text-[12px] text-[#c9a96e] font-medium">Upgrade Plan</span>
+              </button>
+            )}
             <div className="flex items-center gap-3 rounded-lg px-1 py-1.5 w-full text-left group-data-[collapsible=icon]:justify-center">
               <Avatar className="h-9 w-9 border border-gold/30 bg-burgundy/10 shrink-0">
                 <AvatarFallback className="text-xs font-semibold text-burgundy bg-burgundy/10">
@@ -340,6 +355,9 @@ function DashboardLayoutContent({
               <div className="flex-1 min-w-0 group-data-[collapsible=icon]:hidden">
                 <p className="text-sm font-semibold text-walnut truncate leading-none">
                   {user?.name || "User"}
+                </p>
+                <p className="text-[11px] text-walnut/50 mt-0.5">
+                  {plan === "publisher" ? "Publisher" : plan === "author_pro" ? "Author Pro" : "Starter Plan"}
                 </p>
               </div>
             </div>

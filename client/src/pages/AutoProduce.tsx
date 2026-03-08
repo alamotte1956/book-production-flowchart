@@ -11,6 +11,8 @@ import { useState, useRef, useCallback, useEffect } from "react";
 import { Link, useParams, useLocation, useSearch } from "wouter";
 import { trpc } from "@/lib/trpc";
 import { useAuth } from "@/_core/hooks/useAuth";
+import { usePlan } from "@/hooks/usePlan";
+import { UpgradeGate } from "@/components/UpgradeGate";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -882,7 +884,17 @@ function JobCard({ jobId, projectId }: { jobId: number; projectId: number }) {
 
 // ─── Main Page ────────────────────────────────────────────────────────────────
 
-export default function AutoProduce() {
+function AutoProduceGate() {
+  const { canAccess } = usePlan();
+  if (!canAccess("ai_typesetting")) {
+    return <UpgradeGate feature="ai_typesetting"><span /></UpgradeGate>;
+  }
+  return <AutoProduceInner />;
+}
+
+export default AutoProduceGate;
+
+function AutoProduceInner() {
   const params = useParams<{ id: string }>();
   const projectId = parseInt(params.id ?? "0", 10);
   const [, navigate] = useLocation();

@@ -10,6 +10,8 @@ import { useState, useMemo, useCallback } from "react";
 import { Link, useParams, useLocation } from "wouter";
 import { trpc } from "@/lib/trpc";
 import { useAuth } from "@/_core/hooks/useAuth";
+import { usePlan } from "@/hooks/usePlan";
+import { UpgradeGate } from "@/components/UpgradeGate";
 import { phases } from "@/data/flowchartData";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -70,7 +72,17 @@ const STATUS_STYLES: Record<string, { label: string; color: string; bg: string; 
 
 // ─── Component ───────────────────────────────────────────────────
 
-export default function Timeline() {
+function TimelineGate() {
+  const { canAccess } = usePlan();
+  if (!canAccess("timeline")) {
+    return <UpgradeGate feature="timeline"><span /></UpgradeGate>;
+  }
+  return <TimelineInner />;
+}
+
+export default TimelineGate;
+
+function TimelineInner() {
   const { id } = useParams<{ id: string }>();
   const [, navigate] = useLocation();
   const { isAuthenticated, loading: authLoading } = useAuth();
