@@ -11,8 +11,9 @@ import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Separator } from "@/components/ui/separator";
 import { Badge } from "@/components/ui/badge";
+import { exportSpecSheetAsPdf } from "@/lib/exportPdf";
 import {
-  Ruler, Copy, Check, AlertTriangle,
+  Ruler, Copy, Check, AlertTriangle, Download,
 } from "lucide-react";
 import { toast } from "sonner";
 import DashboardLayout from "@/components/DashboardLayout";
@@ -229,7 +230,7 @@ export default function SpineCalculator() {
       `Copyright Page:         ${copyrightPage ? "Yes" : "No"}`,
       "",
       "═══════════════════════════════════════════════",
-      `Generated: ${new Date().toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" })}`,
+      `Easy Book Publishers — ${new Date().toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" })}`,
       "═══════════════════════════════════════════════",
     ];
     return lines.join("\n");
@@ -240,6 +241,73 @@ export default function SpineCalculator() {
       setCopied(true);
       toast.success("Specification sheet copied to clipboard");
       setTimeout(() => setCopied(false), 2000);
+    });
+  }
+
+  function handleDownloadPdf() {
+    exportSpecSheetAsPdf({
+      title: "Bible Binding Specification Sheet",
+      subtitle: `${trimSizeId === "custom" ? `${trimW}" × ${trimH}"` : trimSize.name} · ${pages} pages`,
+      filename: `Spine-Spec-${trimW}x${trimH}-${pages}pp.pdf`,
+      sections: [
+        {
+          title: "Book Details",
+          rows: [
+            { label: "Trim Size", value: trimSizeId === "custom" ? `${trimW}" × ${trimH}"` : trimSize.name },
+            { label: "Page Count", value: `${pages.toLocaleString()} pp` },
+            { label: "Paper", value: paper.name },
+            { label: "Paper PPI", value: `${ppi} pages/inch` },
+          ],
+        },
+        {
+          title: "Text Block",
+          rows: [
+            { label: "Text Block Thickness", value: `${textBlockIn}" (${textBlockMm} mm)` },
+          ],
+        },
+        {
+          title: "Binding",
+          rows: [
+            { label: "Binding Method", value: binding.name },
+            { label: "Board Thickness", value: binding.boardThickness > 0 ? `${binding.boardThickness}" (${Math.round(binding.boardThickness * 25.4 * 10) / 10} mm)` : "N/A (no boards)" },
+            { label: "Cover Material", value: coverMaterial.name },
+            { label: "Cover Thickness", value: `${coverThickness}" (${Math.round(coverThickness * 25.4 * 10) / 10} mm)` },
+          ],
+        },
+        {
+          title: "Spine",
+          rows: [
+            { label: "Spine Width", value: `${spine.spineIn}" (${spine.spineMm} mm)`, bold: true },
+          ],
+        },
+        {
+          title: "Cover Dimensions",
+          rows: [
+            { label: "Cover Width (full wrap)", value: `${coverW}" (${coverWmm} mm)` },
+            { label: "Cover Height", value: `${coverHin}" (${coverHmm} mm)` },
+          ],
+        },
+        {
+          title: "Finishing",
+          rows: [
+            { label: "Ribbon Markers", value: `${ribbonCount} × ${ribbonColor}` },
+            { label: "Gilding", value: GILDING_OPTIONS.find(g => g.id === gildingId)?.name ?? "—" },
+            { label: "Headband / Tailband", value: headbandColor },
+            { label: "Thumb Index", value: thumbIndex ? "Yes" : "No" },
+          ],
+        },
+        {
+          title: "Interior Features",
+          rows: [
+            { label: "Red-Letter Edition", value: redLetter ? "Yes" : "No" },
+            { label: "Section Headings", value: sectionHeadings ? "Yes" : "No" },
+            { label: "Cross-References", value: crossRefs ? "Yes" : "No" },
+            { label: "Footnotes", value: footnotes ? "Yes" : "No" },
+            { label: "Concordance", value: concordance ? "Yes" : "No" },
+            { label: "Maps / Charts", value: maps ? "Yes" : "No" },
+          ],
+        },
+      ],
     });
   }
 
@@ -591,15 +659,26 @@ export default function SpineCalculator() {
             <Card className="border-[#e8dfd0] bg-white shadow-sm">
               <CardHeader className="pb-3 flex flex-row items-center justify-between">
                 <CardTitle className="font-serif text-lg text-[#2c1a00]">Specification Sheet</CardTitle>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={handleCopy}
-                  className="border-[#d4c8b4] text-[#5c3d2e] hover:bg-[#f0e8d8]"
-                >
-                  {copied ? <Check size={14} className="mr-2 text-green-600" /> : <Copy size={14} className="mr-2" />}
-                  {copied ? "Copied!" : "Copy"}
-                </Button>
+                <div className="flex gap-2">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={handleDownloadPdf}
+                    className="border-[#d4c8b4] text-[#5c3d2e] hover:bg-[#f0e8d8]"
+                  >
+                    <Download size={14} className="mr-2" />
+                    PDF
+                  </Button>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={handleCopy}
+                    className="border-[#d4c8b4] text-[#5c3d2e] hover:bg-[#f0e8d8]"
+                  >
+                    {copied ? <Check size={14} className="mr-2 text-green-600" /> : <Copy size={14} className="mr-2" />}
+                    {copied ? "Copied!" : "Copy"}
+                  </Button>
+                </div>
               </CardHeader>
               <CardContent>
                 <pre className="text-[10px] font-mono text-[#5c3d2e] bg-[#faf6ef] rounded-lg p-4 overflow-x-auto whitespace-pre leading-relaxed border border-[#e8dfd0]">

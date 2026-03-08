@@ -10,6 +10,7 @@ import { Separator } from "@/components/ui/separator";
 import { ArrowLeft, FileText, Printer, Copy, Check, Download, Info } from "lucide-react";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { toast } from "sonner";
+import { exportSpecSheetAsPdf } from "@/lib/exportPdf";
 import DashboardLayout from "@/components/DashboardLayout";
 
 const TRIM_SIZES = [
@@ -215,17 +216,80 @@ export default function PrintSpecs() {
   };
 
   const handleDownload = () => {
-    if (!specText) return;
-    const blob = new Blob([specText], { type: "text/plain" });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = `Print-Specs-${trimW}x${trimH}-${pages}pp.txt`;
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    URL.revokeObjectURL(url);
-    toast.success("Spec sheet downloaded");
+    if (!specs) return;
+    exportSpecSheetAsPdf({
+      title: "Press-Ready File Specification Sheet",
+      subtitle: `${trimSizeId === "custom" ? `${trimW}" × ${trimH}"` : trimSize.name} · ${pages} pages`,
+      filename: `Print-Specs-${trimW}x${trimH}-${pages}pp.pdf`,
+      sections: [
+        {
+          title: "Book Details",
+          rows: [
+            { label: "Trim Size", value: trimSizeId === "custom" ? `${trimW}" × ${trimH}"` : trimSize.name },
+            { label: "Trim (mm)", value: `${Math.round(trimW * 25.4 * 10) / 10} × ${Math.round(trimH * 25.4 * 10) / 10} mm` },
+            { label: "Page Count", value: `${pages.toLocaleString()} pp` },
+            { label: "Paper Stock", value: `${paper.name} (${ppi} PPI)` },
+            { label: "Binding", value: binding.name },
+          ],
+        },
+        {
+          title: "Spine",
+          rows: [
+            { label: "Text Block Thickness", value: `${specs.textBlock}" (${Math.round(specs.textBlock * 25.4 * 10) / 10} mm)` },
+            { label: "Spine Width", value: `${specs.spineIn}" (${specs.spineMm} mm)`, bold: true },
+          ],
+        },
+        {
+          title: "Bleed & Safe Zone",
+          rows: [
+            { label: "Bleed", value: `${BLEED}" on all sides` },
+            { label: "Safe Zone", value: `${SAFE_ZONE}" inside trim edge` },
+            { label: "Safe Content Area", value: `${specs.safeW}" × ${specs.safeH}" per page` },
+          ],
+        },
+        {
+          title: "Interior Page Dimensions",
+          rows: [
+            { label: "Trim Size", value: `${trimW}" × ${trimH}"` },
+            { label: "With Bleed", value: `${specs.trimWithBleedW}" × ${specs.trimWithBleedH}"` },
+            { label: "With Bleed (mm)", value: `${specs.trimWithBleedWmm} × ${specs.trimWithBleedHmm} mm` },
+            { label: "Pixel Dimensions", value: `${specs.interiorPixelW} × ${specs.interiorPixelH} px @ ${dpi} DPI` },
+          ],
+        },
+        {
+          title: "Full-Wrap Cover Dimensions",
+          rows: [
+            { label: "Cover Width", value: `${specs.fullWrapW}" (${specs.fullWrapWmm} mm)` },
+            { label: "Cover Height", value: `${specs.fullWrapH}" (${specs.fullWrapHmm} mm)` },
+            { label: "Cover Pixels", value: `${specs.coverPixelW} × ${specs.coverPixelH} px @ ${dpi} DPI` },
+          ],
+        },
+        {
+          title: "Color & Print",
+          rows: [
+            { label: "Interior Color Mode", value: colorMode.name },
+            { label: "Cover Color Mode", value: coverColor.name },
+            { label: "Resolution", value: `${dpi} DPI minimum` },
+          ],
+        },
+        {
+          title: "File Format Requirements",
+          rows: [
+            { label: "PDF Standard", value: pdfStandard.name },
+            { label: "Font Embedding", value: "ALL fonts must be embedded or outlined" },
+            { label: "Transparency", value: "Flatten (PDF/X-1a) or preserve (PDF/X-4)" },
+            { label: "ICC Profile", value: "Use printer-supplied or GRACoL 2006" },
+          ],
+        },
+        {
+          title: "Black Ink Guidelines",
+          rows: [
+            { label: "Body Text Black", value: "K100 only (C0 M0 Y0 K100)" },
+            { label: "Rich Black (covers)", value: "C60 M40 Y40 K100" },
+          ],
+        },
+      ],
+    });
   };
 
   const handlePrint = () => {
@@ -260,7 +324,7 @@ export default function PrintSpecs() {
               onClick={handleDownload}
             >
               <Download className="w-3.5 h-3.5" />
-              Download
+              PDF
             </Button>
             <Button
               size="sm"

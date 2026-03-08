@@ -15,6 +15,7 @@ import { Separator } from "@/components/ui/separator";
 import { ArrowLeft, Layers, Printer, Copy, Check, Info, Download, ShoppingCart, AlertTriangle, CheckCircle2 } from "lucide-react";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { toast } from "sonner";
+import { exportSpecSheetAsPdf } from "@/lib/exportPdf";
 import WhatsNext from "@/components/WhatsNext";
 import type { NextPrompt } from "@shared/prompts";
 
@@ -240,6 +241,8 @@ export default function CoverDesigner() {
     `Black Text:          Rich black = K100 only (not 4-color black)`,
     ...(barcode ? [`Barcode Area:        2.0" × 1.2" — bottom-right of back cover`] : []),
     "",
+    "",
+    `Easy Book Publishers — ${new Date().toLocaleDateString()}`,
     "══════════════════════════════════════════════════",
   ].join("\n") : "";
 
@@ -290,17 +293,56 @@ export default function CoverDesigner() {
   ].join("\n") : "";
 
   const handleDownloadKdpSpec = () => {
-    if (!kdpSpecText) return;
-    const blob = new Blob([kdpSpecText], { type: "text/plain" });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = `KDP-Cover-Spec-${trimW}x${trimH}-${pages}pp.txt`;
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    URL.revokeObjectURL(url);
-    toast.success("KDP cover spec downloaded");
+    if (!kdpSpecs) return;
+    exportSpecSheetAsPdf({
+      title: "Amazon KDP Cover Template Specifications",
+      subtitle: `${trimSizeId === "custom" ? `${trimW}" × ${trimH}"` : trimSize.name} · ${pages} pages`,
+      filename: `KDP-Cover-Spec-${trimW}x${trimH}-${pages}pp.pdf`,
+      sections: [
+        {
+          title: "Book Details",
+          rows: [
+            { label: "Trim Size", value: trimSizeId === "custom" ? `${trimW}" × ${trimH}"` : trimSize.name },
+            { label: "KDP Compatible", value: kdpSpecs.isAcceptedTrimSize ? "YES ✓" : "NO ✗" },
+            { label: "Page Count", value: `${pages.toLocaleString()} pp` },
+            { label: "Paper Stock", value: `${kdpSpecs.paperName} (${kdpSpecs.ppi} PPI)` },
+          ],
+        },
+        {
+          title: "KDP Spine Calculation",
+          rows: [
+            { label: "Formula", value: "Page Count ÷ PPI = Spine Width" },
+            { label: "Calculation", value: `${pages} ÷ ${kdpSpecs.ppi} = ${kdpSpecs.spineIn}"` },
+            { label: "Spine Width", value: `${kdpSpecs.spineIn}" (${kdpSpecs.spineMm}mm)`, bold: true },
+          ],
+        },
+        {
+          title: "Full Cover Dimensions (Amazon Formula)",
+          rows: [
+            { label: "Full Width", value: `${kdpSpecs.fullWidth}"` },
+            { label: "Full Height", value: `${kdpSpecs.fullHeight}"` },
+            { label: "Full Cover (mm)", value: `${kdpSpecs.fullWidthMm} × ${kdpSpecs.fullHeightMm}mm` },
+          ],
+        },
+        {
+          title: "Bleed & Barcode",
+          rows: [
+            { label: "Bleed", value: `${BLEED}" on outside, top, and bottom edges` },
+            { label: "Barcode Zone", value: `${kdpSpecs.barcodeZoneW}" × ${kdpSpecs.barcodeZoneH}" — bottom-right of back cover` },
+          ],
+        },
+        {
+          title: "KDP File Requirements",
+          rows: [
+            { label: "Format", value: "PDF" },
+            { label: "Color Space", value: "CMYK (no RGB, no spot colors)" },
+            { label: "Resolution", value: "300 DPI minimum" },
+            { label: "Fonts", value: "All fonts must be embedded" },
+            { label: "Transparency", value: "Must be flattened" },
+          ],
+        },
+      ],
+    });
   };
 
   const handleCopy = () => {
@@ -312,7 +354,64 @@ export default function CoverDesigner() {
   };
 
   const handlePrint = () => {
-    window.print();
+    if (!specs) return;
+    exportSpecSheetAsPdf({
+      title: "Cover Design Specification Sheet",
+      subtitle: `${trimSizeId === "custom" ? `${trimW}" × ${trimH}"` : trimSize.name} · ${pages} pages`,
+      filename: `Cover-Spec-${trimW}x${trimH}-${pages}pp.pdf`,
+      sections: [
+        {
+          title: "Book Details",
+          rows: [
+            { label: "Trim Size", value: trimSizeId === "custom" ? `${trimW}" × ${trimH}"` : trimSize.name },
+            { label: "Binding", value: binding.name },
+            { label: "Page Count", value: `${pages.toLocaleString()} pp` },
+            { label: "Paper", value: `${paper.name} (${ppi} PPI)` },
+          ],
+        },
+        {
+          title: "Spine",
+          rows: [
+            { label: "Text Block", value: `${specs.textBlock}" (${Math.round(specs.textBlock * 25.4 * 10) / 10}mm)` },
+            { label: "Spine Width", value: `${specs.spineIn}" (${specs.spineMm}mm)`, bold: true },
+          ],
+        },
+        {
+          title: "Full Wrap Dimensions (with bleed)",
+          rows: [
+            { label: "Width", value: `${specs.fullWrapW}" (${specs.fullWrapWmm}mm)` },
+            { label: "Height", value: `${specs.fullWrapH}" (${specs.fullWrapHmm}mm)` },
+          ],
+        },
+        {
+          title: "Individual Panel Dimensions",
+          rows: [
+            { label: "Front Cover", value: `${trimW}" × ${trimH}" (trim)` },
+            { label: "Back Cover", value: `${trimW}" × ${trimH}" (trim)` },
+            { label: "Spine", value: `${specs.spineIn}" × ${trimH}" (trim)` },
+          ],
+        },
+        {
+          title: "Bleed & Safe Zone",
+          rows: [
+            { label: "Bleed", value: `${BLEED}" on all sides` },
+            { label: "Safe Zone", value: `${SAFE_ZONE}" inside trim edge` },
+            { label: "Safe Content Area", value: `${specs.safeW}" × ${specs.safeH}" per panel` },
+          ],
+        },
+        {
+          title: "Print Specifications",
+          rows: [
+            { label: "Color Mode", value: colorMode.name },
+            { label: "Laminate", value: laminate.name },
+            ...(selectedFinishes.length > 0 ? [{ label: "Special Finishes", value: selectedFinishes.join(", ") }] : []),
+            { label: "Resolution", value: "300 DPI minimum (600 DPI preferred)" },
+            { label: "PDF Standard", value: "PDF/X-1a or PDF/X-4" },
+            { label: "Font Embedding", value: "All fonts must be embedded" },
+          ],
+        },
+      ],
+    });
   };
 
   const toggleFinish = (finish: string) => {
@@ -686,7 +785,7 @@ export default function CoverDesigner() {
                       onClick={handleDownloadKdpSpec}
                     >
                       <Download className="w-4 h-4" />
-                      Download KDP Cover Spec
+                      Download KDP Cover Spec (PDF)
                     </Button>
                   </>
                 )}
@@ -798,7 +897,7 @@ export default function CoverDesigner() {
                     onClick={handlePrint}
                   >
                     <Printer className="w-4 h-4" />
-                    Print Spec Sheet
+                    Export Spec Sheet (PDF)
                   </Button>
 
                   <WhatsNext
