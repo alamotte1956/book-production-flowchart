@@ -795,7 +795,7 @@ export const appRouter = router({
   ai: router({
     generateCopy: protectedProcedure
       .input(z.object({
-        type: z.enum(["back-cover-blurb", "author-bio", "catalog-description", "press-release", "marketing-email"]),
+        type: z.enum(["back-cover-blurb", "author-bio", "catalog-description", "press-release", "marketing-email", "bisac-description", "toc-description", "study-note-summary", "devotional-intro"]),
         bookTitle: z.string().min(1).max(255),
         author: z.string().max(255).optional(),
         genre: z.string().max(128).optional(),
@@ -810,8 +810,12 @@ export const appRouter = router({
           "catalog-description": "library/bookstore catalog description",
           "press-release": "press release",
           "marketing-email": "marketing email",
+          "bisac-description": "BISAC subject description",
+          "toc-description": "table of contents description",
+          "study-note-summary": "study note summary",
+          "devotional-intro": "devotional introduction",
         };
-        const targetWords = input.wordCount ?? (input.type === "back-cover-blurb" ? 150 : input.type === "author-bio" ? 100 : 200);
+        const targetWords = input.wordCount ?? (input.type === "back-cover-blurb" ? 150 : input.type === "author-bio" ? 100 : input.type === "bisac-description" ? 100 : input.type === "study-note-summary" ? 200 : input.type === "devotional-intro" ? 250 : 200);
         const toneGuide = input.tone ? `Tone: ${input.tone}.` : "";
         const synopsisLine = input.synopsis ? `\nSynopsis / Key details: ${input.synopsis}` : "";
 

@@ -463,7 +463,10 @@ const GENRES = [
   "Fantasy", "Romance", "Historical Fiction", "Horror", "Young Adult", "Middle Grade",
   "Children's", "Narrative Nonfiction", "Memoir / Autobiography",
   "Self-Help / Personal Development", "Business / Finance", "Academic / Textbook",
-  "Poetry", "Graphic Novel", "Short Story Collection", "Bible / Scripture", "Other",
+  "Poetry", "Graphic Novel", "Short Story Collection", "Bible / Scripture",
+  "Christian Living", "Devotional", "Children's Christian", "Prayer", "Pastoral",
+  "Biography", "Academic / Theological", "Music / Audio",
+  "Other",
 ];
 
 // ─── Inline Genre Editor ─────────────────────────────────────────────────────
@@ -822,6 +825,185 @@ function PhaseSection({
   );
 }
 
+// ─── AI Writing Assistant ────────────────────────────────────────
+
+const TRACKER_COPY_TYPES = [
+  { value: "back-cover-blurb", label: "Back-Cover Blurb", desc: "~150 words" },
+  { value: "author-bio", label: "Author Biography", desc: "~100 words" },
+  { value: "press-release", label: "Press Release", desc: "~300 words" },
+  { value: "marketing-email", label: "Marketing Email", desc: "~250 words" },
+  { value: "bisac-description", label: "BISAC Description", desc: "~100 words" },
+  { value: "catalog-description", label: "Catalog Description", desc: "~200 words" },
+] as const;
+
+const BIBLE_COPY_TYPES = [
+  { value: "toc-description", label: "Table of Contents Description", desc: "~150 words" },
+  { value: "study-note-summary", label: "Study Note Summary", desc: "~200 words" },
+  { value: "devotional-intro", label: "Devotional Introduction", desc: "~250 words" },
+] as const;
+
+const AI_TONES = [
+  { value: "literary", label: "Literary" },
+  { value: "commercial", label: "Commercial" },
+  { value: "academic", label: "Academic" },
+  { value: "inspirational", label: "Inspirational" },
+  { value: "devotional", label: "Devotional" },
+] as const;
+
+type CopyTypeValue = typeof TRACKER_COPY_TYPES[number]["value"] | typeof BIBLE_COPY_TYPES[number]["value"];
+
+function AIAssistantPanel({
+  projectTitle,
+  projectAuthor,
+  projectGenre,
+}: {
+  projectTitle: string;
+  projectAuthor: string | null | undefined;
+  projectGenre: string | null | undefined;
+}) {
+  const [bookTitle, setBookTitle] = useState(projectTitle);
+  const [author, setAuthor] = useState(projectAuthor ?? "");
+  const [genre, setGenre] = useState(projectGenre ?? "");
+  const [synopsis, setSynopsis] = useState("");
+  const [copyType, setCopyType] = useState<CopyTypeValue>("back-cover-blurb");
+  const [tone, setTone] = useState<typeof AI_TONES[number]["value"]>("inspirational");
+  const [result, setResult] = useState("");
+
+  useEffect(() => { setBookTitle(projectTitle); }, [projectTitle]);
+  useEffect(() => { setAuthor(projectAuthor ?? ""); }, [projectAuthor]);
+  useEffect(() => { setGenre(projectGenre ?? ""); }, [projectGenre]);
+
+  const isBible = projectGenre === "Bible / Scripture";
+  const allCopyTypes = isBible ? [...TRACKER_COPY_TYPES, ...BIBLE_COPY_TYPES] : TRACKER_COPY_TYPES;
+
+  const generateMutation = trpc.ai.generateCopy.useMutation({
+    onSuccess: (data) => {
+      setResult(typeof data.content === "string" ? data.content : "");
+    },
+    onError: (err) => {
+      toast.error("Failed to generate copy: " + err.message);
+    },
+  });
+
+  const handleGenerate = () => {
+    if (!bookTitle.trim()) {
+      toast.error("Please enter a book title.");
+      return;
+    }
+    generateMutation.mutate({
+      type: copyType,
+      bookTitle: bookTitle.trim(),
+      author: author.trim() || undefined,
+      genre: genre.trim() || undefined,
+      synopsis: synopsis.trim() || undefined,
+      tone,
+    });
+  };
+
+  const handleCopy = () => {
+    navigator.clipboard.writeText(result);
+    toast.success("Copied to clipboard!");
+  };
+
+  return (
+    <div className="space-y-4">
+      <div>
+        <label className="text-xs font-bold uppercase tracking-wider text-[#a89880] mb-2 block">Copy Type</label>
+        <div className="space-y-1">
+          {allCopyTypes.map(ct => (
+            <button
+              key={ct.value}
+              onClick={() => setCopyType(ct.value)}
+              className={`w-full flex items-center justify-between px-3 py-2 rounded-lg border text-sm transition-all ${
+                copyType === ct.value
+                  ? "border-purple-400 bg-purple-50 text-purple-800"
+                  : "border-[#e8dfd0] bg-white text-[#3d2b1f] hover:border-[#c9a96e]/60"
+              }`}
+            >
+              <span className="font-medium text-xs">{ct.label}</span>
+              <span className="text-[10px] text-[#a89880]">{ct.desc}</span>
+            </button>
+          ))}
+        </div>
+      </div>
+
+      <div className="space-y-2">
+        <label className="text-xs font-bold uppercase tracking-wider text-[#a89880] block">Book Details</label>
+        <Input
+          value={bookTitle}
+          onChange={e => setBookTitle(e.target.value)}
+          placeholder="Book title *"
+          className="text-sm border-[#e8dfd0]"
+        />
+        <div className="grid grid-cols-2 gap-2">
+          <Input
+            value={author}
+            onChange={e => setAuthor(e.target.value)}
+            placeholder="Author"
+            className="text-sm border-[#e8dfd0]"
+          />
+          <Input
+            value={genre}
+            onChange={e => setGenre(e.target.value)}
+            placeholder="Genre"
+            className="text-sm border-[#e8dfd0]"
+          />
+        </div>
+        <Textarea
+          value={synopsis}
+          onChange={e => setSynopsis(e.target.value)}
+          placeholder="Brief synopsis or key selling points (optional)"
+          className="text-sm border-[#e8dfd0] resize-none"
+          rows={3}
+        />
+      </div>
+
+      <div>
+        <label className="text-xs font-bold uppercase tracking-wider text-[#a89880] mb-2 block">Tone</label>
+        <Select value={tone} onValueChange={(v) => setTone(v as typeof tone)}>
+          <SelectTrigger className="border-[#e8dfd0] text-sm">
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent>
+            {AI_TONES.map(t => (
+              <SelectItem key={t.value} value={t.value}>{t.label}</SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+      </div>
+
+      <Button
+        className="w-full bg-purple-600 hover:bg-purple-700 text-white gap-2"
+        onClick={handleGenerate}
+        disabled={generateMutation.isPending || !bookTitle.trim()}
+      >
+        {generateMutation.isPending ? (
+          <><RefreshCw size={14} className="animate-spin" /> Generating…</>
+        ) : (
+          <><Wand2 size={14} /> Generate Copy</>
+        )}
+      </Button>
+
+      {result && (
+        <div className="bg-[#fdf9f3] rounded-lg border border-[#e8dfd0] p-3">
+          <div className="flex items-center justify-between mb-2">
+            <span className="text-[10px] font-bold text-[#8b5e3c] uppercase tracking-wide">
+              {allCopyTypes.find(ct => ct.value === copyType)?.label}
+            </span>
+            <button
+              onClick={handleCopy}
+              className="flex items-center gap-1 text-[10px] text-[#8b7b6b] hover:text-[#5c3d2e] transition-colors"
+            >
+              <Copy size={10} /> Copy
+            </button>
+          </div>
+          <p className="text-xs text-[#3d2b1f] leading-relaxed whitespace-pre-wrap">{result}</p>
+        </div>
+      )}
+    </div>
+  );
+}
+
 // ─── Main Page ──────────────────────────────────────────────────
 
 export default function ProjectTracker() {
@@ -831,6 +1013,7 @@ export default function ProjectTracker() {
   const { isAuthenticated, loading: authLoading } = useAuth();
   const [printMode, setPrintMode] = useState(false);
   const [showNotes, setShowNotes] = useState(false);
+  const [showAI, setShowAI] = useState(false);
 
   const duplicateMutation = trpc.project.duplicate.useMutation({
     onSuccess: (newProject) => {
@@ -1047,6 +1230,15 @@ export default function ProjectTracker() {
             Notes
           </button>
 
+          {/* AI Assistant toggle */}
+          <button
+            onClick={() => setShowAI(v => !v)}
+            className={`hidden sm:flex items-center gap-1.5 text-xs transition-colors print:hidden ${showAI ? "text-purple-400" : "text-purple-300/60 hover:text-purple-400"}`}
+          >
+            <Wand2 size={14} />
+            AI Assistant
+          </button>
+
           <div className="text-right shrink-0">
             <span className="text-2xl font-serif font-bold text-[#c9a96e] print:text-[#3a2a1a]">{overallPct}%</span>
             <div className="w-32 mt-1">
@@ -1171,6 +1363,30 @@ export default function ProjectTracker() {
             })}
           </nav>
         </aside>
+
+        {/* AI Writing Assistant — collapsible right panel */}
+        {showAI && (
+          <aside className="hidden lg:block w-72 shrink-0 print:hidden order-last">
+            <div className="sticky top-24 bg-white/80 backdrop-blur-sm rounded-xl border border-[#e8dfd0] p-4 overflow-y-auto max-h-[calc(100vh-8rem)]">
+              <div className="flex items-center justify-between mb-4">
+                <div className="flex items-center gap-2">
+                  <div className="w-7 h-7 rounded-lg bg-purple-100 flex items-center justify-center">
+                    <Wand2 size={14} className="text-purple-600" />
+                  </div>
+                  <h3 className="text-sm font-serif font-semibold text-[#2c1a00]">AI Assistant</h3>
+                </div>
+                <button onClick={() => setShowAI(false)} className="text-[#a89880] hover:text-[#5c3d2e] transition-colors">
+                  <X size={14} />
+                </button>
+              </div>
+              <AIAssistantPanel
+                projectTitle={project.title}
+                projectAuthor={project.author}
+                projectGenre={project.genre}
+              />
+            </div>
+          </aside>
+        )}
 
         {/* Main content — left-aligned */}
         <main className="flex-1 min-w-0 space-y-10">

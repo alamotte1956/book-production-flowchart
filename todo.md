@@ -286,9 +286,9 @@
 - [ ] Export as PDF spec sheet for sending to printer
 
 ### 28e — AI Writing Assistant
-- [ ] Add AI assistant panel to project tracker sidebar
-- [ ] Features: generate back-cover blurb, author bio, press release, marketing copy, BISAC description
-- [ ] Bible-specific: generate table of contents description, study note summaries, devotional intros
+- [x] Add AI assistant panel to project tracker sidebar
+- [x] Features: generate back-cover blurb, author bio, press release, marketing copy, BISAC description
+- [x] Bible-specific: generate table of contents description, study note summaries, devotional intros
 
 ## Phase 28 Completion Status
 
@@ -335,10 +335,10 @@
 - [x] Show live typeface preview in the spec summary panel
 
 ## Phase 31: Recommended Pairings Panel
-- [ ] Add TYPEFACE_PAIRINGS lookup table to shared/bibleSpecs.ts
-- [ ] Build RecommendedPairings component in BibleStudio
-- [ ] Auto-apply pairing on one-click "Use This Pairing" button
-- [ ] Show live three-font preview in the pairings panel
+- [x] Add TYPEFACE_PAIRINGS lookup table to shared/bibleSpecs.ts
+- [x] Build RecommendedPairings component in BibleStudio
+- [x] Auto-apply pairing on one-click "Use This Pairing" button
+- [x] Show live three-font preview in the pairings panel
 
 ## Phase 32: SEO Fixes
 - [x] Reduce meta keywords on home page (/) from 9 to 3-8 focused keywords
@@ -387,13 +387,13 @@
 - [x] Show Retry Attempts row in Technical Details diagnostic panel
 
 ## Phase 37: Automatic Format Conversion Suggestions
-- [ ] Add errorType field to production_jobs table (enum: format_unsupported, parse_empty, pipeline_error, unknown)
-- [ ] Run pnpm db:push to migrate the database
-- [ ] Classify error type in the start and retry mutations when job fails
-- [ ] Return errorType in the status query
-- [ ] Show format conversion tip in error panel when errorType is format_unsupported or parse_empty
-- [ ] List recommended conversion tools (LibreOffice, Word, Google Docs, Pandoc) in the tip
-- [ ] Show the detected file extension in the tip message
+- [x] Add errorType field to production_jobs table (enum: format_unsupported, parse_empty, pipeline_error, unknown)
+- [x] Run pnpm db:push to migrate the database
+- [x] Classify error type in the start and retry mutations when job fails
+- [x] Return errorType in the status query
+- [x] Show format conversion tip in error panel when errorType is format_unsupported or parse_empty
+- [x] List recommended conversion tools (LibreOffice, Word, Google Docs, Pandoc) in the tip
+- [x] Show the detected file extension in the tip message
 
 ## Phase 38: Guided "What's Next?" Prompt System
 - [x] Fix classifyError scope bug (moved to module scope in routers.ts)
@@ -428,7 +428,7 @@
 - [x] Show personalized greeting on GuidedJourney page based on answers
 
 ## Phase 41: Rebrand to Create Design Publish LLC
-- [ ] Replace all "The Bookmaker's Journey" with "Create Design Publish LLC" across all files
+- [x] Replace all "The Bookmaker's Journey" with "Create Design Publish LLC" across all files
 
 ## Phase 43: User Guide Web Page
 - [ ] Build UserGuide page at /guide with full instruction book content
@@ -566,7 +566,7 @@
 ## Phase 66: CDP Publishing Catalog Integration
 - [x] Add Bible edition types to Bible Studio (Youth, Gift, Interlinear, Harmony of the Gospels, Expanded Text)
 - [x] Add Auto-Produce typesetting styles for Christian Living, Devotionals, Children's Christian, Prayer, Pastoral, Biography, Theological, Music/Audio (already in bibleSpecs.ts)
-- [ ] Update Resources Hub to include CDP's publisher partners (Harvest House, Tyndale, Zondervan, BronzeBow)
+- [x] Update Resources Hub to include CDP's publisher partners (Harvest House, Tyndale, Zondervan, BronzeBow)
 
 ## Phase 67: CDP Book Templates Page
 - [x] Create shared/cdpTemplates.ts with one-click presets for all CDP book types
@@ -574,7 +574,7 @@
 - [x] Add "Use This Template" button that pre-fills Auto-Produce settings
 - [x] Wire /cdp-templates route in App.tsx and add to dashboard nav
 - [x] Add CDP Templates link to landing page tools section (TOOLS array + desktop/mobile nav)
-- [ ] Update Resources Hub with CDP publisher partners
+- [x] Update Resources Hub with CDP publisher partners
 
 ## Phase 68: Full Book Recreation Workflow
 - [ ] Build PublishingWizard.tsx — multi-step guided workflow (Template → Project → Manuscript → Typesetting → Cover → Generate)

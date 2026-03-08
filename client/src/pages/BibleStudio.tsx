@@ -30,6 +30,7 @@ import {
   PAPER_TYPES,
   BINDING_TYPES,
   TYPEFACES,
+  TYPEFACE_PAIRINGS,
   calculateSpineWidth,
   getBibleTrimSizes,
   getBibleStyles,
@@ -632,6 +633,118 @@ function AIWritingAssistant() {
   );
 }
 
+// ─── Recommended Typeface Pairings ───────────────────────────────────────────
+
+function RecommendedPairings({ onApply }: { onApply: (bodyId: string, headingId: string, verseId: string) => void }) {
+  const [isOpen, setIsOpen] = useState(false);
+
+  return (
+    <div className="bg-white rounded-xl border border-[#e8ddd0] overflow-hidden">
+      <button
+        className="w-full flex items-center justify-between p-4 hover:bg-[#fdf9f3] transition-colors"
+        onClick={() => setIsOpen(v => !v)}
+      >
+        <div className="flex items-center gap-3">
+          <div className="w-8 h-8 rounded-lg bg-amber-100 flex items-center justify-center">
+            <Sparkles size={16} className="text-amber-600" />
+          </div>
+          <div className="text-left">
+            <h3 className="text-sm font-semibold text-[#2c1a00]">Typeface Pairings</h3>
+            <p className="text-[11px] text-[#8b7b6b]">Professional font combinations — one-click apply</p>
+          </div>
+        </div>
+        <ChevronDown size={16} className={`text-[#a08060] transition-transform ${isOpen ? "rotate-180" : ""}`} />
+      </button>
+
+      {isOpen && (
+        <div className="px-4 pb-4 border-t border-[#f0e8dc] pt-4 space-y-3">
+          {TYPEFACE_PAIRINGS.map(pairing => {
+            const bodyFace = TYPEFACES.find(t => t.id === pairing.bodyTypefaceId);
+            const headingFace = TYPEFACES.find(t => t.id === pairing.headingTypefaceId);
+            const verseFace = TYPEFACES.find(t => t.id === pairing.verseNumberTypefaceId);
+
+            const fontUrls = Array.from(new Set(
+              [bodyFace?.googleFontsUrl, headingFace?.googleFontsUrl, verseFace?.googleFontsUrl].filter((u): u is string => !!u)
+            ));
+
+            return (
+              <div key={pairing.id} className="rounded-lg border border-[#e8ddd0] bg-[#fdf9f3] p-3">
+                {fontUrls.map(url => <link key={url} rel="stylesheet" href={url} />)}
+                <div className="flex items-start justify-between gap-2 mb-2">
+                  <div>
+                    <p className="text-sm font-semibold text-[#2c1a00]">{pairing.name}</p>
+                    <p className="text-[11px] text-[#8b7b6b] mt-0.5 leading-relaxed">{pairing.description}</p>
+                  </div>
+                </div>
+
+                <div className="flex flex-wrap gap-1 mb-3">
+                  {pairing.tags.map(tag => (
+                    <span key={tag} className="text-[9px] bg-[#e8ddd0] text-[#5c3d2e] px-1.5 py-0.5 rounded font-semibold uppercase tracking-wide">
+                      {tag}
+                    </span>
+                  ))}
+                </div>
+
+                <div className="space-y-1.5 mb-3 bg-white rounded-lg border border-[#f0e8dc] p-3">
+                  <div>
+                    <p className="text-[9px] text-[#a08060] uppercase tracking-wider font-bold mb-0.5">Body</p>
+                    <p
+                      className="text-sm text-[#2c1a00] leading-snug"
+                      style={{ fontFamily: bodyFace?.cssFamily }}
+                    >
+                      In the beginning God created the heavens and the earth.
+                    </p>
+                  </div>
+                  <div>
+                    <p className="text-[9px] text-[#a08060] uppercase tracking-wider font-bold mb-0.5">Heading</p>
+                    <p
+                      className="text-base text-[#2c1a00] leading-snug"
+                      style={{
+                        fontFamily: headingFace?.cssFamily,
+                        fontStyle: headingFace?.category === "italic" ? "italic" : "normal",
+                      }}
+                    >
+                      Genesis · Chapter 1
+                    </p>
+                  </div>
+                  <div>
+                    <p className="text-[9px] text-[#a08060] uppercase tracking-wider font-bold mb-0.5">Verse Numbers</p>
+                    <p
+                      className="text-sm text-[#2c1a00] leading-snug"
+                      style={{
+                        fontFamily: verseFace?.cssFamily,
+                        fontWeight: verseFace?.category === "sans-serif-bold" ? 700 : 400,
+                      }}
+                    >
+                      ¹ In the beginning ² And the earth was
+                    </p>
+                  </div>
+                </div>
+
+                <div className="flex items-center justify-between text-[10px] text-[#8b7b6b] mb-2">
+                  <span>{bodyFace?.name} · {headingFace?.name} · {verseFace?.name}</span>
+                </div>
+
+                <Button
+                  size="sm"
+                  className="w-full bg-[#8b5e3c] hover:bg-[#7a4f30] text-white gap-1.5 text-xs"
+                  onClick={() => {
+                    onApply(pairing.bodyTypefaceId, pairing.headingTypefaceId, pairing.verseNumberTypefaceId);
+                    toast.success(`Applied "${pairing.name}" typeface pairing`);
+                  }}
+                >
+                  <Check size={12} />
+                  Use This Pairing
+                </Button>
+              </div>
+            );
+          })}
+        </div>
+      )}
+    </div>
+  );
+}
+
 // ─── Main Page ────────────────────────────────────────────────────────────────
 
 export default function BibleStudio() {
@@ -1030,10 +1143,18 @@ export default function BibleStudio() {
 
           </div>
 
-          {/* Right: Sticky spec summary + AI assistant */}
+          {/* Right: Sticky spec summary + pairings + AI assistant */}
           <div className="lg:col-span-1">
             <div className="sticky top-24 space-y-4">
               <SpecSummary config={config} />
+              <RecommendedPairings onApply={(bodyId, headingId, verseId) => {
+                setConfig(prev => ({
+                  ...prev,
+                  bodyTypefaceId: bodyId,
+                  headingTypefaceId: headingId,
+                  verseNumberTypefaceId: verseId,
+                }));
+              }} />
               <AIWritingAssistant />
             </div>
           </div>

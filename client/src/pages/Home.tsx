@@ -43,7 +43,10 @@ const GENRES = [
   "Fantasy", "Romance", "Historical Fiction", "Horror", "Young Adult", "Middle Grade",
   "Children's", "Narrative Nonfiction", "Memoir / Autobiography", "Self-Help / Personal Development",
   "Business / Finance", "Academic / Textbook", "Poetry", "Graphic Novel",
-  "Short Story Collection", "Bible / Scripture", "Other",
+  "Short Story Collection", "Bible / Scripture",
+  "Christian Living", "Devotional", "Children's Christian", "Prayer", "Pastoral",
+  "Biography", "Academic / Theological", "Music / Audio",
+  "Other",
 ];
 
 const features = [
@@ -366,7 +369,7 @@ export default function Home() {
 
         {/* Hero */}
         <div className="relative h-[75vh] min-h-[550px] flex items-center justify-center overflow-hidden pt-14">
-          <img src={HERO_URL} alt="Bookmaker's workshop" className="absolute inset-0 w-full h-full object-cover" />
+          <img src={HERO_URL} alt="Publishing workshop" className="absolute inset-0 w-full h-full object-cover" />
           <div className="absolute inset-0 bg-gradient-to-b from-[#1a1008]/70 via-[#1a1008]/40 to-[#1a1008]/80" />
           <div className="relative z-10 text-center px-6 max-w-3xl">
             <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8 }}>

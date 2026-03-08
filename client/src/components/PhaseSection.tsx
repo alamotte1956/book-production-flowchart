@@ -1,6 +1,6 @@
 /*
  * PhaseSection Component
- * Design: Each phase is a "chapter" in the bookmaker's journey.
+ * Design: Each phase is a "chapter" in the publishing journey.
  * Features decorative chapter headers with drop-cap numbers,
  * and a winding path of step cards.
  */

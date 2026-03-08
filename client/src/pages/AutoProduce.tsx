@@ -346,6 +346,51 @@ function JobCard({ jobId, projectId }: { jobId: number; projectId: number }) {
               </div>
             </div>
 
+            {(job.errorType === "format_unsupported" || job.errorType === "parse_empty") && (
+              <div className="mx-4 mb-3 rounded-lg border border-amber-300 bg-amber-50 p-4">
+                <div className="flex items-start gap-3">
+                  <div className="flex-shrink-0 mt-0.5">
+                    <div className="w-8 h-8 rounded-full bg-amber-100 flex items-center justify-center">
+                      <FileText className="w-4 h-4 text-amber-700" />
+                    </div>
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-semibold text-amber-900 mb-1">
+                      {job.errorType === "format_unsupported"
+                        ? "Unsupported File Format"
+                        : "No Text Could Be Extracted"}
+                    </p>
+                    <p className="text-sm text-amber-800 mb-2">
+                      {job.errorType === "format_unsupported"
+                        ? <>The file <strong className="font-mono">{job.manuscriptFileName ?? "uploaded file"}</strong>{(() => { const ext = (job.manuscriptFileName ?? "").split(".").pop()?.toLowerCase(); return ext ? <> (.<span className="font-mono">{ext}</span>)</> : null; })()} is in a format that Auto-Produce cannot process directly.</>
+                        : <>No readable text was found in <strong className="font-mono">{job.manuscriptFileName ?? "the uploaded file"}</strong>{(() => { const ext = (job.manuscriptFileName ?? "").split(".").pop()?.toLowerCase(); return ext ? <> (.<span className="font-mono">{ext}</span>)</> : null; })()} . The file may be image-only, password-protected, or empty.</>
+                      }
+                    </p>
+                    <p className="text-xs font-semibold text-amber-800 mb-2">Convert your file using one of these tools, then re-upload:</p>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                      {[
+                        { name: "Microsoft Word", desc: "Open → File → Save As → .docx" },
+                        { name: "Google Docs", desc: "Upload → File → Download as → .docx" },
+                        { name: "LibreOffice Writer", desc: "Free & open-source — export to .docx or .pdf" },
+                        { name: "Pandoc (CLI)", desc: "pandoc input.ext -o output.docx" },
+                      ].map(tool => (
+                        <div key={tool.name} className="flex items-start gap-2 bg-white/70 rounded border border-amber-200 px-3 py-2">
+                          <CheckCircle2 className="w-3.5 h-3.5 text-amber-600 mt-0.5 flex-shrink-0" />
+                          <div>
+                            <p className="text-xs font-semibold text-amber-900">{tool.name}</p>
+                            <p className="text-xs text-amber-700">{tool.desc}</p>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                    <p className="text-xs text-amber-700 mt-2">
+                      Supported formats: <strong>.docx</strong>, <strong>.pdf</strong>, <strong>.txt</strong>, <strong>.md</strong>, <strong>.html</strong>, <strong>.rtf</strong>, <strong>.epub</strong>
+                    </p>
+                  </div>
+                </div>
+              </div>
+            )}
+
             {/* Action bar */}
             <div className="flex items-center gap-2 px-4 pb-3 flex-wrap">
               {(job.retryCount ?? 0) >= 3 ? (

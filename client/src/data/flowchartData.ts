@@ -1,6 +1,6 @@
 /*
  * Book Production Flowchart Data
- * Design: "The Bookmaker's Journey" — Artisan Storybook Aesthetic
+ * Design: "Create Design Publish LLC" — Artisan Storybook Aesthetic
  * Each phase is a chapter, each step is a station with inputs
  */
 

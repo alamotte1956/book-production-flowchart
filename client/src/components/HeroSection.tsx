@@ -22,7 +22,7 @@ export default function HeroSection() {
       <div className="absolute inset-0">
         <img
           src={HERO_IMAGE}
-          alt="Bookmaker's workshop"
+          alt="Publishing workshop"
           className="w-full h-full object-cover"
         />
         {/* Warm overlay */}

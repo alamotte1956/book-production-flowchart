@@ -1153,6 +1153,91 @@ export const TYPEFACES: TypefaceOption[] = [
   },
 ];
 
+export type TypefacePairing = {
+  id: string;
+  name: string;
+  description: string;
+  bodyTypefaceId: string;
+  headingTypefaceId: string;
+  verseNumberTypefaceId: string;
+  tags: string[];
+};
+
+export const TYPEFACE_PAIRINGS: TypefacePairing[] = [
+  {
+    id: "classic-scripture",
+    name: "Classic Scripture",
+    description: "The traditional Bible pairing — Gentium body with Garamond italic headings and condensed sans verse numbers. Used by major Bible publishers worldwide.",
+    bodyTypefaceId: "gentium",
+    headingTypefaceId: "italic-garamond",
+    verseNumberTypefaceId: "sans-roboto-condensed",
+    tags: ["Traditional", "Bible Recommended"],
+  },
+  {
+    id: "modern-study",
+    name: "Modern Study Bible",
+    description: "Clean, highly legible pairing for study editions — Crimson Pro body, Playfair Display headings, and Source Sans verse numbers for clear hierarchy.",
+    bodyTypefaceId: "crimson-pro",
+    headingTypefaceId: "italic-playfair",
+    verseNumberTypefaceId: "sans-source-sans",
+    tags: ["Study", "Modern"],
+  },
+  {
+    id: "devotional-warmth",
+    name: "Devotional Warmth",
+    description: "Warm and inviting for devotional and inspirational editions — Lora body, Lora italic headings, and Open Sans verse numbers.",
+    bodyTypefaceId: "lora",
+    headingTypefaceId: "italic-lora",
+    verseNumberTypefaceId: "sans-open-sans",
+    tags: ["Devotional", "Warm"],
+  },
+  {
+    id: "elegant-premium",
+    name: "Elegant Premium",
+    description: "High-contrast luxury pairing for gift and premium editions — Cormorant Garamond body, Cormorant italic headings, Raleway verse numbers.",
+    bodyTypefaceId: "cormorant",
+    headingTypefaceId: "italic-cormorant",
+    verseNumberTypefaceId: "sans-raleway",
+    tags: ["Premium", "Gift Edition"],
+  },
+  {
+    id: "scholarly-reference",
+    name: "Scholarly Reference",
+    description: "Authoritative academic pairing for reference and seminary editions — Source Serif body, Libre Baskerville italic headings, Inter verse numbers.",
+    bodyTypefaceId: "source-serif",
+    headingTypefaceId: "italic-libre-baskerville",
+    verseNumberTypefaceId: "sans-inter",
+    tags: ["Academic", "Reference"],
+  },
+  {
+    id: "contemporary-readable",
+    name: "Contemporary Readable",
+    description: "Maximum readability for large-print and pew editions — Merriweather body, Crimson Pro italic headings, Nunito verse numbers.",
+    bodyTypefaceId: "merriweather",
+    headingTypefaceId: "italic-crimson",
+    verseNumberTypefaceId: "sans-nunito",
+    tags: ["Large Print", "Pew"],
+  },
+  {
+    id: "childrens-friendly",
+    name: "Children's Friendly",
+    description: "Approachable and clear for children's Bible editions — EB Garamond body, Garamond italic headings, Montserrat bold verse numbers.",
+    bodyTypefaceId: "garamond",
+    headingTypefaceId: "italic-garamond",
+    verseNumberTypefaceId: "sans-montserrat",
+    tags: ["Children's", "Friendly"],
+  },
+  {
+    id: "formal-traditional",
+    name: "Formal Traditional",
+    description: "Stately and formal for KJV and traditional editions — Libre Baskerville body, Libre Baskerville italic headings, Roboto Condensed verse numbers.",
+    bodyTypefaceId: "libre-baskerville",
+    headingTypefaceId: "italic-libre-baskerville",
+    verseNumberTypefaceId: "sans-roboto-condensed",
+    tags: ["Traditional", "KJV"],
+  },
+];
+
 /** Get all typefaces for a given category */
 export function getTypefacesByCategory(category: TypefaceCategory): TypefaceOption[] {
   return TYPEFACES.filter(t => t.category === category);

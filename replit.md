@@ -84,6 +84,11 @@ PostgreSQL via Replit's built-in database. Use `npx drizzle-kit push` to sync sc
 - **Cover Designer**: Dimensional cover spec generation
 - **ISBN Manager**: Metadata entry and ONIX 3.0 XML export
 - **What's Next Banners**: Contextual next-step suggestions on all tool pages after task completion
+- **AI Writing Assistant**: Generate back-cover blurbs, author bios, press releases, marketing copy in Project Tracker
+- **Typeface Pairings**: 8 professional font pairings in Bible Studio with one-click apply and live preview
+- **Format Conversion Suggestions**: Smart error guidance when Auto-Produce fails due to unsupported formats
+- **CDP Publisher Partners**: Harvest House, Tyndale, Zondervan, BronzeBow in Resources Hub
+- **CDP Genres**: Christian Living, Devotional, Children's Christian, Prayer, Pastoral, Biography, Academic/Theological, Music/Audio
 - **Contact Form**: Public contact form on landing page
 
 ## Database Tables

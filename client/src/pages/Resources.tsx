@@ -5,7 +5,7 @@
 
 import { useEffect } from "react";
 import { Link, useLocation } from "wouter";
-import { ArrowLeft, ExternalLink, TrendingUp, BookOpen, Users, DollarSign, Star, BookMarked, Ruler, Layers, Barcode, Calendar, Zap } from "lucide-react";
+import { ArrowLeft, ExternalLink, TrendingUp, BookOpen, Users, DollarSign, Star, BookMarked, Ruler, Layers, Barcode, Calendar, Zap, Handshake } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 
@@ -446,6 +446,35 @@ const stats = [
   },
 ];
 
+// ─── CDP Publisher Partners ──────────────────────────────────────
+
+const publisherPartners = [
+  {
+    name: "Harvest House Publishers",
+    url: "https://www.harvesthousepublishers.com",
+    description: "One of the largest independent Christian publishers in the U.S., Harvest House specializes in books that help people grow spiritually, including Bible studies, devotionals, fiction, and family resources.",
+    specialties: ["Devotionals", "Bible Studies", "Christian Fiction", "Family"],
+  },
+  {
+    name: "Tyndale House Publishers",
+    url: "https://www.tyndale.com",
+    description: "A leading publisher of Christian literature including the bestselling New Living Translation Bible. Tyndale publishes fiction, nonfiction, children's books, and digital media with a focus on practical Christian living.",
+    specialties: ["Bibles", "Nonfiction", "Fiction", "Children's"],
+  },
+  {
+    name: "Zondervan",
+    url: "https://www.zondervan.com",
+    description: "A world leader in Christian communications and a division of HarperCollins. Publisher of the New International Version (NIV) Bible, along with a broad range of inspirational, academic, and children's titles.",
+    specialties: ["Bibles", "Academic", "Inspirational", "Children's"],
+  },
+  {
+    name: "BronzeBow Publishing",
+    url: "https://www.bronzebowpublishing.com",
+    description: "A faith-based publishing company dedicated to producing high-quality Christian books, curriculum, and media. BronzeBow partners with authors to bring impactful stories and teachings to a wide audience.",
+    specialties: ["Christian Living", "Curriculum", "Ministry", "Media"],
+  },
+];
+
 // ─── Component ───────────────────────────────────────────────────
 
 export default function Resources() {
@@ -522,6 +551,50 @@ export default function Resources() {
                 </div>
               );
             })}
+          </div>
+        </section>
+
+        {/* CDP Publisher Partners */}
+        <section id="publisher-partners" className="scroll-mt-20">
+          <div className="flex items-center gap-3 mb-2">
+            <div className="w-10 h-10 rounded-full flex items-center justify-center bg-[#7c5cbf]/15 shrink-0">
+              <Handshake size={20} className="text-[#7c5cbf]" />
+            </div>
+            <div>
+              <h2 className="font-serif text-2xl text-[#3a2a1a]">CDP Publisher Partners</h2>
+            </div>
+          </div>
+          <p className="text-sm text-[#8b7b6b] mb-6 max-w-2xl">
+            Create Design Publish LLC works with these trusted publishing partners to bring faith-based content to readers worldwide.
+          </p>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {publisherPartners.map((partner) => (
+              <a
+                key={partner.name}
+                href={partner.url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="group bg-white rounded-xl border border-[#e8dfd0] p-5 hover:border-[#7c5cbf]/40 hover:shadow-md transition-all duration-200 flex flex-col gap-3"
+              >
+                <div className="flex items-start justify-between gap-3">
+                  <h3 className="font-serif text-base text-[#3a2a1a] group-hover:text-[#5c3d2e] transition-colors">
+                    {partner.name}
+                  </h3>
+                  <ExternalLink size={14} className="text-[#a89880] group-hover:text-[#7c5cbf] shrink-0 mt-0.5 transition-colors" />
+                </div>
+                <p className="text-sm text-[#5c3d2e] leading-relaxed">{partner.description}</p>
+                <div className="flex flex-wrap gap-1.5 mt-auto">
+                  {partner.specialties.map((specialty) => (
+                    <span
+                      key={specialty}
+                      className="text-[10px] px-2 py-0.5 rounded-full bg-[#7c5cbf]/10 text-[#7c5cbf]"
+                    >
+                      {specialty}
+                    </span>
+                  ))}
+                </div>
+              </a>
+            ))}
           </div>
         </section>
 

@@ -415,7 +415,7 @@ export default function UserGuide() {
           </div>
           <div className="flex items-center gap-2">
             <a
-              href="/bookmakers-journey-instruction-book.pdf"
+              href="/cdp-publishing-guide.pdf"
               download
               className="flex items-center gap-1.5 text-xs text-[#c9a96e]/60 hover:text-[#c9a96e] transition-colors px-3 py-1.5 rounded-md hover:bg-[#c9a96e]/10"
             >

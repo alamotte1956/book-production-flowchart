@@ -36,7 +36,7 @@
 <response>
 <idea>
 
-## Idea 2: "The Bookmaker's Journey" — Warm Artisan Storybook Aesthetic
+## Idea 2: "Create Design Publish LLC" — Warm Artisan Storybook Aesthetic
 
 **Design Movement**: Arts & Crafts Movement meets Editorial Design — inspired by William Morris's Kelmscott Press, hand-crafted book arts, and the warmth of a bookbinder's workshop.
 
