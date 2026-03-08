@@ -1,6 +1,6 @@
 /*
  * Book Production Flowchart Data
- * Design: "Easy Book Publishers LLC" — Artisan Storybook Aesthetic
+ * Design: "Easy Book Publishers" — Artisan Storybook Aesthetic
  * Each phase is a chapter, each step is a station with inputs
  */
 

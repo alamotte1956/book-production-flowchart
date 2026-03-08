@@ -208,10 +208,10 @@ export default function PublishingWizard({ onComplete, onSkip, initialAnswers }:
           <div className="flex items-center justify-center gap-2 mb-3">
             <img
               src="https://d2xsxph8kpxj0f.cloudfront.net/310519663211654017/kGjPju6hKCvCsjZhgUHyqj/CDPlargelogo_25428631.PNG"
-              alt="Easy Book Publishers LLC"
+              alt="Easy Book Publishers"
               className="w-7 h-7 rounded-md object-cover"
             />
-            <span className="font-serif text-lg text-[#5c3d2e]">Easy Book Publishers LLC</span>
+            <span className="font-serif text-lg text-[#5c3d2e]">Easy Book Publishers</span>
           </div>
           <h1 className="font-serif text-3xl md:text-4xl text-[#2c1a00] leading-tight">
             Let's Publish Your Book

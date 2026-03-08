@@ -375,7 +375,7 @@ export default function Templates() {
           <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
             <div>
               <div className="flex items-center gap-2 mb-3">
-                <img src="https://d2xsxph8kpxj0f.cloudfront.net/310519663211654017/kGjPju6hKCvCsjZhgUHyqj/CDPlargelogo_25428631.PNG" alt="Easy Book Publishers LLC" className="h-8 w-auto object-contain opacity-80" />
+                <img src="https://d2xsxph8kpxj0f.cloudfront.net/310519663211654017/kGjPju6hKCvCsjZhgUHyqj/CDPlargelogo_25428631.PNG" alt="Easy Book Publishers" className="h-8 w-auto object-contain opacity-80" />
                 <span className="text-[#c9a96e]/50 text-xs uppercase tracking-widest">Template Library</span>
               </div>
               <h1 className="font-serif text-3xl md:text-4xl text-[#f5d98a] mb-3">Book Templates</h1>
