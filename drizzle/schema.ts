@@ -189,7 +189,7 @@ export const affiliates = pgTable("affiliates", {
   website: varchar("website", { length: 500 }),
   paypalEmail: varchar("paypalEmail", { length: 320 }),
   promotionMethod: text("promotionMethod"),
-  commissionRate: integer("commissionRate").default(25).notNull(),
+  commissionRate: integer("commissionRate").default(20).notNull(),
   status: affiliateStatusEnum("status").default("pending").notNull(),
   totalClicks: integer("totalClicks").default(0).notNull(),
   totalConversions: integer("totalConversions").default(0).notNull(),

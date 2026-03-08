@@ -130,7 +130,7 @@ PostgreSQL via Replit's built-in database. Use `npx drizzle-kit push` to sync sc
 
 ## Affiliate Program
 
-- **Commission**: 25% on every sale, no cap on earnings
+- **Commission**: 20% on every sale, no cap on earnings
 - **Cookie Duration**: 90-day tracking cookie (`ebp_ref`) set via Express middleware on `?ref=CODE` visits
 - **Cookie Type**: httpOnly, server-read only — server reads cookie in `createCheckoutSession` and passes as metadata to Stripe
 - **Payouts**: Monthly via PayPal, $50 minimum threshold

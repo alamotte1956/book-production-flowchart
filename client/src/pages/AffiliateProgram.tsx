@@ -16,7 +16,7 @@ import { toast } from "sonner";
 import SiteFooter from "@/components/SiteFooter";
 
 const highlights = [
-  { icon: DollarSign, title: "25% Commission", description: "Earn 25% on every sale you refer — one of the highest rates in the publishing tools industry" },
+  { icon: DollarSign, title: "20% Commission", description: "Earn 20% on every sale you refer — one of the highest rates in the publishing tools industry" },
   { icon: Clock, title: "90-Day Cookie", description: "Your referrals are tracked for 90 days, so you earn even if they don't buy right away" },
   { icon: CalendarDays, title: "Monthly Payouts", description: "Get paid every month via PayPal once you hit the $50 minimum threshold" },
   { icon: BarChart3, title: "Real-Time Dashboard", description: "Track clicks, conversions, and earnings with a live affiliate dashboard" },
@@ -27,7 +27,7 @@ const highlights = [
 const steps = [
   { number: "1", title: "Apply & Get Approved", description: "Fill out the application below. Most affiliates are approved within 24 hours.", icon: Users },
   { number: "2", title: "Share Your Unique Link", description: "Get your personalized referral link and share it on your blog, YouTube, podcast, or social media.", icon: Share2 },
-  { number: "3", title: "Earn Commissions", description: "When someone purchases through your link, you earn 25% of the sale. Track everything in your dashboard.", icon: TrendingUp },
+  { number: "3", title: "Earn Commissions", description: "When someone purchases through your link, you earn 20% of the sale. Track everything in your dashboard.", icon: TrendingUp },
 ];
 
 const competitorComparison = [
@@ -35,12 +35,12 @@ const competitorComparison = [
   { competitor: "Scrivener", rate: "20%", cookie: "120 days", payout: "Monthly", notes: "Via eSellerate / Paddle" },
   { competitor: "Publisher Rocket", rate: "$60/sale", cookie: "60 days", payout: "Monthly", notes: "Flat rate per sale" },
   { competitor: "Creative Market", rate: "20–30%", cookie: "30 days", payout: "Monthly", notes: "Marketplace model" },
-  { competitor: "Easy Book Publishers", rate: "25%", cookie: "90 days", payout: "Monthly", notes: "All plans, real-time dashboard", highlight: true },
+  { competitor: "Easy Book Publishers", rate: "20%", cookie: "90 days", payout: "Monthly", notes: "All plans, real-time dashboard", highlight: true },
 ];
 
 const faqs = [
   { q: "Who can become an affiliate?", a: "Anyone with an audience interested in self-publishing, book design, or writing tools. This includes bloggers, YouTubers, podcasters, writing coaches, book designers, and publishing consultants." },
-  { q: "How much can I earn?", a: "You earn 25% on every sale. Author Pro lifetime plans earn you $33 per sale, Publisher lifetime plans earn $87.25 per sale. Monthly and annual subscriptions earn recurring commissions." },
+  { q: "How much can I earn?", a: "You earn 20% on every sale. Author Pro lifetime plans earn you $26.40 per sale, Publisher lifetime plans earn $69.80 per sale. Monthly and annual subscriptions earn recurring commissions." },
   { q: "When do I get paid?", a: "Payouts are processed monthly via PayPal once your balance reaches the $50 minimum threshold. Commissions are approved after a 30-day hold period to account for refunds." },
   { q: "How long does the cookie last?", a: "Our tracking cookie lasts 90 days. If someone clicks your link and purchases within 90 days, you get credit for the sale — even if they visit the site multiple times." },
   { q: "What marketing materials do you provide?", a: "We provide ready-to-use banner ads, text links, social media copy, and email templates. All available in your affiliate dashboard once approved." },
@@ -106,7 +106,7 @@ export default function AffiliateProgram() {
         <div className="text-center py-20">
           <Badge className="bg-[#c9a96e]/10 text-[#8b6914] border-[#c9a96e]/30 mb-4">Affiliate Program</Badge>
           <h1 className="font-serif text-4xl md:text-6xl text-[#1a1008] mb-4 leading-tight">
-            Earn <span className="text-[#8b6914]">25% Commission</span><br />on Every Referral
+            Earn <span className="text-[#8b6914]">20% Commission</span><br />on Every Referral
           </h1>
           <p className="text-lg text-[#5c4a2a]/70 max-w-2xl mx-auto mb-8">
             Join the Easy Book Publishers affiliate program and earn money by sharing the tools
@@ -156,13 +156,13 @@ export default function AffiliateProgram() {
         <div className="mb-20">
           <div className="text-center mb-10">
             <h2 className="font-serif text-3xl text-[#1a1008] mb-3">Earnings Potential</h2>
-            <p className="text-[#5c4a2a]/70">Here's what you could earn at 25% commission</p>
+            <p className="text-[#5c4a2a]/70">Here's what you could earn at 20% commission</p>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             <Card className="bg-white border-[#c9a96e]/15">
               <CardContent className="p-6 text-center">
                 <Zap className="w-8 h-8 text-[#c9a96e] mx-auto mb-3" />
-                <div className="font-serif text-3xl text-[#1a1008] font-bold">$33</div>
+                <div className="font-serif text-3xl text-[#1a1008] font-bold">$26.40</div>
                 <div className="text-sm text-[#5c4a2a]/70 mt-1">per Author Pro lifetime sale</div>
                 <div className="text-xs text-[#8b6914] mt-2">Plan price: $132</div>
               </CardContent>
@@ -170,7 +170,7 @@ export default function AffiliateProgram() {
             <Card className="bg-white border-[#c9a96e]/15 ring-2 ring-[#c9a96e]/30">
               <CardContent className="p-6 text-center">
                 <TrendingUp className="w-8 h-8 text-[#c9a96e] mx-auto mb-3" />
-                <div className="font-serif text-3xl text-[#1a1008] font-bold">$87.25</div>
+                <div className="font-serif text-3xl text-[#1a1008] font-bold">$69.80</div>
                 <div className="text-sm text-[#5c4a2a]/70 mt-1">per Publisher lifetime sale</div>
                 <div className="text-xs text-[#8b6914] mt-2">Plan price: $349</div>
               </CardContent>
@@ -178,7 +178,7 @@ export default function AffiliateProgram() {
             <Card className="bg-white border-[#c9a96e]/15">
               <CardContent className="p-6 text-center">
                 <Wallet className="w-8 h-8 text-[#c9a96e] mx-auto mb-3" />
-                <div className="font-serif text-3xl text-[#1a1008] font-bold">$3.25+</div>
+                <div className="font-serif text-3xl text-[#1a1008] font-bold">$2.60+</div>
                 <div className="text-sm text-[#5c4a2a]/70 mt-1">per monthly subscription</div>
                 <div className="text-xs text-[#8b6914] mt-2">Recurring every month</div>
               </CardContent>
@@ -186,7 +186,7 @@ export default function AffiliateProgram() {
           </div>
           <div className="mt-6 bg-[#c9a96e]/10 border border-[#c9a96e]/20 rounded-xl p-4 text-center">
             <p className="text-sm text-[#5c4a2a]">
-              <strong>Example:</strong> Refer just 10 Publisher lifetime customers per month = <strong>$872.50/month</strong> in passive income
+              <strong>Example:</strong> Refer just 10 Publisher lifetime customers per month = <strong>$698/month</strong> in passive income
             </p>
           </div>
         </div>
