@@ -244,8 +244,9 @@ export default function SpineCalculator() {
     });
   }
 
-  function handleDownloadPdf() {
-    exportSpecSheetAsPdf({
+  async function handleDownloadPdf() {
+    try {
+    await exportSpecSheetAsPdf({
       title: "Bible Binding Specification Sheet",
       subtitle: `${trimSizeId === "custom" ? `${trimW}" × ${trimH}"` : trimSize.name} · ${pages} pages`,
       filename: `Spine-Spec-${trimW}x${trimH}-${pages}pp.pdf`,
@@ -309,6 +310,9 @@ export default function SpineCalculator() {
         },
       ],
     });
+    } catch (err) {
+      toast.error("PDF generation failed. Please try again.");
+    }
   }
 
   return (

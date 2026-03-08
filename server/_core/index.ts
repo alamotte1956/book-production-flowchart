@@ -101,6 +101,26 @@ async function startServer() {
     ".docx": "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
     ".txt": "text/plain",
   };
+  app.post("/api/render-pdf", express.json({ limit: "2mb" }), async (req, res) => {
+    try {
+      const { html, filename } = req.body;
+      if (!html || typeof html !== "string") {
+        return res.status(400).json({ error: "Missing html field" });
+      }
+      const { renderSpecSheetPdf } = await import("../specSheetRenderer.js");
+      const pdfBuffer = await renderSpecSheetPdf(html);
+      const safeName = (filename || "spec-sheet").replace(/[^a-zA-Z0-9_-]/g, "_") + ".pdf";
+      res.setHeader("Content-Type", "application/pdf");
+      res.setHeader("Content-Disposition", `attachment; filename="${safeName}"`);
+      res.setHeader("Content-Length", pdfBuffer.length);
+      res.send(pdfBuffer);
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : String(err);
+      console.error("[render-pdf] Error:", msg);
+      res.status(500).json({ error: "PDF rendering failed", details: msg });
+    }
+  });
+
   app.get("/api/files/*", async (req, res) => {
     const rawPath = (req.params[0] || "").replace(/^\/+/, "");
     if (!rawPath || rawPath.includes("..") || path.isAbsolute(rawPath)) {

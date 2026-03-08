@@ -292,9 +292,10 @@ export default function CoverDesigner() {
     "══════════════════════════════════════════════════",
   ].join("\n") : "";
 
-  const handleDownloadKdpSpec = () => {
+  const handleDownloadKdpSpec = async () => {
     if (!kdpSpecs) return;
-    exportSpecSheetAsPdf({
+    try {
+    await exportSpecSheetAsPdf({
       title: "Amazon KDP Cover Template Specifications",
       subtitle: `${trimSizeId === "custom" ? `${trimW}" × ${trimH}"` : trimSize.name} · ${pages} pages`,
       filename: `KDP-Cover-Spec-${trimW}x${trimH}-${pages}pp.pdf`,
@@ -343,6 +344,9 @@ export default function CoverDesigner() {
         },
       ],
     });
+    } catch (err) {
+      toast.error("PDF generation failed. Please try again.");
+    }
   };
 
   const handleCopy = () => {
@@ -353,9 +357,10 @@ export default function CoverDesigner() {
     setTimeout(() => setCopied(false), 2000);
   };
 
-  const handlePrint = () => {
+  const handlePrint = async () => {
     if (!specs) return;
-    exportSpecSheetAsPdf({
+    try {
+    await exportSpecSheetAsPdf({
       title: "Cover Design Specification Sheet",
       subtitle: `${trimSizeId === "custom" ? `${trimW}" × ${trimH}"` : trimSize.name} · ${pages} pages`,
       filename: `Cover-Spec-${trimW}x${trimH}-${pages}pp.pdf`,
@@ -412,6 +417,9 @@ export default function CoverDesigner() {
         },
       ],
     });
+    } catch (err) {
+      toast.error("PDF generation failed. Please try again.");
+    }
   };
 
   const toggleFinish = (finish: string) => {

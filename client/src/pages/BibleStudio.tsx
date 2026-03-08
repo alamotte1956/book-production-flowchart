@@ -252,8 +252,9 @@ function SpecSummary({ config }: { config: BibleConfig }) {
     config.twoColorPrinting && "Two-Color Printing",
   ].filter(Boolean) as string[];
 
-  const handleExportSpecSheet = () => {
-    exportSpecSheetAsPdf({
+  const handleExportSpecSheet = async () => {
+    try {
+    await exportSpecSheetAsPdf({
       title: "Bible Edition Spec Sheet",
       subtitle: edition?.label ?? "Bible Edition",
       filename: `Bible-Spec-Sheet-${edition?.label ?? "Edition"}.pdf`,
@@ -291,6 +292,9 @@ function SpecSummary({ config }: { config: BibleConfig }) {
       ],
       footerNote: spine.notes,
     });
+    } catch (err) {
+      toast.error("PDF generation failed. Please try again.");
+    }
   };
 
   return (

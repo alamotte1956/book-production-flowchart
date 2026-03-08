@@ -155,12 +155,27 @@ function esc(s: string): string {
     .replace(/"/g, "&quot;");
 }
 
-export function exportSpecSheetAsPdf(opts: ExportPdfOptions) {
+export async function exportSpecSheetAsPdf(opts: ExportPdfOptions) {
   const html = buildSpecSheetHtml(opts);
-  const win = window.open("", "_blank");
-  if (win) {
-    win.document.write(html);
-    win.document.close();
-    setTimeout(() => win.print(), 600);
+
+  const response = await fetch("/api/render-pdf", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ html, filename: opts.filename }),
+  });
+
+  if (!response.ok) {
+    const err = await response.json().catch(() => ({ error: "Unknown error" }));
+    throw new Error(err.error || "PDF rendering failed");
   }
+
+  const blob = await response.blob();
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = opts.filename.endsWith(".pdf") ? opts.filename : `${opts.filename}.pdf`;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
 }

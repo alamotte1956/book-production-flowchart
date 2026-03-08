@@ -215,9 +215,10 @@ export default function PrintSpecs() {
     setTimeout(() => setCopied(false), 2000);
   };
 
-  const handleDownload = () => {
+  const handleDownload = async () => {
     if (!specs) return;
-    exportSpecSheetAsPdf({
+    try {
+    await exportSpecSheetAsPdf({
       title: "Press-Ready File Specification Sheet",
       subtitle: `${trimSizeId === "custom" ? `${trimW}" × ${trimH}"` : trimSize.name} · ${pages} pages`,
       filename: `Print-Specs-${trimW}x${trimH}-${pages}pp.pdf`,
@@ -290,6 +291,9 @@ export default function PrintSpecs() {
         },
       ],
     });
+    } catch (err) {
+      toast.error("PDF generation failed. Please try again.");
+    }
   };
 
   const handlePrint = () => {
