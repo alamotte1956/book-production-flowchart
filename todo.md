@@ -124,11 +124,11 @@
 - [x] On save: invalidates project query so filtering re-applies immediately, shows toast
 
 ## Phase 19: Inline Title & Author Editing in Tracker Header
-- [ ] Add updateProjectMeta() db helper (updates title and/or author)
-- [ ] Add project.updateMeta tRPC mutation to server/routers.ts
-- [ ] Add TitleEditor inline popover component (text input, min 1 char validation)
-- [ ] Add AuthorEditor inline popover component (optional text input)
-- [ ] Both editors show edit hint on hover and save with Enter key support
+- [x] Add updateProjectMeta() db helper (updates title and/or author)
+- [x] Add project.updateMeta tRPC mutation to server/routers.ts
+- [x] Add TitleEditor inline popover component (text input, min 1 char validation)
+- [x] Add AuthorEditor inline popover component (optional text input)
+- [x] Both editors show edit hint on hover and save with Enter key support
 
 ## Phase 20: Add Bible / Scripture Genre
 - [x] Add "Bible / Scripture" to GENRES list in Home.tsx (Create Project dialog)
@@ -402,30 +402,30 @@
 - [x] Add WhatsNext panel to Home dashboard (based on project state via trpc.prompts.getContext)
 - [x] Add prompts.getContext tRPC query to server/routers.ts
 - [ ] Add WhatsNext sidebar to project tracker page
-- [ ] Add contextual next-step banner to Auto-Produce page after job completes
-- [ ] Add contextual next-step banner to Bible Design Studio after spec export
-- [ ] Add contextual next-step banner to Spine Calculator after calculation
-- [ ] Add contextual next-step banner to Cover Designer after spec export
+- [x] Add contextual next-step banner to Auto-Produce page after job completes
+- [x] Add contextual next-step banner to Bible Design Studio after spec export
+- [x] Add contextual next-step banner to Spine Calculator after calculation
+- [x] Add contextual next-step banner to Cover Designer after spec export
 
 ## Phase 39: Guided Publishing Onboarding Wizard
-- [ ] Build PublishingWizard multi-step component (client/src/components/PublishingWizard.tsx)
-- [ ] Step 1: What do you want to publish? (Bible, Novel, Non-Fiction, Children's Book, Poetry, Memoir, Textbook, Other)
-- [ ] Step 2: Is this your first time publishing? (Yes / No)
-- [ ] Step 3: Do you have a manuscript ready? (Yes / In progress / Not started)
-- [ ] Step 4: What format do you want to publish in? (Print / eBook / Both)
-- [ ] Step 5: Do you have an ISBN? (Yes / No / Not sure what that is)
-- [ ] Step 6: What is your target audience? (General / Children / Academic / Religious / Other)
-- [ ] Step 7: What is your timeline? (ASAP / 1-3 months / 3-6 months / 6+ months)
-- [ ] Build GuidedJourney page (/guided-journey) showing personalized roadmap with instructions
-- [ ] Roadmap shows numbered steps, each with: what it is, why it matters, how to do it in this program
-- [ ] Each roadmap step has a direct "Go to Tool" button
-- [ ] Add wizard trigger to dashboard (prominent "Start Your Publishing Journey" CTA for new users)
-- [ ] Add wizard trigger to the landing page hero section
-- [ ] Save wizard answers to database (new wizard_sessions table)
-- [ ] Add server endpoint: wizard.saveAnswers mutation
-- [ ] Add server endpoint: wizard.getAnswers query
-- [ ] Register /guided-journey route in App.tsx
-- [ ] Show personalized greeting on GuidedJourney page based on answers
+- [x] Build PublishingWizard multi-step component (client/src/components/PublishingWizard.tsx)
+- [x] Step 1: What do you want to publish? (Bible, Novel, Non-Fiction, Children's Book, Poetry, Memoir, Textbook, Other)
+- [x] Step 2: Is this your first time publishing? (Yes / No)
+- [x] Step 3: Do you have a manuscript ready? (Yes / In progress / Not started)
+- [x] Step 4: What format do you want to publish in? (Print / eBook / Both)
+- [x] Step 5: Do you have an ISBN? (Yes / No / Not sure what that is)
+- [x] Step 6: What is your target audience? (General / Children / Academic / Religious / Other)
+- [x] Step 7: What is your timeline? (ASAP / 1-3 months / 3-6 months / 6+ months)
+- [x] Build GuidedJourney page (/guided-journey) showing personalized roadmap with instructions
+- [x] Roadmap shows numbered steps, each with: what it is, why it matters, how to do it in this program
+- [x] Each roadmap step has a direct "Go to Tool" button
+- [x] Add wizard trigger to dashboard (prominent "Start Your Publishing Journey" CTA for new users)
+- [x] Add wizard trigger to the landing page hero section
+- [x] Save wizard answers to database (new wizard_sessions table)
+- [x] Add server endpoint: wizard.saveAnswers mutation
+- [x] Add server endpoint: wizard.getAnswers query
+- [x] Register /guided-journey route in App.tsx
+- [x] Show personalized greeting on GuidedJourney page based on answers
 
 ## Phase 41: Rebrand to Create Design Publish LLC
 - [ ] Replace all "The Bookmaker's Journey" with "Create Design Publish LLC" across all files

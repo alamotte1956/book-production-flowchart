@@ -151,3 +151,14 @@ export const contactSubmissions = pgTable("contact_submissions", {
 
 export type ContactSubmission = typeof contactSubmissions.$inferSelect;
 export type InsertContactSubmission = typeof contactSubmissions.$inferInsert;
+
+export const wizardSessions = pgTable("wizard_sessions", {
+  id: serial("id").primaryKey(),
+  userId: integer("userId").notNull(),
+  answers: jsonb("answers").notNull(),
+  completedAt: timestamp("completedAt"),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+});
+
+export type WizardSession = typeof wizardSessions.$inferSelect;
+export type InsertWizardSession = typeof wizardSessions.$inferInsert;

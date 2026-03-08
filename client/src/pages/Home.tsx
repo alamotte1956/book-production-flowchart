@@ -19,6 +19,7 @@ import {
   Upload, CheckCircle2, SkipForward, Clock, Sparkles, Copy,
   Layers, BookMarked, Ruler, Zap, BarChart3, Library,
   ChevronRight, ChevronDown, Calendar, Star, TrendingUp, FileText, HelpCircle, LogOut, User, Menu, X, LayoutGrid, Search, Send,
+  Compass,
 } from "lucide-react";
 import {
   DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel,
@@ -304,6 +305,9 @@ export default function Home() {
     },
   });
 
+  const wizardAnswersQuery = trpc.wizard.getAnswers.useQuery(undefined, { enabled: isAuthenticated });
+  const hasWizardSession = !!wizardAnswersQuery.data?.answers && !!(wizardAnswersQuery.data.answers as Record<string, unknown>).bookType;
+
   // ─── Guided prompts context (must be before any early returns to satisfy React hooks rules) ───
   const projectList0 = projectsQuery.data ?? [];
   const firstProjectForPrompts = projectList0[0];
@@ -419,6 +423,11 @@ export default function Home() {
                     </Button>
                   </a>
                 </div>
+                <a href="/guided-journey" className="inline-flex items-center gap-2 text-[#f5d98a]/80 hover:text-[#f5d98a] transition-colors font-serif text-sm border border-[#c9a96e]/30 hover:border-[#c9a96e]/60 rounded-full px-5 py-2">
+                  <Compass size={15} />
+                  <span>Start Your Publishing Journey</span>
+                  <ArrowRight size={14} />
+                </a>
                 <button
                   onClick={() => document.getElementById('features')?.scrollIntoView({ behavior: 'smooth' })}
                   className="flex flex-col items-center gap-1 text-[#c9a96e]/70 hover:text-[#c9a96e] transition-colors group"
@@ -918,6 +927,39 @@ export default function Home() {
       </div>
 
       <main className="max-w-7xl mx-auto px-6 py-10">
+
+        {(projectList.length === 0 || !hasWizardSession) && (
+          <motion.section
+            initial={{ opacity: 0, y: 16 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5 }}
+            className="mb-10"
+          >
+            <div className="relative overflow-hidden rounded-2xl border border-[#c9a96e]/25 bg-gradient-to-r from-[#fdf5e4] via-[#faf0d8] to-[#fdf5e4] p-6 md:p-8 shadow-sm">
+              <div className="absolute top-0 right-0 w-40 h-40 bg-[#c9a96e]/5 rounded-full -translate-y-1/2 translate-x-1/2" />
+              <div className="absolute bottom-0 left-0 w-24 h-24 bg-[#c9a96e]/5 rounded-full translate-y-1/2 -translate-x-1/2" />
+              <div className="relative flex flex-col md:flex-row items-center gap-5">
+                <div className="w-14 h-14 rounded-xl bg-gradient-to-br from-[#c9a96e] to-[#b8944f] flex items-center justify-center shadow-md shadow-[#c9a96e]/20 shrink-0">
+                  <Compass size={26} className="text-[#2a1a0a]" />
+                </div>
+                <div className="flex-1 text-center md:text-left">
+                  <h3 className="font-serif text-xl md:text-2xl text-[#2c1a00] leading-tight">Start Your Publishing Journey</h3>
+                  <p className="text-sm text-[#6b5f53] mt-1.5 max-w-lg leading-relaxed">
+                    Take our quick Publishing Wizard to get a personalized roadmap — we'll guide you through every step from manuscript to finished book.
+                  </p>
+                </div>
+                <Button
+                  className="bg-gradient-to-r from-[#c9a96e] to-[#b8944f] hover:from-[#d4b480] hover:to-[#c9a96e] text-[#2a1a0a] font-semibold gap-2 shadow-md shadow-[#c9a96e]/15 px-6 py-3 shrink-0"
+                  onClick={() => navigate("/guided-journey")}
+                >
+                  <Sparkles size={16} />
+                  Take the Wizard
+                  <ArrowRight size={16} />
+                </Button>
+              </div>
+            </div>
+          </motion.section>
+        )}
 
         <section className="mb-12">
           <div className="flex items-center justify-between mb-6">

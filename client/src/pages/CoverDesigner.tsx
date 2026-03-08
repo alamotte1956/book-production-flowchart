@@ -15,6 +15,8 @@ import { Separator } from "@/components/ui/separator";
 import { ArrowLeft, Layers, Printer, Copy, Check, Info, Download } from "lucide-react";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { toast } from "sonner";
+import WhatsNext from "@/components/WhatsNext";
+import type { NextPrompt } from "@shared/prompts";
 
 // ─── Trim sizes ────────────────────────────────────────────────────────────────
 const TRIM_SIZES = [
@@ -568,6 +570,22 @@ export default function CoverDesigner() {
                     <Printer className="w-4 h-4" />
                     Print Spec Sheet
                   </Button>
+
+                  <WhatsNext
+                    compact
+                    className="mt-2"
+                    prompts={[
+                      {
+                        id: "after_cover_isbn",
+                        title: "Assign an ISBN & Metadata",
+                        description: "Your cover specs are set! Next, add your ISBN-13 and metadata so your barcode and distribution records are ready.",
+                        actionLabel: "Open ISBN Manager",
+                        actionRoute: "/isbn-manager",
+                        icon: "isbn",
+                        priority: "high",
+                      } satisfies NextPrompt,
+                    ]}
+                  />
                 </>
               ) : (
                 <div className="bg-[#f5ede4] rounded-xl p-6 text-center border border-[#e8ddd0]">

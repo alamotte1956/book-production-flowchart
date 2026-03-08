@@ -8,6 +8,8 @@
 import { useState, useMemo } from "react";
 import { Link, useLocation } from "wouter";
 import { ArrowLeft, BookOpen, Printer, FileDown, ChevronRight, Info, Check, Sparkles, Wand2, Copy, RefreshCw, ChevronDown } from "lucide-react";
+import WhatsNext from "@/components/WhatsNext";
+import type { NextPrompt } from "@shared/prompts";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -428,6 +430,22 @@ function SpecSummary({ config }: { config: BibleConfig }) {
         <FileDown className="w-4 h-4" />
         Export Spec Sheet (Print / PDF)
       </Button>
+
+      <WhatsNext
+        compact
+        className="mt-2"
+        prompts={[
+          {
+            id: "after_bible_spine",
+            title: "Calculate Your Spine Width",
+            description: "Your Bible edition specs are configured! Next, calculate the exact spine width for your cover file using the Spine Calculator.",
+            actionLabel: "Open Spine Calculator",
+            actionRoute: "/spine-calculator",
+            icon: "spine_calc",
+            priority: "high",
+          } satisfies NextPrompt,
+        ]}
+      />
     </div>
   );
 }

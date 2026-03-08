@@ -9,6 +9,7 @@ import {
   phaseDueDates, InsertPhaseDueDate, PhaseDueDate,
   productionJobs, InsertProductionJob, ProductionJob,
   contactSubmissions, InsertContactSubmission, ContactSubmission,
+  wizardSessions, InsertWizardSession, WizardSession,
 } from "../drizzle/schema";
 
 
@@ -368,4 +369,42 @@ export async function createContactSubmission(
   if (!db) throw new Error("Database not available");
   const [submission] = await db.insert(contactSubmissions).values(data).returning();
   return submission;
+}
+
+// ─── Wizard Session helpers ────────────────────────────────────
+
+export async function saveWizardAnswers(
+  userId: number,
+  answers: Record<string, unknown>
+): Promise<WizardSession> {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  const existing = await db.select().from(wizardSessions)
+    .where(eq(wizardSessions.userId, userId))
+    .limit(1);
+
+  if (existing.length > 0) {
+    const [updated] = await db.update(wizardSessions)
+      .set({ answers, completedAt: new Date() })
+      .where(eq(wizardSessions.id, existing[0].id))
+      .returning();
+    return updated;
+  } else {
+    const [created] = await db.insert(wizardSessions).values({
+      userId,
+      answers,
+      completedAt: new Date(),
+    }).returning();
+    return created;
+  }
+}
+
+export async function getWizardAnswers(userId: number): Promise<WizardSession | undefined> {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  const [session] = await db.select().from(wizardSessions)
+    .where(eq(wizardSessions.userId, userId))
+    .limit(1);
+  return session;
 }

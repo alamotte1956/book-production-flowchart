@@ -18,6 +18,8 @@ import {
 } from "lucide-react";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { toast } from "sonner";
+import WhatsNext from "@/components/WhatsNext";
+import type { NextPrompt } from "@shared/prompts";
 
 // ─── Paper types with PPI (pages per inch) ────────────────────────────────────
 const PAPER_TYPES = [
@@ -616,6 +618,23 @@ export default function SpineCalculator() {
                 </pre>
               </CardContent>
             </Card>
+          )}
+
+          {pages > 0 && ppi > 0 && spine.spineIn > 0 && (
+            <WhatsNext
+              compact
+              prompts={[
+                {
+                  id: "after_spine_cover",
+                  title: "Generate Your Cover Spec Sheet",
+                  description: "Now that you have your spine width, use the Cover Designer to calculate full-wrap cover dimensions with bleed and safe zones.",
+                  actionLabel: "Open Cover Designer",
+                  actionRoute: "/cover-designer",
+                  icon: "cover_designer",
+                  priority: "high",
+                } satisfies NextPrompt,
+              ]}
+            />
           )}
         </div>
       </div>

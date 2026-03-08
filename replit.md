@@ -48,17 +48,7 @@ Optional:
 
 ## Database
 
-PostgreSQL via Replit's built-in database. Schema includes:
-- `users` — Auth users (id serial, openId varchar unique)
-- `sessions` — Replit Auth session storage
-- `projects` — Book projects
-- `step_statuses` — Per-step completion tracking
-- `uploaded_files` — File uploads per step
-- `phase_due_dates` — Phase deadline tracking
-- `production_jobs` — Auto-produce AI typesetting jobs
-- `contact_submissions` — Contact form entries
-
-Run `pnpm run db:push` to sync schema changes.
+PostgreSQL via Replit's built-in database. Use `npx drizzle-kit push` to sync schema changes.
 
 ## Migration Notes
 
@@ -82,3 +72,28 @@ Run `pnpm run db:push` to sync schema changes.
 - **Dark Headers**: All tool pages use `bg-[#2a1a0a]` sticky headers with gold accents
 - **Cards**: `border-[#e8dfd0] bg-white shadow-sm` pattern across tool pages
 - **Contact Form**: Embedded on landing page (`#contact-section`), uses `contact.send` tRPC mutation
+
+## Key Features
+
+- **9-Phase/30-Step Workflow Tracker**: Full book production pipeline from concept to publication
+- **Inline Editing**: Title, author, and genre editable inline in project tracker header
+- **Publishing Wizard**: 7-step onboarding wizard at `/guided-journey` with personalized roadmap
+- **Auto-Produce**: AI typesetting with PDF/EPUB/IDML generation, auto-selects scripture style for Bible projects
+- **Bible Design Studio**: Full Bible edition configurator with spec sheet export
+- **Spine Calculator**: PPI-based spine width calculation with spec sheets
+- **Cover Designer**: Dimensional cover spec generation
+- **ISBN Manager**: Metadata entry and ONIX 3.0 XML export
+- **What's Next Banners**: Contextual next-step suggestions on all tool pages after task completion
+- **Contact Form**: Public contact form on landing page
+
+## Database Tables
+
+- `users` — Auth users (id serial, openId varchar unique)
+- `sessions` — Replit Auth session storage
+- `projects` — Book projects
+- `step_statuses` — Per-step completion tracking
+- `uploaded_files` — File uploads per step
+- `phase_due_dates` — Phase deadline tracking
+- `production_jobs` — Auto-produce AI typesetting jobs
+- `contact_submissions` — Contact form entries
+- `wizard_sessions` — Publishing wizard answers (userId, answers jsonb, completedAt)

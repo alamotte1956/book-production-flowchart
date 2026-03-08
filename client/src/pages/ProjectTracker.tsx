@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { Textarea } from "@/components/ui/textarea";
+import { Input } from "@/components/ui/input";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -19,7 +20,7 @@ import {
   Calendar, AlertTriangle, Clock, Download, ChevronsDown, ChevronsUp, Copy, BarChart2, Wand2,
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
-import { useState, useMemo, useCallback, useRef, useEffect } from "react";
+import { useState, useMemo, useCallback, useRef, useEffect, type KeyboardEvent } from "react";
 import { useLocation, useParams } from "wouter";
 import { getLoginUrl } from "@/const";
 import { motion, AnimatePresence } from "framer-motion";
@@ -537,6 +538,154 @@ function GenreEditor({ projectId, currentGenre }: { projectId: number; currentGe
   );
 }
 
+// ─── Inline Title Editor ─────────────────────────────────────────────────────
+
+function TitleEditor({ projectId, currentTitle }: { projectId: number; currentTitle: string }) {
+  const [open, setOpen] = useState(false);
+  const [localTitle, setLocalTitle] = useState(currentTitle);
+  const inputRef = useRef<HTMLInputElement>(null);
+  const utils = trpc.useUtils();
+
+  useEffect(() => { setLocalTitle(currentTitle); }, [currentTitle]);
+  useEffect(() => { if (open) setTimeout(() => inputRef.current?.select(), 50); }, [open]);
+
+  const updateMeta = trpc.project.updateMeta.useMutation({
+    onSuccess: () => {
+      utils.project.get.invalidate({ projectId });
+      utils.project.list.invalidate();
+      toast.success("Title updated");
+      setOpen(false);
+    },
+    onError: () => toast.error("Failed to update title"),
+  });
+
+  const handleSave = () => {
+    const trimmed = localTitle.trim();
+    if (!trimmed) { toast.error("Title cannot be empty"); return; }
+    if (trimmed === currentTitle) { setOpen(false); return; }
+    updateMeta.mutate({ projectId, title: trimmed });
+  };
+
+  const handleKeyDown = (e: KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === "Enter") handleSave();
+    if (e.key === "Escape") { setLocalTitle(currentTitle); setOpen(false); }
+  };
+
+  return (
+    <Popover open={open} onOpenChange={(v) => { if (!v) setLocalTitle(currentTitle); setOpen(v); }}>
+      <PopoverTrigger asChild>
+        <button className="font-serif text-xl truncate tracking-wide hover:text-[#c9a96e] transition-colors group flex items-center gap-1.5 print:pointer-events-none">
+          {currentTitle}
+          <span className="opacity-0 group-hover:opacity-100 transition-opacity text-[#c9a96e]/60 text-[10px] print:hidden">(edit)</span>
+        </button>
+      </PopoverTrigger>
+      <PopoverContent className="w-72 p-3" align="start">
+        <p className="text-xs font-semibold text-[#3a2a1a] mb-2">Edit Title</p>
+        <Input
+          ref={inputRef}
+          value={localTitle}
+          onChange={(e) => setLocalTitle(e.target.value)}
+          onKeyDown={handleKeyDown}
+          className="h-8 text-sm border-[#d4c8b4]"
+          maxLength={255}
+        />
+        <div className="flex gap-2 mt-3">
+          <Button
+            size="sm" className="flex-1 h-7 text-xs"
+            onClick={handleSave}
+            disabled={updateMeta.isPending || !localTitle.trim()}
+          >
+            {updateMeta.isPending ? <Loader2 size={12} className="animate-spin" /> : "Save"}
+          </Button>
+          <Button
+            size="sm" variant="ghost" className="h-7 text-xs"
+            onClick={() => { setLocalTitle(currentTitle); setOpen(false); }}
+          >
+            Cancel
+          </Button>
+        </div>
+      </PopoverContent>
+    </Popover>
+  );
+}
+
+// ─── Inline Author Editor ────────────────────────────────────────────────────
+
+function AuthorEditor({ projectId, currentAuthor }: { projectId: number; currentAuthor: string | null | undefined }) {
+  const [open, setOpen] = useState(false);
+  const [localAuthor, setLocalAuthor] = useState(currentAuthor ?? "");
+  const inputRef = useRef<HTMLInputElement>(null);
+  const utils = trpc.useUtils();
+
+  useEffect(() => { setLocalAuthor(currentAuthor ?? ""); }, [currentAuthor]);
+  useEffect(() => { if (open) setTimeout(() => inputRef.current?.select(), 50); }, [open]);
+
+  const updateMeta = trpc.project.updateMeta.useMutation({
+    onSuccess: () => {
+      utils.project.get.invalidate({ projectId });
+      utils.project.list.invalidate();
+      toast.success("Author updated");
+      setOpen(false);
+    },
+    onError: () => toast.error("Failed to update author"),
+  });
+
+  const handleSave = () => {
+    const trimmed = localAuthor.trim();
+    if (trimmed === (currentAuthor ?? "")) { setOpen(false); return; }
+    updateMeta.mutate({ projectId, author: trimmed || null });
+  };
+
+  const handleKeyDown = (e: KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === "Enter") handleSave();
+    if (e.key === "Escape") { setLocalAuthor(currentAuthor ?? ""); setOpen(false); }
+  };
+
+  return (
+    <Popover open={open} onOpenChange={(v) => { if (!v) setLocalAuthor(currentAuthor ?? ""); setOpen(v); }}>
+      <PopoverTrigger asChild>
+        <button className="flex items-center gap-1 hover:text-[#c9a96e] transition-colors group print:hidden">
+          {currentAuthor ? (
+            <>
+              <span className="italic">by {currentAuthor}</span>
+              <span className="opacity-0 group-hover:opacity-100 transition-opacity text-[#c9a96e]/60 text-[10px] ml-0.5">(edit)</span>
+            </>
+          ) : (
+            <span className="text-[#c9a96e]/40 hover:text-[#c9a96e]/70 italic">+ Add author</span>
+          )}
+        </button>
+      </PopoverTrigger>
+      <PopoverContent className="w-64 p-3" align="start">
+        <p className="text-xs font-semibold text-[#3a2a1a] mb-2">Edit Author</p>
+        <Input
+          ref={inputRef}
+          value={localAuthor}
+          onChange={(e) => setLocalAuthor(e.target.value)}
+          onKeyDown={handleKeyDown}
+          placeholder="Author name (optional)"
+          className="h-8 text-sm border-[#d4c8b4]"
+          maxLength={255}
+        />
+        <div className="flex gap-2 mt-3">
+          <Button
+            size="sm" className="flex-1 h-7 text-xs"
+            onClick={handleSave}
+            disabled={updateMeta.isPending}
+          >
+            {updateMeta.isPending ? <Loader2 size={12} className="animate-spin" /> : "Save"}
+          </Button>
+          <Button
+            size="sm" variant="ghost" className="h-7 text-xs"
+            onClick={() => { setLocalAuthor(currentAuthor ?? ""); setOpen(false); }}
+          >
+            Cancel
+          </Button>
+        </div>
+      </PopoverContent>
+    </Popover>
+  );
+}
+
 // ─── Phase Section Component ────────────────────────────────────
 
 function PhaseSection({
@@ -808,9 +957,9 @@ export default function ProjectTracker() {
             <ArrowLeft size={20} />
           </Button>
           <div className="flex-1 min-w-0">
-            <h1 className="font-serif text-xl truncate tracking-wide">{project.title}</h1>
+            <TitleEditor projectId={projectId} currentTitle={project.title} />
             <div className="flex items-center gap-3 text-xs text-[#c9a96e]/70 print:text-[#8b7b6b]">
-              {project.author && <span className="italic">by {project.author}</span>}
+              <AuthorEditor projectId={projectId} currentAuthor={project.author} />
               <GenreEditor projectId={projectId} currentGenre={project.genre} />
             </div>
           </div>

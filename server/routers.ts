@@ -7,7 +7,7 @@ import {
   getStepStatusesByProject, upsertStepStatus, upsertStepDates,
   getFilesByProject, createUploadedFile, deleteUploadedFile,
   getDueDatesByProject, upsertPhaseDueDate, deletePhaseDueDate,
-  updateProjectDeadline, updateProjectGenre, updateProjectBibleSpecs,
+  updateProjectDeadline, updateProjectGenre, updateProjectBibleSpecs, updateProjectMeta,
   createProductionJob, getProductionJobsByProject, getProductionJobById, updateProductionJob,
 } from "./db";
 import { parseManuscript } from "./manuscriptParser";
@@ -18,7 +18,7 @@ import { generateIdml } from "./idmlGenerator";
 import { invokeLLM } from "./_core/llm";
 import { lookupByIsbn } from "./isbnLookup";
 import { notifyOwner } from "./_core/notification";
-import { createContactSubmission } from "./db";
+import { createContactSubmission, saveWizardAnswers, getWizardAnswers } from "./db";
 import { TRPCError } from "@trpc/server";
 
 // ─── Error classification helper (module scope so it's shared by start + retry) ──
@@ -134,6 +134,23 @@ export const appRouter = router({
         return updateProjectBibleSpecs(input.projectId, {
           bibleEditionType: input.bibleEditionType,
           bibleTranslation: input.bibleTranslation,
+        });
+      }),
+
+    updateMeta: protectedProcedure
+      .input(z.object({
+        projectId: z.number(),
+        title: z.string().min(1).max(255).optional(),
+        author: z.string().max(255).nullable().optional(),
+      }))
+      .mutation(async ({ ctx, input }) => {
+        const project = await getProjectById(input.projectId);
+        if (!project || project.userId !== ctx.user.id) {
+          throw new Error("Project not found");
+        }
+        return updateProjectMeta(input.projectId, {
+          title: input.title,
+          author: input.author,
         });
       }),
   }),
@@ -963,6 +980,21 @@ export const appRouter = router({
           hasTimeline: dueDates.length > 0,
           overallPhase: hasCompletedJob ? "distribution" : hasManuscript ? "production" : project.bibleEditionType ? "design" : "setup",
         };
+      }),
+  }),
+
+  wizard: router({
+    saveAnswers: protectedProcedure
+      .input(z.object({
+        answers: z.record(z.string(), z.unknown()),
+      }))
+      .mutation(async ({ ctx, input }) => {
+        return saveWizardAnswers(ctx.user.id, input.answers);
+      }),
+
+    getAnswers: protectedProcedure
+      .query(async ({ ctx }) => {
+        return getWizardAnswers(ctx.user.id) ?? null;
       }),
   }),
 });

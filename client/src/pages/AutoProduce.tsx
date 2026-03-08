@@ -25,6 +25,8 @@ import {
   ChevronDown, ChevronUp, RefreshCw, Copy, Terminal,
   File, Image, Archive, FileCode, FileSpreadsheet,
 } from "lucide-react";
+import WhatsNext from "@/components/WhatsNext";
+import type { NextPrompt } from "@shared/prompts";
 import JSZip from "jszip";
 
 const MAX_FILE_SIZE_MB = 50;
@@ -544,6 +546,22 @@ function JobCard({ jobId, projectId }: { jobId: number; projectId: number }) {
                 </Button>
               </a>
             )}
+
+            <WhatsNext
+              compact
+              className="mt-2"
+              prompts={[
+                {
+                  id: "after_produce_cover",
+                  title: "Design Your Book Cover",
+                  description: "Your interior is ready! Next, generate a full-wrap cover spec sheet with exact dimensions for your printer.",
+                  actionLabel: "Open Cover Designer",
+                  actionRoute: "/cover-designer",
+                  icon: "cover_designer",
+                  priority: "high",
+                } satisfies NextPrompt,
+              ]}
+            />
           </div>
         )}
 
