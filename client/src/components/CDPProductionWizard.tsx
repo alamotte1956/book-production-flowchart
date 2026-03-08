@@ -147,9 +147,9 @@ export default function CDPProductionWizard({
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
-    const allowedExts = /\.(docx?|txt|rtf|epub)$/i;
+    const allowedExts = /\.(docx?|txt|text|log|asc|rtf|epub|pdf|odt|pages|md|markdown|mdx|html?|xml|xlsx?|numbers|ods|csv|tsv|json|ya?ml|png|jpe?g|webp|tiff?|gif|svg|zip|rar)$/i;
     if (!allowedExts.test(file.name)) {
-      setFileError("Unsupported file type. Please upload a .docx, .doc, .txt, .rtf, or .epub file.");
+      setFileError("Unsupported file type. Accepted: Word, PDF, TXT, MD, HTML, RTF, EPUB, spreadsheets, images, and more.");
       return;
     }
     if (file.size > 50 * 1024 * 1024) {
@@ -410,7 +410,7 @@ export default function CDPProductionWizard({
               <input
                 ref={fileInputRef}
                 type="file"
-                accept=".docx,.doc,.txt,.rtf,.epub"
+                accept=".docx,.doc,.odt,.pages,.pdf,.txt,.text,.log,.asc,.md,.markdown,.mdx,.html,.htm,.xml,.rtf,.xlsx,.xls,.numbers,.ods,.csv,.tsv,.json,.yaml,.yml,.epub,.png,.jpg,.jpeg,.webp,.tiff,.tif,.gif,.svg,.zip,.rar"
                 className="hidden"
                 onChange={handleFileSelect}
               />
@@ -426,7 +426,7 @@ export default function CDPProductionWizard({
                 <div className="flex flex-col items-center gap-2">
                   <Upload className="w-8 h-8 text-[#c9a96e]/60" />
                   <p className="font-medium text-[#5c3d2e]">Click to upload manuscript</p>
-                  <p className="text-sm text-[#8b7b6b]">.docx, .doc, .txt, .rtf, .epub · Max 50 MB</p>
+                  <p className="text-sm text-[#8b7b6b]">All text formats accepted · Max 50 MB</p>
                 </div>
               )}
             </div>

@@ -18,7 +18,7 @@ import * as cheerio from "cheerio";
 
 export type SupportedFormat =
   | "docx" | "pdf" | "xlsx" | "csv" | "rtf"
-  | "html" | "markdown" | "txt" | "json" | "numbers" | "odt";
+  | "html" | "markdown" | "txt" | "json" | "numbers" | "odt" | "epub";
 
 export type ParsedManuscript = {
   text: string;
@@ -42,6 +42,7 @@ const HTML_MIMES = new Set(["text/html","application/xhtml+xml","text/xml","appl
 const RTF_MIMES = new Set(["application/rtf","text/rtf","application/x-rtf"]);
 const MARKDOWN_MIMES = new Set(["text/markdown","text/x-markdown"]);
 const JSON_MIMES = new Set(["application/json","text/json"]);
+const EPUB_MIMES = new Set(["application/epub+zip"]);
 
 const EXT_FORMAT: Record<string, SupportedFormat> = {
   docx:"docx", doc:"docx", odt:"odt", pages:"docx",
@@ -52,6 +53,7 @@ const EXT_FORMAT: Record<string, SupportedFormat> = {
   md:"markdown", markdown:"markdown", mdx:"markdown",
   txt:"txt", text:"txt", log:"txt", asc:"txt", nfo:"txt",
   json:"json", yaml:"txt", yml:"txt",
+  epub:"epub",
 };
 
 function detectFormat(mimeType: string, fileName: string): SupportedFormat {
@@ -64,6 +66,7 @@ function detectFormat(mimeType: string, fileName: string): SupportedFormat {
   if (RTF_MIMES.has(mime)) return "rtf";
   if (MARKDOWN_MIMES.has(mime)) return "markdown";
   if (JSON_MIMES.has(mime)) return "json";
+  if (EPUB_MIMES.has(mime)) return "epub";
   const ext = fileName.toLowerCase().split(".").pop() ?? "";
   return EXT_FORMAT[ext] ?? "txt";
 }
@@ -148,6 +151,40 @@ function parseMarkdown(buffer: Buffer): string {
     .trim();
 }
 
+async function parseEpub(buffer: Buffer): Promise<string> {
+  const JSZip = (await import("jszip")).default;
+  const zip = await JSZip.loadAsync(buffer);
+  const xhtmlFiles: { path: string; content: string }[] = [];
+
+  for (const [path, entry] of Object.entries(zip.files)) {
+    if (entry.dir) continue;
+    const lower = path.toLowerCase();
+    if (lower.endsWith(".xhtml") || lower.endsWith(".html") || lower.endsWith(".htm")) {
+      const content = await entry.async("text");
+      xhtmlFiles.push({ path, content });
+    }
+  }
+
+  xhtmlFiles.sort((a, b) => a.path.localeCompare(b.path));
+
+  const sections: string[] = [];
+  for (const file of xhtmlFiles) {
+    const $ = cheerio.load(file.content);
+    $("script, style, nav, head").remove();
+    const text = ($("body").length > 0 ? $("body").text() : $.text())
+      .replace(/\n{3,}/g, "\n\n")
+      .replace(/ {2,}/g, " ")
+      .trim();
+    if (text.length > 20) sections.push(text);
+  }
+
+  if (sections.length === 0) {
+    return buffer.toString("utf-8").replace(/<[^>]+>/g, " ").replace(/\s+/g, " ").trim();
+  }
+
+  return sections.join("\n\n");
+}
+
 function extractStringsFromObject(obj: unknown, depth = 0): string[] {
   if (depth > 5) return [];
   if (typeof obj === "string") return [obj];
@@ -213,6 +250,10 @@ export async function parseManuscript(
     case "json":
       text = parseJson(buffer);
       break;
+    case "epub":
+      try { text = await parseEpub(buffer); }
+      catch { text = buffer.toString("utf-8").replace(/<[^>]+>/g, " ").replace(/\s+/g, " ").trim(); }
+      break;
     case "txt":
     default:
       text = buffer.toString("utf-8").trim();
@@ -239,11 +280,13 @@ export const ACCEPTED_EXTENSIONS = [
   ".md", ".markdown", ".mdx",
   ".txt", ".text", ".log", ".asc",
   ".json", ".yaml", ".yml",
+  ".epub",
 ] as const;
 
 export const SUPPORTED_FORMAT_GROUPS = [
   { label: "Word Processing", formats: "DOCX, DOC, ODT, Pages" },
   { label: "PDF", formats: "PDF" },
+  { label: "E-book", formats: "EPUB" },
   { label: "Spreadsheets", formats: "XLSX, XLS, Numbers, CSV, TSV" },
   { label: "Rich Text", formats: "RTF" },
   { label: "Web / Markup", formats: "HTML, HTM, XML" },

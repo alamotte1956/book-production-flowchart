@@ -23,7 +23,7 @@ import { toast } from "sonner";
 import {
   ArrowLeft, Upload, FileText, Wand2, Download, AlertCircle,
   CheckCircle2, Clock, Loader2, BookOpen, FileDown, Sparkles, Eye, X,
-  ChevronDown, ChevronUp, RefreshCw, Copy, Terminal,
+  ChevronDown, ChevronUp, RefreshCw, Copy, Terminal, Type,
   File, Image, Archive, FileCode, FileSpreadsheet, ShieldCheck, Info,
 } from "lucide-react";
 import { Tooltip, TooltipTrigger, TooltipContent } from "@/components/ui/tooltip";
@@ -919,6 +919,8 @@ function AutoProduceInner() {
   const [outputFormat, setOutputFormat] = useState<"both" | "pdf" | "epub">("both");
   const [isDragging, setIsDragging] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [inputMode, setInputMode] = useState<"file" | "text">("file");
+  const [pastedText, setPastedText] = useState("");
   const [previewOpen, setPreviewOpen] = useState(false);
   const [styleAutoSelected, setStyleAutoSelected] = useState(false);
   const [trimAutoSelected, setTrimAutoSelected] = useState(false);
@@ -1053,17 +1055,35 @@ function AutoProduceInner() {
   }, [handleFileSelect]);
 
   const handleSubmit = async () => {
-    if (!selectedFile || !trimSizeId || !styleId) return;
+    if (!trimSizeId || !styleId) return;
     setIsSubmitting(true);
     try {
-      const fileBase64 = await fileToBase64(selectedFile);
+      let fileBase64: string;
+      let fileName: string;
+      let mimeType: string;
+
+      if (inputMode === "text") {
+        const textContent = pastedText.trim();
+        if (textContent.length < 50) return;
+        const blob = new Blob([textContent], { type: "text/plain;charset=utf-8" });
+        const tempFile = new File([blob], "manuscript.txt", { type: "text/plain" });
+        fileBase64 = await fileToBase64(tempFile);
+        fileName = "manuscript.txt";
+        mimeType = "text/plain";
+      } else {
+        if (!selectedFile) return;
+        fileBase64 = await fileToBase64(selectedFile);
+        fileName = selectedFile.name;
+        mimeType = selectedFile.type || "text/plain";
+      }
+
       await startMutation.mutateAsync({
         projectId,
         trimSizeId,
         styleId,
         outputFormat,
-        fileName: selectedFile.name,
-        mimeType: selectedFile.type || "text/plain",
+        fileName,
+        mimeType,
         fileBase64,
       });
     } finally {
@@ -1082,7 +1102,8 @@ function AutoProduceInner() {
 
   const project = projectData?.project;
   const canPreview = !!(trimSizeId && styleId);
-  const canSubmit = selectedFile && trimSizeId && styleId && !isSubmitting && projectId > 0;
+  const hasInput = inputMode === "file" ? !!selectedFile : pastedText.trim().length >= 50;
+  const canSubmit = hasInput && trimSizeId && styleId && !isSubmitting && projectId > 0;
 
   return (
     <div className="min-h-screen bg-[#faf6ef]">
@@ -1256,7 +1277,35 @@ function AutoProduceInner() {
               </div>
             )}
 
-            {/* Drop zone */}
+            {/* Input mode toggle */}
+            <div className="flex rounded-lg border border-[#d4b896]/60 overflow-hidden">
+              <button
+                type="button"
+                onClick={() => setInputMode("file")}
+                className={`flex-1 flex items-center justify-center gap-2 py-2 text-sm font-medium transition-colors ${
+                  inputMode === "file"
+                    ? "bg-[#8b5e3c] text-white"
+                    : "bg-[#fdf9f3] text-[#8b7b6b] hover:bg-[#f5ede4]"
+                }`}
+              >
+                <Upload className="w-3.5 h-3.5" />
+                Upload File
+              </button>
+              <button
+                type="button"
+                onClick={() => setInputMode("text")}
+                className={`flex-1 flex items-center justify-center gap-2 py-2 text-sm font-medium transition-colors ${
+                  inputMode === "text"
+                    ? "bg-[#8b5e3c] text-white"
+                    : "bg-[#fdf9f3] text-[#8b7b6b] hover:bg-[#f5ede4]"
+                }`}
+              >
+                <Type className="w-3.5 h-3.5" />
+                Paste Text
+              </button>
+            </div>
+
+            {inputMode === "file" ? (
             <div
               className={`border-2 border-dashed rounded-lg p-8 text-center cursor-pointer transition-colors ${
                 isDragging
@@ -1282,7 +1331,6 @@ function AutoProduceInner() {
               />
               {selectedFile ? (
                 <div className="space-y-2 w-full">
-                  {/* Image preview */}
                   {previewUrl && (
                     <div className="flex flex-col items-center gap-2">
                       <img
@@ -1297,7 +1345,6 @@ function AutoProduceInner() {
                     </div>
                   )}
 
-                  {/* ZIP contents preview */}
                   {zipContents !== null && !previewUrl && (
                     <div className="w-full text-left">
                       <div className="flex items-center gap-2 mb-2 justify-center">
@@ -1335,7 +1382,6 @@ function AutoProduceInner() {
                     </div>
                   )}
 
-                  {/* Default non-image, non-zip file confirmation */}
                   {!previewUrl && zipContents === null && (
                     <>
                       <CheckCircle2 className="w-10 h-10 text-green-500 mx-auto" />
@@ -1368,6 +1414,31 @@ function AutoProduceInner() {
                 </div>
               )}
             </div>
+            ) : (
+            <div className="space-y-2">
+              <textarea
+                value={pastedText}
+                onChange={(e) => setPastedText(e.target.value)}
+                placeholder="Paste or type your manuscript text here...&#10;&#10;You can paste content from any source — Word, Google Docs, web pages, notes apps, or type directly."
+                className="w-full min-h-[200px] max-h-[400px] rounded-lg border-2 border-[#d4b896]/60 bg-[#fdf9f3] p-4 text-sm text-[#3a2a1a] placeholder:text-[#b09880] focus:border-[#8b5e3c] focus:ring-1 focus:ring-[#8b5e3c] focus:outline-none resize-y font-serif leading-relaxed"
+              />
+              <div className="flex items-center justify-between text-xs text-[#8b7b6b]">
+                <span>
+                  {pastedText.trim().length > 0
+                    ? `${pastedText.trim().split(/\s+/).filter(Boolean).length.toLocaleString()} words`
+                    : "Minimum 50 characters"}
+                </span>
+                {pastedText.trim().length > 0 && pastedText.trim().length < 50 && (
+                  <span className="text-amber-600">Need at least 50 characters</span>
+                )}
+                {pastedText.trim().length >= 50 && (
+                  <span className="text-green-600 flex items-center gap-1">
+                    <CheckCircle2 className="w-3 h-3" /> Ready
+                  </span>
+                )}
+              </div>
+            </div>
+            )}
 
             {/* Submit */}
             <Button
@@ -1397,9 +1468,9 @@ function AutoProduceInner() {
                 <span> to start production.</span>
               </div>
             )}
-            {projectId > 0 && (!trimSizeId || !styleId || !selectedFile) && (
+            {projectId > 0 && (!trimSizeId || !styleId || !hasInput) && (
               <p className="text-xs text-center text-[#b09880]">
-                {!selectedFile ? "Upload a manuscript file" : !trimSizeId ? "Select a trim size" : "Select a typesetting style"} to continue
+                {!hasInput ? (inputMode === "file" ? "Upload a manuscript file" : "Paste your manuscript text (minimum 50 characters)") : !trimSizeId ? "Select a trim size" : "Select a typesetting style"} to continue
               </p>
             )}
           </CardContent>

@@ -81,11 +81,14 @@ PostgreSQL via Replit's built-in database. Use `npx drizzle-kit push` to sync sc
   - **KDP Print-Ready PDF**: Amazon-compliant with 0.125" bleed, gutter margins scaled by page count
   - **EPUB**: Standards-compliant ebook via epub-gen-memory with TOC, copyright page, metadata
   - **IDML (InDesign)**: Real Adobe InDesign Interchange format with paragraph/character styles, master spreads, and proper layout
+  - **Input modes**: File upload (30+ formats) or direct text paste/type
   - Auto-selects scripture style for Bible projects
-- **Bible Design Studio**: Full Bible edition configurator with spec sheet export
-- **Spine Calculator**: PPI-based spine width calculation with spec sheets
-- **Cover Designer**: Dimensional cover spec generation
-- **ISBN Manager**: Metadata entry and ONIX 3.0 XML export
+- **Manuscript Parsing**: Supports DOCX, DOC, ODT, PDF, EPUB, XLSX, CSV, RTF, HTML, Markdown, JSON, YAML, TXT, and more via `server/manuscriptParser.ts`
+- **Real PDF Spec Sheets**: All tool pages generate downloadable PDFs via server-side Puppeteer rendering (`POST /api/render-pdf`)
+- **Bible Design Studio**: Full Bible edition configurator with real PDF spec sheet export
+- **Spine Calculator**: PPI-based spine width calculation with real PDF spec sheets
+- **Cover Designer**: Dimensional cover spec generation with real PDF export (standard + KDP)
+- **ISBN Manager**: Metadata entry and ONIX 3.0 XML download
 - **Step-to-Tool Actions**: Each production step in the Project Tracker shows a contextual action button linking to the relevant built-in tool (e.g., "Open Cover Designer", "Start Auto-Produce", "Open ISBN Manager"). Defined in `STEP_TOOL_ACTIONS` map in `ProjectTracker.tsx`.
 - **What's Next Banners**: Contextual next-step suggestions on all tool pages after task completion
 - **AI Writing Assistant**: Generate back-cover blurbs, author bios, press releases, marketing copy in Project Tracker
