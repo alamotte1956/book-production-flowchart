@@ -58,7 +58,7 @@ export default function PhaseSection({ phase, globalStepOffset, isFirst }: Phase
         >
           {phase.title}
         </h2>
-        <p className="font-sans text-sm md:text-base text-[#8b7b6b] max-w-md mx-auto italic">
+        <p className="text-sm md:text-base text-[#8b7b6b] max-w-md mx-auto italic">
           {phase.subtitle}
         </p>
 

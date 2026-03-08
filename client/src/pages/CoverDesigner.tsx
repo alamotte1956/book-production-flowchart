@@ -261,7 +261,7 @@ export default function CoverDesigner() {
           <div className="lg:col-span-2 space-y-8">
 
             {/* Trim Size */}
-            <Card className="border-[#e8dfd0]">
+            <Card className="border-[#e8dfd0] bg-white shadow-sm">
               <CardHeader className="pb-3">
                 <CardTitle className="font-serif text-lg text-[#2c1a00] flex items-center gap-2">
                   <span className="w-7 h-7 rounded-full bg-[#c9a96e] text-[#2a1a0a] flex items-center justify-center text-sm font-bold">1</span>
@@ -298,7 +298,7 @@ export default function CoverDesigner() {
             </Card>
 
             {/* Paper & Binding */}
-            <Card className="border-[#e8dfd0]">
+            <Card className="border-[#e8dfd0] bg-white shadow-sm">
               <CardHeader className="pb-3">
                 <CardTitle className="font-serif text-lg text-[#2c1a00] flex items-center gap-2">
                   <span className="w-7 h-7 rounded-full bg-[#c9a96e] text-[#2a1a0a] flex items-center justify-center text-sm font-bold">2</span>
@@ -358,7 +358,7 @@ export default function CoverDesigner() {
             </Card>
 
             {/* Print Specifications */}
-            <Card className="border-[#e8dfd0]">
+            <Card className="border-[#e8dfd0] bg-white shadow-sm">
               <CardHeader className="pb-3">
                 <CardTitle className="font-serif text-lg text-[#2c1a00] flex items-center gap-2">
                   <span className="w-7 h-7 rounded-full bg-[#c9a96e] text-[#2a1a0a] flex items-center justify-center text-sm font-bold">3</span>
@@ -443,7 +443,7 @@ export default function CoverDesigner() {
 
             {/* Visual diagram */}
             {specs && trimW > 0 && trimH > 0 && (
-              <Card className="border-[#e8dfd0]">
+              <Card className="border-[#e8dfd0] bg-white shadow-sm">
                 <CardHeader className="pb-3">
                   <CardTitle className="font-serif text-lg text-[#2c1a00] flex items-center gap-2">
                     <span className="w-7 h-7 rounded-full bg-[#c9a96e] text-[#2a1a0a] flex items-center justify-center text-sm font-bold">4</span>

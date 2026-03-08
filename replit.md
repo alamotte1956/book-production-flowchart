@@ -66,3 +66,19 @@ Run `pnpm run db:push` to sync schema changes.
 - Drizzle `onDuplicateKeyUpdate` → `onConflictDoUpdate` (PostgreSQL syntax)
 - Drizzle `$returningId()` → `.returning()` (PostgreSQL syntax)
 - Originally used custom Manus OAuth (`createdesignpublish.net`), fully replaced with Replit Auth; all old OAuth files removed
+
+## Design System
+
+- **Aesthetic**: Artisan storybook / Arts & Crafts movement
+- **Primary Font**: Lora (serif) — set globally via `font-serif` on body in `index.css`
+- **Color Palette**:
+  - `#f5d98a` — Gold text/accents
+  - `#c9a96e` — Muted gold
+  - `#3a2a1a` / `#2a1a0a` — Walnut dark (headers, dark panels)
+  - `#f5efe0` / `#faf6ef` — Parchment light (backgrounds)
+  - `#6b5f53` / `#8b7b6b` — Muted body text
+  - `#4a3828` — Dark borders
+  - `#e8dfd0` — Light borders
+- **Dark Headers**: All tool pages use `bg-[#2a1a0a]` sticky headers with gold accents
+- **Cards**: `border-[#e8dfd0] bg-white shadow-sm` pattern across tool pages
+- **Contact Form**: Embedded on landing page (`#contact-section`), uses `contact.send` tRPC mutation

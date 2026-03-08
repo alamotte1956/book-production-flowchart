@@ -101,12 +101,12 @@ const DEFAULT_CONFIG: BibleConfig = {
 function SectionHeader({ step, title, subtitle }: { step: number; title: string; subtitle: string }) {
   return (
     <div className="flex items-start gap-4 mb-5">
-      <div className="w-8 h-8 rounded-full bg-[#2c1a00] text-[#c9a96e] flex items-center justify-center text-sm font-bold flex-shrink-0 mt-0.5">
+      <div className="w-8 h-8 rounded-full bg-[#2c1a00] text-[#c9a96e] flex items-center justify-center text-sm font-bold flex-shrink-0 mt-0.5 shadow-sm">
         {step}
       </div>
       <div>
         <h2 className="text-lg font-serif font-semibold text-[#2c1a00]">{title}</h2>
-        <p className="text-sm text-[#8b7b6b] mt-0.5">{subtitle}</p>
+        <p className="text-sm text-[#8b7b6b] mt-0.5 leading-relaxed">{subtitle}</p>
       </div>
     </div>
   );
@@ -652,15 +652,17 @@ export default function BibleStudio() {
   return (
     <div className="min-h-screen bg-[#faf6ef]">
       {/* Header */}
-      <header className="bg-[#2c1a00] text-white px-6 py-4 flex items-center gap-4 sticky top-0 z-30 shadow-lg">
+      <header className="bg-[#2c1a00] text-white px-6 py-4 flex items-center gap-4 sticky top-0 z-30 shadow-lg border-b border-[#4a3828]">
         <button
           onClick={() => navigate("/")}
-          className="text-[#c9a96e] hover:text-white transition-colors p-1 rounded"
+          className="text-[#c9a96e] hover:text-white transition-colors p-1.5 rounded-lg hover:bg-[#3d2810]"
         >
           <ArrowLeft className="w-5 h-5" />
         </button>
         <div className="flex items-center gap-3">
-          <BookOpen className="w-5 h-5 text-[#c9a96e]" />
+          <div className="w-9 h-9 bg-[#c9a96e]/20 rounded-lg flex items-center justify-center">
+            <BookOpen className="w-5 h-5 text-[#c9a96e]" />
+          </div>
           <div>
             <h1 className="text-lg font-serif font-bold leading-tight">Bible Design Studio</h1>
             <p className="text-xs text-[#a08060]">Configure any Bible edition with complete freedom</p>

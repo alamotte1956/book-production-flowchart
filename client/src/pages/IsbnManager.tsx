@@ -286,15 +286,17 @@ ${bisacElements}
   return (
     <div className="min-h-screen bg-[#faf6ef]">
       {/* Header */}
-      <header className="bg-[#2a1a0a] text-white px-6 py-4 flex items-center gap-4 sticky top-0 z-30 shadow-lg">
+      <header className="bg-[#2c1a00] text-white px-6 py-4 flex items-center gap-4 sticky top-0 z-30 shadow-lg border-b border-[#4a3828]">
         <button
           onClick={() => navigate("/")}
-          className="text-[#c9a96e] hover:text-white transition-colors p-1 rounded"
+          className="text-[#c9a96e] hover:text-white transition-colors p-1.5 rounded-lg hover:bg-[#3d2810]"
         >
           <ArrowLeft className="w-5 h-5" />
         </button>
         <div className="flex items-center gap-3">
-          <BookMarked className="w-5 h-5 text-[#c9a96e]" />
+          <div className="w-9 h-9 bg-[#c9a96e]/20 rounded-lg flex items-center justify-center">
+            <BookMarked className="w-5 h-5 text-[#c9a96e]" />
+          </div>
           <div>
             <h1 className="text-lg font-serif font-bold leading-tight">ISBN & Metadata Manager</h1>
             <p className="text-xs text-[#a08060]">ISBN, BISAC, LCCN, and ONIX 3.0 export</p>
@@ -328,10 +330,10 @@ ${bisacElements}
           <div className="lg:col-span-2 space-y-6">
 
             {/* Title & Authors */}
-            <Card className="border-[#e8dfd0]">
+            <Card className="border-[#e8dfd0] bg-white shadow-sm">
               <CardHeader className="pb-3">
                 <CardTitle className="font-serif text-lg text-[#2c1a00] flex items-center gap-2">
-                  <span className="w-7 h-7 rounded-full bg-[#c9a96e] text-[#2a1a0a] flex items-center justify-center text-sm font-bold">1</span>
+                  <span className="w-7 h-7 rounded-full bg-[#2c1a00] text-[#c9a96e] flex items-center justify-center text-sm font-bold">1</span>
                   Title & Authors
                 </CardTitle>
               </CardHeader>
@@ -382,10 +384,10 @@ ${bisacElements}
             </Card>
 
             {/* Publisher & Edition */}
-            <Card className="border-[#e8dfd0]">
+            <Card className="border-[#e8dfd0] bg-white shadow-sm">
               <CardHeader className="pb-3">
                 <CardTitle className="font-serif text-lg text-[#2c1a00] flex items-center gap-2">
-                  <span className="w-7 h-7 rounded-full bg-[#c9a96e] text-[#2a1a0a] flex items-center justify-center text-sm font-bold">2</span>
+                  <span className="w-7 h-7 rounded-full bg-[#2c1a00] text-[#c9a96e] flex items-center justify-center text-sm font-bold">2</span>
                   Publisher & Edition
                 </CardTitle>
               </CardHeader>
@@ -436,10 +438,10 @@ ${bisacElements}
             </Card>
 
             {/* ISBNs */}
-            <Card className="border-[#e8dfd0]">
+            <Card className="border-[#e8dfd0] bg-white shadow-sm">
               <CardHeader className="pb-3">
                 <CardTitle className="font-serif text-lg text-[#2c1a00] flex items-center gap-2">
-                  <span className="w-7 h-7 rounded-full bg-[#c9a96e] text-[#2a1a0a] flex items-center justify-center text-sm font-bold">3</span>
+                  <span className="w-7 h-7 rounded-full bg-[#2c1a00] text-[#c9a96e] flex items-center justify-center text-sm font-bold">3</span>
                   ISBN Numbers
                 </CardTitle>
               </CardHeader>
@@ -495,10 +497,10 @@ ${bisacElements}
             </Card>
 
             {/* BISAC Codes */}
-            <Card className="border-[#e8dfd0]">
+            <Card className="border-[#e8dfd0] bg-white shadow-sm">
               <CardHeader className="pb-3">
                 <CardTitle className="font-serif text-lg text-[#2c1a00] flex items-center gap-2">
-                  <span className="w-7 h-7 rounded-full bg-[#c9a96e] text-[#2a1a0a] flex items-center justify-center text-sm font-bold">4</span>
+                  <span className="w-7 h-7 rounded-full bg-[#2c1a00] text-[#c9a96e] flex items-center justify-center text-sm font-bold">4</span>
                   BISAC Subject Codes
                 </CardTitle>
               </CardHeader>
@@ -544,10 +546,10 @@ ${bisacElements}
             </Card>
 
             {/* Descriptions */}
-            <Card className="border-[#e8dfd0]">
+            <Card className="border-[#e8dfd0] bg-white shadow-sm">
               <CardHeader className="pb-3">
                 <CardTitle className="font-serif text-lg text-[#2c1a00] flex items-center gap-2">
-                  <span className="w-7 h-7 rounded-full bg-[#c9a96e] text-[#2a1a0a] flex items-center justify-center text-sm font-bold">5</span>
+                  <span className="w-7 h-7 rounded-full bg-[#2c1a00] text-[#c9a96e] flex items-center justify-center text-sm font-bold">5</span>
                   Descriptions
                 </CardTitle>
               </CardHeader>
@@ -578,10 +580,10 @@ ${bisacElements}
             </Card>
 
             {/* Physical specs */}
-            <Card className="border-[#e8dfd0]">
+            <Card className="border-[#e8dfd0] bg-white shadow-sm">
               <CardHeader className="pb-3">
                 <CardTitle className="font-serif text-lg text-[#2c1a00] flex items-center gap-2">
-                  <span className="w-7 h-7 rounded-full bg-[#c9a96e] text-[#2a1a0a] flex items-center justify-center text-sm font-bold">6</span>
+                  <span className="w-7 h-7 rounded-full bg-[#2c1a00] text-[#c9a96e] flex items-center justify-center text-sm font-bold">6</span>
                   Physical Specifications
                 </CardTitle>
               </CardHeader>

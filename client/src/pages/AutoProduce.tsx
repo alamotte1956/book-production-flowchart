@@ -290,7 +290,7 @@ function JobCard({ jobId, projectId }: { jobId: number; projectId: number }) {
   const isActive = job.status === "queued" || job.status === "processing";
 
   return (
-    <Card className="border border-[#d4b896]/40 bg-[#fdf9f3]">
+    <Card className="border border-[#e8dfd0] bg-white shadow-sm">
       <CardHeader className="pb-3">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
@@ -301,7 +301,7 @@ function JobCard({ jobId, projectId }: { jobId: number; projectId: number }) {
             ) : (
               <AlertCircle className="w-4 h-4 text-red-500" />
             )}
-            <CardTitle className="text-sm font-semibold text-[#3d2b1f]">
+            <CardTitle className="text-sm font-semibold text-[#2c1a00]">
               {job.manuscriptFileName ?? "Manuscript"}
             </CardTitle>
           </div>
@@ -741,18 +741,15 @@ export default function AutoProduce() {
   return (
     <div className="min-h-screen bg-[#faf6ef]">
       {/* Header */}
-      <header className="bg-[#1a1008] text-[#f5ede4] px-6 py-4 shadow-lg">
+      <header className="bg-[#2a1a0a] text-[#f5ede4] px-6 py-4 shadow-lg sticky top-0 z-30">
         <div className="max-w-5xl mx-auto flex items-center justify-between">
           <div className="flex items-center gap-4">
-            <Button
-              variant="ghost"
-              size="sm"
+            <button
               onClick={() => navigate(`/project/${projectId}`)}
-              className="text-[#c9a96e] hover:text-[#f5ede4] hover:bg-[#2a1f10] gap-2 px-2"
+              className="text-[#c9a96e] hover:text-white transition-colors p-1 rounded"
             >
-              <ArrowLeft className="w-4 h-4" />
-              Back to Tracker
-            </Button>
+              <ArrowLeft className="w-5 h-5" />
+            </button>
             <div className="h-5 w-px bg-[#4a3828]" />
             <div>
               <div className="flex items-center gap-2">
@@ -785,9 +782,9 @@ export default function AutoProduce() {
         </div>
 
         {/* Upload Form */}
-        <Card className="border border-[#d4b896]/40 bg-white shadow-sm">
+        <Card className="border border-[#e8dfd0] bg-white shadow-sm">
           <CardHeader>
-            <CardTitle className="font-serif text-[#3d2b1f] text-xl">New Production Run</CardTitle>
+            <CardTitle className="font-serif text-[#2c1a00] text-xl">New Production Run</CardTitle>
             <CardDescription className="text-[#8b7b6b]">
               Configure your trim size and style, preview the look, then upload your manuscript to begin.
             </CardDescription>
@@ -1033,9 +1030,9 @@ export default function AutoProduce() {
         )}
 
         {/* What the AI does */}
-        <Card className="border border-[#d4b896]/30 bg-[#fdf9f3]">
+        <Card className="border border-[#e8dfd0] bg-white shadow-sm">
           <CardHeader>
-            <CardTitle className="font-serif text-[#3d2b1f] text-base flex items-center gap-2">
+            <CardTitle className="font-serif text-[#2c1a00] text-base flex items-center gap-2">
               <Sparkles className="w-4 h-4 text-[#c9a96e]" />
               What the AI does
             </CardTitle>

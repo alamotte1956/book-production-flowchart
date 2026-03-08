@@ -82,7 +82,7 @@ export default function StepCard({ step, stepNumber, isLeft, accentColor, phaseC
               <div className="flex-1">
                 <div className="flex items-center gap-2 mb-1">
                   <span
-                    className="text-sm font-semibold tracking-wider uppercase font-sans"
+                    className="text-sm font-semibold tracking-wider uppercase"
                     style={{ color: accentColor }}
                   >
                     Step {stepNumber}
@@ -102,14 +102,14 @@ export default function StepCard({ step, stepNumber, isLeft, accentColor, phaseC
             </div>
 
             {/* Description */}
-            <p className="mt-3 text-[#6b5c4c] font-sans text-sm md:text-base leading-relaxed">
+            <p className="mt-3 text-[#6b5c4c] text-sm md:text-base leading-relaxed">
               {step.description}
             </p>
 
             {/* Input count badge */}
             <div className="mt-3 flex items-center gap-2">
               <span
-                className="inline-flex items-center gap-1.5 text-sm font-medium px-3 py-1 rounded-full font-sans"
+                className="inline-flex items-center gap-1.5 text-sm font-medium px-3 py-1 rounded-full"
                 style={{
                   backgroundColor: `${accentColor}12`,
                   color: accentColor,
@@ -119,7 +119,7 @@ export default function StepCard({ step, stepNumber, isLeft, accentColor, phaseC
                 {step.inputs.length} input{step.inputs.length !== 1 ? "s" : ""}
               </span>
               {!isExpanded && (
-                <span className="text-sm text-[#9b8b7b] font-sans">Click to expand</span>
+                <span className="text-sm text-[#9b8b7b]">Click to expand</span>
               )}
             </div>
           </div>
@@ -147,7 +147,7 @@ export default function StepCard({ step, stepNumber, isLeft, accentColor, phaseC
                       style={{ borderColor: `${accentColor}25` }}
                     >
                       <div
-                        className="shrink-0 mt-0.5 w-6 h-6 rounded flex items-center justify-center text-xs font-bold font-sans"
+                        className="shrink-0 mt-0.5 w-6 h-6 rounded flex items-center justify-center text-xs font-bold"
                         style={{
                           backgroundColor: `${accentColor}15`,
                           color: accentColor,
@@ -156,10 +156,10 @@ export default function StepCard({ step, stepNumber, isLeft, accentColor, phaseC
                         {idx + 1}
                       </div>
                       <div>
-                        <p className="font-sans font-semibold text-sm text-[#3a2a1a]">
+                        <p className="font-semibold text-sm text-[#3a2a1a]">
                           {input.name}
                         </p>
-                        <p className="font-sans text-sm text-[#6b5c4c] mt-0.5 leading-relaxed">
+                        <p className="text-sm text-[#6b5c4c] mt-0.5 leading-relaxed">
                           {input.description}
                         </p>
                       </div>

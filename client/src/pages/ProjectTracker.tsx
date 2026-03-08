@@ -244,15 +244,15 @@ function StepCard({
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: globalIndex * 0.03 }}
     >
-      <Card className={`${statusColors[status]} transition-all duration-200 overflow-hidden print:break-inside-avoid`}>
+      <Card className={`${statusColors[status]} transition-all duration-200 overflow-hidden print:break-inside-avoid hover:shadow-md`}>
         <CardContent className="p-0">
           <button
             className="w-full text-left px-5 py-4 flex items-center gap-4"
             onClick={() => !printMode && setExpanded(!expanded)}
           >
             <div
-              className="w-10 h-10 rounded-lg flex items-center justify-center shrink-0"
-              style={{ backgroundColor: status === "skipped" ? "#e5e7eb" : `${phase.accentColor}20` }}
+              className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0 shadow-sm"
+              style={{ backgroundColor: status === "skipped" ? "#e5e7eb" : `${phase.accentColor}18` }}
             >
               {status === "complete" ? (
                 <Check size={20} className="text-[#4a6741]" />
@@ -565,39 +565,47 @@ function PhaseSection({
 
   return (
     <section id={`phase-${phase.id}`} className="scroll-mt-20 print:break-before-page">
-      <div className="flex items-center gap-4 mb-4">
-        <div
-          className="w-10 h-10 rounded-full flex items-center justify-center text-white font-bold text-sm shrink-0"
-          style={{ backgroundColor: phase.accentColor }}
-        >
-          {phase.number}
-        </div>
-        <div className="flex-1 min-w-0">
-          <h3 className="font-serif text-xl text-[#3a2a1a]">{phase.title}</h3>
-          <div className="flex items-center gap-3 mt-0.5">
-            <p className="text-xs text-[#8b7b6b]">{phase.subtitle}</p>
-            {!printMode && (
-              <DueDatePicker
-                phaseId={phase.id}
-                projectId={projectId}
-                currentDueDate={dueDateMap[phase.id]}
-                phaseComplete={phaseComplete}
-              />
-            )}
-            {printMode && dueDateMap[phase.id] && (
-              <span className="text-xs text-[#8b7b6b]">Due: {formatDate(dueDateMap[phase.id])}</span>
-            )}
+      <div className="rounded-xl bg-gradient-to-r from-white/80 to-[#f8f5ef]/80 border border-[#e8dfd0] p-5 mb-5 backdrop-blur-sm">
+        <div className="flex items-center gap-4">
+          <div
+            className="w-12 h-12 rounded-xl flex items-center justify-center text-white font-serif font-bold text-lg shrink-0 shadow-sm"
+            style={{ backgroundColor: phase.accentColor }}
+          >
+            {phaseComplete ? <Check size={20} /> : phase.number}
           </div>
-        </div>
-        <div className="text-right shrink-0">
-          <span className="text-sm font-semibold" style={{ color: phase.accentColor }}>{pct}%</span>
-          <div className="w-24 mt-1">
-            <Progress value={pct} className="h-1.5" />
+          <div className="flex-1 min-w-0">
+            <h3 className="font-serif text-xl font-semibold text-[#3a2a1a] tracking-wide">{phase.title}</h3>
+            <div className="flex items-center gap-3 mt-1">
+              <p className="text-xs text-[#8b7b6b] italic">{phase.subtitle}</p>
+              {!printMode && (
+                <DueDatePicker
+                  phaseId={phase.id}
+                  projectId={projectId}
+                  currentDueDate={dueDateMap[phase.id]}
+                  phaseComplete={phaseComplete}
+                />
+              )}
+              {printMode && dueDateMap[phase.id] && (
+                <span className="text-xs text-[#8b7b6b]">Due: {formatDate(dueDateMap[phase.id])}</span>
+              )}
+            </div>
+          </div>
+          <div className="text-right shrink-0">
+            <span className="text-lg font-serif font-bold" style={{ color: phase.accentColor }}>{pct}%</span>
+            <div className="w-28 mt-1.5">
+              <div className="h-2 rounded-full overflow-hidden" style={{ backgroundColor: `${phase.accentColor}15` }}>
+                <div
+                  className="h-full rounded-full transition-all duration-500 ease-out"
+                  style={{ width: `${pct}%`, backgroundColor: phase.accentColor }}
+                />
+              </div>
+            </div>
+            <span className="text-[10px] text-[#a89880] mt-0.5 block">{completedInPhase}/{visibleSteps.length} steps</span>
           </div>
         </div>
       </div>
 
-      <div className="space-y-3 border-l-2 pl-4" style={{ borderColor: `${phase.accentColor}30` }}>
+      <div className="space-y-3 border-l-2 pl-4 ml-1" style={{ borderColor: `${phase.accentColor}30` }}>
         {visibleSteps.map((step, idx) => (
           <StepCard
             key={step.id}
@@ -789,8 +797,9 @@ export default function ProjectTracker() {
   return (
     <div className="min-h-screen bg-[#faf6ef]">
       {/* Header */}
-      <header className="sticky top-0 z-50 bg-[#2a1a0a] text-[#f5efe0] shadow-lg print:static print:bg-white print:text-[#3a2a1a] print:shadow-none print:border-b print:border-[#e8dfd0]">
-        <div className="max-w-6xl mx-auto px-6 py-4 flex items-center gap-4">
+      <header className="sticky top-0 z-50 bg-gradient-to-r from-[#2a1a0a] via-[#3a2414] to-[#2a1a0a] text-[#f5efe0] shadow-lg print:static print:bg-white print:text-[#3a2a1a] print:shadow-none print:border-b print:border-[#e8dfd0]">
+        <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGNpcmNsZSBjeD0iMjAiIGN5PSIyMCIgcj0iMSIgZmlsbD0icmdiYSgyMDEsMTY5LDExMCwwLjA1KSIvPjwvc3ZnPg==')] opacity-50 print:hidden" />
+        <div className="max-w-6xl mx-auto px-6 py-4 flex items-center gap-4 relative">
           <Button
             variant="ghost" size="icon"
             className="text-[#c9a96e] hover:bg-[#c9a96e]/10 print:hidden"
@@ -799,10 +808,9 @@ export default function ProjectTracker() {
             <ArrowLeft size={20} />
           </Button>
           <div className="flex-1 min-w-0">
-            <h1 className="font-serif text-xl truncate">{project.title}</h1>
+            <h1 className="font-serif text-xl truncate tracking-wide">{project.title}</h1>
             <div className="flex items-center gap-3 text-xs text-[#c9a96e]/70 print:text-[#8b7b6b]">
-              {project.author && <span>by {project.author}</span>}
-              {/* Inline genre editor */}
+              {project.author && <span className="italic">by {project.author}</span>}
               <GenreEditor projectId={projectId} currentGenre={project.genre} />
             </div>
           </div>
@@ -891,9 +899,14 @@ export default function ProjectTracker() {
           </button>
 
           <div className="text-right shrink-0">
-            <span className="text-2xl font-bold text-[#c9a96e] print:text-[#3a2a1a]">{overallPct}%</span>
+            <span className="text-2xl font-serif font-bold text-[#c9a96e] print:text-[#3a2a1a]">{overallPct}%</span>
             <div className="w-32 mt-1">
-              <Progress value={overallPct} className="h-2 bg-[#c9a96e]/20" />
+              <div className="h-2 rounded-full overflow-hidden bg-[#c9a96e]/20">
+                <div
+                  className="h-full rounded-full bg-gradient-to-r from-[#c9a96e] to-[#e0c48a] transition-all duration-500 ease-out"
+                  style={{ width: `${overallPct}%` }}
+                />
+              </div>
             </div>
             <span className="text-[10px] text-[#c9a96e]/50 print:text-[#8b7b6b]">{completedSteps}/{totalSteps} steps</span>
           </div>
@@ -908,7 +921,7 @@ export default function ProjectTracker() {
             .map(s => ({ phase: p, step: s, notes: statusMap[s.id]!.notes! }))
         );
         return (
-          <div className="bg-amber-50 border-b border-amber-200 print:hidden">
+          <div className="bg-gradient-to-r from-amber-50/80 to-[#fdf9f3] border-b border-[#c9a96e]/20 print:hidden">
             <div className="max-w-6xl mx-auto px-6 py-4">
               <div className="flex items-center justify-between mb-3">
                 <h3 className="font-serif text-sm font-semibold text-[#3a2a1a] flex items-center gap-2">
@@ -924,7 +937,7 @@ export default function ProjectTracker() {
               ) : (
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
                   {stepsWithNotes.map(({ phase, step, notes }) => (
-                    <div key={step.id} className="bg-white rounded-lg border border-amber-200 p-3">
+                    <div key={step.id} className="bg-white/80 rounded-lg border border-[#c9a96e]/20 p-3 hover:shadow-sm transition-shadow">
                       <div className="flex items-center gap-1.5 mb-1.5">
                         <span
                           className="w-4 h-4 rounded-full flex items-center justify-center text-[9px] font-bold text-white shrink-0"
@@ -944,7 +957,7 @@ export default function ProjectTracker() {
 
       {/* Genre filter info banner */}
       {hiddenStepIds.size > 0 && !printMode && (
-        <div className="bg-[#f5ede4] border-b border-[#d4b896]/50 print:hidden">
+        <div className="bg-gradient-to-r from-[#f5ede4] to-[#faf6ef] border-b border-[#d4b896]/30 print:hidden">
           <div className="max-w-6xl mx-auto px-6 py-2.5 flex items-center gap-3">
             <Eye size={14} className="text-[#8b5e3c] shrink-0" />
             <p className="text-xs text-[#5c3d2e] flex-1">
@@ -970,9 +983,13 @@ export default function ProjectTracker() {
 
       <div className="max-w-6xl mx-auto px-6 py-8 flex gap-8">
         {/* Sidebar — phase navigation */}
-        <aside className="hidden lg:block w-52 shrink-0 print:hidden">
-          <nav className="sticky top-24 space-y-1">
-            <p className="text-xs font-bold uppercase tracking-wider text-[#a89880] mb-3">Chapters</p>
+        <aside className="hidden lg:block w-56 shrink-0 print:hidden">
+          <nav className="sticky top-24 space-y-1 bg-white/60 backdrop-blur-sm rounded-xl border border-[#e8dfd0] p-4">
+            <div className="flex items-center gap-2 mb-4">
+              <div className="h-px flex-1 bg-[#c9a96e]/20" />
+              <p className="text-xs font-serif font-semibold uppercase tracking-widest text-[#a89880]">Chapters</p>
+              <div className="h-px flex-1 bg-[#c9a96e]/20" />
+            </div>
             {allPhases.map((phase) => {
               const done = phase.steps.filter(
                 (s) => statusMap[s.id]?.status === "complete" || statusMap[s.id]?.status === "skipped"
@@ -984,16 +1001,22 @@ export default function ProjectTracker() {
                 <a
                   key={phase.id}
                   href={`#phase-${phase.id}`}
-                  className={`flex items-center gap-2 px-3 py-2 rounded-lg text-sm transition-colors ${isOverdue ? "text-red-600 hover:bg-red-50" : "text-[#5c3d2e] hover:bg-[#f0e8d8]"}`}
+                  className={`flex items-center gap-2.5 px-3 py-2.5 rounded-lg text-sm transition-all duration-200 ${
+                    isOverdue
+                      ? "text-red-600 hover:bg-red-50 border border-red-200/50"
+                      : phaseComplete
+                      ? "text-[#4a6741] hover:bg-[#f0faf2] border border-[#4a6741]/10"
+                      : "text-[#5c3d2e] hover:bg-[#f0e8d8] border border-transparent"
+                  }`}
                 >
                   <span
-                    className="w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-bold text-white shrink-0"
-                    style={{ backgroundColor: isOverdue ? "#dc2626" : phase.accentColor }}
+                    className="w-6 h-6 rounded-lg flex items-center justify-center text-[10px] font-bold text-white shrink-0 shadow-sm"
+                    style={{ backgroundColor: isOverdue ? "#dc2626" : phaseComplete ? "#4a6741" : phase.accentColor }}
                   >
-                    {phaseComplete ? <Check size={10} /> : phase.number}
+                    {phaseComplete ? <Check size={11} /> : phase.number}
                   </span>
-                  <span className="truncate flex-1">{phase.title}</span>
-                  <span className="text-[10px] text-[#a89880]">{done}/{phase.steps.length}</span>
+                  <span className="truncate flex-1 font-medium">{phase.title}</span>
+                  <span className="text-[10px] font-medium text-[#a89880]">{done}/{phase.steps.length}</span>
                 </a>
               );
             })}
@@ -1018,14 +1041,19 @@ export default function ProjectTracker() {
           })}
 
           {/* Footer */}
-          <div className="text-center py-12 print:hidden">
-            <div className="flex items-center justify-center gap-3 mb-4">
-              <div className="h-px w-12 bg-[#c9a96e]/30" />
-              <BookOpen size={20} className="text-[#c9a96e]/50" />
-              <div className="h-px w-12 bg-[#c9a96e]/30" />
+          <div className="text-center py-16 print:hidden">
+            <div className="flex items-center justify-center gap-4 mb-6">
+              <div className="h-px w-16 bg-gradient-to-r from-transparent to-[#c9a96e]/30" />
+              <div className="w-8 h-8 rounded-full border-2 border-[#c9a96e]/20 flex items-center justify-center">
+                <BookOpen size={16} className="text-[#c9a96e]/40" />
+              </div>
+              <div className="h-px w-16 bg-gradient-to-l from-transparent to-[#c9a96e]/30" />
             </div>
-            <p className="font-serif text-lg text-[#c9a96e]/60 italic">
+            <p className="font-serif text-lg text-[#c9a96e]/50 italic tracking-wide">
               "Every book is a journey."
+            </p>
+            <p className="text-xs text-[#a89880]/40 mt-2 tracking-wider uppercase">
+              {completedSteps} of {totalSteps} steps complete
             </p>
           </div>
         </main>

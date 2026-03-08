@@ -18,7 +18,7 @@ import {
   BookOpen, Plus, Trash2, ArrowRight, Loader2,
   Upload, CheckCircle2, SkipForward, Clock, Sparkles, Copy,
   Layers, BookMarked, Ruler, Zap, BarChart3, Library,
-  ChevronRight, ChevronDown, Calendar, Star, TrendingUp, FileText, HelpCircle, LogOut, User, Menu, X, LayoutGrid, Search,
+  ChevronRight, ChevronDown, Calendar, Star, TrendingUp, FileText, HelpCircle, LogOut, User, Menu, X, LayoutGrid, Search, Send,
 } from "lucide-react";
 import {
   DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel,
@@ -268,6 +268,21 @@ export default function Home() {
   const [bibleTranslation, setBibleTranslation] = useState("");
   const [notes, setNotes] = useState("");
 
+  const [contactName, setContactName] = useState("");
+  const [contactEmail, setContactEmail] = useState("");
+  const [contactSubject, setContactSubject] = useState("");
+  const [contactMessage, setContactMessage] = useState("");
+  const [contactSent, setContactSent] = useState(false);
+  const contactMutation = trpc.contact.send.useMutation({
+    onSuccess: () => {
+      setContactSent(true);
+      setContactName("");
+      setContactEmail("");
+      setContactSubject("");
+      setContactMessage("");
+    },
+  });
+
   const isBible = genre === "Bible / Scripture";
 
   const projectsQuery = trpc.project.list.useQuery(undefined, { enabled: isAuthenticated });
@@ -324,6 +339,12 @@ export default function Home() {
                 className="font-serif text-base text-[#f5efe0] hover:text-[#f5d98a] transition-colors hidden md:block px-3 py-1.5"
               >
                 Tools
+              </button>
+              <button
+                onClick={() => document.getElementById('contact-section')?.scrollIntoView({ behavior: 'smooth' })}
+                className="font-serif text-base text-[#f5efe0] hover:text-[#f5d98a] transition-colors hidden md:block px-3 py-1.5"
+              >
+                Contact
               </button>
               <a href={getLoginUrl()}>
                 <button className="font-serif text-base text-[#f5efe0] hover:text-white transition-colors px-4 py-2 rounded-md border border-[#c9a96e]/30 hover:border-[#c9a96e]/60">
@@ -539,6 +560,114 @@ export default function Home() {
           </motion.div>
         </div>
 
+        {/* Contact Form */}
+        <div id="contact-section" className="bg-[#2a1a0a] py-20">
+          <div className="max-w-2xl mx-auto px-6">
+            <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.6 }}>
+              <div className="text-center mb-10">
+                <Send size={28} className="mx-auto text-[#c9a96e] mb-4" />
+                <h2 className="font-serif text-3xl md:text-4xl text-[#f5efe0]">Get in Touch</h2>
+                <p className="mt-3 font-serif text-[#c9a96e]/80 max-w-md mx-auto">Have a question about self-publishing or our platform? We'd love to hear from you.</p>
+              </div>
+              {contactSent ? (
+                <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} className="text-center py-12">
+                  <CheckCircle2 size={48} className="mx-auto text-green-400 mb-4" />
+                  <h3 className="font-serif text-2xl text-[#f5efe0] mb-2">Message Sent!</h3>
+                  <p className="font-serif text-[#c9a96e]/70 mb-6">Thank you for reaching out. We'll get back to you soon.</p>
+                  <Button
+                    variant="outline"
+                    className="border-[#c9a96e]/40 text-[#c9a96e] hover:bg-[#c9a96e]/10 hover:border-[#c9a96e]"
+                    onClick={() => setContactSent(false)}
+                  >
+                    Send Another Message
+                  </Button>
+                </motion.div>
+              ) : (
+                <form
+                  onSubmit={(e) => {
+                    e.preventDefault();
+                    contactMutation.mutate({
+                      name: contactName,
+                      email: contactEmail,
+                      subject: contactSubject,
+                      message: contactMessage,
+                    });
+                  }}
+                  className="space-y-5"
+                >
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+                    <div>
+                      <Label className="text-[#c9a96e]/80 font-semibold text-sm">Name *</Label>
+                      <Input
+                        value={contactName}
+                        onChange={e => setContactName(e.target.value)}
+                        placeholder="Your name"
+                        required
+                        className="mt-1.5 bg-[#3a2a1a] border-[#c9a96e]/20 text-[#f5efe0] placeholder:text-[#c9a96e]/30 focus:border-[#c9a96e]/50"
+                      />
+                    </div>
+                    <div>
+                      <Label className="text-[#c9a96e]/80 font-semibold text-sm">Email *</Label>
+                      <Input
+                        type="email"
+                        value={contactEmail}
+                        onChange={e => setContactEmail(e.target.value)}
+                        placeholder="your@email.com"
+                        required
+                        className="mt-1.5 bg-[#3a2a1a] border-[#c9a96e]/20 text-[#f5efe0] placeholder:text-[#c9a96e]/30 focus:border-[#c9a96e]/50"
+                      />
+                    </div>
+                  </div>
+                  <div>
+                    <Label className="text-[#c9a96e]/80 font-semibold text-sm">Subject *</Label>
+                    <Input
+                      value={contactSubject}
+                      onChange={e => setContactSubject(e.target.value)}
+                      placeholder="What's this about?"
+                      required
+                      className="mt-1.5 bg-[#3a2a1a] border-[#c9a96e]/20 text-[#f5efe0] placeholder:text-[#c9a96e]/30 focus:border-[#c9a96e]/50"
+                    />
+                  </div>
+                  <div>
+                    <Label className="text-[#c9a96e]/80 font-semibold text-sm">Message *</Label>
+                    <Textarea
+                      value={contactMessage}
+                      onChange={e => setContactMessage(e.target.value)}
+                      placeholder="Tell us more… (at least 10 characters)"
+                      required
+                      rows={5}
+                      className="mt-1.5 bg-[#3a2a1a] border-[#c9a96e]/20 text-[#f5efe0] placeholder:text-[#c9a96e]/30 focus:border-[#c9a96e]/50 resize-none"
+                    />
+                  </div>
+                  {contactMutation.error && (
+                    <p className="text-sm text-red-400 font-serif">{contactMutation.error.message}</p>
+                  )}
+                  <div className="flex justify-center pt-2">
+                    <Button
+                      type="submit"
+                      size="lg"
+                      disabled={contactMutation.isPending}
+                      className="bg-[#c9a96e] hover:bg-[#b8944f] text-[#2a1a0a] font-semibold text-base px-10 py-6 rounded-lg"
+                    >
+                      {contactMutation.isPending ? (
+                        <>
+                          <Loader2 className="mr-2 animate-spin" size={18} />
+                          Sending…
+                        </>
+                      ) : (
+                        <>
+                          Send Message
+                          <Send className="ml-2" size={16} />
+                        </>
+                      )}
+                    </Button>
+                  </div>
+                </form>
+              )}
+            </motion.div>
+          </div>
+        </div>
+
         <footer className="py-12 bg-[#2a1a0a] border-t border-[#c9a96e]/10">
           <div className="max-w-5xl mx-auto px-6">
             <div className="flex flex-col md:flex-row items-center justify-between gap-6">
@@ -601,8 +730,7 @@ export default function Home() {
 
   // ─── Authenticated Publisher Command Center ──────────────────────────────────
   return (
-    <div className="min-h-screen bg-[#f5f0e8]">
-      {/* Mobile menu backdrop */}
+    <div className="min-h-screen bg-gradient-to-b from-[#faf6ef] to-[#f0e8d8]">
       {mobileMenuOpen && (
         <div
           className="fixed inset-0 z-40 bg-black/60 md:hidden"
@@ -610,13 +738,11 @@ export default function Home() {
         />
       )}
 
-      {/* Mobile slide-out drawer */}
       <div
         className={`fixed top-0 right-0 h-full w-72 z-50 bg-[#1a1008] border-l border-[#c9a96e]/15 transform transition-transform duration-300 ease-in-out md:hidden ${
           mobileMenuOpen ? "translate-x-0" : "translate-x-full"
         }`}
       >
-        {/* Drawer header */}
         <div className="flex items-center justify-between px-5 py-4 border-b border-[#c9a96e]/10">
           <div className="flex items-center gap-2.5">
             <img
@@ -624,7 +750,7 @@ export default function Home() {
               alt="Create Design Publish LLC"
               className="h-10 w-auto object-contain"
             />
-            <span className="font-serif text-[#f5d98a] text-sm">Menu</span>
+            <span className="font-serif text-[#f5d98a] text-sm tracking-wide">Menu</span>
           </div>
           <button
             onClick={() => setMobileMenuOpen(false)}
@@ -635,22 +761,20 @@ export default function Home() {
           </button>
         </div>
 
-        {/* Drawer user info */}
         <div className="px-5 py-4 border-b border-[#c9a96e]/10">
           <div className="flex items-center gap-3">
-            <div className="w-9 h-9 rounded-full bg-[#c9a96e]/20 flex items-center justify-center shrink-0">
-              <span className="text-sm font-bold text-[#c9a96e]">
+            <div className="w-10 h-10 rounded-full bg-gradient-to-br from-[#c9a96e]/30 to-[#c9a96e]/10 flex items-center justify-center shrink-0 border border-[#c9a96e]/20">
+              <span className="text-sm font-bold text-[#f5d98a]">
                 {(user?.name || user?.email || "?")[0].toUpperCase()}
               </span>
             </div>
             <div className="min-w-0">
-              <p className="text-sm text-[#f5efe0] font-medium truncate">{user?.name || "Account"}</p>
+              <p className="text-sm text-[#f5efe0] font-semibold truncate">{user?.name || "Account"}</p>
               <p className="text-xs text-[#c9a96e]/40 truncate">{user?.email || ""}</p>
             </div>
           </div>
         </div>
 
-        {/* Drawer nav links */}
         <nav className="px-3 py-4 flex flex-col gap-1">
           {[
             { label: "CDP Templates", path: "/cdp-templates", icon: LayoutGrid, badge: "New" },
@@ -668,7 +792,7 @@ export default function Home() {
               className="flex items-center gap-3 w-full text-left px-3 py-3 rounded-lg text-[#c9a96e]/70 hover:text-[#f5efe0] hover:bg-[#c9a96e]/10 transition-all group"
             >
               <item.icon size={16} className="shrink-0 text-[#c9a96e]/50 group-hover:text-[#c9a96e]" />
-              <span className="text-sm flex-1">{item.label}</span>
+              <span className="text-sm font-serif flex-1">{item.label}</span>
               {item.badge && (
                 <span className="text-[10px] px-1.5 py-0.5 rounded bg-[#c9a96e]/10 text-[#c9a96e]/60 font-medium">{item.badge}</span>
               )}
@@ -676,37 +800,34 @@ export default function Home() {
           ))}
         </nav>
 
-        {/* Drawer sign out */}
         <div className="absolute bottom-0 left-0 right-0 px-3 py-4 border-t border-[#c9a96e]/10">
           <button
             onClick={() => { logout(); setMobileMenuOpen(false); }}
             className="flex items-center gap-3 w-full px-3 py-3 rounded-lg text-red-400/70 hover:text-red-400 hover:bg-red-900/15 transition-all"
           >
             <LogOut size={16} className="shrink-0" />
-            <span className="text-sm">Sign Out</span>
+            <span className="text-sm font-serif">Sign Out</span>
           </button>
         </div>
       </div>
 
-      {/* Command Center Header */}
-      <header className="bg-[#1e1108] text-[#f5efe0] border-b border-[#c9a96e]/10">
-        <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
+      <header className="bg-gradient-to-r from-[#1a1008] via-[#1e1108] to-[#1a1008] text-[#f5efe0] border-b border-[#c9a96e]/15 shadow-lg shadow-[#1a1008]/20">
+        <div className="max-w-7xl mx-auto px-6 py-5 flex items-center justify-between">
           <div className="flex items-center gap-4">
-            <div className="flex items-center gap-2.5">
+            <div className="flex items-center gap-3">
               <img
                 src="https://d2xsxph8kpxj0f.cloudfront.net/310519663211654017/kGjPju6hKCvCsjZhgUHyqj/CDPlargelogo_25428631.PNG"
                 alt="Create Design Publish LLC"
-                className="h-10 w-auto object-contain"
+                className="h-11 w-auto object-contain"
               />
               <div>
-                <h1 className="font-serif text-lg leading-tight text-[#f5efe0]">Create Design Publish LLC</h1>
-                <p className="text-[10px] text-[#c9a96e]/50 uppercase tracking-widest hidden sm:block">Self-Publishing &amp; Online Publishing Platform</p>
+                <h1 className="font-serif text-xl leading-tight text-[#f5d98a] tracking-wide" style={{ textShadow: "0 0 30px rgba(245,217,138,0.3)" }}>Publisher Command Center</h1>
+                <p className="text-[10px] text-[#c9a96e]/50 uppercase tracking-[0.2em] hidden sm:block font-serif">Create Design Publish LLC</p>
               </div>
             </div>
           </div>
 
-          {/* Desktop quick nav */}
-          <nav className="hidden md:flex items-center gap-1">
+          <nav className="hidden md:flex items-center gap-0.5">
             {[
               { label: "Templates", path: "/cdp-templates", icon: LayoutGrid },
               { label: "KP&A", path: "/kpa-templates", icon: LayoutGrid },
@@ -720,7 +841,7 @@ export default function Home() {
               <button
                 key={item.path}
                 onClick={() => navigate(item.path)}
-                className="flex items-center gap-1.5 text-xs text-[#c9a96e]/60 hover:text-[#c9a96e] hover:bg-[#c9a96e]/10 px-3 py-1.5 rounded-md transition-all"
+                className="flex items-center gap-1.5 text-xs font-serif text-[#c9a96e]/60 hover:text-[#f5d98a] hover:bg-[#c9a96e]/10 px-3 py-2 rounded-lg transition-all"
               >
                 <item.icon size={13} />
                 {item.label}
@@ -729,17 +850,16 @@ export default function Home() {
           </nav>
 
           <div className="flex items-center gap-2">
-            {/* Desktop account dropdown */}
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <button className="w-8 h-8 rounded-full bg-[#c9a96e]/20 hover:bg-[#c9a96e]/30 flex items-center justify-center transition-colors outline-none" aria-label="Account menu">
-                  <span className="text-sm font-bold text-[#c9a96e]">
+                <button className="w-9 h-9 rounded-full bg-gradient-to-br from-[#c9a96e]/25 to-[#c9a96e]/10 hover:from-[#c9a96e]/35 hover:to-[#c9a96e]/20 flex items-center justify-center transition-all outline-none border border-[#c9a96e]/20" aria-label="Account menu">
+                  <span className="text-sm font-bold text-[#f5d98a]">
                     {(user?.name || user?.email || "?")[0].toUpperCase()}
                   </span>
                 </button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="w-52 bg-[#2a1a0a] border-[#c9a96e]/20 text-[#f5efe0]">
-                <DropdownMenuLabel className="text-[#c9a96e]/70 text-xs">
+              <DropdownMenuContent align="end" className="w-56 bg-[#2a1a0a] border-[#c9a96e]/20 text-[#f5efe0] shadow-xl">
+                <DropdownMenuLabel className="text-[#c9a96e]/70 text-xs font-serif">
                   <div className="flex items-center gap-2">
                     <User size={13} />
                     <span className="truncate">{user?.name || user?.email || "Account"}</span>
@@ -747,7 +867,7 @@ export default function Home() {
                 </DropdownMenuLabel>
                 <DropdownMenuSeparator className="bg-[#c9a96e]/15" />
                 <DropdownMenuItem
-                  className="text-xs text-[#f5efe0] hover:bg-[#c9a96e]/10 focus:bg-[#c9a96e]/10 cursor-pointer"
+                  className="text-xs font-serif text-[#f5efe0] hover:bg-[#c9a96e]/10 focus:bg-[#c9a96e]/10 cursor-pointer"
                   onClick={() => navigate("/guide")}
                 >
                   <HelpCircle size={13} className="mr-2 text-[#c9a96e]/60" />
@@ -755,7 +875,7 @@ export default function Home() {
                 </DropdownMenuItem>
                 <DropdownMenuSeparator className="bg-[#c9a96e]/15" />
                 <DropdownMenuItem
-                  className="text-xs text-red-400 hover:bg-red-900/20 focus:bg-red-900/20 cursor-pointer"
+                  className="text-xs font-serif text-red-400 hover:bg-red-900/20 focus:bg-red-900/20 cursor-pointer"
                   onClick={() => logout()}
                 >
                   <LogOut size={13} className="mr-2" />
@@ -764,7 +884,6 @@ export default function Home() {
               </DropdownMenuContent>
             </DropdownMenu>
 
-            {/* Mobile hamburger button */}
             <button
               className="md:hidden w-8 h-8 flex items-center justify-center rounded-md text-[#c9a96e]/70 hover:text-[#c9a96e] hover:bg-[#c9a96e]/10 transition-colors"
               onClick={() => setMobileMenuOpen(true)}
@@ -776,38 +895,43 @@ export default function Home() {
         </div>
       </header>
 
-      {/* Stats bar */}
-      <div className="bg-[#2a1a0a] border-b border-[#c9a96e]/10">
-        <div className="max-w-7xl mx-auto px-6 py-3 flex items-center gap-8 overflow-x-auto">
+      <div className="bg-gradient-to-r from-[#2a1a0a] via-[#33200e] to-[#2a1a0a] border-b border-[#c9a96e]/10">
+        <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between gap-6 overflow-x-auto">
           {[
-            { label: "Active Projects", value: projectList.length, icon: FileText, color: "text-[#c9a96e]" },
-            { label: "Production Phases", value: phases.length, icon: BarChart3, color: "text-blue-400" },
-            { label: "Steps per Project", value: totalSteps, icon: CheckCircle2, color: "text-green-400" },
-            { label: "Tracked Inputs", value: totalInputs, icon: TrendingUp, color: "text-purple-400" },
-          ].map(stat => (
-            <div key={stat.label} className="flex items-center gap-2.5 shrink-0">
-              <stat.icon size={16} className={stat.color} />
-              <div>
-                <p className="text-lg font-bold text-white leading-none">{stat.value}</p>
-                <p className="text-[10px] text-[#c9a96e]/40 uppercase tracking-wide">{stat.label}</p>
+            { label: "Active Projects", value: projectList.length, icon: FileText, color: "text-[#f5d98a]" },
+            { label: "Production Phases", value: phases.length, icon: BarChart3, color: "text-[#c9a96e]" },
+            { label: "Steps per Project", value: totalSteps, icon: CheckCircle2, color: "text-[#d4b896]" },
+            { label: "Tracked Inputs", value: totalInputs, icon: TrendingUp, color: "text-[#c9a96e]/80" },
+          ].map((stat, idx) => (
+            <div key={stat.label} className="flex items-center gap-3 shrink-0">
+              <div className="w-9 h-9 rounded-lg bg-[#c9a96e]/10 flex items-center justify-center">
+                <stat.icon size={16} className={stat.color} />
               </div>
+              <div>
+                <p className="text-xl font-bold text-[#f5efe0] leading-none font-serif">{stat.value}</p>
+                <p className="text-[10px] text-[#c9a96e]/50 uppercase tracking-wider font-serif">{stat.label}</p>
+              </div>
+              {idx < 3 && <div className="hidden sm:block h-8 w-px bg-[#c9a96e]/10 ml-3" />}
             </div>
           ))}
         </div>
       </div>
 
-      <main className="max-w-7xl mx-auto px-6 py-8">
+      <main className="max-w-7xl mx-auto px-6 py-10">
 
-        {/* Tools Hub */}
-        <section className="mb-10">
-          <div className="flex items-center justify-between mb-5">
+        <section className="mb-12">
+          <div className="flex items-center justify-between mb-6">
             <div>
-              <h2 className="font-serif text-xl text-[#2c1a00]">Publisher Tools Hub</h2>
-              <p className="text-xs text-[#8b7b6b] mt-0.5">Professional tools for every stage of book production</p>
+              <div className="flex items-center gap-2 mb-1">
+                <div className="h-px w-8 bg-[#c9a96e]/40" />
+                <span className="text-[10px] font-semibold uppercase tracking-[0.2em] text-[#c9a96e]">Professional Suite</span>
+              </div>
+              <h2 className="font-serif text-2xl text-[#2c1a00]">Publisher Tools Hub</h2>
+              <p className="text-sm text-[#8b7b6b] mt-1">Everything you need to create, design, and publish your book</p>
             </div>
           </div>
 
-          <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-4 gap-3">
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
             {TOOLS.map((tool, i) => (
               <motion.div
                 key={tool.id}
@@ -816,12 +940,12 @@ export default function Home() {
                 transition={{ delay: i * 0.04 }}
               >
                 <div
-                  className={`rounded-xl p-4 border cursor-pointer group transition-all h-full ${
+                  className={`rounded-xl p-5 border cursor-pointer group transition-all h-full ${
                     tool.dark
-                      ? "bg-[#2c1a00] border-[#4a3828] hover:border-[#c9a96e]/50"
+                      ? "bg-gradient-to-br from-[#2c1a00] to-[#1a1008] border-[#4a3828] hover:border-[#c9a96e]/50 shadow-md"
                       : tool.cta
-                      ? "bg-[#c9a96e] border-[#c9a96e] hover:bg-[#b8944f] hover:border-[#b8944f]"
-                      : "bg-white border-[#e8dfd0] hover:shadow-md hover:border-[#c9a96e]/40"
+                      ? "bg-gradient-to-br from-[#c9a96e] to-[#b8944f] border-[#c9a96e] hover:from-[#d4b480] hover:to-[#c9a96e] shadow-md shadow-[#c9a96e]/20"
+                      : "bg-white/90 backdrop-blur-sm border-[#e8dfd0] hover:shadow-lg hover:border-[#c9a96e]/40 hover:-translate-y-0.5"
                   }`}
                   onClick={() => {
                     if (tool.path) navigate(tool.path);
@@ -831,19 +955,19 @@ export default function Home() {
                   }}
                 >
                   <div className="flex items-start justify-between mb-3">
-                    <div className={`w-9 h-9 rounded-lg flex items-center justify-center ${
-                      tool.dark ? "bg-[#c9a96e]/20" : tool.cta ? "bg-[#2a1a0a]/10" : "bg-[#f0e8d8]"
+                    <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${
+                      tool.dark ? "bg-[#c9a96e]/15 border border-[#c9a96e]/20" : tool.cta ? "bg-[#2a1a0a]/10" : "bg-gradient-to-br from-[#f5ede0] to-[#e8dfd0]"
                     }`}>
-                      <tool.icon size={18} className={tool.dark ? "text-[#c9a96e]" : tool.cta ? "text-[#2a1a0a]" : "text-[#8b5e3c]"} />
+                      <tool.icon size={18} className={tool.dark ? "text-[#f5d98a]" : tool.cta ? "text-[#2a1a0a]" : "text-[#8b5e3c]"} />
                     </div>
-                    <span className={`text-[9px] px-1.5 py-0.5 rounded-full font-semibold uppercase tracking-wide ${
+                    <span className={`text-[9px] px-2 py-0.5 rounded-full font-semibold uppercase tracking-wider ${
                       tool.cta ? "bg-[#2a1a0a]/10 text-[#2a1a0a]" : tool.badgeColor
                     }`}>
                       {tool.badge}
                     </span>
                   </div>
-                  <h3 className={`font-serif text-sm font-semibold leading-tight mb-1 ${
-                    tool.dark ? "text-[#f5efe0] group-hover:text-[#c9a96e]" : tool.cta ? "text-[#2a1a0a]" : "text-[#3a2a1a] group-hover:text-[#5c3d2e]"
+                  <h3 className={`font-serif text-sm font-semibold leading-tight mb-1.5 ${
+                    tool.dark ? "text-[#f5efe0] group-hover:text-[#f5d98a]" : tool.cta ? "text-[#2a1a0a]" : "text-[#3a2a1a] group-hover:text-[#5c3d2e]"
                   } transition-colors`}>
                     {tool.label}
                   </h3>
@@ -852,10 +976,10 @@ export default function Home() {
                   }`}>
                     {tool.desc}
                   </p>
-                  <div className={`flex items-center gap-1 mt-2 text-[10px] font-medium ${
+                  <div className={`flex items-center gap-1 mt-3 text-[11px] font-semibold ${
                     tool.dark ? "text-[#c9a96e]" : tool.cta ? "text-[#2a1a0a]" : "text-[#c9a96e]"
                   }`}>
-                    Open <ChevronRight size={10} className="group-hover:translate-x-0.5 transition-transform" />
+                    Open <ChevronRight size={11} className="group-hover:translate-x-0.5 transition-transform" />
                   </div>
                 </div>
               </motion.div>
@@ -863,9 +987,8 @@ export default function Home() {
           </div>
         </section>
 
-        {/* What's Next panel */}
         {whatsNextPrompts.length > 0 && (
-          <section className="mb-10">
+          <section className="mb-12">
             <WhatsNext
               prompts={whatsNextPrompts}
               title={firstProject ? `What's Next for "${firstProject.title}"?` : "What's Next?"}
@@ -873,45 +996,53 @@ export default function Home() {
           </section>
         )}
 
-        {/* Projects section */}
         <section>
-          <div className="flex items-center justify-between mb-5">
+          <div className="flex items-center justify-between mb-6">
             <div>
-              <h2 className="font-serif text-xl text-[#2c1a00]">Your Book Projects</h2>
-              <p className="text-xs text-[#8b7b6b] mt-0.5">
+              <div className="flex items-center gap-2 mb-1">
+                <div className="h-px w-8 bg-[#c9a96e]/40" />
+                <span className="text-[10px] font-semibold uppercase tracking-[0.2em] text-[#c9a96e]">Library</span>
+              </div>
+              <h2 className="font-serif text-2xl text-[#2c1a00]">Your Book Projects</h2>
+              <p className="text-sm text-[#8b7b6b] mt-1">
                 {projectList.length} project{projectList.length !== 1 ? "s" : ""} · {phases.length} phases · {totalSteps} steps each
               </p>
             </div>
             <Dialog open={open} onOpenChange={setOpen}>
               <DialogTrigger asChild>
-                <Button className="bg-[#c9a96e] hover:bg-[#b8944f] text-[#2a1a0a] font-semibold gap-1.5">
+                <Button className="bg-gradient-to-r from-[#c9a96e] to-[#b8944f] hover:from-[#d4b480] hover:to-[#c9a96e] text-[#2a1a0a] font-semibold gap-2 shadow-md shadow-[#c9a96e]/15 px-5 py-2.5">
                   <Plus size={16} /> New Project
                 </Button>
               </DialogTrigger>
-              <DialogContent className="bg-[#faf6ef] border-[#e8dfd0]">
+              <DialogContent className="bg-gradient-to-b from-[#faf6ef] to-[#f5ede0] border-[#c9a96e]/20 shadow-2xl max-w-lg">
                 <DialogHeader>
+                  <div className="flex items-center gap-2 mb-1">
+                    <div className="h-px w-8 bg-[#c9a96e]/40" />
+                    <span className="text-[10px] font-semibold uppercase tracking-[0.2em] text-[#c9a96e]">New Project</span>
+                  </div>
                   <DialogTitle className="font-serif text-2xl text-[#3a2a1a]">Start a New Book Project</DialogTitle>
+                  <p className="text-sm text-[#8b7b6b] mt-1">Fill in your book details to begin tracking production across all {totalSteps} steps.</p>
                 </DialogHeader>
                 <form
                   onSubmit={(e) => {
                     e.preventDefault();
                     createMutation.mutate({ title, author, genre, bibleEditionType: bibleEditionType || undefined, bibleTranslation: bibleTranslation || undefined, notes });
                   }}
-                  className="space-y-4 mt-4"
+                  className="space-y-5 mt-5"
                 >
                   <div>
-                    <Label className="text-[#5c3d2e] font-semibold">Book Title *</Label>
-                    <Input value={title} onChange={e => setTitle(e.target.value)} placeholder="e.g., The Great American Novel" className="mt-1 border-[#d4c8b4]" required />
+                    <Label className="text-[#5c3d2e] font-semibold text-sm">Book Title *</Label>
+                    <Input value={title} onChange={e => setTitle(e.target.value)} placeholder="e.g., The Great American Novel" className="mt-1.5 border-[#c9a96e]/30 bg-white/80 focus:border-[#c9a96e] focus:ring-[#c9a96e]/20" required />
                   </div>
                   <div className="grid grid-cols-2 gap-4">
                     <div>
-                      <Label className="text-[#5c3d2e] font-semibold">Author</Label>
-                      <Input value={author} onChange={e => setAuthor(e.target.value)} placeholder="Author name" className="mt-1 border-[#d4c8b4]" />
+                      <Label className="text-[#5c3d2e] font-semibold text-sm">Author</Label>
+                      <Input value={author} onChange={e => setAuthor(e.target.value)} placeholder="Author name" className="mt-1.5 border-[#c9a96e]/30 bg-white/80 focus:border-[#c9a96e]" />
                     </div>
                     <div>
-                      <Label className="text-[#5c3d2e] font-semibold">Genre</Label>
+                      <Label className="text-[#5c3d2e] font-semibold text-sm">Genre</Label>
                       <Select value={genre} onValueChange={setGenre}>
-                        <SelectTrigger className="mt-1 border-[#d4c8b4] bg-white text-[#3a2a1a]">
+                        <SelectTrigger className="mt-1.5 border-[#c9a96e]/30 bg-white/80 text-[#3a2a1a]">
                           <SelectValue placeholder="Select genre…" />
                         </SelectTrigger>
                         <SelectContent>
@@ -921,13 +1052,16 @@ export default function Home() {
                     </div>
                   </div>
                   {isBible && (
-                    <div className="rounded-lg border border-[#c9a96e]/40 bg-[#fdf5e4] p-4 space-y-4">
-                      <p className="text-xs font-semibold text-[#8b5e3c] uppercase tracking-wider">Bible Edition Details</p>
+                    <div className="rounded-xl border border-[#c9a96e]/30 bg-gradient-to-br from-[#fdf5e4] to-[#faf0d8] p-5 space-y-4">
+                      <div className="flex items-center gap-2">
+                        <BookOpen size={14} className="text-[#c9a96e]" />
+                        <p className="text-xs font-semibold text-[#8b5e3c] uppercase tracking-wider">Bible Edition Details</p>
+                      </div>
                       <div className="grid grid-cols-2 gap-4">
                         <div>
-                          <Label className="text-[#5c3d2e] font-semibold">Edition Type</Label>
+                          <Label className="text-[#5c3d2e] font-semibold text-sm">Edition Type</Label>
                           <Select value={bibleEditionType} onValueChange={setBibleEditionType}>
-                            <SelectTrigger className="mt-1 border-[#d4c8b4] bg-white text-[#3a2a1a]">
+                            <SelectTrigger className="mt-1.5 border-[#c9a96e]/30 bg-white/80 text-[#3a2a1a]">
                               <SelectValue placeholder="Select edition…" />
                             </SelectTrigger>
                             <SelectContent>
@@ -936,9 +1070,9 @@ export default function Home() {
                           </Select>
                         </div>
                         <div>
-                          <Label className="text-[#5c3d2e] font-semibold">Translation</Label>
+                          <Label className="text-[#5c3d2e] font-semibold text-sm">Translation</Label>
                           <Select value={bibleTranslation} onValueChange={setBibleTranslation}>
-                            <SelectTrigger className="mt-1 border-[#d4c8b4] bg-white text-[#3a2a1a]">
+                            <SelectTrigger className="mt-1.5 border-[#c9a96e]/30 bg-white/80 text-[#3a2a1a]">
                               <SelectValue placeholder="Select translation…" />
                             </SelectTrigger>
                             <SelectContent>
@@ -950,11 +1084,11 @@ export default function Home() {
                     </div>
                   )}
                   <div>
-                    <Label className="text-[#5c3d2e] font-semibold">Notes</Label>
-                    <Textarea value={notes} onChange={e => setNotes(e.target.value)} placeholder="Any notes about this project..." className="mt-1 border-[#d4c8b4]" rows={3} />
+                    <Label className="text-[#5c3d2e] font-semibold text-sm">Notes</Label>
+                    <Textarea value={notes} onChange={e => setNotes(e.target.value)} placeholder="Any notes about this project..." className="mt-1.5 border-[#c9a96e]/30 bg-white/80 focus:border-[#c9a96e]" rows={3} />
                   </div>
-                  <Button type="submit" disabled={!title || createMutation.isPending} className="w-full bg-[#c9a96e] hover:bg-[#b8944f] text-[#2a1a0a] font-semibold">
-                    {createMutation.isPending ? <Loader2 className="animate-spin mr-2" size={16} /> : null}
+                  <Button type="submit" disabled={!title || createMutation.isPending} className="w-full bg-gradient-to-r from-[#c9a96e] to-[#b8944f] hover:from-[#d4b480] hover:to-[#c9a96e] text-[#2a1a0a] font-semibold py-3 shadow-md shadow-[#c9a96e]/15 text-base">
+                    {createMutation.isPending ? <Loader2 className="animate-spin mr-2" size={16} /> : <Plus size={16} className="mr-2" />}
                     Create Project
                   </Button>
                 </form>
@@ -963,13 +1097,13 @@ export default function Home() {
           </div>
 
           {projectList.length === 0 ? (
-            <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} className="text-center py-20 bg-white rounded-2xl border border-[#e8dfd0]">
-              <div className="w-20 h-20 rounded-full bg-[#f0e8d8] flex items-center justify-center mx-auto mb-6">
+            <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} className="text-center py-24 bg-gradient-to-br from-white/90 to-[#faf6ef]/90 backdrop-blur-sm rounded-2xl border border-[#c9a96e]/20 shadow-sm">
+              <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-[#f5ede0] to-[#e8dfd0] flex items-center justify-center mx-auto mb-6 shadow-sm">
                 <BookOpen size={32} className="text-[#c9a96e]" />
               </div>
-              <p className="font-serif text-2xl text-[#5c3d2e]">No projects yet</p>
-              <p className="text-sm text-[#8b7b6b] mt-2 max-w-sm mx-auto">Create your first book project to start tracking production across all {totalSteps} steps.</p>
-              <Button className="mt-6 bg-[#c9a96e] hover:bg-[#b8944f] text-[#2a1a0a] font-semibold" onClick={() => setOpen(true)}>
+              <p className="font-serif text-2xl text-[#3a2a1a]">No projects yet</p>
+              <p className="text-sm text-[#8b7b6b] mt-2 max-w-sm mx-auto leading-relaxed">Create your first book project to start tracking production across all {totalSteps} steps.</p>
+              <Button className="mt-8 bg-gradient-to-r from-[#c9a96e] to-[#b8944f] hover:from-[#d4b480] hover:to-[#c9a96e] text-[#2a1a0a] font-semibold shadow-md shadow-[#c9a96e]/15 px-6 py-3" onClick={() => setOpen(true)}>
                 <Plus size={18} className="mr-2" /> Create Your First Project
               </Button>
             </motion.div>
@@ -978,20 +1112,19 @@ export default function Home() {
               {projectList.map((project, i) => (
                 <motion.div key={project.id} initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.05 }}>
                   <Card
-                    className="bg-white border-[#e8dfd0] hover:shadow-lg hover:border-[#c9a96e]/40 transition-all cursor-pointer group"
+                    className="bg-white/90 backdrop-blur-sm border-[#e8dfd0] hover:shadow-xl hover:border-[#c9a96e]/40 hover:-translate-y-0.5 transition-all cursor-pointer group"
                     onClick={() => navigate(`/project/${project.id}`)}
                   >
-                    <CardContent className="p-5">
-                      {/* Title row */}
-                      <div className="flex items-start justify-between mb-1">
+                    <CardContent className="p-6">
+                      <div className="flex items-start justify-between mb-2">
                         <div className="flex-1 min-w-0">
-                          <h3 className="font-serif text-lg text-[#3a2a1a] truncate group-hover:text-[#5c3d2e] transition-colors leading-tight">{project.title}</h3>
-                          {project.author && <p className="text-xs text-[#8b7b6b] mt-0.5">by {project.author}</p>}
+                          <h3 className="font-serif text-lg text-[#3a2a1a] truncate group-hover:text-[#5c3d2e] transition-colors leading-tight font-semibold">{project.title}</h3>
+                          {project.author && <p className="text-xs text-[#8b7b6b] mt-1 italic">by {project.author}</p>}
                         </div>
                         <div className="flex items-center gap-0.5 opacity-0 group-hover:opacity-100 transition-opacity shrink-0 ml-2">
                           <Button
                             variant="ghost" size="icon"
-                            className="w-7 h-7 text-[#a89880] hover:text-[#c9a96e]"
+                            className="w-7 h-7 text-[#a89880] hover:text-[#c9a96e] hover:bg-[#f5ede0]"
                             title="Duplicate project"
                             onClick={(e) => { e.stopPropagation(); duplicateMutation.mutate({ projectId: project.id }); }}
                           >
@@ -999,7 +1132,7 @@ export default function Home() {
                           </Button>
                           <Button
                             variant="ghost" size="icon"
-                            className="w-7 h-7 text-[#a89880] hover:text-red-600"
+                            className="w-7 h-7 text-[#a89880] hover:text-red-600 hover:bg-red-50"
                             title="Delete project"
                             onClick={(e) => {
                               e.stopPropagation();
@@ -1013,48 +1146,45 @@ export default function Home() {
                         </div>
                       </div>
 
-                      {/* Badges */}
-                      <div className="flex flex-wrap gap-1.5 mt-2">
+                      <div className="flex flex-wrap gap-1.5 mt-2.5">
                         {project.genre && (
-                          <span className="text-[10px] px-2 py-0.5 rounded-full bg-[#f0e8d8] text-[#8b7b6b]">
+                          <span className="text-[10px] px-2.5 py-0.5 rounded-full bg-[#f5ede0] text-[#8b7b6b] font-medium border border-[#e8dfd0]">
                             {project.genre}
                           </span>
                         )}
                         {project.bibleEditionType && (
-                          <span className="text-[10px] px-2 py-0.5 rounded-full bg-amber-50 text-amber-700 border border-amber-200">
+                          <span className="text-[10px] px-2.5 py-0.5 rounded-full bg-amber-50 text-amber-700 border border-amber-200 font-medium">
                             {project.bibleEditionType}
                           </span>
                         )}
                         {project.bibleTranslation && (
-                          <span className="text-[10px] px-2 py-0.5 rounded-full bg-amber-50 text-amber-700 border border-amber-200">
+                          <span className="text-[10px] px-2.5 py-0.5 rounded-full bg-amber-50 text-amber-700 border border-amber-200 font-medium">
                             {project.bibleTranslation}
                           </span>
                         )}
                       </div>
 
-                      {/* Progress placeholder */}
-                      <div className="mt-4">
-                        <div className="flex items-center justify-between text-[10px] text-[#a89880] mb-1">
+                      <div className="mt-5">
+                        <div className="flex items-center justify-between text-[10px] text-[#a89880] mb-1.5 font-medium">
                           <span>Production Progress</span>
                           <span>—</span>
                         </div>
-                        <Progress value={0} className="h-1.5 bg-[#f0e8d8]" />
+                        <Progress value={0} className="h-2 bg-[#f0e8d8] rounded-full" />
                       </div>
 
-                      {/* Footer */}
-                      <div className="mt-3 pt-3 border-t border-[#f0e8d8] flex items-center justify-between">
-                        <span className="text-[10px] text-[#a89880]">
+                      <div className="mt-4 pt-4 border-t border-[#f0e8d8] flex items-center justify-between">
+                        <span className="text-[11px] text-[#a89880]">
                           Created {new Date(project.createdAt).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}
                         </span>
-                        <div className="flex items-center gap-2">
+                        <div className="flex items-center gap-3">
                           <button
-                            className="text-[10px] text-[#a89880] hover:text-[#5c3d2e] transition-colors"
+                            className="text-[11px] text-[#a89880] hover:text-[#5c3d2e] transition-colors font-medium"
                             onClick={(e) => { e.stopPropagation(); navigate(`/timeline/${project.id}`); }}
                           >
                             Timeline
                           </button>
-                          <span className="flex items-center gap-0.5 text-[10px] text-[#c9a96e] font-medium group-hover:translate-x-0.5 transition-transform">
-                            Open <ArrowRight size={10} />
+                          <span className="flex items-center gap-0.5 text-[11px] text-[#c9a96e] font-semibold group-hover:translate-x-0.5 transition-transform">
+                            Open <ArrowRight size={11} />
                           </span>
                         </div>
                       </div>

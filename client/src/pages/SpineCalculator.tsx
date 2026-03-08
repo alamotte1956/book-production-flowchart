@@ -247,20 +247,34 @@ export default function SpineCalculator() {
   return (
     <div className="min-h-screen bg-[#faf6ef]">
       {/* Header */}
-      <header className="sticky top-0 z-10 bg-[#faf6ef]/95 backdrop-blur border-b border-[#e8dfd0] px-6 py-4">
-        <div className="max-w-6xl mx-auto flex items-center gap-4">
-          <Button variant="ghost" size="sm" onClick={() => navigate("/")} className="text-[#5c3d2e] hover:bg-[#f0e8d8]">
-            <ArrowLeft size={16} className="mr-2" /> Back
-          </Button>
-          <div className="flex items-center gap-3">
-            <div className="w-9 h-9 rounded-lg bg-[#c9a96e]/20 flex items-center justify-center">
-              <Ruler size={18} className="text-[#8b5e3c]" />
-            </div>
-            <div>
-              <h1 className="font-serif text-xl text-[#3a2a1a] leading-tight">Spine Width Calculator</h1>
-              <p className="text-xs text-[#8b7b6b]">Bible binding specification tool</p>
-            </div>
+      <header className="bg-[#2a1a0a] text-white px-6 py-4 flex items-center gap-4 sticky top-0 z-30 shadow-lg">
+        <button
+          onClick={() => navigate("/")}
+          className="text-[#c9a96e] hover:text-white transition-colors p-1 rounded"
+        >
+          <ArrowLeft className="w-5 h-5" />
+        </button>
+        <div className="flex items-center gap-3">
+          <div className="w-9 h-9 rounded-lg bg-[#c9a96e]/20 flex items-center justify-center">
+            <Ruler size={18} className="text-[#c9a96e]" />
           </div>
+          <div>
+            <h1 className="text-lg font-serif font-bold leading-tight">Spine Width Calculator</h1>
+            <p className="text-xs text-[#a08060]">Bible binding specification tool</p>
+          </div>
+        </div>
+        <div className="ml-auto flex items-center gap-2">
+          {pages > 0 && ppi > 0 && (
+            <Button
+              size="sm"
+              variant="outline"
+              className="border-[#c9a96e] text-[#c9a96e] hover:bg-[#3d2810] gap-1.5 text-xs"
+              onClick={handleCopy}
+            >
+              {copied ? <Check size={14} /> : <Copy size={14} />}
+              {copied ? "Copied!" : "Copy Spec"}
+            </Button>
+          )}
         </div>
       </header>
 
@@ -269,15 +283,16 @@ export default function SpineCalculator() {
         <div className="space-y-6">
 
           {/* Trim Size */}
-          <Card className="border-[#e8dfd0] bg-white">
+          <Card className="border-[#e8dfd0] bg-white shadow-sm">
             <CardHeader className="pb-3">
-              <CardTitle className="font-serif text-lg text-[#3a2a1a] flex items-center gap-2">
-                <BookOpen size={18} className="text-[#c9a96e]" /> Trim Size
+              <CardTitle className="font-serif text-lg text-[#2c1a00] flex items-center gap-2">
+                <span className="w-7 h-7 rounded-full bg-[#c9a96e] text-[#2a1a0a] flex items-center justify-center text-sm font-bold">1</span>
+                Trim Size
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-3">
               <Select value={trimSizeId} onValueChange={setTrimSizeId}>
-                <SelectTrigger className="border-[#d4c8b4]">
+                <SelectTrigger className="border-[#d4c8b4] bg-white text-[#3a2a1a]">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
@@ -300,10 +315,11 @@ export default function SpineCalculator() {
           </Card>
 
           {/* Page Count & Paper */}
-          <Card className="border-[#e8dfd0] bg-white">
+          <Card className="border-[#e8dfd0] bg-white shadow-sm">
             <CardHeader className="pb-3">
-              <CardTitle className="font-serif text-lg text-[#3a2a1a] flex items-center gap-2">
-                <Printer size={18} className="text-[#c9a96e]" /> Paper & Page Count
+              <CardTitle className="font-serif text-lg text-[#2c1a00] flex items-center gap-2">
+                <span className="w-7 h-7 rounded-full bg-[#c9a96e] text-[#2a1a0a] flex items-center justify-center text-sm font-bold">2</span>
+                Paper & Page Count
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
@@ -322,7 +338,7 @@ export default function SpineCalculator() {
               <div>
                 <Label className="text-[#5c3d2e] font-semibold">Paper Type</Label>
                 <Select value={paperTypeId} onValueChange={setPaperTypeId}>
-                  <SelectTrigger className="mt-1 border-[#d4c8b4]">
+                  <SelectTrigger className="mt-1 border-[#d4c8b4] bg-white text-[#3a2a1a]">
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
@@ -341,13 +357,16 @@ export default function SpineCalculator() {
           </Card>
 
           {/* Binding Method */}
-          <Card className="border-[#e8dfd0] bg-white">
+          <Card className="border-[#e8dfd0] bg-white shadow-sm">
             <CardHeader className="pb-3">
-              <CardTitle className="font-serif text-lg text-[#3a2a1a]">Binding Method</CardTitle>
+              <CardTitle className="font-serif text-lg text-[#2c1a00] flex items-center gap-2">
+                <span className="w-7 h-7 rounded-full bg-[#c9a96e] text-[#2a1a0a] flex items-center justify-center text-sm font-bold">3</span>
+                Binding Method
+              </CardTitle>
             </CardHeader>
             <CardContent className="space-y-3">
               <Select value={bindingMethodId} onValueChange={setBindingMethodId}>
-                <SelectTrigger className="border-[#d4c8b4]">
+                <SelectTrigger className="border-[#d4c8b4] bg-white text-[#3a2a1a]">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
@@ -359,13 +378,16 @@ export default function SpineCalculator() {
           </Card>
 
           {/* Cover Material */}
-          <Card className="border-[#e8dfd0] bg-white">
+          <Card className="border-[#e8dfd0] bg-white shadow-sm">
             <CardHeader className="pb-3">
-              <CardTitle className="font-serif text-lg text-[#3a2a1a]">Cover Material</CardTitle>
+              <CardTitle className="font-serif text-lg text-[#2c1a00] flex items-center gap-2">
+                <span className="w-7 h-7 rounded-full bg-[#c9a96e] text-[#2a1a0a] flex items-center justify-center text-sm font-bold">4</span>
+                Cover Material
+              </CardTitle>
             </CardHeader>
             <CardContent className="space-y-3">
               <Select value={coverMaterialId} onValueChange={setCoverMaterialId}>
-                <SelectTrigger className="border-[#d4c8b4]">
+                <SelectTrigger className="border-[#d4c8b4] bg-white text-[#3a2a1a]">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
@@ -383,16 +405,19 @@ export default function SpineCalculator() {
           </Card>
 
           {/* Finishing */}
-          <Card className="border-[#e8dfd0] bg-white">
+          <Card className="border-[#e8dfd0] bg-white shadow-sm">
             <CardHeader className="pb-3">
-              <CardTitle className="font-serif text-lg text-[#3a2a1a]">Finishing & Features</CardTitle>
+              <CardTitle className="font-serif text-lg text-[#2c1a00] flex items-center gap-2">
+                <span className="w-7 h-7 rounded-full bg-[#c9a96e] text-[#2a1a0a] flex items-center justify-center text-sm font-bold">5</span>
+                Finishing & Features
+              </CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <Label className="text-[#5c3d2e] font-semibold text-sm">Ribbon Markers</Label>
                   <Select value={ribbonCount} onValueChange={setRibbonCount}>
-                    <SelectTrigger className="mt-1 border-[#d4c8b4]">
+                    <SelectTrigger className="mt-1 border-[#d4c8b4] bg-white text-[#3a2a1a]">
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
@@ -403,7 +428,7 @@ export default function SpineCalculator() {
                 <div>
                   <Label className="text-[#5c3d2e] font-semibold text-sm">Ribbon Color</Label>
                   <Select value={ribbonColor} onValueChange={setRibbonColor}>
-                    <SelectTrigger className="mt-1 border-[#d4c8b4]">
+                    <SelectTrigger className="mt-1 border-[#d4c8b4] bg-white text-[#3a2a1a]">
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
@@ -416,7 +441,7 @@ export default function SpineCalculator() {
                 <div>
                   <Label className="text-[#5c3d2e] font-semibold text-sm">Gilding</Label>
                   <Select value={gildingId} onValueChange={setGildingId}>
-                    <SelectTrigger className="mt-1 border-[#d4c8b4]">
+                    <SelectTrigger className="mt-1 border-[#d4c8b4] bg-white text-[#3a2a1a]">
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
@@ -427,7 +452,7 @@ export default function SpineCalculator() {
                 <div>
                   <Label className="text-[#5c3d2e] font-semibold text-sm">Headband / Tailband</Label>
                   <Select value={headbandColor} onValueChange={setHeadbandColor}>
-                    <SelectTrigger className="mt-1 border-[#d4c8b4]">
+                    <SelectTrigger className="mt-1 border-[#d4c8b4] bg-white text-[#3a2a1a]">
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
@@ -472,66 +497,67 @@ export default function SpineCalculator() {
         {/* ── Right column: results ── */}
         <div className="space-y-6">
           {/* Spine result */}
-          <Card className="border-[#c9a96e]/40 bg-gradient-to-br from-[#fdf5e4] to-[#faf6ef]">
-            <CardHeader className="pb-3">
-              <CardTitle className="font-serif text-xl text-[#3a2a1a]">Calculated Spine Width</CardTitle>
-            </CardHeader>
-            <CardContent>
+          <div className="bg-[#2c1a00] rounded-xl p-5 text-white shadow-lg">
+            <div className="flex items-center gap-2 mb-4">
+              <Ruler size={16} className="text-[#c9a96e]" />
+              <span className="text-sm font-semibold text-[#c9a96e] tracking-wide uppercase">Calculated Spine Width</span>
+            </div>
+            <div>
               {pages > 0 && ppi > 0 ? (
                 <div className="space-y-4">
                   <div className="flex items-end gap-4">
                     <div>
-                      <p className="text-5xl font-bold text-[#8b5e3c] font-mono">{spine.spineIn}"</p>
-                      <p className="text-lg text-[#a89880] font-mono">{spine.spineMm} mm</p>
+                      <p className="text-5xl font-bold text-white font-mono">{spine.spineIn}"</p>
+                      <p className="text-lg text-[#c9a96e] font-mono">{spine.spineMm} mm</p>
                     </div>
                     <div className="pb-2">
-                      <Badge className="bg-[#c9a96e]/20 text-[#8b5e3c] border-[#c9a96e]/30">
+                      <Badge className="bg-[#c9a96e]/20 text-[#c9a96e] border-[#c9a96e]/30">
                         {spine.spineIn < 0.5 ? "Slim" : spine.spineIn < 1.5 ? "Standard" : spine.spineIn < 2.5 ? "Thick" : "Extra Thick"}
                       </Badge>
                     </div>
                   </div>
 
                   {warnings.map((w, i) => (
-                    <div key={i} className="flex items-start gap-2 p-3 rounded-lg bg-amber-50 border border-amber-200">
-                      <AlertTriangle size={14} className="text-amber-600 mt-0.5 shrink-0" />
-                      <p className="text-xs text-amber-700">{w}</p>
+                    <div key={i} className="flex items-start gap-2 p-3 rounded-lg bg-amber-900/20 border border-amber-700/30">
+                      <AlertTriangle size={14} className="text-amber-400 mt-0.5 shrink-0" />
+                      <p className="text-xs text-amber-200">{w}</p>
                     </div>
                   ))}
 
-                  <Separator className="bg-[#e8dfd0]" />
+                  <Separator className="bg-[#4a3828]" />
 
                   <div className="space-y-2 text-sm">
                     <div className="flex justify-between">
-                      <span className="text-[#8b7b6b]">Text block</span>
-                      <span className="font-mono text-[#3a2a1a]">{textBlockIn}" ({textBlockMm} mm)</span>
+                      <span className="text-[#a08060]">Text block</span>
+                      <span className="font-mono text-white">{textBlockIn}" ({textBlockMm} mm)</span>
                     </div>
                     <div className="flex justify-between">
-                      <span className="text-[#8b7b6b]">Board thickness (×2)</span>
-                      <span className="font-mono text-[#3a2a1a]">{(binding.boardThickness * 2).toFixed(3)}" ({Math.round(binding.boardThickness * 2 * 25.4 * 10) / 10} mm)</span>
+                      <span className="text-[#a08060]">Board thickness (×2)</span>
+                      <span className="font-mono text-white">{(binding.boardThickness * 2).toFixed(3)}" ({Math.round(binding.boardThickness * 2 * 25.4 * 10) / 10} mm)</span>
                     </div>
                     <div className="flex justify-between">
-                      <span className="text-[#8b7b6b]">Cover material (×2)</span>
-                      <span className="font-mono text-[#3a2a1a]">{(coverThickness * 2).toFixed(3)}" ({Math.round(coverThickness * 2 * 25.4 * 10) / 10} mm)</span>
+                      <span className="text-[#a08060]">Cover material (×2)</span>
+                      <span className="font-mono text-white">{(coverThickness * 2).toFixed(3)}" ({Math.round(coverThickness * 2 * 25.4 * 10) / 10} mm)</span>
                     </div>
                     {bindingMethodId === "perfect-bound" && (
                       <div className="flex justify-between">
-                        <span className="text-[#8b7b6b]">Adhesive allowance</span>
-                        <span className="font-mono text-[#3a2a1a]">0.060" (1.5 mm)</span>
+                        <span className="text-[#a08060]">Adhesive allowance</span>
+                        <span className="font-mono text-white">0.060" (1.5 mm)</span>
                       </div>
                     )}
                   </div>
                 </div>
               ) : (
-                <p className="text-[#8b7b6b] text-sm">Enter page count and select paper type to calculate.</p>
+                <p className="text-[#a08060] text-sm">Enter page count and select paper type to calculate.</p>
               )}
-            </CardContent>
-          </Card>
+            </div>
+          </div>
 
           {/* Cover dimensions */}
           {trimW > 0 && spine.spineIn > 0 && (
-            <Card className="border-[#e8dfd0] bg-white">
+            <Card className="border-[#e8dfd0] bg-white shadow-sm">
               <CardHeader className="pb-3">
-                <CardTitle className="font-serif text-lg text-[#3a2a1a]">Full Cover Dimensions</CardTitle>
+                <CardTitle className="font-serif text-lg text-[#2c1a00]">Full Cover Dimensions</CardTitle>
               </CardHeader>
               <CardContent className="space-y-3">
                 <div className="grid grid-cols-2 gap-4 text-sm">
@@ -571,9 +597,9 @@ export default function SpineCalculator() {
 
           {/* Spec sheet */}
           {pages > 0 && ppi > 0 && (
-            <Card className="border-[#e8dfd0] bg-white">
+            <Card className="border-[#e8dfd0] bg-white shadow-sm">
               <CardHeader className="pb-3 flex flex-row items-center justify-between">
-                <CardTitle className="font-serif text-lg text-[#3a2a1a]">Specification Sheet</CardTitle>
+                <CardTitle className="font-serif text-lg text-[#2c1a00]">Specification Sheet</CardTitle>
                 <Button
                   variant="outline"
                   size="sm"

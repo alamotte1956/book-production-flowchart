@@ -15,7 +15,7 @@ import { Separator } from "@/components/ui/separator";
 import {
   Search, BookOpen, User, Building2, Calendar, FileText,
   Ruler, ExternalLink, Sparkles, ChevronRight, AlertCircle,
-  Loader2, CheckCircle2, BookMarked,
+  Loader2, CheckCircle2, BookMarked, ArrowLeft,
 } from "lucide-react";
 import { ErrorDetail } from "@/components/ErrorDetail";
 import { useLocation, Link } from "wouter";
@@ -422,13 +422,14 @@ export default function ISBNLookup() {
   return (
     <div className="min-h-screen bg-[#faf6ef]">
       {/* Header */}
-      <div className="bg-[#1a1008] text-white px-6 py-8">
+      <div className="bg-[#2c1a00] text-white px-6 py-8 border-b border-[#4a3828]">
         <div className="max-w-2xl mx-auto">
           <button
             onClick={() => navigate("/")}
-            className="text-[#c9a96e] text-sm hover:text-[#e8c87a] transition-colors mb-4 flex items-center gap-1"
+            className="text-[#c9a96e] text-sm hover:text-white transition-colors mb-4 flex items-center gap-1.5 hover:gap-2"
           >
-            ← Back to Dashboard
+            <ArrowLeft className="w-4 h-4" />
+            Back to Dashboard
           </button>
           <div className="flex items-center gap-3 mb-2">
             <div className="w-10 h-10 bg-[#c9a96e]/20 rounded-lg flex items-center justify-center">
@@ -436,7 +437,7 @@ export default function ISBNLookup() {
             </div>
             <h1 className="font-serif text-2xl font-bold">ISBN Book Lookup</h1>
           </div>
-          <p className="text-[#c9a96e]/80 text-sm leading-relaxed">
+          <p className="text-[#a08060] text-sm leading-relaxed">
             Enter any book's ISBN to retrieve its production specifications and get an instant
             CDP template recommendation for recreating it.
           </p>
@@ -456,7 +457,7 @@ export default function ISBNLookup() {
           <Button
             onClick={handleSearch}
             disabled={isLoading || inputValue.replace(/[-\s]/g, "").length < 10}
-            className="bg-[#3b2a1a] hover:bg-[#5c3d2e] text-white px-6"
+            className="bg-[#8b5e3c] hover:bg-[#7a4f30] text-white px-6"
           >
             {isLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Search className="w-4 h-4" />}
             <span className="ml-2">Look Up</span>
@@ -558,6 +559,29 @@ export default function ISBNLookup() {
               </p>
             </div>
           )}
+        </div>
+      </div>
+
+      {/* Related Tools footer backlinks */}
+      <div className="border-t border-[#e8dfd0] bg-[#faf6ef] px-6 py-6">
+        <div className="max-w-2xl mx-auto">
+          <p className="text-xs text-[#8b7b6b] mb-3 font-semibold uppercase tracking-wide">Other Self-Publishing Tools</p>
+          <div className="flex flex-wrap gap-2">
+            {[
+              { href: "/isbn-manager", label: "ISBN & Metadata" },
+              { href: "/bible-studio", label: "Bible Design Studio" },
+              { href: "/spine-calculator", label: "Spine Calculator" },
+              { href: "/cover-designer", label: "Cover Designer" },
+              { href: "/timeline", label: "Production Timeline" },
+              { href: "/auto-produce", label: "Auto-Produce" },
+              { href: "/resources", label: "Resources Hub" },
+            ].map(({ href, label }) => (
+              <Link key={href} href={href}
+                className="text-xs px-3 py-1.5 rounded-full border border-[#d4c8b4] text-[#5c3d2e] hover:bg-[#c9a96e]/10 hover:border-[#c9a96e]/50 transition-colors">
+                {label}
+              </Link>
+            ))}
+          </div>
         </div>
       </div>
 
