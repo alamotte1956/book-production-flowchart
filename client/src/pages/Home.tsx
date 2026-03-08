@@ -310,28 +310,28 @@ export default function Home() {
                 alt="Create Design Publish LLC"
                 className="h-10 w-auto object-contain"
               />
-              <span className="font-serif text-[#f5d98a] text-base tracking-wide hidden sm:block">Create Design Publish LLC</span>
+              <span className="font-serif text-[#f5d98a] text-lg md:text-xl tracking-wide hidden sm:block">Create Design Publish LLC</span>
             </div>
             <div className="flex items-center gap-3">
               <button
                 onClick={() => document.getElementById('features')?.scrollIntoView({ behavior: 'smooth' })}
-                className="font-serif text-sm text-[#c9a96e]/80 hover:text-[#c9a96e] transition-colors hidden md:block px-3 py-1.5"
+                className="font-serif text-base text-[#c9a96e]/80 hover:text-[#c9a96e] transition-colors hidden md:block px-3 py-1.5"
               >
                 Features
               </button>
               <button
                 onClick={() => document.getElementById('tools-section')?.scrollIntoView({ behavior: 'smooth' })}
-                className="font-serif text-sm text-[#c9a96e]/80 hover:text-[#c9a96e] transition-colors hidden md:block px-3 py-1.5"
+                className="font-serif text-base text-[#c9a96e]/80 hover:text-[#c9a96e] transition-colors hidden md:block px-3 py-1.5"
               >
                 Tools
               </button>
               <a href={getLoginUrl()}>
-                <button className="font-serif text-sm text-[#f5efe0] hover:text-white transition-colors px-4 py-1.5 rounded-md border border-[#c9a96e]/30 hover:border-[#c9a96e]/60">
+                <button className="font-serif text-base text-[#f5efe0] hover:text-white transition-colors px-4 py-2 rounded-md border border-[#c9a96e]/30 hover:border-[#c9a96e]/60">
                   Sign In
                 </button>
               </a>
               <a href={getSignUpUrl()}>
-                <button className="font-serif text-sm bg-[#c9a96e] hover:bg-[#b8944f] text-[#1a1008] font-semibold px-4 py-1.5 rounded-md transition-colors">
+                <button className="font-serif text-base bg-[#c9a96e] hover:bg-[#b8944f] text-[#1a1008] font-semibold px-4 py-2 rounded-md transition-colors">
                   Create Account
                 </button>
               </a>
