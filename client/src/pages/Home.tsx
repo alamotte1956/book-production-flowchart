@@ -1073,6 +1073,91 @@ export default function Home() {
             </div>
           )}
         </section>
+
+        <section id="contact-section" className="mb-12">
+          <div className="rounded-xl border border-[#e8dfd0] bg-white/90 backdrop-blur-sm p-8">
+            <div className="max-w-2xl mx-auto">
+              <div className="text-center mb-6">
+                <div className="flex items-center justify-center gap-2 mb-2">
+                  <div className="h-px w-8 bg-[#c9a96e]/40" />
+                  <span className="text-[10px] font-semibold uppercase tracking-[0.2em] text-[#c9a96e]">Support</span>
+                  <div className="h-px w-8 bg-[#c9a96e]/40" />
+                </div>
+                <h2 className="font-serif text-2xl text-[#2c1a00]">Get in Touch</h2>
+                <p className="text-sm text-[#8b7b6b] mt-1">Questions about your project? Need help with a tool? We're here to help.</p>
+              </div>
+
+              {contactSent ? (
+                <div className="text-center py-8">
+                  <CheckCircle2 className="w-12 h-12 text-emerald-500 mx-auto mb-3" />
+                  <h3 className="font-serif text-lg text-[#2c1a00] mb-1">Message Sent</h3>
+                  <p className="text-sm text-[#8b7b6b]">We'll get back to you as soon as possible.</p>
+                  <Button
+                    variant="outline"
+                    className="mt-4 border-[#e8dfd0] text-[#8b7b6b] hover:bg-[#f5ede0]"
+                    onClick={() => setContactSent(false)}
+                  >
+                    Send Another Message
+                  </Button>
+                </div>
+              ) : (
+                <div className="grid gap-4">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                      <Label className="text-[#5c3d2e] text-xs font-medium mb-1.5 block">Name</Label>
+                      <Input
+                        value={contactName}
+                        onChange={(e) => setContactName(e.target.value)}
+                        placeholder="Your name"
+                        className="border-[#e8dfd0] bg-[#faf6ef]/50 focus:border-[#c9a96e] focus:ring-[#c9a96e]/20"
+                      />
+                    </div>
+                    <div>
+                      <Label className="text-[#5c3d2e] text-xs font-medium mb-1.5 block">Email</Label>
+                      <Input
+                        value={contactEmail}
+                        onChange={(e) => setContactEmail(e.target.value)}
+                        placeholder="you@example.com"
+                        type="email"
+                        className="border-[#e8dfd0] bg-[#faf6ef]/50 focus:border-[#c9a96e] focus:ring-[#c9a96e]/20"
+                      />
+                    </div>
+                  </div>
+                  <div>
+                    <Label className="text-[#5c3d2e] text-xs font-medium mb-1.5 block">Subject</Label>
+                    <Input
+                      value={contactSubject}
+                      onChange={(e) => setContactSubject(e.target.value)}
+                      placeholder="How can we help?"
+                      className="border-[#e8dfd0] bg-[#faf6ef]/50 focus:border-[#c9a96e] focus:ring-[#c9a96e]/20"
+                    />
+                  </div>
+                  <div>
+                    <Label className="text-[#5c3d2e] text-xs font-medium mb-1.5 block">Message</Label>
+                    <Textarea
+                      value={contactMessage}
+                      onChange={(e) => setContactMessage(e.target.value)}
+                      placeholder="Tell us about your question or project..."
+                      rows={4}
+                      className="border-[#e8dfd0] bg-[#faf6ef]/50 focus:border-[#c9a96e] focus:ring-[#c9a96e]/20 resize-none"
+                    />
+                  </div>
+                  <Button
+                    onClick={() => contactMutation.mutate({ name: contactName, email: contactEmail, subject: contactSubject, message: contactMessage })}
+                    disabled={!contactName || !contactEmail || !contactMessage || contactMutation.isPending}
+                    className="bg-gradient-to-r from-[#5c3d2e] to-[#3a2a1a] hover:from-[#6b4a3a] hover:to-[#4a3828] text-[#f5efe0] w-full sm:w-auto sm:self-end"
+                  >
+                    {contactMutation.isPending ? (
+                      <><Loader2 className="w-4 h-4 animate-spin mr-2" /> Sending...</>
+                    ) : (
+                      <><Send className="w-4 h-4 mr-2" /> Send Message</>
+                    )}
+                  </Button>
+                </div>
+              )}
+            </div>
+          </div>
+        </section>
       </main>
     </div>
   );
