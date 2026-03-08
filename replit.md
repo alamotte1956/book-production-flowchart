@@ -143,5 +143,7 @@ PostgreSQL via Replit's built-in database. Use `npx drizzle-kit push` to sync sc
 - **Publisher-only**: `priority_support`
 - **Starter limits**: 1 book project (enforced on backend in `server/routers.ts` project.create and project.duplicate)
 - **Gated pages**: AutoProduce, Timeline, Templates use wrapper Gate components that render UpgradeGate for Starter users
+- **Dashboard Tool Hub**: Tools with `gatedFeature` show lock icon + "PRO" badge + "Upgrade >" for users without access; clicking redirects to /pricing. Uses `canAccess(feature)` from usePlan for proper plan-level checks.
 - **Sidebar**: Lock icons on gated items for Starter users, plan label under user name, "Upgrade Plan" CTA in footer
 - **Dashboard**: "Unlock Pro Publishing Tools" teaser banner for Starter users, "Upgrade for More Projects" button when project limit reached
+- **Checkout Feedback**: Home.tsx and Pricing.tsx read `?checkout=success&plan=X` / `?checkout=cancelled` query params and show sonner toasts, then clean up URL

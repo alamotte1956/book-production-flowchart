@@ -4,7 +4,7 @@
  * Unauthenticated: Artisan storybook landing page
  */
 import { useAuth } from "@/_core/hooks/useAuth";
-import { usePlan } from "@/hooks/usePlan";
+import { usePlan, type PlanFeature } from "@/hooks/usePlan";
 import { trpc } from "@/lib/trpc";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -21,6 +21,7 @@ import {
   ChevronRight, ChevronDown, Calendar, Star, TrendingUp, FileText, HelpCircle, LogOut, User, Menu, X, LayoutGrid, Search, Send,
   Compass, PenTool, Palette, Printer, Quote, Package, RotateCcw,
 } from "lucide-react";
+import { toast } from "sonner";
 import {
   DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel,
   DropdownMenuSeparator, DropdownMenuTrigger,
@@ -169,16 +170,18 @@ const TOOLS = [
     badge: "Bible",
     badgeColor: "bg-amber-100 text-amber-800",
     dark: true,
+    gatedFeature: null as string | null,
   },
   {
     id: "auto-produce",
-    path: null, // opens new project dialog
+    path: null,
     icon: Zap,
     label: "Auto-Produce",
     desc: "Generate typeset PDF and EPUB previews instantly with AI-powered layout engine.",
     badge: "AI",
     badgeColor: "bg-purple-100 text-purple-800",
     dark: false,
+    gatedFeature: "ai_typesetting" as string | null,
   },
   {
     id: "spine-calculator",
@@ -189,6 +192,7 @@ const TOOLS = [
     badge: "Print",
     badgeColor: "bg-blue-100 text-blue-800",
     dark: false,
+    gatedFeature: null,
   },
   {
     id: "cover-designer",
@@ -199,6 +203,7 @@ const TOOLS = [
     badge: "Design",
     badgeColor: "bg-rose-100 text-rose-800",
     dark: false,
+    gatedFeature: null,
   },
   {
     id: "isbn-manager",
@@ -209,16 +214,18 @@ const TOOLS = [
     badge: "Metadata",
     badgeColor: "bg-green-100 text-green-800",
     dark: false,
+    gatedFeature: null,
   },
   {
     id: "timeline",
-    path: null, // needs project id
+    path: null,
     icon: Calendar,
     label: "Production Timeline",
     desc: "Gantt-style timeline with per-step due dates and deadline tracking.",
     badge: "Planning",
     badgeColor: "bg-sky-100 text-sky-800",
     dark: false,
+    gatedFeature: "timeline",
   },
   {
     id: "resources",
@@ -229,6 +236,7 @@ const TOOLS = [
     badge: "Reference",
     badgeColor: "bg-orange-100 text-orange-800",
     dark: false,
+    gatedFeature: null,
   },
   {
     id: "templates",
@@ -239,6 +247,7 @@ const TOOLS = [
     badge: "Templates",
     badgeColor: "bg-amber-100 text-amber-800",
     dark: false,
+    gatedFeature: "templates",
   },
   {
     id: "isbn-lookup",
@@ -249,10 +258,11 @@ const TOOLS = [
     badge: "Lookup",
     badgeColor: "bg-indigo-100 text-indigo-800",
     dark: false,
+    gatedFeature: null,
   },
   {
     id: "new-project",
-    path: null, // opens new project dialog
+    path: null,
     icon: Plus,
     label: "New Book Project",
     desc: "Start a new project and track all 30 production steps from manuscript to shelf.",
@@ -260,12 +270,13 @@ const TOOLS = [
     badgeColor: "bg-emerald-100 text-emerald-800",
     dark: false,
     cta: true,
+    gatedFeature: null,
   },
 ];
 
 export default function Home() {
   const { user, isAuthenticated, loading: authLoading, logout } = useAuth();
-  const { isStarter, projectLimit } = usePlan();
+  const { isStarter, projectLimit, canAccess } = usePlan();
   const [, navigate] = useLocation();
   const [open, setOpen] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -283,6 +294,19 @@ export default function Home() {
         document.getElementById(id)?.remove();
       });
     };
+  }, []);
+
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const checkout = params.get("checkout");
+    const plan = params.get("plan");
+    if (checkout === "success") {
+      toast.success(`Welcome to ${plan ? plan.replace("_", " ").replace(/\b\w/g, c => c.toUpperCase()) : "your new plan"}! Your premium features are now unlocked.`);
+      window.history.replaceState({}, "", "/");
+    } else if (checkout === "cancelled") {
+      toast("Checkout was cancelled. You can upgrade anytime from the Pricing page.");
+      window.history.replaceState({}, "", "/");
+    }
   }, []);
 
   const [title, setTitle] = useState("");
@@ -698,7 +722,9 @@ export default function Home() {
           </div>
 
           <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
-            {TOOLS.map((tool, i) => (
+            {TOOLS.map((tool, i) => {
+              const isToolLocked = tool.gatedFeature !== null && !canAccess(tool.gatedFeature as PlanFeature);
+              return (
               <motion.div
                 key={tool.id}
                 initial={{ opacity: 0, y: 10 }}
@@ -706,7 +732,7 @@ export default function Home() {
                 transition={{ delay: i * 0.04 }}
               >
                 <div
-                  className={`rounded-xl p-5 border cursor-pointer group transition-all h-full ${
+                  className={`rounded-xl p-5 border cursor-pointer group transition-all h-full relative ${
                     tool.dark
                       ? "bg-gradient-to-br from-[#2c1a00] to-[#1a1008] border-[#4a3828] hover:border-[#c9a96e]/50 shadow-md"
                       : tool.cta
@@ -714,6 +740,7 @@ export default function Home() {
                       : "bg-white/90 backdrop-blur-sm border-[#e8dfd0] hover:shadow-lg hover:border-[#c9a96e]/40 hover:-translate-y-0.5"
                   }`}
                   onClick={() => {
+                    if (isToolLocked) { navigate("/pricing"); return; }
                     if (tool.path) navigate(tool.path);
                     else if (tool.id === "new-project" || tool.id === "auto-produce") setOpen(true);
                     else if (tool.id === "timeline" && projectList.length > 0) navigate(`/timeline/${projectList[0].id}`);
@@ -724,12 +751,16 @@ export default function Home() {
                     <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${
                       tool.dark ? "bg-[#c9a96e]/15 border border-[#c9a96e]/20" : tool.cta ? "bg-[#2a1a0a]/10" : "bg-gradient-to-br from-[#f5ede0] to-[#e8dfd0]"
                     }`}>
-                      <tool.icon size={18} className={tool.dark ? "text-[#f5d98a]" : tool.cta ? "text-[#2a1a0a]" : "text-[#8b5e3c]"} />
+                      {isToolLocked ? (
+                        <Lock size={18} className="text-[#c9a96e]/60" />
+                      ) : (
+                        <tool.icon size={18} className={tool.dark ? "text-[#f5d98a]" : tool.cta ? "text-[#2a1a0a]" : "text-[#8b5e3c]"} />
+                      )}
                     </div>
                     <span className={`text-[9px] px-2 py-0.5 rounded-full font-semibold uppercase tracking-wider ${
-                      tool.cta ? "bg-[#2a1a0a]/10 text-[#2a1a0a]" : tool.badgeColor
+                      isToolLocked ? "bg-[#c9a96e]/15 text-[#c9a96e]" : tool.cta ? "bg-[#2a1a0a]/10 text-[#2a1a0a]" : tool.badgeColor
                     }`}>
-                      {tool.badge}
+                      {isToolLocked ? "Pro" : tool.badge}
                     </span>
                   </div>
                   <h3 className={`font-serif text-sm font-semibold leading-tight mb-1.5 ${
@@ -743,13 +774,14 @@ export default function Home() {
                     {tool.desc}
                   </p>
                   <div className={`flex items-center gap-1 mt-3 text-[11px] font-semibold ${
-                    tool.dark ? "text-[#c9a96e]" : tool.cta ? "text-[#2a1a0a]" : "text-[#c9a96e]"
+                    isToolLocked ? "text-[#c9a96e]/60" : tool.dark ? "text-[#c9a96e]" : tool.cta ? "text-[#2a1a0a]" : "text-[#c9a96e]"
                   }`}>
-                    Open <ChevronRight size={11} className="group-hover:translate-x-0.5 transition-transform" />
+                    {isToolLocked ? "Upgrade" : "Open"} <ChevronRight size={11} className="group-hover:translate-x-0.5 transition-transform" />
                   </div>
                 </div>
               </motion.div>
-            ))}
+            );
+            })}
           </div>
         </section>
 

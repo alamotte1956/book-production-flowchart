@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -7,6 +7,7 @@ import { useLocation } from "wouter";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { trpc } from "@/lib/trpc";
 import { useAuth } from "@/_core/hooks/useAuth";
+import { toast } from "sonner";
 
 type BillingCycle = "monthly" | "annual" | "lifetime";
 
@@ -144,6 +145,14 @@ export default function Pricing() {
   const [loadingTier, setLoadingTier] = useState<string | null>(null);
   const { user } = useAuth();
   const checkoutMutation = trpc.stripe.createCheckoutSession.useMutation();
+
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    if (params.get("checkout") === "cancelled") {
+      toast("Checkout was cancelled. You can try again whenever you're ready.");
+      window.history.replaceState({}, "", "/pricing");
+    }
+  }, []);
 
   const handleSelectPlan = async (tierName: string) => {
     if (tierName === "Starter") {
