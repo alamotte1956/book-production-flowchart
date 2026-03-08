@@ -565,7 +565,7 @@ export default function Resources() {
             </div>
           </div>
           <p className="text-sm text-[#8b7b6b] mb-6 max-w-2xl">
-            Create Design Publish LLC works with these trusted publishing partners to bring faith-based content to readers worldwide.
+            Easy Book Publishers LLC works with these trusted publishing partners to bring faith-based content to readers worldwide.
           </p>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {publisherPartners.map((partner) => (

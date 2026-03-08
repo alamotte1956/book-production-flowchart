@@ -1,4 +1,4 @@
-# Create Design Publish LLC — Book Production Tracker
+# Easy Book Publishers LLC — Book Production Tracker
 
 ## Project Overview
 
@@ -102,6 +102,10 @@ PostgreSQL via Replit's built-in database. Use `npx drizzle-kit push` to sync sc
 - **Polished Project Tracker**: Ornamental chapter dividers, color-coded progress lines, phase celebration effects, improved step cards
 - **Project Export**: Export project summary as formatted HTML document from Project Tracker
 - **Polished Landing Page**: Enhanced hero, How It Works section, testimonials/social proof, feature card hover effects
+- **Dark Mode**: Toggle in sidebar, persists to localStorage, full dark palette with CSS custom properties
+- **Enhanced ISBN Manager**: ISBN-10 auto-calculation from ISBN-13, 30+ BISAC categories, LCCN field, prominent read-only ISBN-10 display
+- **Guided Journey Dashboard**: New users see "Start Your Publishing Journey" CTA, wizard-completers see roadmap summary with retake option
+- **Project Duplication**: Duplicate button in Project Tracker creates project copy with "(Copy)" suffix
 - **Contact Form**: Public contact form on landing page (backend wired to contact_submissions table)
 
 ## Database Tables

@@ -22,7 +22,7 @@ export interface RouteMeta {
 }
 
 const BASE = "https://www.createdesignpublish.net";
-const SITE_NAME = "Create Design Publish LLC";
+const SITE_NAME = "Easy Book Publishers";
 const OG_IMAGE =
   "https://d2xsxph8kpxj0f.cloudfront.net/310519663211654017/kGjPju6hKCvCsjZhgUHyqj/og-preview-LrRyvCyZ6fWHwBLgjV9mdz.png";
 
@@ -31,7 +31,7 @@ export const ROUTE_META: Array<{ path: string; meta: RouteMeta }> = [
   {
     path: "/bible-studio",
     meta: {
-      title: "Bible Design Studio — Create Design Publish",
+      title: "Bible Design Studio — Easy Book Publishers",
       description:
         "Design any Bible edition online — trim size, paper, binding, typesetting style, journaling margins, and red-letter text. Self-publishing made simple.",
       keywords:
@@ -46,7 +46,7 @@ export const ROUTE_META: Array<{ path: string; meta: RouteMeta }> = [
   {
     path: "/spine-calculator",
     meta: {
-      title: "Spine Width Calculator — Create Design Publish",
+      title: "Spine Width Calculator — Easy Book Publishers",
       description:
         "Calculate exact spine width from page count, paper type, and binding method. Free self-publishing tool for print-ready cover design.",
       keywords:
@@ -61,7 +61,7 @@ export const ROUTE_META: Array<{ path: string; meta: RouteMeta }> = [
   {
     path: "/cover-designer",
     meta: {
-      title: "Book Cover Designer — Create Design Publish",
+      title: "Book Cover Designer — Easy Book Publishers",
       description:
         "Calculate full-wrap cover dimensions with bleed, safe zones, and print-ready specs. Design your book cover online for any trim size.",
       keywords:
@@ -76,7 +76,7 @@ export const ROUTE_META: Array<{ path: string; meta: RouteMeta }> = [
   {
     path: "/isbn-manager",
     meta: {
-      title: "ISBN & Metadata Manager — Create Design Publish",
+      title: "ISBN & Metadata Manager — Easy Book Publishers",
       description:
         "Manage ISBN, LCCN, BISAC codes, and export ONIX 3.0 XML for distributors. Complete metadata tool for self-publishing authors.",
       keywords:
@@ -91,7 +91,7 @@ export const ROUTE_META: Array<{ path: string; meta: RouteMeta }> = [
   {
     path: "/auto-produce",
     meta: {
-      title: "Auto-Produce — AI Book Layout — Create Design Publish",
+      title: "Auto-Produce — AI Book Layout — Easy Book Publishers",
       description:
         "Generate typeset PDF and EPUB previews instantly with our AI-powered layout engine. Automate book production from manuscript to print-ready file.",
       keywords:
@@ -106,7 +106,7 @@ export const ROUTE_META: Array<{ path: string; meta: RouteMeta }> = [
   {
     path: "/timeline",
     meta: {
-      title: "Production Timeline — Create Design Publish",
+      title: "Production Timeline — Easy Book Publishers",
       description:
         "Plan your book production schedule with a Gantt-style timeline, per-step due dates, and deadline risk warnings. Stay on track from manuscript to shelf.",
       keywords:
@@ -121,7 +121,7 @@ export const ROUTE_META: Array<{ path: string; meta: RouteMeta }> = [
   {
     path: "/resources",
     meta: {
-      title: "Self-Publishing Resources — Create Design Publish",
+      title: "Self-Publishing Resources — Easy Book Publishers",
       description:
         "43 curated self-publishing and online publishing resources — Scrivener, IngramSpark, NetGalley, and more — organized by production phase.",
       keywords:
@@ -136,11 +136,11 @@ export const ROUTE_META: Array<{ path: string; meta: RouteMeta }> = [
   {
     path: "/guide",
     meta: {
-      title: "Self-Publishing Platform Guide — Create Design Publish",
+      title: "Self-Publishing Platform Guide — Easy Book Publishers",
       description:
-        "Step-by-step guide to using the Create Design Publish self-publishing platform. Learn how to create, design, and publish your book online.",
+        "Step-by-step guide to using the Easy Book Publishers self-publishing platform. Learn how to create, design, and publish your book online.",
       keywords:
-        "self-publishing guide, online publishing, book design, create design publish, publishing platform",
+        "self-publishing guide, online publishing, book design, easy book publishers, publishing platform",
       canonical: `${BASE}/guide`,
       ogImage: OG_IMAGE,
       ogType: "website",
@@ -151,7 +151,7 @@ export const ROUTE_META: Array<{ path: string; meta: RouteMeta }> = [
   {
     path: "/print-specs",
     meta: {
-      title: "Print Specs Generator — Create Design Publish",
+      title: "Print Specs Generator — Easy Book Publishers",
       description:
         "Generate complete press-ready file specifications for your printer — trim size, bleed, safe zone, color mode, resolution, PDF/X standard, and preflight checklist.",
       keywords:
@@ -166,11 +166,11 @@ export const ROUTE_META: Array<{ path: string; meta: RouteMeta }> = [
   {
     path: "/",
     meta: {
-      title: "Create Design Publish — Self-Publishing Platform",
+      title: "Easy Book Publishers — Self-Publishing Platform",
       description:
         "Create, design, and publish your book with our all-in-one self-publishing platform. AI typesetting, cover design, ISBN tools, and a 30-step workflow.",
       keywords:
-        "self-publishing, online publishing, book design, publishing platform, Bible publishing, create design publish",
+        "self-publishing, online publishing, book design, publishing platform, Bible publishing, easy book publishers",
       canonical: `${BASE}/`,
       ogImage: OG_IMAGE,
       ogType: "website",

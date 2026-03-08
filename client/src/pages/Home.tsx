@@ -1,5 +1,5 @@
 /**
- * Home Page — Create Design Publish LLC
+ * Home Page — Easy Book Publishers
  * Authenticated: Publisher Command Center dashboard
  * Unauthenticated: Artisan storybook landing page
  */
@@ -19,7 +19,7 @@ import {
   Upload, CheckCircle2, SkipForward, Clock, Sparkles, Copy,
   Layers, BookMarked, Ruler, Zap, BarChart3, Library,
   ChevronRight, ChevronDown, Calendar, Star, TrendingUp, FileText, HelpCircle, LogOut, User, Menu, X, LayoutGrid, Search, Send,
-  Compass, PenTool, Palette, Printer, Quote, Package,
+  Compass, PenTool, Palette, Printer, Quote, Package, RotateCcw,
 } from "lucide-react";
 import {
   DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel,
@@ -32,6 +32,35 @@ import { motion } from "framer-motion";
 import { phases } from "@/data/flowchartData";
 import WhatsNext from "@/components/WhatsNext";
 import { getNextPrompts } from "@shared/prompts";
+import type { WizardAnswers } from "@/components/PublishingWizard";
+
+function getWizardFormatLabel(format: string) {
+  switch (format) {
+    case "print": return "Print Book";
+    case "ebook": return "eBook Only";
+    case "both": return "Print + eBook";
+    default: return format;
+  }
+}
+
+function getWizardTimelineLabel(timeline: string) {
+  switch (timeline) {
+    case "asap": return "ASAP";
+    case "1-3-months": return "1–3 Months";
+    case "3-6-months": return "3–6 Months";
+    case "6-plus-months": return "6+ Months";
+    default: return timeline;
+  }
+}
+
+function getWizardExperienceLabel(exp: string) {
+  switch (exp) {
+    case "first-time": return "First-time Publisher";
+    case "some-experience": return "Some Experience";
+    case "experienced": return "Experienced Publisher";
+    default: return exp;
+  }
+}
 
 const HERO_URL = "https://d2xsxph8kpxj0f.cloudfront.net/310519663211654017/kGjPju6hKCvCsjZhgUHyqj/hero-banner-cxQRR1jXLBmcXxFPJoqxWN.webp";
 
@@ -56,9 +85,9 @@ const features = [
   { icon: Clock, title: "Publishing Deadlines & Milestones", desc: "Set target dates per phase and stay on schedule from manuscript creation through final publishing and distribution." },
 ];
 
-const PAGE_TITLE = "Create Design Publish — Self-Publishing Platform";
+const PAGE_TITLE = "Easy Book Publishers — Self-Publishing Platform";
 const PAGE_DESCRIPTION = "Create, design, and publish your book with our all-in-one self-publishing platform. AI typesetting, cover design, ISBN tools, and a 30-step workflow.";
-const PAGE_KEYWORDS = "self-publishing, online publishing, book design, publishing platform, Bible publishing, create design publish";
+const PAGE_KEYWORDS = "self-publishing, online publishing, book design, publishing platform, Bible publishing, easy book publishers";
 
 function setMetaTag(name: string, content: string) {
   let el = document.querySelector<HTMLMetaElement>(`meta[name="${name}"]`);
@@ -75,7 +104,7 @@ const SITE_URL = "https://booksrus.manus.space";
 const jsonLdSoftwareApp = {
   "@context": "https://schema.org",
   "@type": "SoftwareApplication",
-  "name": "Create Design Publish LLC — Self-Publishing & Online Publishing Platform",
+  "name": "Easy Book Publishers — Self-Publishing & Online Publishing Platform",
   "url": SITE_URL,
   "description": PAGE_DESCRIPTION,
   "applicationCategory": "ProductivityApplication",
@@ -92,13 +121,13 @@ const jsonLdSoftwareApp = {
     "Resources & Success Hub with 43 curated self-publishing tools",
   ],
   "screenshot": HERO_URL,
-  "creator": { "@type": "Organization", "name": "Create Design Publish LLC", "url": SITE_URL },
+  "creator": { "@type": "Organization", "name": "Easy Book Publishers", "url": SITE_URL },
 };
 
 const jsonLdWebSite = {
   "@context": "https://schema.org",
   "@type": "WebSite",
-  "name": "Create Design Publish LLC",
+  "name": "Easy Book Publishers",
   "url": SITE_URL,
   "description": PAGE_DESCRIPTION,
   "potentialAction": {
@@ -111,11 +140,11 @@ const jsonLdWebSite = {
 const jsonLdOrganization = {
   "@context": "https://schema.org",
   "@type": "Organization",
-  "name": "Create Design Publish LLC",
+  "name": "Easy Book Publishers",
   "url": SITE_URL,
   "logo": "https://d2xsxph8kpxj0f.cloudfront.net/310519663211654017/kGjPju6hKCvCsjZhgUHyqj/CDPlargelogo_25428631.PNG",
   "sameAs": [SITE_URL],
-  "description": "Create Design Publish LLC builds self-publishing and online publishing tools that help independent authors and small presses create, design, and publish professional books — from first draft to finished product.",
+  "description": "Easy Book Publishers builds self-publishing and online publishing tools that help independent authors and small presses create, design, and publish professional books — from first draft to finished product.",
 };
 
 function injectJsonLd(id: string, data: object) {
@@ -331,7 +360,7 @@ export default function Home() {
             <div className="flex items-center gap-2.5">
               <img
                 src="https://d2xsxph8kpxj0f.cloudfront.net/310519663211654017/kGjPju6hKCvCsjZhgUHyqj/CDPlargelogo_25428631.PNG"
-                alt="Create Design Publish LLC"
+                alt="Easy Book Publishers"
                 className="h-10 w-auto object-contain"
               />
               <span className="font-serif text-[#f5d98a] text-lg md:text-xl tracking-wide hidden sm:block">Easy Book Publishers</span>
@@ -386,7 +415,7 @@ export default function Home() {
                 <div className="h-px w-20 bg-gradient-to-r from-transparent to-[#c9a96e]/60" />
                 <img
                   src="https://d2xsxph8kpxj0f.cloudfront.net/310519663211654017/kGjPju6hKCvCsjZhgUHyqj/CDPlargelogo_25428631.PNG"
-                  alt="Create Design Publish LLC"
+                  alt="Easy Book Publishers"
                   className="h-12 w-auto object-contain drop-shadow-lg"
                 />
                 <div className="h-px w-20 bg-gradient-to-l from-transparent to-[#c9a96e]/60" />
@@ -768,7 +797,7 @@ export default function Home() {
               <div className="flex items-center gap-3">
                 <img
                   src="https://d2xsxph8kpxj0f.cloudfront.net/310519663211654017/kGjPju6hKCvCsjZhgUHyqj/CDPlargelogo_25428631.PNG"
-                  alt="Create Design Publish LLC"
+                  alt="Easy Book Publishers"
                   className="h-10 w-auto object-contain"
                 />
                 <div>
@@ -841,7 +870,7 @@ export default function Home() {
           <div className="flex items-center gap-2.5">
             <img
               src="https://d2xsxph8kpxj0f.cloudfront.net/310519663211654017/kGjPju6hKCvCsjZhgUHyqj/CDPlargelogo_25428631.PNG"
-              alt="Create Design Publish LLC"
+              alt="Easy Book Publishers"
               className="h-10 w-auto object-contain"
             />
             <span className="font-serif text-[#f5d98a] text-sm tracking-wide">Menu</span>
@@ -911,12 +940,12 @@ export default function Home() {
             <div className="flex items-center gap-3">
               <img
                 src="https://d2xsxph8kpxj0f.cloudfront.net/310519663211654017/kGjPju6hKCvCsjZhgUHyqj/CDPlargelogo_25428631.PNG"
-                alt="Create Design Publish LLC"
+                alt="Easy Book Publishers"
                 className="h-11 w-auto object-contain"
               />
               <div>
                 <h1 className="font-serif text-xl leading-tight text-[#f5d98a] tracking-wide" style={{ textShadow: "0 0 30px rgba(245,217,138,0.3)" }}>Publisher Command Center</h1>
-                <p className="text-[10px] text-[#c9a96e]/50 uppercase tracking-[0.2em] hidden sm:block font-serif">Create Design Publish LLC</p>
+                <p className="text-[10px] text-[#c9a96e]/50 uppercase tracking-[0.2em] hidden sm:block font-serif">Easy Book Publishers</p>
               </div>
             </div>
           </div>
@@ -1013,7 +1042,7 @@ export default function Home() {
 
       <main className="max-w-7xl mx-auto px-6 py-10">
 
-        {(projectList.length === 0 || !hasWizardSession) && (
+        {!hasWizardSession && (
           <motion.section
             initial={{ opacity: 0, y: 16 }}
             animate={{ opacity: 1, y: 0 }}
@@ -1045,6 +1074,87 @@ export default function Home() {
             </div>
           </motion.section>
         )}
+
+        {hasWizardSession && (() => {
+          const wa = wizardAnswersQuery.data?.answers as Partial<WizardAnswers> | undefined;
+          if (!wa) return null;
+          return (
+            <motion.section
+              initial={{ opacity: 0, y: 16 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5 }}
+              className="mb-10"
+            >
+              <div className="relative overflow-hidden rounded-2xl border border-[#c9a96e]/25 bg-gradient-to-r from-[#fdf5e4] via-[#faf0d8] to-[#fdf5e4] p-6 md:p-8 shadow-sm">
+                <div className="absolute top-0 right-0 w-40 h-40 bg-[#c9a96e]/5 rounded-full -translate-y-1/2 translate-x-1/2" />
+                <div className="absolute bottom-0 left-0 w-24 h-24 bg-[#c9a96e]/5 rounded-full translate-y-1/2 -translate-x-1/2" />
+                <div className="relative">
+                  <div className="flex flex-col md:flex-row items-start md:items-center gap-4 mb-5">
+                    <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-[#c9a96e] to-[#b8944f] flex items-center justify-center shadow-md shadow-[#c9a96e]/20 shrink-0">
+                      <Compass size={22} className="text-[#2a1a0a]" />
+                    </div>
+                    <div className="flex-1">
+                      <div className="flex items-center gap-2 mb-1">
+                        <h3 className="font-serif text-lg md:text-xl text-[#2c1a00] leading-tight">Your Publishing Roadmap</h3>
+                        <Badge className="bg-emerald-50 text-emerald-700 border-emerald-200 text-[10px] font-semibold">Completed</Badge>
+                      </div>
+                      <p className="text-sm text-[#6b5f53]">
+                        Personalized plan for <span className="font-semibold text-[#3a2a1a]">{wa.bookTitle}</span>
+                      </p>
+                    </div>
+                    <div className="flex items-center gap-2 shrink-0">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        className="border-[#d4c8b4] text-[#5c3d2e] gap-1.5 text-xs"
+                        onClick={() => navigate("/guided-journey")}
+                      >
+                        <RotateCcw size={12} /> Retake Quiz
+                      </Button>
+                      <Button
+                        size="sm"
+                        className="bg-gradient-to-r from-[#c9a96e] to-[#b8944f] hover:from-[#d4b480] hover:to-[#c9a96e] text-[#2a1a0a] font-semibold gap-1.5 text-xs"
+                        onClick={() => navigate("/guided-journey")}
+                      >
+                        View Full Roadmap <ArrowRight size={12} />
+                      </Button>
+                    </div>
+                  </div>
+                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                    <div className="bg-white/70 rounded-lg border border-[#e8dfd0] p-3">
+                      <div className="flex items-center gap-1.5 mb-1">
+                        <BookOpen size={12} className="text-[#c9a96e]" />
+                        <span className="text-[10px] uppercase tracking-wider text-[#a89880] font-semibold">Book Type</span>
+                      </div>
+                      <p className="text-sm font-medium text-[#3a2a1a] font-serif">{wa.bookType}</p>
+                    </div>
+                    <div className="bg-white/70 rounded-lg border border-[#e8dfd0] p-3">
+                      <div className="flex items-center gap-1.5 mb-1">
+                        <Layers size={12} className="text-[#c9a96e]" />
+                        <span className="text-[10px] uppercase tracking-wider text-[#a89880] font-semibold">Format</span>
+                      </div>
+                      <p className="text-sm font-medium text-[#3a2a1a] font-serif">{getWizardFormatLabel(wa.format || "")}</p>
+                    </div>
+                    <div className="bg-white/70 rounded-lg border border-[#e8dfd0] p-3">
+                      <div className="flex items-center gap-1.5 mb-1">
+                        <Clock size={12} className="text-[#c9a96e]" />
+                        <span className="text-[10px] uppercase tracking-wider text-[#a89880] font-semibold">Timeline</span>
+                      </div>
+                      <p className="text-sm font-medium text-[#3a2a1a] font-serif">{getWizardTimelineLabel(wa.timeline || "")}</p>
+                    </div>
+                    <div className="bg-white/70 rounded-lg border border-[#e8dfd0] p-3">
+                      <div className="flex items-center gap-1.5 mb-1">
+                        <Star size={12} className="text-[#c9a96e]" />
+                        <span className="text-[10px] uppercase tracking-wider text-[#a89880] font-semibold">Experience</span>
+                      </div>
+                      <p className="text-sm font-medium text-[#3a2a1a] font-serif">{getWizardExperienceLabel(wa.experience || "")}</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </motion.section>
+          );
+        })()}
 
         <section className="mb-12">
           <div className="flex items-center justify-between mb-6">

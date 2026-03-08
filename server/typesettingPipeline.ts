@@ -536,7 +536,7 @@ export type EpubMetadata = {
 
 function generateCopyrightPageHtml(book: ParsedBook, meta: EpubMetadata): string {
   const year = new Date().getFullYear();
-  const publisher = meta.publisher || "Create Design Publish LLC";
+  const publisher = meta.publisher || "Easy Book Publishers";
   const lines = [
     `<div style="text-align:center;margin-top:2em;">`,
     `<p style="font-size:1.2em;font-weight:bold;margin-bottom:1em;">${escapeHtml(book.title)}</p>`,
@@ -622,7 +622,7 @@ export async function renderToEpub(book: ParsedBook, style: TypesettingStyle, me
       });
     }
 
-    const publisher = epubMeta.publisher || "Create Design Publish LLC";
+    const publisher = epubMeta.publisher || "Easy Book Publishers";
     const description = epubMeta.description || `${book.title} by ${book.author}`;
     const publishDate = new Date().toISOString().split("T")[0];
 

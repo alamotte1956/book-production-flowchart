@@ -1,6 +1,6 @@
 /**
  * CDP Book Templates
- * One-click presets for every book type Create Design Publish LLC has historically produced.
+ * One-click presets for every book type Easy Book Publishers LLC has historically produced.
  * Each template pre-fills the Auto-Produce and Bible Studio settings so users can recreate
  * a CDP-style book in a single click.
  */

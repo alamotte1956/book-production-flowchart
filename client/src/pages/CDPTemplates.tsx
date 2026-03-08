@@ -1,6 +1,6 @@
 /**
  * CDP Book Templates
- * A visual catalog of every book type Create Design Publish LLC has historically produced.
+ * A visual catalog of every book type Easy Book Publishers LLC has historically produced.
  * Each card shows the book type, key specs, and a "Use This Template" button that
  * navigates to the appropriate tool with settings pre-filled.
  */
@@ -232,14 +232,14 @@ export default function CDPTemplates() {
           <div className="flex items-center gap-2 mb-3">
             <img
               src="https://d2xsxph8kpxj0f.cloudfront.net/310519663211654017/kGjPju6hKCvCsjZhgUHyqj/CDPlargelogo_25428631.PNG"
-              alt="Create Design Publish LLC"
+              alt="Easy Book Publishers LLC"
               className="h-8 w-auto object-contain opacity-80"
             />
             <span className="text-[#c9a96e]/50 text-xs uppercase tracking-widest">Publishing Catalog</span>
           </div>
           <h1 className="font-serif text-3xl md:text-4xl text-[#f5d98a] mb-3">CDP Book Templates</h1>
           <p className="text-[#c9a96e]/70 text-sm max-w-2xl leading-relaxed">
-            One-click presets for every book type Create Design Publish LLC has historically produced —
+            One-click presets for every book type Easy Book Publishers LLC has historically produced —
             from Study Bibles and Devotional Bibles to Christian Living books, children's titles,
             theological commentaries, and hymnals. Select a template to pre-fill all formatting settings.
           </p>

@@ -23,10 +23,12 @@ import { useIsMobile } from "@/hooks/useMobile";
 import {
   LayoutDashboard, LogOut, PanelLeft,
   BookOpen, Ruler, Layers, BookMarked, Library, HelpCircle, LayoutGrid, Search, FileText,
+  Sun, Moon,
 } from "lucide-react";
 import { CSSProperties, useEffect, useRef, useState } from "react";
 import { useLocation } from "wouter";
 import { DashboardLayoutSkeleton } from './DashboardLayoutSkeleton';
+import { useTheme } from "@/contexts/ThemeContext";
 import { Button } from "./ui/button";
 
 const menuItems = [
@@ -121,6 +123,7 @@ function DashboardLayoutContent({
   setSidebarWidth,
 }: DashboardLayoutContentProps) {
   const { user, logout } = useAuth();
+  const { theme, toggleTheme } = useTheme();
   const [location, setLocation] = useLocation();
   const { state, toggleSidebar } = useSidebar();
   const isCollapsed = state === "collapsed";
@@ -185,7 +188,7 @@ function DashboardLayoutContent({
               {!isCollapsed ? (
                 <div className="flex items-center gap-2 min-w-0">
                   <span className="font-bold tracking-tight text-walnut truncate text-sm">
-                    Create Design Publish
+                    Easy Book Publishers
                   </span>
                 </div>
               ) : null}
@@ -223,6 +226,22 @@ function DashboardLayoutContent({
           </SidebarContent>
 
           <SidebarFooter className="p-3 bg-cream/50 border-t border-gold/15">
+            <button
+              onClick={toggleTheme}
+              className="flex items-center gap-3 rounded-lg px-3 py-2 hover:bg-gold/10 transition-colors w-full text-left text-walnut/80 group-data-[collapsible=icon]:justify-center focus:outline-none focus-visible:ring-2 focus-visible:ring-burgundy/30 mb-1"
+              aria-label={theme === "dark" ? "Switch to light mode" : "Switch to dark mode"}
+            >
+              {theme === "dark" ? (
+                <Sun className="h-4 w-4 text-gold shrink-0" />
+              ) : (
+                <Moon className="h-4 w-4 text-walnut/60 shrink-0" />
+              )}
+              {!isCollapsed && (
+                <span className="tracking-wide text-[13px]">
+                  {theme === "dark" ? "Light Mode" : "Dark Mode"}
+                </span>
+              )}
+            </button>
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <button className="flex items-center gap-3 rounded-lg px-1 py-1.5 hover:bg-gold/10 transition-colors w-full text-left group-data-[collapsible=icon]:justify-center focus:outline-none focus-visible:ring-2 focus-visible:ring-burgundy/30">

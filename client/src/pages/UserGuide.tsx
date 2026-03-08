@@ -1,5 +1,5 @@
 /**
- * User Guide Page — Create Design Publish LLC
+ * User Guide Page — Easy Book Publishers LLC
  * Full instruction book rendered as a navigable web page.
  */
 import { useCallback, useRef, useState } from "react";
@@ -76,7 +76,7 @@ const sections: Section[] = [
     icon: BookOpen,
     content: (
       <div>
-        <p className="mb-4">Create Design Publish LLC is a complete book production management platform built for independent authors, Bible publishers, designers, and small publishing houses. It guides you from the first spark of an idea through every professional production stage to a finished, print-ready volume.</p>
+        <p className="mb-4">Easy Book Publishers LLC is a complete book production management platform built for independent authors, Bible publishers, designers, and small publishing houses. It guides you from the first spark of an idea through every professional production stage to a finished, print-ready volume.</p>
         <h4 className="font-serif text-base font-semibold text-[#2c1a00] mb-2">What the Platform Provides</h4>
         <InfoTable rows={[
           ["Production Tracker", "9 phases, 30 steps, 110 tracked inputs per project"],
@@ -492,7 +492,7 @@ export default function UserGuide() {
             </button>
             <span className="text-[#c9a96e]/20">|</span>
             <div className="flex items-center gap-2">
-              <img src={CDP_LOGO} alt="Create Design Publish LLC" className="w-6 h-6 rounded object-cover" />
+              <img src={CDP_LOGO} alt="Easy Book Publishers LLC" className="w-6 h-6 rounded object-cover" />
               <span className="font-serif text-base text-[#f5efe0]">User Guide</span>
             </div>
           </div>
@@ -514,7 +514,7 @@ export default function UserGuide() {
         <div className="max-w-4xl mx-auto text-center">
           <div className="flex items-center justify-center gap-3 mb-5">
             <div className="h-px w-12 bg-[#c9a96e]/40" />
-            <img src={CDP_LOGO} alt="Create Design Publish LLC" className="w-12 h-12 rounded-xl object-cover" />
+            <img src={CDP_LOGO} alt="Easy Book Publishers LLC" className="w-12 h-12 rounded-xl object-cover" />
             <div className="h-px w-12 bg-[#c9a96e]/40" />
           </div>
           <h1
@@ -525,7 +525,7 @@ export default function UserGuide() {
               letterSpacing: "0.04em",
             }}
           >
-            Create Design Publish LLC
+            Easy Book Publishers LLC
           </h1>
           <p
             className="mt-4 font-serif text-3xl tracking-widest"
@@ -626,7 +626,7 @@ export default function UserGuide() {
 
         {/* Footer note */}
         <div className="mt-8 p-6 bg-[#2a1a0a] rounded-xl text-center">
-          <p className="text-[#c9a96e] font-serif text-lg mb-1">Create Design Publish LLC</p>
+          <p className="text-[#c9a96e] font-serif text-lg mb-1">Easy Book Publishers LLC</p>
           <p className="text-[#8b7b6b] text-sm">A creator, designer, and publisher's dream platform.</p>
           <div className="mt-4 flex items-center justify-center gap-4">
             <Badge className="bg-[#c9a96e]/20 text-[#c9a96e] border-[#c9a96e]/30 text-xs">9 Phases</Badge>
