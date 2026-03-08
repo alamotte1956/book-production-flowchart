@@ -365,12 +365,11 @@ export default function Home() {
                 Create Design Publish LLC
               </h1>
               <p
-                className="mt-4 font-serif text-2xl md:text-3xl tracking-widest uppercase"
+                className="mt-4 font-serif text-xl md:text-2xl lg:text-3xl tracking-widest uppercase"
                 style={{
-                  color: "transparent",
-                  WebkitTextStroke: "1.5px #c9a96e",
-                  letterSpacing: "0.2em",
-                  textShadow: "0 0 30px rgba(201,169,110,0.25)",
+                  color: "#f5d98a",
+                  textShadow: "0 0 60px rgba(245,217,138,0.55), 0 0 120px rgba(201,169,110,0.4), 0 3px 6px rgba(0,0,0,0.6)",
+                  letterSpacing: "0.18em",
                 }}
               >
                 Manuscript to Masterpiece
