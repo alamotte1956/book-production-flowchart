@@ -111,7 +111,8 @@ function generateRoadmap(answers: WizardAnswers): RoadmapStep[] {
       ? "Use Auto-Produce to generate a professionally formatted EPUB for digital distribution."
       : "Use Auto-Produce to generate a professionally typeset PDF ready for print production.",
     icon: Zap,
-    toolLabel: "Auto-Produce (from project)",
+    toolPath: "/auto-produce",
+    toolLabel: "Start Auto-Produce",
     priority: "essential",
     phase: "Production",
   });
@@ -156,7 +157,8 @@ function generateRoadmap(answers: WizardAnswers): RoadmapStep[] {
       ? "You're on a tight schedule. Set up your production timeline with aggressive but achievable milestones."
       : `You have ${answers.timeline === "1-3-months" ? "1–3 months" : answers.timeline === "3-6-months" ? "3–6 months" : "6+ months"}. Set phase deadlines to stay on track.`,
     icon: Calendar,
-    toolLabel: "Timeline (from project)",
+    toolPath: "/timeline",
+    toolLabel: "Open Timeline",
     priority: "recommended",
     phase: "Planning",
   });
