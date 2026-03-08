@@ -315,13 +315,13 @@ export default function Home() {
             <div className="flex items-center gap-3">
               <button
                 onClick={() => document.getElementById('features')?.scrollIntoView({ behavior: 'smooth' })}
-                className="font-serif text-base text-[#c9a96e]/80 hover:text-[#c9a96e] transition-colors hidden md:block px-3 py-1.5"
+                className="font-serif text-base text-[#f5efe0] hover:text-[#f5d98a] transition-colors hidden md:block px-3 py-1.5"
               >
                 Features
               </button>
               <button
                 onClick={() => document.getElementById('tools-section')?.scrollIntoView({ behavior: 'smooth' })}
-                className="font-serif text-base text-[#c9a96e]/80 hover:text-[#c9a96e] transition-colors hidden md:block px-3 py-1.5"
+                className="font-serif text-base text-[#f5efe0] hover:text-[#f5d98a] transition-colors hidden md:block px-3 py-1.5"
               >
                 Tools
               </button>
