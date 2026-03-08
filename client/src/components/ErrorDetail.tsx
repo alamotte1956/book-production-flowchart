@@ -86,7 +86,7 @@ function suggestFix(code?: string, message?: string): string | null {
     return "This ISBN was not found in Open Library or Google Books. Try an alternate edition or verify the number.";
   }
   if (code === "UNAUTHORIZED") {
-    return "You need to be signed in to use this feature. Please log in and try again.";
+    return "An authentication error occurred. Please refresh the page and try again.";
   }
   if (code === "TIMEOUT" || msg.includes("timeout") || msg.includes("timed out")) {
     return "The external book database took too long to respond. Please wait a moment and try again.";

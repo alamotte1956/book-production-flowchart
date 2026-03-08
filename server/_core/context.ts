@@ -1,12 +1,32 @@
 import type { CreateExpressContextOptions } from "@trpc/server/adapters/express";
 import type { User } from "../../drizzle/schema";
-import { getUserByOpenId } from "../db";
+import { getUserByOpenId, upsertUser } from "../db";
+
+const GUEST_OPEN_ID = "guest-default-user";
 
 export type TrpcContext = {
   req: CreateExpressContextOptions["req"];
   res: CreateExpressContextOptions["res"];
   user: User | null;
 };
+
+async function getOrCreateGuestUser(): Promise<User | null> {
+  try {
+    let guest = await getUserByOpenId(GUEST_OPEN_ID);
+    if (!guest) {
+      await upsertUser({
+        openId: GUEST_OPEN_ID,
+        name: "Guest User",
+        email: null,
+        loginMethod: "guest",
+      });
+      guest = await getUserByOpenId(GUEST_OPEN_ID);
+    }
+    return guest ?? null;
+  } catch {
+    return null;
+  }
+}
 
 export async function createContext(
   opts: CreateExpressContextOptions
@@ -21,6 +41,10 @@ export async function createContext(
     }
   } catch (error) {
     user = null;
+  }
+
+  if (!user) {
+    user = await getOrCreateGuestUser();
   }
 
   return {

@@ -3,7 +3,6 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Check, X, ArrowRight, BookOpen, Zap, Crown, HelpCircle, Loader2 } from "lucide-react";
-import { getSignUpUrl } from "@/const";
 import { useLocation } from "wouter";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { trpc } from "@/lib/trpc";
@@ -148,12 +147,7 @@ export default function Pricing() {
 
   const handleSelectPlan = async (tierName: string) => {
     if (tierName === "Starter") {
-      window.location.href = getSignUpUrl();
-      return;
-    }
-
-    if (!user) {
-      window.location.href = getSignUpUrl();
+      navigate("/");
       return;
     }
 
@@ -187,11 +181,9 @@ export default function Pricing() {
             />
             <span className="font-serif text-[#f5d98a] text-lg md:text-xl tracking-wide hidden sm:block">Easy Book Publishers</span>
           </button>
-          <a href={getSignUpUrl()}>
-            <Button className="bg-[#c9a96e] hover:bg-[#b8944f] text-[#1a1008] font-semibold">
-              Get Started
-            </Button>
-          </a>
+          <Button onClick={() => navigate("/")} className="bg-[#c9a96e] hover:bg-[#b8944f] text-[#1a1008] font-semibold">
+            Go to Dashboard
+          </Button>
         </div>
       </nav>
 
@@ -408,12 +400,10 @@ export default function Pricing() {
           <p className="text-[#d4c8b4]/80 mb-8 max-w-xl mx-auto">
             Join authors and publishers using Easy Book Publishers to bring their books to life — from first idea to finished volume.
           </p>
-          <a href={getSignUpUrl()}>
-            <Button size="lg" className="bg-gradient-to-r from-[#d4b480] to-[#c9a96e] hover:from-[#e0c490] hover:to-[#d4b480] text-[#1a1008] font-bold text-base px-10 py-6 rounded-xl shadow-xl shadow-[#c9a96e]/25">
-              Get Started Free
-              <ArrowRight className="ml-2" size={18} />
-            </Button>
-          </a>
+          <Button onClick={() => navigate("/")} size="lg" className="bg-gradient-to-r from-[#d4b480] to-[#c9a96e] hover:from-[#e0c490] hover:to-[#d4b480] text-[#1a1008] font-bold text-base px-10 py-6 rounded-xl shadow-xl shadow-[#c9a96e]/25">
+            Go to Dashboard
+            <ArrowRight className="ml-2" size={18} />
+          </Button>
         </div>
       </div>
     </div>

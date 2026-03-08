@@ -1,12 +1,6 @@
 import { useAuth } from "@/_core/hooks/useAuth";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import {
   Sidebar,
   SidebarContent,
   SidebarFooter,
@@ -22,7 +16,7 @@ import {
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { useIsMobile } from "@/hooks/useMobile";
 import {
-  LayoutDashboard, LogOut, PanelLeft,
+  LayoutDashboard, PanelLeft,
   BookOpen, Ruler, Layers, BookMarked, Library, HelpCircle, LayoutGrid, Search, FileText,
   Sun, Moon, Bell, CheckCircle, Upload, Zap, CreditCard,
 } from "lucide-react";
@@ -192,34 +186,6 @@ export default function DashboardLayout({
     return <DashboardLayoutSkeleton />
   }
 
-  if (!user) {
-    return (
-      <div className="flex items-center justify-center min-h-screen bg-parchment">
-        <div className="flex flex-col items-center gap-8 p-8 max-w-md w-full">
-          <div className="flex flex-col items-center gap-4">
-            <div className="w-16 h-16 rounded-full bg-burgundy/10 flex items-center justify-center">
-              <BookOpen className="h-8 w-8 text-burgundy" />
-            </div>
-            <h1 className="text-2xl font-bold tracking-tight text-walnut text-center">
-              Sign in to continue
-            </h1>
-            <p className="text-sm text-walnut/70 text-center max-w-sm leading-relaxed">
-              Access to the Publisher Command Center requires authentication. Sign in to manage your book projects.
-            </p>
-          </div>
-          <Button
-            onClick={() => {
-              window.location.href = "/api/login";
-            }}
-            size="lg"
-            className="w-full bg-burgundy hover:bg-burgundy/90 text-parchment shadow-lg hover:shadow-xl transition-all font-semibold tracking-wide"
-          >
-            Sign in
-          </Button>
-        </div>
-      </div>
-    );
-  }
 
   return (
     <SidebarProvider
@@ -245,7 +211,7 @@ function DashboardLayoutContent({
   children,
   setSidebarWidth,
 }: DashboardLayoutContentProps) {
-  const { user, logout } = useAuth();
+  const { user } = useAuth();
   const { theme, toggleTheme } = useTheme();
   const [location, setLocation] = useLocation();
   const { state, toggleSidebar } = useSidebar();
@@ -366,34 +332,18 @@ function DashboardLayoutContent({
                 </span>
               )}
             </button>
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <button className="flex items-center gap-3 rounded-lg px-1 py-1.5 hover:bg-gold/10 transition-colors w-full text-left group-data-[collapsible=icon]:justify-center focus:outline-none focus-visible:ring-2 focus-visible:ring-burgundy/30">
-                  <Avatar className="h-9 w-9 border border-gold/30 bg-burgundy/10 shrink-0">
-                    <AvatarFallback className="text-xs font-semibold text-burgundy bg-burgundy/10">
-                      {user?.name?.charAt(0).toUpperCase()}
-                    </AvatarFallback>
-                  </Avatar>
-                  <div className="flex-1 min-w-0 group-data-[collapsible=icon]:hidden">
-                    <p className="text-sm font-semibold text-walnut truncate leading-none">
-                      {user?.name || "-"}
-                    </p>
-                    <p className="text-xs text-walnut/60 truncate mt-1.5">
-                      {user?.email || "-"}
-                    </p>
-                  </div>
-                </button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="w-48 bg-parchment border-gold/20">
-                <DropdownMenuItem
-                  onClick={logout}
-                  className="cursor-pointer text-destructive focus:text-destructive"
-                >
-                  <LogOut className="mr-2 h-4 w-4" />
-                  <span>Sign out</span>
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
+            <div className="flex items-center gap-3 rounded-lg px-1 py-1.5 w-full text-left group-data-[collapsible=icon]:justify-center">
+              <Avatar className="h-9 w-9 border border-gold/30 bg-burgundy/10 shrink-0">
+                <AvatarFallback className="text-xs font-semibold text-burgundy bg-burgundy/10">
+                  {user?.name?.charAt(0).toUpperCase() || "U"}
+                </AvatarFallback>
+              </Avatar>
+              <div className="flex-1 min-w-0 group-data-[collapsible=icon]:hidden">
+                <p className="text-sm font-semibold text-walnut truncate leading-none">
+                  {user?.name || "User"}
+                </p>
+              </div>
+            </div>
           </SidebarFooter>
         </Sidebar>
         <div

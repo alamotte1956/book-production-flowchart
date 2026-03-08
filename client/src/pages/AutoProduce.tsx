@@ -11,7 +11,6 @@ import { useState, useRef, useCallback, useEffect } from "react";
 import { Link, useParams, useLocation, useSearch } from "wouter";
 import { trpc } from "@/lib/trpc";
 import { useAuth } from "@/_core/hooks/useAuth";
-import { getLoginUrl } from "@/const";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -1068,18 +1067,6 @@ export default function AutoProduce() {
     );
   }
 
-  if (!isAuthenticated) {
-    return (
-      <div className="min-h-screen bg-[#faf6ef] flex items-center justify-center">
-        <div className="text-center space-y-4">
-          <p className="text-[#5c3d2e] font-serif text-xl">Please sign in to use Auto-Produce.</p>
-          <Button onClick={() => window.location.href = getLoginUrl()} className="bg-[#8b5e3c] hover:bg-[#7a4f30] text-white">
-            Sign In
-          </Button>
-        </div>
-      </div>
-    );
-  }
 
   const project = projectData?.project;
   const canPreview = !!(trimSizeId && styleId);

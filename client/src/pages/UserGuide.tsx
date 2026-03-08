@@ -89,7 +89,7 @@ const sections: Section[] = [
           ["Resources Hub", "43 curated tools across every production stage"],
         ]} />
         <h4 className="font-serif text-base font-semibold text-[#2c1a00] mb-2 mt-4">First Steps</h4>
-        <Step num={1} title="Log In" desc="Click 'Start Your Project' on the landing page and sign in with your Manus account." />
+        <Step num={1} title="Open the Dashboard" desc="Visit the app to land directly on the Publisher Command Center dashboard." />
         <Step num={2} title="Create a Project" desc="Click 'New Book Project' on the dashboard. Enter your book title, genre, and a brief description." />
         <Step num={3} title="Follow the What's Next Panel" desc="The dashboard shows your top 3 recommended next actions in priority order. Work through them in sequence." />
         <Step num={4} title="Use the Publisher Tools Hub" desc="Access any specialist tool (Bible Studio, Spine Calculator, Cover Designer, etc.) from the 8-card grid on the dashboard." />
@@ -385,7 +385,7 @@ const sections: Section[] = [
         <h4 className="font-serif text-base font-semibold text-[#2c1a00] mb-2">General</h4>
         <InfoTable rows={[
           ["Is the platform free to use?", "Yes. All tools on the platform are free. You only pay for printing, ISBNs, and distribution services from third-party vendors."],
-          ["Do I need an account?", "Yes. Sign in with your Manus account to save projects, track progress, and access all tools."],
+          ["Do I need an account?", "No. The app is ready to use immediately — just open it and start creating projects."],
           ["Can I use this for non-Bible books?", "Absolutely. The platform supports any book type — fiction, nonfiction, children's, poetry, academic, and more. Bible Studio is one specialized tool among many."],
           ["Is my data saved?", "Yes. All project data, step progress, and uploaded files are saved to your account and persist across sessions."],
         ]} />

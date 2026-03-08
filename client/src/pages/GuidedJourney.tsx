@@ -375,27 +375,6 @@ export default function GuidedJourney() {
     );
   }
 
-  if (!isAuthenticated) {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-[#faf6ef] via-[#f5ede0] to-[#faf6ef] flex items-center justify-center p-4">
-        <div className="text-center max-w-md">
-          <div className="w-16 h-16 rounded-2xl bg-[#fdf5e4] border border-[#e8c87a]/40 flex items-center justify-center mx-auto mb-4">
-            <Sparkles size={28} className="text-[#c9a96e]" />
-          </div>
-          <h1 className="font-serif text-2xl text-[#2c1a00] mb-2">Sign In to Start</h1>
-          <p className="text-sm text-[#8b7b6b] mb-6">
-            Create a free account to take the Publishing Wizard and get your personalized roadmap.
-          </p>
-          <Button
-            className="bg-[#c9a96e] hover:bg-[#b8944f] text-[#2a1a0a] font-semibold"
-            onClick={() => { window.location.href = "/api/login"; }}
-          >
-            Sign In to Continue
-          </Button>
-        </div>
-      </div>
-    );
-  }
 
   if (completedAnswers && !forceWizard) {
     return (

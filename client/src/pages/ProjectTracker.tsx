@@ -23,7 +23,6 @@ import {
 import type { LucideIcon } from "lucide-react";
 import { useState, useMemo, useCallback, useRef, useEffect, type KeyboardEvent } from "react";
 import { useLocation, useParams } from "wouter";
-import { getLoginUrl } from "@/const";
 import { motion, AnimatePresence } from "framer-motion";
 import { getIrrelevantStepIds, getFilterReason } from "@shared/genreFilter";
 import { getNextPrompts } from "@shared/prompts";
@@ -1495,18 +1494,6 @@ export default function ProjectTracker() {
     );
   }
 
-  if (!authLoading && !isAuthenticated) {
-    return (
-      <div className="min-h-screen bg-[#faf6ef] flex items-center justify-center">
-        <div className="text-center">
-          <p className="text-[#8b7b6b]">Please log in to view this project</p>
-          <Button variant="outline" className="mt-4" onClick={() => { window.location.href = getLoginUrl(); }}>
-            Log In
-          </Button>
-        </div>
-      </div>
-    );
-  }
 
   if (error || !data) {
     return (

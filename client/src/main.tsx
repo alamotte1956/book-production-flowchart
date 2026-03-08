@@ -37,7 +37,7 @@ const redirectToLoginIfUnauthorized = (error: unknown) => {
 
   if (!isUnauthorized) return;
 
-  window.location.href = "/api/login";
+  console.warn("Auth error:", error.message);
 };
 
 queryClient.getQueryCache().subscribe(event => {

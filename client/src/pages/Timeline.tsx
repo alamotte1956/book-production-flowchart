@@ -10,7 +10,6 @@ import { useState, useMemo, useCallback } from "react";
 import { Link, useParams, useLocation } from "wouter";
 import { trpc } from "@/lib/trpc";
 import { useAuth } from "@/_core/hooks/useAuth";
-import { getLoginUrl } from "@/const";
 import { phases } from "@/data/flowchartData";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -82,11 +81,6 @@ export default function Timeline() {
   const [editingStep, setEditingStep] = useState<string | null>(null);
   const [editingDeadline, setEditingDeadline] = useState(false);
 
-  // ── Auth redirect
-  if (!authLoading && !isAuthenticated) {
-    window.location.href = getLoginUrl();
-    return null;
-  }
 
   const utils = trpc.useUtils();
 

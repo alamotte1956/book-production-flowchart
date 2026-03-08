@@ -13,7 +13,6 @@ import { useState, useRef } from "react";
 import { useLocation } from "wouter";
 import { trpc } from "@/lib/trpc";
 import { useAuth } from "@/_core/hooks/useAuth";
-import { getLoginUrl } from "@/const";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -162,7 +161,7 @@ export default function CDPProductionWizard({
   };
 
   const handleLaunch = async () => {
-    if (!user) { window.location.href = getLoginUrl(); return; }
+    if (!user) return;
     if (!selectedFile) return;
     setLaunching(true);
     setLaunchError(null);
@@ -566,14 +565,6 @@ export default function CDPProductionWizard({
               </div>
             </div>
 
-            {!user && (
-              <div className="bg-amber-50 border border-amber-200 rounded-lg p-3 text-sm text-amber-800">
-                You need to be signed in to launch a production job.{" "}
-                <a href={getLoginUrl()} className="underline font-medium">
-                  Sign in
-                </a>
-              </div>
-            )}
 
             <Button
               className="w-full bg-[#7c3aed] hover:bg-[#6d28d9] text-white h-11 text-base font-semibold"

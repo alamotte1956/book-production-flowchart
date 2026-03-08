@@ -23,13 +23,12 @@ A full-stack book production workflow management platform ("Manuscript to Master
 
 ## Auth Flow
 
-- Replit Auth handles login/signup via OpenID Connect
-- Login: `/api/login` → Replit OIDC → `/api/callback` → session created
-- Logout: `/api/logout` → Replit end-session
-- User info: `/api/auth/user` (authenticated endpoint)
+- **No login required** — a guest user (openId: "guest-default-user") is auto-created and used when no Replit Auth session exists
+- Replit Auth OIDC integration still exists in code but login is not enforced; all pages are accessible without authentication
+- tRPC context falls back to the guest user when no authenticated session is present (`server/_core/context.ts`)
+- All `protectedProcedure` endpoints work automatically since a user context is always available
 - Sessions stored in PostgreSQL `sessions` table
-- App users stored in `users` table, keyed by `openId` (Replit Auth `sub` claim)
-- tRPC context extracts user from passport session via `req.user.claims.sub` → `users.openId`
+- App users stored in `users` table, keyed by `openId`
 
 ## Running the App
 
