@@ -67,7 +67,7 @@ PostgreSQL via Replit's built-in database. Use `npx drizzle-kit push` to sync sc
   - `#e8dfd0` — Light borders
 - **Dark Headers**: All tool pages use `bg-[#2a1a0a]` sticky headers with gold accents
 - **Cards**: `border-[#e8dfd0] bg-white shadow-sm` pattern across tool pages
-- **Contact Form**: Embedded on landing page (`#contact-section`), uses `contact.send` tRPC mutation
+- **Contact Form**: Embedded at bottom of dashboard (`#contact-section`), uses `contact.send` tRPC mutation with name/email/subject/message fields and success state
 
 ## Key Features
 
