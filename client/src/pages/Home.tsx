@@ -772,14 +772,14 @@ export default function Home() {
                   className="h-10 w-auto object-contain"
                 />
                 <div>
-                  <p className="font-serif text-[#f5d98a] text-base">Create Design Publish LLC</p>
+                  <p className="font-serif text-[#f5d98a] text-base">Easy Book Publishers</p>
                   <p className="font-serif text-xs text-[#c9a96e]/60 uppercase tracking-widest">Manuscript to Masterpiece</p>
                 </div>
               </div>
               <div className="flex flex-col items-center md:items-end gap-1 text-center md:text-right">
                 <a href="https://createdesignpublish.net" className="font-serif text-sm text-[#c9a96e]/70 hover:text-[#c9a96e] transition-colors">createdesignpublish.net</a>
                 <a href="mailto:gs@safarilegacy.org" className="font-serif text-sm text-[#c9a96e]/70 hover:text-[#c9a96e] transition-colors">gs@safarilegacy.org</a>
-                <p className="font-serif text-xs text-[#c9a96e]/50 mt-1">&copy; {new Date().getFullYear()} Create Design Publish LLC. All rights reserved.</p>
+                <p className="font-serif text-xs text-[#c9a96e]/50 mt-1">&copy; 2026 Easy Book Publishers. All rights reserved.</p>
               </div>
             </div>
           </div>
