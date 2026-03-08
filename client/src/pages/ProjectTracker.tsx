@@ -25,6 +25,9 @@ import { useLocation, useParams } from "wouter";
 import { getLoginUrl } from "@/const";
 import { motion, AnimatePresence } from "framer-motion";
 import { getIrrelevantStepIds, getFilterReason } from "@shared/genreFilter";
+import { getNextPrompts } from "@shared/prompts";
+import type { ProjectPromptContext } from "@shared/prompts";
+import WhatsNext from "@/components/WhatsNext";
 
 // Icon map for dynamic rendering
 const iconMap: Record<string, LucideIcon> = {
@@ -1014,6 +1017,7 @@ export default function ProjectTracker() {
   const [printMode, setPrintMode] = useState(false);
   const [showNotes, setShowNotes] = useState(false);
   const [showAI, setShowAI] = useState(false);
+  const [showWhatsNext, setShowWhatsNext] = useState(false);
 
   const duplicateMutation = trpc.project.duplicate.useMutation({
     onSuccess: (newProject) => {
@@ -1087,6 +1091,16 @@ export default function ProjectTracker() {
       return done < p.steps.length && dd < Date.now();
     });
   }, [allPhases, dueDateMap, statusMap]);
+
+  const { data: promptContext } = trpc.prompts.getContext.useQuery(
+    { projectId },
+    { enabled: isAuthenticated && projectId > 0 && !!data }
+  );
+
+  const whatsNextPrompts = useMemo(() => {
+    if (!promptContext) return [];
+    return getNextPrompts(promptContext as ProjectPromptContext);
+  }, [promptContext]);
 
   if (authLoading || isLoading) {
     return (
@@ -1220,6 +1234,15 @@ export default function ProjectTracker() {
               <TooltipContent>Print / Save as PDF</TooltipContent>
             </Tooltip>
           </div>
+
+          {/* What's Next toggle */}
+          <button
+            onClick={() => setShowWhatsNext(v => !v)}
+            className={`hidden sm:flex items-center gap-1.5 text-xs transition-colors print:hidden ${showWhatsNext ? "text-amber-400" : "text-amber-300/60 hover:text-amber-400"}`}
+          >
+            <Lightbulb size={14} />
+            What's Next
+          </button>
 
           {/* Notes toggle */}
           <button
@@ -1363,6 +1386,30 @@ export default function ProjectTracker() {
             })}
           </nav>
         </aside>
+
+        {/* What's Next — collapsible right panel */}
+        {showWhatsNext && (
+          <aside className="hidden lg:block w-72 shrink-0 print:hidden order-last">
+            <div className="sticky top-24 bg-white/80 backdrop-blur-sm rounded-xl border border-[#e8dfd0] p-4 overflow-y-auto max-h-[calc(100vh-8rem)]">
+              <div className="flex items-center justify-between mb-4">
+                <div className="flex items-center gap-2">
+                  <div className="w-7 h-7 rounded-lg bg-amber-100 flex items-center justify-center">
+                    <Lightbulb size={14} className="text-amber-600" />
+                  </div>
+                  <h3 className="text-sm font-serif font-semibold text-[#2c1a00]">What's Next?</h3>
+                </div>
+                <button onClick={() => setShowWhatsNext(false)} className="text-[#a89880] hover:text-[#5c3d2e] transition-colors">
+                  <X size={14} />
+                </button>
+              </div>
+              {whatsNextPrompts.length > 0 ? (
+                <WhatsNext prompts={whatsNextPrompts} title="Suggested Actions" />
+              ) : (
+                <p className="text-xs text-[#a89880] italic">No suggestions available for this project yet.</p>
+              )}
+            </div>
+          </aside>
+        )}
 
         {/* AI Writing Assistant — collapsible right panel */}
         {showAI && (

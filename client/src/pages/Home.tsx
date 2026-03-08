@@ -308,6 +308,7 @@ export default function Home() {
     },
   });
 
+  const activityQuery = trpc.activity.recent.useQuery(undefined, { enabled: isAuthenticated });
   const wizardAnswersQuery = trpc.wizard.getAnswers.useQuery(undefined, { enabled: isAuthenticated });
   const hasWizardSession = !!wizardAnswersQuery.data?.answers && !!(wizardAnswersQuery.data.answers as Record<string, unknown>).bookType;
 
@@ -1038,6 +1039,47 @@ export default function Home() {
               prompts={whatsNextPrompts}
               title={firstProject ? `What's Next for "${firstProject.title}"?` : "What's Next?"}
             />
+          </section>
+        )}
+
+        {activityQuery.data && activityQuery.data.length > 0 && (
+          <section className="mb-12">
+            <div className="flex items-center gap-2 mb-1">
+              <div className="h-px w-8 bg-[#c9a96e]/40" />
+              <span className="text-[10px] font-semibold uppercase tracking-[0.2em] text-[#c9a96e]">Activity</span>
+            </div>
+            <h2 className="font-serif text-2xl text-[#2c1a00] mb-1">Recent Activity</h2>
+            <p className="text-sm text-[#8b7b6b] mb-5">Your latest publishing actions across all projects</p>
+            <div className="bg-white/90 backdrop-blur-sm rounded-2xl border border-[#e8dfd0] shadow-sm overflow-hidden">
+              {activityQuery.data.map((item, idx) => (
+                <div
+                  key={`${item.type}-${item.projectId}-${idx}`}
+                  className={`flex items-center gap-4 px-5 py-3.5 hover:bg-[#faf6ef]/60 transition-colors cursor-pointer ${
+                    idx < activityQuery.data!.length - 1 ? "border-b border-[#f0e8d8]" : ""
+                  }`}
+                  onClick={() => navigate(`/project/${item.projectId}`)}
+                >
+                  <div className={`w-8 h-8 rounded-lg flex items-center justify-center shrink-0 ${
+                    item.type === "step_completion" ? "bg-emerald-50 border border-emerald-200" :
+                    item.type === "file_upload" ? "bg-blue-50 border border-blue-200" :
+                    "bg-purple-50 border border-purple-200"
+                  }`}>
+                    {item.type === "step_completion" ? <CheckCircle2 size={14} className="text-emerald-600" /> :
+                     item.type === "file_upload" ? <Upload size={14} className="text-blue-600" /> :
+                     <Zap size={14} className="text-purple-600" />}
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm text-[#3a2a1a] truncate">{item.detail}</p>
+                    <p className="text-[11px] text-[#a89880] truncate">{item.projectTitle}</p>
+                  </div>
+                  <span className="text-[11px] text-[#a89880] shrink-0 whitespace-nowrap">
+                    {new Date(item.timestamp).toLocaleDateString("en-US", { month: "short", day: "numeric" })}
+                    {" "}
+                    {new Date(item.timestamp).toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit" })}
+                  </span>
+                </div>
+              ))}
+            </div>
           </section>
         )}
 

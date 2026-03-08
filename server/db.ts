@@ -1,4 +1,4 @@
-import { eq, and } from "drizzle-orm";
+import { eq, and, desc, sql } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/node-postgres";
 import { Pool } from "pg";
 import {
@@ -400,11 +400,109 @@ export async function saveWizardAnswers(
   }
 }
 
-export async function getWizardAnswers(userId: number): Promise<WizardSession | undefined> {
+export async function getWizardAnswers(userId: number): Promise<WizardSession | null> {
   const db = await getDb();
   if (!db) throw new Error("Database not available");
   const [session] = await db.select().from(wizardSessions)
     .where(eq(wizardSessions.userId, userId))
     .limit(1);
-  return session;
+  return session ?? null;
+}
+
+export type ActivityItem = {
+  type: "step_completion" | "file_upload" | "production_job";
+  projectId: number;
+  projectTitle: string;
+  detail: string;
+  timestamp: Date;
+};
+
+export async function getRecentActivity(userId: number): Promise<ActivityItem[]> {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  const userProjects = await db.select({ id: projects.id, title: projects.title })
+    .from(projects)
+    .where(eq(projects.userId, userId));
+
+  if (userProjects.length === 0) return [];
+
+  const projectMap = new Map(userProjects.map(p => [p.id, p.title]));
+  const projectIds = userProjects.map(p => p.id);
+
+  const [completedSteps, recentFiles, recentJobs] = await Promise.all([
+    db.select({
+      projectId: stepStatuses.projectId,
+      stepId: stepStatuses.stepId,
+      status: stepStatuses.status,
+      completedAt: stepStatuses.completedAt,
+      updatedAt: stepStatuses.updatedAt,
+    })
+      .from(stepStatuses)
+      .where(and(
+        sql`${stepStatuses.projectId} IN (${sql.join(projectIds.map(id => sql`${id}`), sql`, `)})`,
+        eq(stepStatuses.status, "complete"),
+      ))
+      .orderBy(desc(stepStatuses.updatedAt))
+      .limit(10),
+
+    db.select({
+      projectId: uploadedFiles.projectId,
+      fileName: uploadedFiles.fileName,
+      uploadedAt: uploadedFiles.uploadedAt,
+    })
+      .from(uploadedFiles)
+      .where(sql`${uploadedFiles.projectId} IN (${sql.join(projectIds.map(id => sql`${id}`), sql`, `)})`)
+      .orderBy(desc(uploadedFiles.uploadedAt))
+      .limit(10),
+
+    db.select({
+      projectId: productionJobs.projectId,
+      status: productionJobs.status,
+      styleId: productionJobs.styleId,
+      createdAt: productionJobs.createdAt,
+      updatedAt: productionJobs.updatedAt,
+    })
+      .from(productionJobs)
+      .where(sql`${productionJobs.projectId} IN (${sql.join(projectIds.map(id => sql`${id}`), sql`, `)})`)
+      .orderBy(desc(productionJobs.updatedAt))
+      .limit(10),
+  ]);
+
+  const items: ActivityItem[] = [];
+
+  for (const s of completedSteps) {
+    items.push({
+      type: "step_completion",
+      projectId: s.projectId,
+      projectTitle: projectMap.get(s.projectId) ?? "Unknown",
+      detail: `Completed step "${s.stepId}"`,
+      timestamp: s.completedAt ?? s.updatedAt,
+    });
+  }
+
+  for (const f of recentFiles) {
+    items.push({
+      type: "file_upload",
+      projectId: f.projectId,
+      projectTitle: projectMap.get(f.projectId) ?? "Unknown",
+      detail: `Uploaded "${f.fileName}"`,
+      timestamp: f.uploadedAt,
+    });
+  }
+
+  for (const j of recentJobs) {
+    const statusLabel = j.status === "complete" ? "completed" : j.status === "error" ? "failed" : j.status === "processing" ? "started" : "queued";
+    items.push({
+      type: "production_job",
+      projectId: j.projectId,
+      projectTitle: projectMap.get(j.projectId) ?? "Unknown",
+      detail: `Production job ${statusLabel} (${j.styleId})`,
+      timestamp: j.updatedAt,
+    });
+  }
+
+  items.sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime());
+
+  return items.slice(0, 10);
 }

@@ -8,7 +8,7 @@
  * confirm the look before committing to the full pipeline.
  */
 import { useState, useRef, useCallback, useEffect } from "react";
-import { Link, useParams, useLocation } from "wouter";
+import { Link, useParams, useLocation, useSearch } from "wouter";
 import { trpc } from "@/lib/trpc";
 import { useAuth } from "@/_core/hooks/useAuth";
 import { getLoginUrl } from "@/const";
@@ -41,20 +41,30 @@ const ACCEPTED_TYPES = [
   // Plain text & markup
   "text/plain",
   "text/markdown",
+  "text/x-markdown",
   "text/html",
+  "application/xhtml+xml",
+  "text/xml",
+  "application/xml",
   "text/rtf",
   "application/rtf",
+  "application/x-rtf",
   // Excel / Spreadsheets
   "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
   "application/vnd.ms-excel",
   // Apple Numbers (zip-based)
   "application/vnd.apple.numbers",
+  "application/x-iwork-numbers-sffnumbers",
   // OpenDocument
   "application/vnd.oasis.opendocument.text",
   "application/vnd.oasis.opendocument.spreadsheet",
-  // CSV
+  // CSV / TSV
   "text/csv",
   "application/csv",
+  "text/tab-separated-values",
+  // Data formats
+  "application/json",
+  "text/json",
   // ePub
   "application/epub+zip",
   // Images
@@ -72,20 +82,52 @@ const ACCEPTED_TYPES = [
   "application/octet-stream",
 ];
 const ACCEPTED_EXT = [
-  ".docx", ".doc",
+  ".docx", ".doc", ".odt", ".pages",
   ".pdf",
-  ".txt", ".md", ".markdown", ".html", ".htm",
+  ".txt", ".text", ".log", ".asc",
+  ".md", ".markdown", ".mdx",
+  ".html", ".htm", ".xml",
   ".rtf",
   ".xlsx", ".xls",
   ".numbers",
-  ".odt", ".ods",
-  ".csv",
+  ".ods",
+  ".csv", ".tsv",
+  ".json", ".yaml", ".yml",
   ".epub",
   // Images
   ".png", ".jpg", ".jpeg", ".webp", ".tiff", ".tif", ".gif", ".svg",
   // Archives
   ".zip", ".rar",
 ].join(",");
+
+const FORMAT_BADGES = [
+  { label: "DOCX", group: "word" },
+  { label: "DOC", group: "word" },
+  { label: "ODT", group: "word" },
+  { label: "Pages", group: "word" },
+  { label: "PDF", group: "pdf" },
+  { label: "RTF", group: "rich" },
+  { label: "TXT", group: "text" },
+  { label: "MD", group: "markup" },
+  { label: "HTML", group: "markup" },
+  { label: "XML", group: "markup" },
+  { label: "CSV", group: "data" },
+  { label: "TSV", group: "data" },
+  { label: "JSON", group: "data" },
+  { label: "YAML", group: "data" },
+  { label: "XLSX", group: "sheet" },
+  { label: "XLS", group: "sheet" },
+  { label: "Numbers", group: "sheet" },
+  { label: "EPUB", group: "ebook" },
+  { label: "PNG", group: "image" },
+  { label: "JPG", group: "image" },
+  { label: "WebP", group: "image" },
+  { label: "SVG", group: "image" },
+  { label: "TIFF", group: "image" },
+  { label: "GIF", group: "image" },
+  { label: "ZIP", group: "archive" },
+  { label: "RAR", group: "archive" },
+] as const;
 
 function fileToBase64(file: File): Promise<string> {
   return new Promise((resolve, reject) => {
@@ -386,7 +428,7 @@ function JobCard({ jobId, projectId }: { jobId: number; projectId: number }) {
                       ))}
                     </div>
                     <p className="text-xs text-amber-700 mt-2">
-                      Supported formats: <strong>.docx</strong>, <strong>.pdf</strong>, <strong>.txt</strong>, <strong>.md</strong>, <strong>.html</strong>, <strong>.rtf</strong>, <strong>.epub</strong>
+                      Supported formats: <strong>.docx</strong>, <strong>.pdf</strong>, <strong>.txt</strong>, <strong>.md</strong>, <strong>.html</strong>, <strong>.rtf</strong>, <strong>.csv</strong>, <strong>.json</strong>, <strong>.xlsx</strong>, <strong>.odt</strong>, <strong>.epub</strong>
                     </p>
                   </div>
                 </div>
@@ -732,6 +774,7 @@ export default function AutoProduce() {
   const params = useParams<{ id: string }>();
   const projectId = parseInt(params.id ?? "0", 10);
   const [, navigate] = useLocation();
+  const searchString = useSearch();
   const { isAuthenticated, loading: authLoading } = useAuth();
 
   const { data: options } = trpc.autoProduce.options.useQuery();
@@ -755,6 +798,7 @@ export default function AutoProduce() {
   const [previewOpen, setPreviewOpen] = useState(false);
   const [styleAutoSelected, setStyleAutoSelected] = useState(false);
   const [trimAutoSelected, setTrimAutoSelected] = useState(false);
+  const [templateName, setTemplateName] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   // Generate / revoke object URL for image previews
@@ -772,6 +816,25 @@ export default function AutoProduce() {
     setPreviewUrl(url);
     return () => URL.revokeObjectURL(url);
   }, [selectedFile]);
+
+  useEffect(() => {
+    const urlParams = new URLSearchParams(searchString);
+    const paramStyle = urlParams.get("style");
+    const paramTrim = urlParams.get("trim");
+    const paramTemplate = urlParams.get("template");
+    if (paramStyle && !styleId) {
+      setStyleId(paramStyle);
+      setStyleAutoSelected(true);
+    }
+    if (paramTrim && !trimSizeId) {
+      setTrimSizeId(paramTrim);
+      setTrimAutoSelected(true);
+    }
+    if (paramTemplate) {
+      setTemplateName(paramTemplate);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   // Read ZIP contents when a .zip file is selected
   useEffect(() => {
@@ -907,7 +970,7 @@ export default function AutoProduce() {
 
   const project = projectData?.project;
   const canPreview = !!(trimSizeId && styleId);
-  const canSubmit = selectedFile && trimSizeId && styleId && !isSubmitting;
+  const canSubmit = selectedFile && trimSizeId && styleId && !isSubmitting && projectId > 0;
 
   return (
     <div className="min-h-screen bg-[#faf6ef]">
@@ -961,6 +1024,22 @@ export default function AutoProduce() {
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-6">
+            {templateName && (
+              <div className="flex items-center gap-3 rounded-lg border border-[#c9a96e]/30 bg-[#fdf9f3] px-4 py-3">
+                <Info className="w-4 h-4 text-[#c9a96e] flex-shrink-0" />
+                <p className="text-sm text-[#5c3d2e]">
+                  Pre-filled from CDP template: <strong className="text-[#3d2b1f]">{templateName}</strong>.
+                  {" "}Style and trim size have been set automatically — you can adjust them below.
+                </p>
+                <button
+                  onClick={() => setTemplateName(null)}
+                  className="ml-auto text-[#a89880] hover:text-[#5c3d2e] transition-colors p-0.5"
+                  aria-label="Dismiss"
+                >
+                  <X className="w-3.5 h-3.5" />
+                </button>
+              </div>
+            )}
             {/* Configuration row */}
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
               <div className="space-y-1.5">
@@ -1163,9 +1242,16 @@ export default function AutoProduce() {
                     <p className="text-xs text-[#8b7b6b] mt-1">
                       or click to browse — max {MAX_FILE_SIZE_MB}MB
                     </p>
-                    <p className="text-[10px] text-[#b09880] mt-1">
-                      Word · PDF · TXT · MD · HTML · RTF · XLSX · ODT · CSV · EPUB · PNG · JPG · WebP · SVG · TIFF · GIF · ZIP · RAR
-                    </p>
+                    <div className="flex flex-wrap justify-center gap-1 mt-2">
+                      {FORMAT_BADGES.map((f) => (
+                        <span
+                          key={f.label}
+                          className="inline-block text-[10px] px-1.5 py-0.5 rounded bg-[#f5ede4] border border-[#d4b896]/40 text-[#5c3d2e]"
+                        >
+                          {f.label}
+                        </span>
+                      ))}
+                    </div>
                   </div>
                 </div>
               )}
@@ -1190,7 +1276,16 @@ export default function AutoProduce() {
               )}
             </Button>
 
-            {(!trimSizeId || !styleId || !selectedFile) && (
+            {projectId === 0 && (
+              <div className="text-xs text-center text-[#b09880] space-y-1">
+                <p>You're previewing settings from a template.</p>
+                <Link href="/dashboard" className="text-[#8b5e3c] underline hover:text-[#6b4226]">
+                  Create a project first
+                </Link>
+                <span> to start production.</span>
+              </div>
+            )}
+            {projectId > 0 && (!trimSizeId || !styleId || !selectedFile) && (
               <p className="text-xs text-center text-[#b09880]">
                 {!selectedFile ? "Upload a manuscript file" : !trimSizeId ? "Select a trim size" : "Select a typesetting style"} to continue
               </p>
@@ -1233,7 +1328,7 @@ export default function AutoProduce() {
           <CardContent>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
               {[
-                { icon: FileText, step: "1. Parse", desc: "Extracts text from your .docx, .pdf, or .txt file" },
+                { icon: FileText, step: "1. Parse", desc: "Extracts text from 25+ formats including DOCX, PDF, TXT, MD, HTML, RTF, CSV, JSON, and more" },
                 { icon: Wand2, step: "2. Structure", desc: "AI detects chapters, frontmatter, and backmatter" },
                 { icon: BookOpen, step: "3. Typeset", desc: "Applies professional layout with your chosen style" },
                 { icon: Download, step: "4. Output", desc: "Renders press-ready interior PDF and EPUB ebook" },

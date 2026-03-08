@@ -149,6 +149,21 @@ export const ROUTE_META: Array<{ path: string; meta: RouteMeta }> = [
     },
   },
   {
+    path: "/print-specs",
+    meta: {
+      title: "Print Specs Generator — Create Design Publish",
+      description:
+        "Generate complete press-ready file specifications for your printer — trim size, bleed, safe zone, color mode, resolution, PDF/X standard, and preflight checklist.",
+      keywords:
+        "print specs, press-ready, file specifications, bleed, safe zone, PDF/X, self-publishing",
+      canonical: `${BASE}/print-specs`,
+      ogImage: OG_IMAGE,
+      ogType: "website",
+      twitterCard: "summary_large_image",
+      siteName: SITE_NAME,
+    },
+  },
+  {
     path: "/",
     meta: {
       title: "Create Design Publish — Self-Publishing Platform",

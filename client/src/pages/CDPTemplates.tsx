@@ -66,11 +66,9 @@ function TemplateCard({ template, onOpenWizard }: { template: CDPTemplate; onOpe
 
   function handleUseTemplate() {
     if (template.isBible) {
-      // Navigate to Bible Studio — it will read the URL param
       navigate(`/bible-studio?template=${template.id}&edition=${template.bibleEditionTypeId ?? ""}&style=${template.styleId}&trim=${template.trimSizeId}&paper=${template.paperTypeId}&binding=${template.bindingTypeId}`);
     } else {
-      // Open the CDP Production Wizard for non-Bible templates
-      onOpenWizard(template);
+      navigate(`/auto-produce/0?style=${encodeURIComponent(template.styleId)}&trim=${encodeURIComponent(template.trimSizeId)}&template=${encodeURIComponent(template.label)}`);
     }
   }
 

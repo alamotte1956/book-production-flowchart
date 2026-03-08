@@ -22,7 +22,7 @@ import {
 import { useIsMobile } from "@/hooks/useMobile";
 import {
   LayoutDashboard, LogOut, PanelLeft,
-  BookOpen, Ruler, Layers, BookMarked, Library, HelpCircle, LayoutGrid, Search,
+  BookOpen, Ruler, Layers, BookMarked, Library, HelpCircle, LayoutGrid, Search, FileText,
 } from "lucide-react";
 import { CSSProperties, useEffect, useRef, useState } from "react";
 import { useLocation } from "wouter";
@@ -38,6 +38,7 @@ const menuItems = [
   { icon: Layers, label: "Cover Designer", path: "/cover-designer" },
   { icon: BookMarked, label: "ISBN & Metadata", path: "/isbn-manager" },
   { icon: Search, label: "ISBN Lookup", path: "/isbn-lookup" },
+  { icon: FileText, label: "Print Specs", path: "/print-specs" },
   { icon: Library, label: "Resources", path: "/resources" },
   { icon: HelpCircle, label: "User Guide", path: "/guide" },
 ];

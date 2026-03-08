@@ -90,6 +90,11 @@ PostgreSQL via Replit's built-in database. Use `npx drizzle-kit push` to sync sc
 - **CDP Publisher Partners**: Harvest House, Tyndale, Zondervan, BronzeBow in Resources Hub
 - **CDP Genres**: Christian Living, Devotional, Children's Christian, Prayer, Pastoral, Biography, Academic/Theological, Music/Audio
 - **Amazon KDP Integration**: KDP-ready PDF with 0.125" bleed, KDP trim size validation, compliance checklist, cover template specs
+- **Print Specs**: Press-ready file specification generator with trim size, bleed, color mode, resolution, PDF/X standard
+- **Expanded Format Support**: 26 manuscript formats supported (DOCX, DOC, ODT, RTF, TXT, MD, HTML, CSV, JSON, YAML, etc.) with format badges in upload UI
+- **WhatsNext in Project Tracker**: Collapsible sidebar with contextual next-step suggestions
+- **Recent Activity Feed**: Dashboard feed showing latest step completions, uploads, and production jobs
+- **Template-to-AutoProduce Flow**: CDP Templates "Use This Template" pre-fills Auto-Produce style/trim via URL params
 - **Contact Form**: Public contact form on landing page
 
 ## Database Tables
