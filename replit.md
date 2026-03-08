@@ -27,8 +27,10 @@ A full-stack book production workflow management platform ("Manuscript to Master
 
 - **No login required for browsing** — a guest user (openId: "guest-default-user") is auto-created and used when no Replit Auth session exists
 - **Email-confirmed account required for checkout** — before Stripe checkout, users must register with name+email and confirm their email address
-- Registration flow: `account.register` creates user with `openId = "email-{email}"`, generates confirmation token, returns `confirmUrl`
+- Registration flow: `account.register` creates user with `openId = "email-{email}"`, generates confirmation token, sends real email via Resend
 - Email confirmation: `account.confirmEmail` validates token, sets `emailConfirmed = true`
+- Resend confirmation: `account.resendConfirmation` regenerates token and resends email (2-minute per-email cooldown enforced)
+- Email service: Resend integration (`server/resendClient.ts`) — branded HTML emails with confirm button + fallback link
 - Checkout gate: `stripe.createCheckoutSession` requires `confirmedUserId` and verifies `emailConfirmed` before proceeding
 - `CheckoutGate` modal component (`client/src/components/CheckoutGate.tsx`) handles the registration/confirmation flow inline on the Pricing page
 - Confirmation page at `/confirm-email?token=...` for link-based verification

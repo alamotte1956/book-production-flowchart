@@ -18,6 +18,7 @@ import { generateIdml } from "./idmlGenerator";
 import { invokeLLM } from "./_core/llm";
 import { lookupByIsbn } from "./isbnLookup";
 import { notifyOwner } from "./_core/notification";
+import { sendConfirmationEmail } from "./resendClient";
 import { createContactSubmission, saveWizardAnswers, getWizardAnswers, getRecentActivity, getDashboardStats, getUserById, updateUserStripeInfo, getUserByEmail, createEmailUser, confirmUserEmail, getUserByConfirmToken, getUserByCheckoutToken } from "./db";
 import { TRPCError } from "@trpc/server";
 import { getUncachableStripeClient, getStripePublishableKey } from "./stripeClient";
@@ -1058,7 +1059,22 @@ export const appRouter = router({
     }),
   }),
 
-  account: router({
+  account: (() => {
+    const emailCooldowns = new Map<string, number>();
+    const EMAIL_COOLDOWN_MS = 120_000;
+
+    function checkEmailCooldown(email: string) {
+      const lastSent = emailCooldowns.get(email.toLowerCase());
+      if (lastSent && Date.now() - lastSent < EMAIL_COOLDOWN_MS) {
+        const waitSecs = Math.ceil((EMAIL_COOLDOWN_MS - (Date.now() - lastSent)) / 1000);
+        throw new TRPCError({ code: "TOO_MANY_REQUESTS", message: `Please wait ${waitSecs} seconds before requesting another email.` });
+      }
+    }
+    function markEmailSent(email: string) {
+      emailCooldowns.set(email.toLowerCase(), Date.now());
+    }
+
+    return router({
     register: publicProcedure
       .input(z.object({
         name: z.string().min(1).max(200),
@@ -1075,6 +1091,8 @@ export const appRouter = router({
           return { status: "already_confirmed" as const, checkoutToken: existing.checkoutToken ?? "" };
         }
 
+        checkEmailCooldown(input.email);
+
         const token = nanoid(48);
         const user = await createEmailUser({
           name: input.name,
@@ -1086,6 +1104,16 @@ export const appRouter = router({
         const isDev = process.env.NODE_ENV === "development";
         if (isDev) {
           console.log(`[Email Confirmation][DEV] User ${input.email} → /confirm-email?token=${token}`);
+        }
+
+        try {
+          await sendConfirmationEmail(input.email, token, input.name);
+          markEmailSent(input.email);
+        } catch (emailErr) {
+          console.error("[Email] Failed to send confirmation:", emailErr);
+          if (!isDev) {
+            throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "Failed to send confirmation email. Please try again." });
+          }
         }
 
         return { status: "confirmation_needed" as const, userId: user.id, ...(isDev ? { confirmUrl: `/confirm-email?token=${token}` } : {}) };
@@ -1113,6 +1141,8 @@ export const appRouter = router({
           return { status: "already_confirmed" as const, checkoutToken: existing.checkoutToken ?? "" };
         }
 
+        checkEmailCooldown(input.email);
+
         const token = nanoid(48);
         await createEmailUser({
           name: existing.name ?? "",
@@ -1125,6 +1155,16 @@ export const appRouter = router({
           console.log(`[Email Confirmation][DEV][RESEND] User ${input.email} → /confirm-email?token=${token}`);
         }
 
+        try {
+          await sendConfirmationEmail(input.email, token, existing.name ?? "");
+          markEmailSent(input.email);
+        } catch (emailErr) {
+          console.error("[Email] Failed to resend confirmation:", emailErr);
+          if (!isDev) {
+            throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "Failed to send confirmation email. Please try again." });
+          }
+        }
+
         return { status: "resent" as const, ...(isDev ? { confirmUrl: `/confirm-email?token=${token}` } : {}) };
       }),
 
@@ -1135,7 +1175,8 @@ export const appRouter = router({
         if (!user) return { exists: false, confirmed: false };
         return { exists: true, confirmed: user.emailConfirmed };
       }),
-  }),
+  });
+  })(),
 
   stripe: router({
     getPublishableKey: publicProcedure.query(async () => {
