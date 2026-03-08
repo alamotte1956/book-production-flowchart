@@ -315,23 +315,23 @@ export default function Home() {
             <div className="flex items-center gap-3">
               <button
                 onClick={() => document.getElementById('features')?.scrollIntoView({ behavior: 'smooth' })}
-                className="text-sm text-[#c9a96e]/80 hover:text-[#c9a96e] transition-colors hidden md:block px-3 py-1.5"
+                className="font-serif text-sm text-[#c9a96e]/80 hover:text-[#c9a96e] transition-colors hidden md:block px-3 py-1.5"
               >
                 Features
               </button>
               <button
                 onClick={() => document.getElementById('tools-section')?.scrollIntoView({ behavior: 'smooth' })}
-                className="text-sm text-[#c9a96e]/80 hover:text-[#c9a96e] transition-colors hidden md:block px-3 py-1.5"
+                className="font-serif text-sm text-[#c9a96e]/80 hover:text-[#c9a96e] transition-colors hidden md:block px-3 py-1.5"
               >
                 Tools
               </button>
               <a href={getLoginUrl()}>
-                <button className="text-sm text-[#f5efe0] hover:text-white transition-colors px-4 py-1.5 rounded-md border border-[#c9a96e]/30 hover:border-[#c9a96e]/60">
+                <button className="font-serif text-sm text-[#f5efe0] hover:text-white transition-colors px-4 py-1.5 rounded-md border border-[#c9a96e]/30 hover:border-[#c9a96e]/60">
                   Sign In
                 </button>
               </a>
               <a href={getSignUpUrl()}>
-                <button className="text-sm bg-[#c9a96e] hover:bg-[#b8944f] text-[#1a1008] font-semibold px-4 py-1.5 rounded-md transition-colors">
+                <button className="font-serif text-sm bg-[#c9a96e] hover:bg-[#b8944f] text-[#1a1008] font-semibold px-4 py-1.5 rounded-md transition-colors">
                   Create Account
                 </button>
               </a>
@@ -374,7 +374,7 @@ export default function Home() {
               >
                 Manuscript to Masterpiece
               </p>
-              <p className="mt-5 font-sans text-lg md:text-xl text-[#d4c8b4] max-w-xl mx-auto leading-relaxed">
+              <p className="mt-5 font-serif text-lg md:text-xl text-[#d4c8b4] max-w-xl mx-auto leading-relaxed">
                 The all-in-one <strong className="text-[#f5d98a] font-semibold">self-publishing</strong> and <strong className="text-[#f5d98a] font-semibold">online publishing</strong> platform. Create, design, and publish your book — from first idea to finished volume.
               </p>
               <div className="mt-8 flex items-center justify-center gap-8 text-[#c9a96e]/80 font-serif text-lg">
@@ -403,7 +403,7 @@ export default function Home() {
                   className="flex flex-col items-center gap-1 text-[#c9a96e]/70 hover:text-[#c9a96e] transition-colors group"
                   aria-label="Learn more"
                 >
-                  <span className="text-sm font-sans tracking-widest uppercase">Learn More</span>
+                  <span className="text-sm font-serif tracking-widest uppercase">Learn More</span>
                   <motion.div
                     animate={{ y: [0, 6, 0] }}
                     transition={{ duration: 1.5, repeat: Infinity, ease: 'easeInOut' }}
@@ -420,7 +420,7 @@ export default function Home() {
         <div id="features" className="max-w-5xl mx-auto px-6 py-20">
           <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.6 }} className="text-center mb-14">
             <h2 className="font-serif text-3xl md:text-4xl text-[#3a2a1a]">Your Complete Self-Publishing Toolkit</h2>
-            <p className="mt-3 text-[#8b7b6b] max-w-lg mx-auto">Not just a flowchart — a real online publishing workspace where you create, design, and track every stage of your book's production.</p>
+            <p className="mt-3 font-serif text-[#8b7b6b] max-w-lg mx-auto">Not just a flowchart — a real online publishing workspace where you create, design, and track every stage of your book's production.</p>
           </motion.div>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
             {features.map((f, i) => (
@@ -430,7 +430,7 @@ export default function Home() {
                     <f.icon size={20} className="text-[#c9a96e]" />
                   </div>
                   <h3 className="font-serif text-lg text-[#3a2a1a] mb-2">{f.title}</h3>
-                  <p className="text-[15px] text-[#6b5f53] leading-relaxed">{f.desc}</p>
+                  <p className="font-serif text-[15px] text-[#6b5f53] leading-relaxed">{f.desc}</p>
                 </div>
               </motion.div>
             ))}
@@ -442,7 +442,7 @@ export default function Home() {
           <div className="max-w-5xl mx-auto px-6">
             <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.6 }} className="text-center mb-14">
               <h2 className="font-serif text-3xl md:text-4xl text-[#f5efe0]">8 Professional Self-Publishing Tools</h2>
-              <p className="mt-3 text-[#c9a96e]/80 max-w-lg mx-auto">Everything you need to create, design, and publish your book — all in one online publishing platform.</p>
+              <p className="mt-3 font-serif text-[#c9a96e]/80 max-w-lg mx-auto">Everything you need to create, design, and publish your book — all in one online publishing platform.</p>
             </motion.div>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
               {[
@@ -459,7 +459,7 @@ export default function Home() {
                   <div className="bg-[#3a2a1a] rounded-xl p-4 border border-[#c9a96e]/10 hover:border-[#c9a96e]/30 transition-colors h-full">
                     <tool.icon size={20} className="text-[#c9a96e] mb-2" />
                     <h3 className="font-serif text-base text-[#f5efe0] leading-tight">{tool.label}</h3>
-                    <p className="text-sm text-[#c9a96e]/60 mt-1 leading-relaxed">{tool.desc}</p>
+                    <p className="font-serif text-sm text-[#c9a96e]/60 mt-1 leading-relaxed">{tool.desc}</p>
                   </div>
                 </motion.div>
               ))}
@@ -471,7 +471,7 @@ export default function Home() {
         <div className="max-w-5xl mx-auto px-6 py-20">
           <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.6 }} className="text-center mb-14">
             <h2 className="font-serif text-3xl md:text-4xl text-[#3a2a1a]">Every Phase of Book Production</h2>
-            <p className="mt-3 text-[#8b7b6b] max-w-lg mx-auto">From the spark of an idea to a finished book in readers' hands — we've mapped every step.</p>
+            <p className="mt-3 font-serif text-[#8b7b6b] max-w-lg mx-auto">From the spark of an idea to a finished book in readers' hands — we've mapped every step.</p>
           </motion.div>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
             {phases.map((phase, i) => (
@@ -483,8 +483,8 @@ export default function Home() {
                     </span>
                     <h3 className="font-serif text-base text-[#3a2a1a]">{phase.title}</h3>
                   </div>
-                  <p className="text-sm text-[#6b5f53]">{phase.subtitle}</p>
-                  <p className="text-sm text-[#8b7b6b] mt-3">{phase.steps.length} steps · {phase.steps.reduce((a, s) => a + s.inputs.length, 0)} inputs</p>
+                  <p className="font-serif text-sm text-[#6b5f53]">{phase.subtitle}</p>
+                  <p className="font-serif text-sm text-[#8b7b6b] mt-3">{phase.steps.length} steps · {phase.steps.reduce((a, s) => a + s.inputs.length, 0)} inputs</p>
                 </div>
               </motion.div>
             ))}
@@ -497,11 +497,11 @@ export default function Home() {
             <div className="flex-1">
               <div className="flex items-center gap-2 mb-3">
                 <Sparkles size={18} className="text-[#c9a96e]" />
-                <span className="text-sm font-bold uppercase tracking-wider text-[#8b7b6b]">Resources & Success Hub</span>
+                <span className="font-serif text-sm font-bold uppercase tracking-wider text-[#8b7b6b]">Resources & Success Hub</span>
               </div>
             <h2 className="font-serif text-2xl md:text-3xl text-[#3a2a1a] mb-3">The Best Self-Publishing Resources</h2>
-            <p className="text-[#8b7b6b] leading-relaxed mb-4">We've curated the most trusted online publishing and self-publishing platforms across every phase — from Scrivener for writing to IngramSpark for distribution.</p>
-              <div className="flex flex-wrap gap-2 text-sm">
+            <p className="font-serif text-[#8b7b6b] leading-relaxed mb-4">We've curated the most trusted online publishing and self-publishing platforms across every phase — from Scrivener for writing to IngramSpark for distribution.</p>
+              <div className="flex flex-wrap gap-2 text-sm font-serif">
                 {["Scrivener", "Reedsy", "QueryTracker", "KDP", "IngramSpark", "BookBub", "NetGalley", "Goodreads"].map(t => (
                   <span key={t} className="px-2.5 py-1 rounded-full bg-[#f0e8d8] text-[#6b5f53]">{t}</span>
                 ))}
@@ -523,7 +523,7 @@ export default function Home() {
           <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.6 }}>
             <Sparkles size={32} className="mx-auto text-[#c9a96e] mb-4" />
             <h2 className="font-serif text-3xl text-[#3a2a1a] mb-3">Start Self-Publishing Today</h2>
-            <p className="text-[#8b7b6b] max-w-md mx-auto mb-8">Create your free account and use our online publishing platform to design, track, and publish your book — from manuscript to shelf.</p>
+            <p className="font-serif text-[#8b7b6b] max-w-md mx-auto mb-8">Create your free account and use our online publishing platform to design, track, and publish your book — from manuscript to shelf.</p>
             <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
               <a href={getSignUpUrl()}>
                 <Button size="lg" className="bg-[#c9a96e] hover:bg-[#b8944f] text-[#2a1a0a] font-semibold text-base px-10 py-6 rounded-lg">
@@ -550,13 +550,13 @@ export default function Home() {
                 />
                 <div>
                   <p className="font-serif text-[#f5d98a] text-base">Create Design Publish LLC</p>
-                  <p className="text-xs text-[#c9a96e]/60 uppercase tracking-widest">Manuscript to Masterpiece</p>
+                  <p className="font-serif text-xs text-[#c9a96e]/60 uppercase tracking-widest">Manuscript to Masterpiece</p>
                 </div>
               </div>
               <div className="flex flex-col items-center md:items-end gap-1 text-center md:text-right">
-                <a href="https://createdesignpublish.net" className="text-sm text-[#c9a96e]/70 hover:text-[#c9a96e] transition-colors">createdesignpublish.net</a>
-                <a href="mailto:gs@safarilegacy.org" className="text-sm text-[#c9a96e]/70 hover:text-[#c9a96e] transition-colors">gs@safarilegacy.org</a>
-                <p className="text-xs text-[#c9a96e]/50 mt-1">&copy; {new Date().getFullYear()} Create Design Publish LLC. All rights reserved.</p>
+                <a href="https://createdesignpublish.net" className="font-serif text-sm text-[#c9a96e]/70 hover:text-[#c9a96e] transition-colors">createdesignpublish.net</a>
+                <a href="mailto:gs@safarilegacy.org" className="font-serif text-sm text-[#c9a96e]/70 hover:text-[#c9a96e] transition-colors">gs@safarilegacy.org</a>
+                <p className="font-serif text-xs text-[#c9a96e]/50 mt-1">&copy; {new Date().getFullYear()} Create Design Publish LLC. All rights reserved.</p>
               </div>
             </div>
           </div>
