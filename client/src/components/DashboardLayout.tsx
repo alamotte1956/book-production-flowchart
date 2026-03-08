@@ -19,12 +19,11 @@ import { usePlan, type PlanFeature } from "@/hooks/usePlan";
 import {
   LayoutDashboard, PanelLeft,
   HelpCircle,
-  Sun, Moon, Bell, CheckCircle, Upload, Zap, CreditCard, Lock, ArrowUpRight,
+  Bell, CheckCircle, Upload, Zap, CreditCard, Lock, ArrowUpRight,
 } from "lucide-react";
 import { CSSProperties, useCallback, useEffect, useRef, useState } from "react";
 import { useLocation } from "wouter";
 import { DashboardLayoutSkeleton } from './DashboardLayoutSkeleton';
-import { useTheme } from "@/contexts/ThemeContext";
 import { Button } from "./ui/button";
 import { trpc } from "@/lib/trpc";
 import SiteFooter from "./SiteFooter";
@@ -206,7 +205,6 @@ function DashboardLayoutContent({
 }: DashboardLayoutContentProps) {
   const { user } = useAuth();
   const { isPublisher, plan, canAccess } = usePlan();
-  const { theme, toggleTheme } = useTheme();
   const [location, setLocation] = useLocation();
   const { state, toggleSidebar } = useSidebar();
   const isCollapsed = state === "collapsed";
@@ -311,22 +309,6 @@ function DashboardLayoutContent({
           </SidebarContent>
 
           <SidebarFooter className="p-3 bg-cream/50 border-t border-gold/15">
-            <button
-              onClick={toggleTheme}
-              className="flex items-center gap-3 rounded-lg px-3 py-2 hover:bg-gold/10 transition-colors w-full text-left text-walnut/80 group-data-[collapsible=icon]:justify-center focus:outline-none focus-visible:ring-2 focus-visible:ring-burgundy/30 mb-1"
-              aria-label={theme === "dark" ? "Switch to light mode" : "Switch to dark mode"}
-            >
-              {theme === "dark" ? (
-                <Sun className="h-4 w-4 text-gold shrink-0" />
-              ) : (
-                <Moon className="h-4 w-4 text-walnut/60 shrink-0" />
-              )}
-              {!isCollapsed && (
-                <span className="tracking-wide text-[13px]">
-                  {theme === "dark" ? "Light Mode" : "Dark Mode"}
-                </span>
-              )}
-            </button>
             {!isPublisher && !isCollapsed && (
               <button
                 onClick={() => setLocation("/pricing")}
