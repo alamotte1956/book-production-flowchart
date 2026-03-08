@@ -67,7 +67,7 @@ export default function LandingPage() {
             />
             <div className="hidden sm:block">
               <span className="font-serif text-[#f5d98a] text-lg tracking-wide">Easy Book Publishers</span>
-              <p className="text-[9px] uppercase tracking-[0.15em] text-[#c9a96e]/60 -mt-0.5">Manuscript to Masterpiece</p>
+              <p className="text-[9px] uppercase tracking-[0.15em] text-[#c9a96e]/80 -mt-0.5">Manuscript to Masterpiece</p>
             </div>
           </a>
           <div className="hidden md:flex items-center gap-6 text-sm">
@@ -123,7 +123,7 @@ export default function LandingPage() {
           <p className="font-serif text-2xl md:text-4xl lg:text-5xl text-[#f5efe0] mb-6 leading-tight">
             From Manuscript to <span className="text-[#f5d98a]">Masterpiece</span>
           </p>
-          <p className="text-lg md:text-xl text-[#d4c8b4]/80 max-w-2xl mx-auto mb-10">
+          <p className="text-lg md:text-xl text-[#d4c8b4] max-w-2xl mx-auto mb-10">
             Design, typeset, and produce print-ready books with professional AI-powered tools.
             No software to download. Works on any device.
           </p>
@@ -139,7 +139,7 @@ export default function LandingPage() {
             {stats.map((s) => (
               <div key={s.label} className="text-center">
                 <div className="font-serif text-3xl md:text-4xl text-[#f5d98a] font-bold">{s.value}</div>
-                <div className="text-xs text-[#d4c8b4]/60 uppercase tracking-wider mt-1">{s.label}</div>
+                <div className="text-xs text-[#d4c8b4]/80 uppercase tracking-wider mt-1">{s.label}</div>
               </div>
             ))}
           </div>
@@ -150,7 +150,7 @@ export default function LandingPage() {
         <div className="text-center mb-14">
           <Badge className="bg-[#c9a96e]/10 text-[#8b6914] border-[#c9a96e]/30 mb-3">How It Works</Badge>
           <h2 className="font-serif text-3xl md:text-4xl text-[#1a1008] mb-3">Four Steps to a Finished Book</h2>
-          <p className="text-[#5c4a2a]/70 max-w-xl mx-auto">From raw manuscript to professional, print-ready output in minutes — not months.</p>
+          <p className="text-[#5c4a2a]/85 max-w-xl mx-auto">From raw manuscript to professional, print-ready output in minutes — not months.</p>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
           {features.map((f, i) => (
@@ -160,7 +160,7 @@ export default function LandingPage() {
               </div>
               <div className="text-xs font-bold text-[#c9a96e] uppercase tracking-wider mb-2">Step {i + 1}</div>
               <h3 className="font-serif text-lg text-[#1a1008] font-semibold mb-2">{f.title}</h3>
-              <p className="text-sm text-[#5c4a2a]/70 leading-relaxed">{f.desc}</p>
+              <p className="text-sm text-[#5c4a2a]/85 leading-relaxed">{f.desc}</p>
             </div>
           ))}
         </div>
@@ -171,7 +171,7 @@ export default function LandingPage() {
           <div className="text-center mb-14">
             <Badge className="bg-[#c9a96e]/15 text-[#f5d98a] border-[#c9a96e]/30 mb-3">Professional Suite</Badge>
             <h2 className="font-serif text-3xl md:text-4xl text-[#f5efe0] mb-3">Publisher Tools Hub</h2>
-            <p className="text-[#d4c8b4]/60 max-w-xl mx-auto">Everything you need to create, design, and publish your book — all in one platform.</p>
+            <p className="text-[#d4c8b4]/80 max-w-xl mx-auto">Everything you need to create, design, and publish your book — all in one platform.</p>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5">
             {tools.map((tool) => (
@@ -185,10 +185,10 @@ export default function LandingPage() {
                     <div className="w-10 h-10 rounded-lg bg-[#c9a96e]/10 flex items-center justify-center">
                       <tool.icon className="w-5 h-5 text-[#c9a96e]" />
                     </div>
-                    <Badge variant="outline" className="text-[10px] border-[#c9a96e]/20 text-[#c9a96e]/70">{tool.badge}</Badge>
+                    <Badge variant="outline" className="text-[10px] border-[#c9a96e]/20 text-[#c9a96e]/90">{tool.badge}</Badge>
                   </div>
                   <h3 className="font-serif text-[#f5efe0] font-semibold mb-1 group-hover:text-[#f5d98a] transition-colors">{tool.label}</h3>
-                  <p className="text-xs text-[#d4c8b4]/50 leading-relaxed">{tool.desc}</p>
+                  <p className="text-xs text-[#d4c8b4]/70 leading-relaxed">{tool.desc}</p>
                   <div className="mt-3 text-[#c9a96e] text-xs flex items-center gap-1 group-hover:gap-2 transition-all">
                     Open <ChevronRight className="w-3 h-3" />
                   </div>
@@ -208,7 +208,7 @@ export default function LandingPage() {
         <div className="text-center mb-14">
           <Badge className="bg-[#c9a96e]/10 text-[#8b6914] border-[#c9a96e]/30 mb-3">Real Output Files</Badge>
           <h2 className="font-serif text-3xl md:text-4xl text-[#1a1008] mb-3">Production-Ready Exports</h2>
-          <p className="text-[#5c4a2a]/70 max-w-xl mx-auto">Not mockups. Not previews. Real, downloadable production files ready for print and distribution.</p>
+          <p className="text-[#5c4a2a]/85 max-w-xl mx-auto">Not mockups. Not previews. Real, downloadable production files ready for print and distribution.</p>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
           {outputFormats.map((fmt) => (
@@ -216,7 +216,7 @@ export default function LandingPage() {
               <CardContent className="p-5 text-center">
                 <FileText className="w-8 h-8 text-[#c9a96e] mx-auto mb-3" />
                 <h3 className="font-serif text-sm font-bold text-[#1a1008] mb-1">{fmt.name}</h3>
-                <p className="text-xs text-[#5c4a2a]/60 leading-relaxed">{fmt.desc}</p>
+                <p className="text-xs text-[#5c4a2a]/80 leading-relaxed">{fmt.desc}</p>
               </CardContent>
             </Card>
           ))}
@@ -239,7 +239,7 @@ export default function LandingPage() {
                     ))}
                   </div>
                   <p className="text-sm text-[#3a2a14] italic leading-relaxed mb-4">"{t.quote}"</p>
-                  <p className="text-xs text-[#5c4a2a]/60 font-medium">— {t.author}</p>
+                  <p className="text-xs text-[#5c4a2a]/80 font-medium">— {t.author}</p>
                 </CardContent>
               </Card>
             ))}
@@ -250,7 +250,7 @@ export default function LandingPage() {
       <section className="max-w-7xl mx-auto px-6 py-20">
         <div className="text-center mb-14">
           <h2 className="font-serif text-3xl md:text-4xl text-[#1a1008] mb-3">Where Do You Want to Go?</h2>
-          <p className="text-[#5c4a2a]/70 max-w-xl mx-auto">Choose your starting point</p>
+          <p className="text-[#5c4a2a]/85 max-w-xl mx-auto">Choose your starting point</p>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 max-w-5xl mx-auto">
           {[
@@ -269,7 +269,7 @@ export default function LandingPage() {
                   <item.icon className="w-6 h-6 text-[#c9a96e]" />
                 </div>
                 <h3 className="font-serif text-lg text-[#1a1008] font-semibold mb-2">{item.title}</h3>
-                <p className="text-sm text-[#5c4a2a]/70 leading-relaxed mb-4">{item.desc}</p>
+                <p className="text-sm text-[#5c4a2a]/85 leading-relaxed mb-4">{item.desc}</p>
                 <span className="text-sm text-[#c9a96e] font-semibold flex items-center justify-center gap-1 group-hover:gap-2 transition-all">
                   {item.cta} <ArrowRight className="w-4 h-4" />
                 </span>
@@ -282,7 +282,7 @@ export default function LandingPage() {
       <section className="bg-gradient-to-r from-[#1a1008] to-[#2a1a10] py-16">
         <div className="max-w-3xl mx-auto px-6 text-center">
           <h2 className="font-serif text-3xl md:text-4xl text-[#f5d98a] mb-4">Ready to Publish Your Book?</h2>
-          <p className="text-[#d4c8b4]/70 mb-8 max-w-xl mx-auto">
+          <p className="text-[#d4c8b4]/90 mb-8 max-w-xl mx-auto">
             Join thousands of authors and publishers who use Easy Book Publishers to create professional, print-ready books. Free to start — no credit card required.
           </p>
           <div className="flex flex-wrap justify-center gap-4">
@@ -297,7 +297,7 @@ export default function LandingPage() {
       </section>
 
       <section className="max-w-7xl mx-auto px-6 py-16">
-        <div className="flex flex-wrap justify-center gap-x-12 gap-y-4 text-sm text-[#5c4a2a]/50">
+        <div className="flex flex-wrap justify-center gap-x-12 gap-y-4 text-sm text-[#5c4a2a]/70">
           <button onClick={() => navigate("/guide")} className="hover:text-[#c9a96e] transition-colors">User Guide</button>
           <button onClick={() => navigate("/resources")} className="hover:text-[#c9a96e] transition-colors">Resources</button>
           <button onClick={() => navigate("/print-specs")} className="hover:text-[#c9a96e] transition-colors">Print Specs</button>
