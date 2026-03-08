@@ -287,7 +287,7 @@ function BookResultCard({
             <div className="flex items-center justify-between">
               <CardTitle className="flex items-center gap-2 text-base text-[#3b2a1a]">
                 <Sparkles className="w-4 h-4 text-[#7c3aed]" />
-                Suggested CDP Production Template
+                Suggested Production Template
               </CardTitle>
               {result.matchConfidence !== undefined && (
                 <ConfidenceBadge confidence={result.matchConfidence} />
@@ -333,7 +333,7 @@ function BookResultCard({
             </div>
 
             <p className="mt-3 text-xs text-[#b0a090] text-center">
-              This will open the Publishing Wizard pre-filled with this book's specs and the matched CDP template.
+              This will open the Publishing Wizard pre-filled with this book's specs and the matched template.
             </p>
           </CardContent>
         </Card>
@@ -439,7 +439,7 @@ export default function ISBNLookup() {
           </div>
           <p className="text-[#a08060] text-sm leading-relaxed">
             Enter any book's ISBN to retrieve its production specifications and get an instant
-            CDP template recommendation for recreating it.
+            template recommendation for recreating it.
           </p>
         </div>
       </div>

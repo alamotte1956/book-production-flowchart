@@ -605,7 +605,7 @@ export default function CDPProductionWizard({
           <div className="flex items-center justify-between">
             <DialogTitle className="font-serif text-[#3b2a1a] flex items-center gap-2">
               <BookOpen className="w-5 h-5 text-[#c9a96e]" />
-              CDP Production Wizard
+              Production Wizard
             </DialogTitle>
             <button
               onClick={onClose}

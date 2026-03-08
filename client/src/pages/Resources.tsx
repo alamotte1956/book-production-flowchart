@@ -447,7 +447,7 @@ const stats = [
   },
 ];
 
-// ─── CDP Publisher Partners ──────────────────────────────────────
+// ─── Publisher Partners ──────────────────────────────────────
 
 const publisherPartners = [
   {
@@ -658,14 +658,14 @@ export default function Resources() {
           </div>
         </section>
 
-        {/* CDP Publisher Partners */}
+        {/* Publisher Partners */}
         <section id="publisher-partners" className="scroll-mt-20">
           <div className="flex items-center gap-3 mb-2">
             <div className="w-10 h-10 rounded-full flex items-center justify-center bg-[#7c5cbf]/15 shrink-0">
               <Handshake size={20} className="text-[#7c5cbf]" />
             </div>
             <div>
-              <h2 className="font-serif text-2xl text-[#3a2a1a]">CDP Publisher Partners</h2>
+              <h2 className="font-serif text-2xl text-[#3a2a1a]">Publisher Partners</h2>
             </div>
           </div>
           <p className="text-sm text-[#8b7b6b] mb-6 max-w-2xl">

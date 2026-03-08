@@ -50,9 +50,9 @@ export default function HeroSection() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, delay: 0.4 }}
         >
-          Create Design
+          Easy Book
           <br />
-          <span className="text-[#c9a96e]">Publish LLC</span>
+          <span className="text-[#c9a96e]">Publishers</span>
         </motion.h1>
 
         {/* Subtitle */}

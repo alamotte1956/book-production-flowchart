@@ -99,7 +99,7 @@ function setMetaTag(name: string, content: string) {
   el.setAttribute("content", content);
 }
 
-const SITE_URL = "https://booksrus.manus.space";
+const SITE_URL = "https://easybookpublishers.com";
 
 const jsonLdSoftwareApp = {
   "@context": "https://schema.org",
@@ -245,7 +245,7 @@ const TOOLS = [
     path: "/isbn-lookup",
     icon: Search,
     label: "ISBN Book Lookup",
-    desc: "Enter any ISBN to retrieve a book's production specs and get an instant CDP template recommendation for recreating it.",
+    desc: "Enter any ISBN to retrieve a book's production specs and get an instant template recommendation for recreating it.",
     badge: "Lookup",
     badgeColor: "bg-indigo-100 text-indigo-800",
     dark: false,

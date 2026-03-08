@@ -2,7 +2,7 @@
  * CDP Book Templates
  * One-click presets for every book type Easy Book Publishers LLC has historically produced.
  * Each template pre-fills the Auto-Produce and Bible Studio settings so users can recreate
- * a CDP-style book in a single click.
+ * a professionally-styled book in a single click.
  */
 
 export type CDPTemplateCategory =
@@ -61,7 +61,7 @@ export const CDP_TEMPLATES: CDPTemplate[] = [
     category: "Bible Editions",
     tagline: "Wide margins, study notes, cross-references, concordance",
     description:
-      "The flagship CDP Bible format. Wide-margin layout with two-column text, extensive study notes in the outer margin, center-column cross-references, concordance, maps, and book introductions. Printed on thin-offset paper for manageable bulk.",
+      "The flagship Bible format. Wide-margin layout with two-column text, extensive study notes in the outer margin, center-column cross-references, concordance, maps, and book introductions. Printed on thin-offset paper for manageable bulk.",
     icon: "BookOpen",
     accentColor: "#7c3aed",
     styleId: "scripture-wide-margin",
@@ -218,7 +218,7 @@ export const CDP_TEMPLATES: CDPTemplate[] = [
     category: "Bible Editions",
     tagline: "Shirt-pocket size on ultra-thin India paper",
     description:
-      "The smallest CDP Bible format. Two-column layout at 9.5pt on 24lb India paper. Minimal margins, no cross-references. Flexible cover for easy carry. Perfect for travel, military, and outreach.",
+      "The smallest Bible format. Two-column layout at 9.5pt on 24lb India paper. Minimal margins, no cross-references. Flexible cover for easy carry. Perfect for travel, military, and outreach.",
     icon: "Package",
     accentColor: "#64748b",
     styleId: "scripture",
@@ -432,7 +432,7 @@ export const CDP_TEMPLATES: CDPTemplate[] = [
     category: "Christian Living",
     tagline: "Practical faith application for everyday believers",
     description:
-      "Standard trade paperback with Lora serif at 11.5pt. Chapter-based structure with application questions, pull quotes, and scripture references. The most common CDP non-Bible format.",
+      "Standard trade paperback with Lora serif at 11.5pt. Chapter-based structure with application questions, pull quotes, and scripture references. The most common non-Bible format.",
     icon: "Cross",
     accentColor: "#7c3aed",
     styleId: "christian-living",
