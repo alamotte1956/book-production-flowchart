@@ -951,7 +951,7 @@ export const appRouter = router({
         }
 
         console.log(
-          `[Contact] Submission #${submission.id} from ${input.email} — notified: ${notified}`
+          `[Contact] Submission #${submission.id} from ${input.email} → info@easybookpublishers.com — notified: ${notified}`
         );
 
         return { success: true, submissionId: submission.id };

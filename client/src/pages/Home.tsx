@@ -690,7 +690,7 @@ export default function Home() {
               <div className="text-center mb-10">
                 <Send size={28} className="mx-auto text-[#c9a96e] mb-4" />
                 <h2 className="font-serif text-3xl md:text-4xl text-[#f5efe0]">Get in Touch</h2>
-                <p className="mt-3 font-serif text-[#c9a96e]/80 max-w-md mx-auto">Have a question about self-publishing or our platform? We'd love to hear from you.</p>
+                <p className="mt-3 font-serif text-[#c9a96e]/80 max-w-md mx-auto">Have a question about self-publishing or our platform? We'd love to hear from you at <a href="mailto:info@easybookpublishers.com" className="underline text-[#c9a96e]">info@easybookpublishers.com</a>.</p>
               </div>
               {contactSent ? (
                 <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} className="text-center py-12">
