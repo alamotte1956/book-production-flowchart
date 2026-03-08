@@ -334,7 +334,7 @@ export default function Home() {
                 alt="Create Design Publish LLC"
                 className="h-10 w-auto object-contain"
               />
-              <span className="font-serif text-[#f5d98a] text-lg md:text-xl tracking-wide hidden sm:block">Create Design Publish LLC</span>
+              <span className="font-serif text-[#f5d98a] text-lg md:text-xl tracking-wide hidden sm:block">Easy Book Publishers</span>
             </div>
             <div className="flex items-center gap-3">
               <button
@@ -399,7 +399,7 @@ export default function Home() {
                   letterSpacing: "0.01em",
                 }}
               >
-                Create Design Publish
+                Easy Book Publishers
               </h1>
               <motion.div initial={{ opacity: 0, width: 0 }} animate={{ opacity: 1, width: "6rem" }} transition={{ delay: 0.5, duration: 0.8 }} className="mx-auto mt-4 h-0.5 bg-gradient-to-r from-transparent via-[#c9a96e] to-transparent" />
               <p
