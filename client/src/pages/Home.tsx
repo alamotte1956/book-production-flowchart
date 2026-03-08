@@ -806,8 +806,8 @@ export default function Home() {
                 </div>
               </div>
               <div className="flex flex-col items-center md:items-end gap-1 text-center md:text-right">
-                <a href="mailto:gs@safarilegacy.org" className="font-serif text-sm text-[#c9a96e]/70 hover:text-[#c9a96e] transition-colors">Easy Book Publishers</a>
-                <a href="mailto:gs@safarilegacy.org" className="font-serif text-sm text-[#c9a96e]/70 hover:text-[#c9a96e] transition-colors">gs@safarilegacy.org</a>
+                <a href="mailto:info@easybookpublishers.com" className="font-serif text-sm text-[#c9a96e]/70 hover:text-[#c9a96e] transition-colors">Easy Book Publishers</a>
+                <a href="mailto:info@easybookpublishers.com" className="font-serif text-sm text-[#c9a96e]/70 hover:text-[#c9a96e] transition-colors">info@easybookpublishers.com</a>
                 <p className="font-serif text-xs text-[#c9a96e]/50 mt-1">&copy; 2026 Easy Book Publishers. All rights reserved.</p>
               </div>
             </div>
