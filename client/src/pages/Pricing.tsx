@@ -111,7 +111,7 @@ const comparisonFeatures: Array<{ name: string; tooltip?: string; starter: strin
   { name: "EPUB Export", starter: false, author: true, publisher: true },
   { name: "Amazon KDP-Ready PDF", tooltip: "Print-ready PDF with bleed, margins, and trim for KDP", starter: false, author: true, publisher: true },
   { name: "Production Timeline", tooltip: "Gantt chart and deadline tracking for all 30 steps", starter: false, author: true, publisher: true },
-  { name: "CDP & KP&A Templates", tooltip: "Pre-configured book templates with style and trim presets", starter: false, author: true, publisher: true },
+  { name: "Book & KP&A Templates", tooltip: "Pre-configured book templates with style and trim presets", starter: false, author: true, publisher: true },
   { name: "Priority Email Support", starter: false, author: false, publisher: true },
   { name: "Dedicated Account Manager", starter: false, author: false, publisher: true },
   { name: "Custom Branding on Exports", starter: false, author: false, publisher: true },

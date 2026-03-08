@@ -412,7 +412,7 @@ export default function KPATemplates() {
             <Link href="/cdp-templates">
               <Button variant="outline" size="sm" className="gap-1 text-xs border-[#e8dfd0] text-[#5c3d2e] hover:bg-[#faf6ef]">
                 <BookOpen className="w-3 h-3" />
-                CDP Templates
+                Book Templates
               </Button>
             </Link>
           </div>

@@ -42,9 +42,6 @@ Required (auto-managed by Replit):
 - `SESSION_SECRET` — Session signing secret
 - `REPL_ID` — Replit app identifier (for OIDC client_id)
 
-Optional:
-- `VITE_ANALYTICS_ENDPOINT` — Analytics endpoint URL
-- `VITE_ANALYTICS_WEBSITE_ID` — Analytics website ID
 
 ## Database
 
@@ -87,14 +84,14 @@ PostgreSQL via Replit's built-in database. Use `npx drizzle-kit push` to sync sc
 - **AI Writing Assistant**: Generate back-cover blurbs, author bios, press releases, marketing copy in Project Tracker
 - **Typeface Pairings**: 8 professional font pairings in Bible Studio with one-click apply and live preview
 - **Format Conversion Suggestions**: Smart error guidance when Auto-Produce fails due to unsupported formats
-- **CDP Publisher Partners**: Harvest House, Tyndale, Zondervan, BronzeBow in Resources Hub
-- **CDP Genres**: Christian Living, Devotional, Children's Christian, Prayer, Pastoral, Biography, Academic/Theological, Music/Audio
+- **Publisher Partners**: Harvest House, Tyndale, Zondervan, BronzeBow in Resources Hub
+- **Book Genres**: Christian Living, Devotional, Children's Christian, Prayer, Pastoral, Biography, Academic/Theological, Music/Audio
 - **Amazon KDP Integration**: KDP-ready PDF with 0.125" bleed, KDP trim size validation, compliance checklist, cover template specs
 - **Print Specs**: Press-ready file specification generator with trim size, bleed, color mode, resolution, PDF/X standard
 - **Expanded Format Support**: 26 manuscript formats supported (DOCX, DOC, ODT, RTF, TXT, MD, HTML, CSV, JSON, YAML, etc.) with format badges in upload UI
 - **WhatsNext in Project Tracker**: Collapsible sidebar with contextual next-step suggestions
 - **Recent Activity Feed**: Dashboard feed showing latest step completions, uploads, and production jobs
-- **Template-to-AutoProduce Flow**: CDP Templates "Use This Template" pre-fills Auto-Produce style/trim via URL params
+- **Template-to-AutoProduce Flow**: Book Templates "Use This Template" pre-fills Auto-Produce style/trim via URL params
 - **Spine Calculator**: Interactive spine width calculator with visual diagram, paper PPI, binding type, cover boards
 - **Dashboard Command Center**: Stats bar (projects, steps, files, jobs) with real-time aggregated data
 - **User Guide**: 13-chapter comprehensive guide with TOC, expand/collapse, Print Specs chapter, FAQ
@@ -107,7 +104,7 @@ PostgreSQL via Replit's built-in database. Use `npx drizzle-kit push` to sync sc
 - **Guided Journey Dashboard**: New users see "Start Your Publishing Journey" CTA, wizard-completers see roadmap summary with retake option
 - **Project Duplication**: Duplicate button in Project Tracker creates project copy with "(Copy)" suffix
 - **Notification Center**: Bell icon in sidebar with unread count, popover dropdown, localStorage-based read tracking
-- **Pricing Page**: Three tiers (Free, Pro $19/mo, Enterprise) with feature comparison table
+- **Pricing Page**: Three tiers (Starter free, Author Pro $149 lifetime, Publisher $399 lifetime) with billing toggle, competitor comparison, and FAQ
 - **Getting Started Checklist**: New projects show 6-step onboarding checklist, auto-hides after 3 completed steps
 - **Resources Search & Filter**: Search bar with text highlighting, category filter pills (Writing, Editorial, Design, etc.)
 - **Contact Form**: Public contact form on landing page (backend wired to contact_submissions table)

@@ -1,5 +1,5 @@
 /**
- * CDP Book Templates
+ * Book Templates
  * A visual catalog of every book type Easy Book Publishers LLC has historically produced.
  * Each card shows the book type, key specs, and a "Use This Template" button that
  * navigates to the appropriate tool with settings pre-filled.
@@ -203,7 +203,7 @@ export default function CDPTemplates() {
               Dashboard
             </button>
             <span className="text-[#c9a96e]/20">/</span>
-            <span className="text-[#f5efe0] text-sm font-medium">CDP Book Templates</span>
+            <span className="text-[#f5efe0] text-sm font-medium">Book Templates</span>
           </div>
           <nav className="hidden md:flex items-center gap-1">
             {[
@@ -237,7 +237,7 @@ export default function CDPTemplates() {
             />
             <span className="text-[#c9a96e]/50 text-xs uppercase tracking-widest">Publishing Catalog</span>
           </div>
-          <h1 className="font-serif text-3xl md:text-4xl text-[#f5d98a] mb-3">CDP Book Templates</h1>
+          <h1 className="font-serif text-3xl md:text-4xl text-[#f5d98a] mb-3">Book Templates</h1>
           <p className="text-[#c9a96e]/70 text-sm max-w-2xl leading-relaxed">
             One-click presets for every book type Easy Book Publishers LLC has historically produced —
             from Study Bibles and Devotional Bibles to Christian Living books, children's titles,
@@ -320,7 +320,7 @@ export default function CDPTemplates() {
         {/* How to use section */}
         <Separator className="my-10 bg-[#e8dfd0]" />
         <section className="bg-white rounded-xl border border-[#e8dfd0] p-6 md:p-8">
-          <h2 className="font-serif text-lg font-bold text-[#3a2a1a] mb-4">How to Use CDP Templates</h2>
+          <h2 className="font-serif text-lg font-bold text-[#3a2a1a] mb-4">How to Use Book Templates</h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {[
               {

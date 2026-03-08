@@ -234,8 +234,8 @@ const TOOLS = [
     id: "cdp-templates",
     path: "/cdp-templates",
     icon: LayoutGrid,
-    label: "CDP Book Templates",
-    desc: "One-click presets for every book type CDP has published — Bibles, devotionals, children's books, theological works, and more.",
+    label: "Book Templates",
+    desc: "One-click presets for every book type — Bibles, devotionals, children's books, theological works, and more.",
     badge: "Templates",
     badgeColor: "bg-amber-100 text-amber-800",
     dark: false,
@@ -644,7 +644,7 @@ export default function Home() {
             </motion.div>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
               {[
-                { name: "Sarah Mitchell", role: "Author of 'Winds of Grace'", quote: "CDP streamlined my entire publishing process. From manuscript upload to print-ready PDF, everything was in one place. I published my debut novel in half the time I expected.", stars: 5 },
+                { name: "Sarah Mitchell", role: "Author of 'Winds of Grace'", quote: "Easy Book Publishers streamlined my entire publishing process. From manuscript upload to print-ready PDF, everything was in one place. I published my debut novel in half the time I expected.", stars: 5 },
                 { name: "Rev. James Okonkwo", role: "Bible Publisher", quote: "The Bible Design Studio is unmatched. I configured a custom study Bible with red-letter text, cross-references, and concordance — all with professional typesetting quality.", stars: 5 },
                 { name: "Elena Ramirez", role: "Children's Book Author", quote: "As a first-time author, the 30-step workflow kept me on track. The spine calculator and cover designer saved me from costly printing mistakes. Truly a game-changer.", stars: 5 },
               ].map((t, i) => (
@@ -906,7 +906,7 @@ export default function Home() {
 
         <nav className="px-3 py-4 flex flex-col gap-1">
           {[
-            { label: "CDP Templates", path: "/cdp-templates", icon: LayoutGrid, badge: "New" },
+            { label: "Book Templates", path: "/cdp-templates", icon: LayoutGrid, badge: "New" },
             { label: "KP&A Templates", path: "/kpa-templates", icon: LayoutGrid, badge: "KP&A" },
             { label: "Bible Design Studio", path: "/bible-studio", icon: BookOpen, badge: "Bible" },
             { label: "Spine Calculator", path: "/spine-calculator", icon: Ruler, badge: "Print" },

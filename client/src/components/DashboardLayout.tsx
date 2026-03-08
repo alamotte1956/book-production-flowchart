@@ -35,7 +35,7 @@ import { trpc } from "@/lib/trpc";
 
 const menuItems = [
   { icon: LayoutDashboard, label: "Dashboard", path: "/" },
-  { icon: LayoutGrid, label: "CDP Templates", path: "/cdp-templates" },
+  { icon: LayoutGrid, label: "Book Templates", path: "/cdp-templates" },
   { icon: LayoutGrid, label: "KP&A Templates", path: "/kpa-templates" },
   { icon: BookOpen, label: "Bible Studio", path: "/bible-studio" },
   { icon: Ruler, label: "Spine Calculator", path: "/spine-calculator" },
