@@ -21,7 +21,7 @@ export interface RouteMeta {
   siteName: string;
 }
 
-const BASE = "https://www.createdesignpublish.net";
+const BASE = "";
 const SITE_NAME = "Easy Book Publishers";
 const OG_IMAGE =
   "https://d2xsxph8kpxj0f.cloudfront.net/310519663211654017/kGjPju6hKCvCsjZhgUHyqj/og-preview-LrRyvCyZ6fWHwBLgjV9mdz.png";
