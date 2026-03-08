@@ -48,3 +48,4 @@ publicDir = "dist/public"
 [userenv]
 
 [userenv.shared]
+RESEND_API_KEY = "re_fVVzQhLh_C3dvmGckTWEqPDLRJ5xAUNDX"

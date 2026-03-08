@@ -1,53 +1,23 @@
 import { Resend } from 'resend';
 
-let connectionSettings: any;
-
-async function getCredentials() {
-  const hostname = process.env.REPLIT_CONNECTORS_HOSTNAME;
-  const xReplitToken = process.env.REPL_IDENTITY
-    ? 'repl ' + process.env.REPL_IDENTITY
-    : process.env.WEB_REPL_RENEWAL
-    ? 'depl ' + process.env.WEB_REPL_RENEWAL
-    : null;
-
-  if (!xReplitToken) {
-    throw new Error('X-Replit-Token not found for repl/depl');
+function getApiKey(): string {
+  const apiKey = process.env.RESEND_API_KEY;
+  if (!apiKey) {
+    throw new Error('RESEND_API_KEY environment variable is not set');
   }
-
-  const response = await fetch(
-    'https://' + hostname + '/api/v2/connection?include_secrets=true&connector_names=resend',
-    {
-      headers: {
-        'Accept': 'application/json',
-        'X-Replit-Token': xReplitToken
-      }
-    }
-  );
-
-  if (!response.ok) {
-    throw new Error(`Resend connector fetch failed: ${response.status} ${response.statusText}`);
-  }
-
-  const data = await response.json();
-  connectionSettings = data.items?.[0];
-
-  if (!connectionSettings || (!connectionSettings.settings.api_key)) {
-    throw new Error('Resend not connected');
-  }
-  return { apiKey: connectionSettings.settings.api_key, fromEmail: connectionSettings.settings.from_email };
+  return apiKey;
 }
 
-export async function getUncachableResendClient() {
-  const { apiKey, fromEmail } = await getCredentials();
+export function getUncachableResendClient() {
+  const apiKey = getApiKey();
   return {
     client: new Resend(apiKey),
-    fromEmail: fromEmail || 'noreply@easybookpublishers.com',
     brandFromEmail: 'Easy Book Publishers <noreply@easybookpublishers.com>',
   };
 }
 
 export async function sendConfirmationEmail(toEmail: string, token: string, userName: string) {
-  const { client, brandFromEmail } = await getUncachableResendClient();
+  const { client, brandFromEmail } = getUncachableResendClient();
 
   const confirmUrl = `https://easybookpublishers.com/confirm-email?token=${token}`;
 
