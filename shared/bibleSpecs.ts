@@ -1269,6 +1269,32 @@ export function getBibleStyles(): TypesettingStyle[] {
   return TYPESETTING_STYLES.filter(s => s.bibleStyle);
 }
 
+export const KDP_ACCEPTED_TRIM_SIZES: Array<{ widthIn: number; heightIn: number }> = [
+  { widthIn: 5, heightIn: 8 },
+  { widthIn: 5.06, heightIn: 7.81 },
+  { widthIn: 5.25, heightIn: 8 },
+  { widthIn: 5.5, heightIn: 8.5 },
+  { widthIn: 6, heightIn: 9 },
+  { widthIn: 6.14, heightIn: 9.21 },
+  { widthIn: 6.69, heightIn: 9.61 },
+  { widthIn: 7, heightIn: 10 },
+  { widthIn: 7.44, heightIn: 9.69 },
+  { widthIn: 7.5, heightIn: 9.25 },
+  { widthIn: 8, heightIn: 10 },
+  { widthIn: 8.25, heightIn: 6 },
+  { widthIn: 8.25, heightIn: 8.25 },
+  { widthIn: 8.5, heightIn: 8.5 },
+  { widthIn: 8.5, heightIn: 11 },
+];
+
+export function isKdpCompatible(trimSizeId: string): boolean {
+  const trim = TRIM_SIZES.find(t => t.id === trimSizeId);
+  if (!trim) return false;
+  return KDP_ACCEPTED_TRIM_SIZES.some(
+    k => k.widthIn === trim.widthIn && k.heightIn === trim.heightIn
+  );
+}
+
 /**
  * Calculate spine width in inches.
  * Formula: (pageCount / ppi) + (2 × coverBoardThicknessIn)

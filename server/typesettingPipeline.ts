@@ -27,17 +27,57 @@ export type ProduceOptions = {
   styleId: string;
   title: string;
   author: string;
+  includeBleed?: boolean;
+  estimatedPageCount?: number;
+  isbn?: string;
+  publisher?: string;
+  description?: string;
 };
 
 export type ProduceResult = {
   pdfBuffer: Buffer;
   epubBuffer: Buffer;
+  printReadyPdfBuffer?: Buffer;
   chapterCount: number;
   wordCount: number;
   parsedBook: ParsedBook;
   trimSize: TrimSize;
   style: TypesettingStyle;
 };
+
+const KDP_BLEED_IN = 0.125;
+
+function getKdpMinInsideMargin(pageCount: number): number {
+  if (pageCount >= 400) return 1.0;
+  if (pageCount >= 150) return 0.75;
+  return 0.375;
+}
+
+export type KdpTrimOverrides = {
+  widthIn: number;
+  heightIn: number;
+  marginTopIn: number;
+  marginBottomIn: number;
+  marginInsideIn: number;
+  marginOutsideIn: number;
+};
+
+export function computeKdpBleedTrim(trim: TrimSize, estimatedPageCount: number): KdpTrimOverrides {
+  const minInside = getKdpMinInsideMargin(estimatedPageCount);
+  const marginInsideIn = Math.max(trim.marginInsideIn, minInside);
+  const marginOutsideIn = Math.max(trim.marginOutsideIn, 0.25);
+  const marginTopIn = Math.max(trim.marginTopIn, 0.25);
+  const marginBottomIn = Math.max(trim.marginBottomIn, 0.25);
+
+  return {
+    widthIn: trim.widthIn + KDP_BLEED_IN,
+    heightIn: trim.heightIn + 2 * KDP_BLEED_IN,
+    marginTopIn: marginTopIn + KDP_BLEED_IN,
+    marginBottomIn: marginBottomIn + KDP_BLEED_IN,
+    marginInsideIn,
+    marginOutsideIn: marginOutsideIn + KDP_BLEED_IN,
+  };
+}
 
 // ─── Pipeline stage error wrapper ────────────────────────────────────────────
 
@@ -197,15 +237,15 @@ function textToHtmlParagraphsScripture(text: string): string {
 export function generateBookHtml(
   book: ParsedBook,
   trim: TrimSize,
-  style: TypesettingStyle
+  style: TypesettingStyle,
+  bleedOverrides?: KdpTrimOverrides
 ): string {
-  const DPI = 96;
-  const pageW = trim.widthIn * DPI;
-  const pageH = trim.heightIn * DPI;
-  const marginTop = trim.marginTopIn * DPI;
-  const marginBottom = trim.marginBottomIn * DPI;
-  const marginInside = trim.marginInsideIn * DPI;
-  const marginOutside = trim.marginOutsideIn * DPI;
+  const pageWidthIn = bleedOverrides?.widthIn ?? trim.widthIn;
+  const pageHeightIn = bleedOverrides?.heightIn ?? trim.heightIn;
+  const mTopIn = bleedOverrides?.marginTopIn ?? trim.marginTopIn;
+  const mBottomIn = bleedOverrides?.marginBottomIn ?? trim.marginBottomIn;
+  const mInsideIn = bleedOverrides?.marginInsideIn ?? trim.marginInsideIn;
+  const mOutsideIn = bleedOverrides?.marginOutsideIn ?? trim.marginOutsideIn;
 
   const isScripture = style.doubleColumn && style.verseNumbers;
 
@@ -246,32 +286,38 @@ export function generateBookHtml(
       </section>`
     : "";
 
+  const bleedMarks = "";
+
+  const trimMetaTag = bleedOverrides
+    ? `\n  <!-- KDP Print-Ready: trim ${trim.widthIn}×${trim.heightIn}in, bleed ${KDP_BLEED_IN}in outside/top/bottom -->`
+    : "";
+
   return `<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>${escapeHtml(book.title)}</title>
+  <title>${escapeHtml(book.title)}</title>${trimMetaTag}
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link href="${style.googleFontsUrl}" rel="stylesheet" />
   <style>
     @page {
-      size: ${trim.widthIn}in ${trim.heightIn}in;
-      margin-top: ${trim.marginTopIn}in;
-      margin-bottom: ${trim.marginBottomIn}in;
-      margin-left: ${trim.marginInsideIn}in;
-      margin-right: ${trim.marginOutsideIn}in;
+      size: ${pageWidthIn}in ${pageHeightIn}in;
+      margin-top: ${mTopIn}in;
+      margin-bottom: ${mBottomIn}in;
+      margin-left: ${mInsideIn}in;
+      margin-right: ${mOutsideIn}in;${bleedMarks}
     }
     @page :left {
-      margin-left: ${trim.marginOutsideIn}in;
-      margin-right: ${trim.marginInsideIn}in;
+      margin-left: ${mOutsideIn}in;
+      margin-right: ${mInsideIn}in;
     }
     @page :right {
-      margin-left: ${trim.marginInsideIn}in;
-      margin-right: ${trim.marginOutsideIn}in;
+      margin-left: ${mInsideIn}in;
+      margin-right: ${mOutsideIn}in;
     }
     * { box-sizing: border-box; margin: 0; padding: 0; }
     html, body {
-      width: ${trim.widthIn}in;
+      width: ${pageWidthIn}in;
       font-family: ${style.fontFamily};
       font-size: ${style.fontSize}pt;
       line-height: ${style.lineHeight};
@@ -283,7 +329,7 @@ export function generateBookHtml(
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      min-height: ${trim.heightIn - trim.marginTopIn - trim.marginBottomIn}in;
+      min-height: ${pageHeightIn - mTopIn - mBottomIn}in;
       text-align: center;
       page-break-after: always;
     }
@@ -403,7 +449,7 @@ export function generateBookHtml(
 
 // ─── Step 3: PDF Rendering via Puppeteer ─────────────────────────────────────
 
-export async function renderToPdf(html: string, trim: TrimSize): Promise<Buffer> {
+export async function renderToPdf(html: string, trim: TrimSize, bleedOverrides?: KdpTrimOverrides): Promise<Buffer> {
   return runStage("pdf-rendering", async () => {
     // /usr/bin/chromium-browser is a shell wrapper; puppeteer-core v24+ requires the actual binary
     const chromiumPath =
@@ -441,25 +487,36 @@ export async function renderToPdf(html: string, trim: TrimSize): Promise<Buffer>
       // Wait for fonts to load
       await page.evaluateHandle("document.fonts.ready");
 
+      const pW = bleedOverrides?.widthIn ?? trim.widthIn;
+      const pH = bleedOverrides?.heightIn ?? trim.heightIn;
+      const pMT = bleedOverrides?.marginTopIn ?? trim.marginTopIn;
+      const pMB = bleedOverrides?.marginBottomIn ?? trim.marginBottomIn;
+      const pML = bleedOverrides?.marginInsideIn ?? trim.marginInsideIn;
+      const pMR = bleedOverrides?.marginOutsideIn ?? trim.marginOutsideIn;
+
+      const isKdpPrint = !!bleedOverrides;
+
       let pdfBuffer: Uint8Array;
       try {
         pdfBuffer = await page.pdf({
-          width: `${trim.widthIn}in`,
-          height: `${trim.heightIn}in`,
+          width: `${pW}in`,
+          height: `${pH}in`,
           printBackground: true,
           margin: {
-            top: `${trim.marginTopIn}in`,
-            bottom: `${trim.marginBottomIn}in`,
-            left: `${trim.marginInsideIn}in`,
-            right: `${trim.marginOutsideIn}in`,
+            top: `${pMT}in`,
+            bottom: `${pMB}in`,
+            left: `${pML}in`,
+            right: `${pMR}in`,
           },
-          displayHeaderFooter: true,
-          headerTemplate: `<div style="font-size:8pt;font-family:serif;width:100%;text-align:center;color:#555;padding:0 ${trim.marginInsideIn}in;"></div>`,
-          footerTemplate: `<div style="font-size:8pt;font-family:serif;width:100%;text-align:center;color:#555;padding:0 ${trim.marginInsideIn}in;"><span class="pageNumber"></span></div>`,
+          displayHeaderFooter: !isKdpPrint,
+          ...(isKdpPrint ? {} : {
+            headerTemplate: `<div style="font-size:8pt;font-family:serif;width:100%;text-align:center;color:#555;padding:0 ${pML}in;"></div>`,
+            footerTemplate: `<div style="font-size:8pt;font-family:serif;width:100%;text-align:center;color:#555;padding:0 ${pML}in;"><span class="pageNumber"></span></div>`,
+          }),
         });
       } catch (pdfErr: unknown) {
         const msg = pdfErr instanceof Error ? pdfErr.message : String(pdfErr);
-        throw new Error(`Puppeteer PDF generation failed (trim: ${trim.widthIn}×${trim.heightIn}in): ${msg}`);
+        throw new Error(`Puppeteer PDF generation failed (trim: ${pW}×${pH}in): ${msg}`);
       }
 
       return Buffer.from(pdfBuffer);
@@ -471,9 +528,47 @@ export async function renderToPdf(html: string, trim: TrimSize): Promise<Buffer>
 
 // ─── Step 4: EPUB Generation ─────────────────────────────────────────────────
 
-export async function renderToEpub(book: ParsedBook, style: TypesettingStyle): Promise<Buffer> {
+export type EpubMetadata = {
+  isbn?: string;
+  publisher?: string;
+  description?: string;
+};
+
+function generateCopyrightPageHtml(book: ParsedBook, meta: EpubMetadata): string {
+  const year = new Date().getFullYear();
+  const publisher = meta.publisher || "Create Design Publish LLC";
+  const lines = [
+    `<div style="text-align:center;margin-top:2em;">`,
+    `<p style="font-size:1.2em;font-weight:bold;margin-bottom:1em;">${escapeHtml(book.title)}</p>`,
+    `<p style="margin-bottom:2em;">by ${escapeHtml(book.author)}</p>`,
+    `<p style="margin-bottom:0.5em;">&copy; ${year} ${escapeHtml(book.author)}. All rights reserved.</p>`,
+    `<p style="margin-bottom:0.5em;">Published by ${escapeHtml(publisher)}</p>`,
+  ];
+  if (meta.isbn) {
+    lines.push(`<p style="margin-bottom:0.5em;">ISBN: ${escapeHtml(meta.isbn)}</p>`);
+  }
+  lines.push(
+    `<p style="margin-bottom:0.5em;font-size:0.85em;">No part of this publication may be reproduced, distributed, or transmitted in any form or by any means, including photocopying, recording, or other electronic or mechanical methods, without the prior written permission of the publisher, except in the case of brief quotations embodied in critical reviews and certain other noncommercial uses permitted by copyright law.</p>`,
+    `</div>`
+  );
+  return lines.join("\n");
+}
+
+function generateTocNavHtml(chapters: Array<{ title?: string; content: string }>): string {
+  const items = chapters.map((ch, i) =>
+    `<li><a href="chapter-${i}.xhtml">${escapeHtml(ch.title || `Chapter ${i}`)}</a></li>`
+  ).join("\n      ");
+  return `<nav epub:type="toc" id="toc">
+    <h1>Table of Contents</h1>
+    <ol>
+      ${items}
+    </ol>
+  </nav>`;
+}
+
+export async function renderToEpub(book: ParsedBook, style: TypesettingStyle, meta?: EpubMetadata): Promise<Buffer> {
   return runStage("epub-generation", async () => {
-    // Dynamic import to avoid issues with ESM
+    const epubMeta = meta || {};
     let EpubModule: { default: (...args: unknown[]) => Promise<Uint8Array> };
     try {
       EpubModule = await import("epub-gen-memory") as typeof EpubModule;
@@ -483,18 +578,37 @@ export async function renderToEpub(book: ParsedBook, style: TypesettingStyle): P
     }
     const Epub = EpubModule.default;
 
-    const content: Array<{ title?: string; content: string }> = book.chapters.map(ch => ({
-      title: ch.title || `Chapter ${ch.number}`,
-      content: `<div>${ch.body.split(/\n{2,}/).map(p =>
-        `<p style="text-indent:1.5em;margin:0;text-align:justify;">${escapeHtml(p.trim().replace(/\n/g, " "))}</p>`
-      ).join("")}</div>`,
-    }));
+    const content: Array<{ title?: string; content: string }> = [];
+
+    content.push({
+      title: "Copyright",
+      content: generateCopyrightPageHtml(book, epubMeta),
+    });
+
+    content.push({
+      title: "Table of Contents",
+      content: generateTocNavHtml(
+        book.chapters.map(ch => ({
+          title: ch.title || `Chapter ${ch.number}`,
+          content: "",
+        }))
+      ),
+    });
 
     if (book.frontmatter?.trim()) {
-      content.unshift({
+      content.push({
         title: "Introduction",
         content: `<div>${book.frontmatter.split(/\n{2,}/).map(p =>
           `<p style="text-indent:1.5em;margin:0;">${escapeHtml(p.trim())}</p>`
+        ).join("")}</div>`,
+      });
+    }
+
+    for (const ch of book.chapters) {
+      content.push({
+        title: ch.title || `Chapter ${ch.number}`,
+        content: `<div>${ch.body.split(/\n{2,}/).map(p =>
+          `<p style="text-indent:1.5em;margin:0;text-align:justify;">${escapeHtml(p.trim().replace(/\n/g, " "))}</p>`
         ).join("")}</div>`,
       });
     }
@@ -508,19 +622,35 @@ export async function renderToEpub(book: ParsedBook, style: TypesettingStyle): P
       });
     }
 
+    const publisher = epubMeta.publisher || "Create Design Publish LLC";
+    const description = epubMeta.description || `${book.title} by ${book.author}`;
+    const publishDate = new Date().toISOString().split("T")[0];
+
+    const epubOptions: Record<string, unknown> = {
+      title: book.title,
+      author: book.author,
+      publisher,
+      description,
+      lang: "en",
+      date: publishDate,
+      css: `
+        body { font-family: ${style.fontFamily}; font-size: 1em; line-height: ${style.lineHeight}; color: ${style.bodyColor}; }
+        h1 { font-family: ${style.chapterHeadingFont}; font-size: 1.5em; color: ${style.headingColor}; text-align: center; margin: 1em 0; }
+        p { text-indent: 1.5em; margin: 0; text-align: justify; }
+        nav#toc ol { list-style-type: none; padding-left: 0; }
+        nav#toc li { margin-bottom: 0.5em; }
+        nav#toc a { text-decoration: none; color: inherit; }
+      `,
+    };
+
+    if (epubMeta.isbn) {
+      epubOptions.identifier = epubMeta.isbn;
+    }
+
     let epubBuffer: Uint8Array;
     try {
       epubBuffer = await Epub(
-        {
-          title: book.title,
-          author: book.author,
-          lang: "en",
-          css: `
-            body { font-family: ${style.fontFamily}; font-size: 1em; line-height: ${style.lineHeight}; color: ${style.bodyColor}; }
-            h1 { font-family: ${style.chapterHeadingFont}; font-size: 1.5em; color: ${style.headingColor}; text-align: center; margin: 1em 0; }
-            p { text-indent: 1.5em; margin: 0; text-align: justify; }
-          `,
-        },
+        epubOptions,
         content
       );
     } catch (epubErr: unknown) {
@@ -558,7 +688,7 @@ export async function produceBook(
   // Step 1: Parse chapters with AI
   const book = await detectChapters(rawText, options.title, options.author);
 
-  // Step 2: Generate HTML (synchronous — wrap in try/catch for safety)
+  // Step 2: Generate screen HTML (synchronous — wrap in try/catch for safety)
   let html: string;
   try {
     html = generateBookHtml(book, trim!, style!);
@@ -567,21 +697,47 @@ export async function produceBook(
     throw new Error(`[Stage: html-generation] Failed to build book HTML: ${msg}`);
   }
 
-  // Step 3: Render PDF and EPUB — the individual stage wrappers already prefix
-  // the message with [Stage: ...] so the caller can identify the failure point.
-  const [pdfBuffer, epubBuffer] = await Promise.all([
-    renderToPdf(html, trim!),
-    renderToEpub(book, style!),
-  ]);
-
+  const includeBleed = options.includeBleed ?? true;
   const wordCount = book.chapters.reduce(
     (acc, ch) => acc + ch.body.split(/\s+/).filter(Boolean).length,
     0
   );
+  const estimatedPageCount = options.estimatedPageCount ?? Math.ceil(wordCount / 250);
+
+  // Step 3: Render PDF and EPUB — the individual stage wrappers already prefix
+  // the message with [Stage: ...] so the caller can identify the failure point.
+  const renderTasks: Promise<Buffer>[] = [
+    renderToPdf(html, trim!),
+    renderToEpub(book, style!, {
+      isbn: options.isbn,
+      publisher: options.publisher,
+      description: options.description,
+    }),
+  ];
+
+  let printReadyPdfPromise: Promise<Buffer> | undefined;
+  if (includeBleed) {
+    const bleedOverrides = computeKdpBleedTrim(trim!, estimatedPageCount);
+    let bleedHtml: string;
+    try {
+      bleedHtml = generateBookHtml(book, trim!, style!, bleedOverrides);
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : String(err);
+      throw new Error(`[Stage: html-generation-kdp] Failed to build KDP bleed HTML: ${msg}`);
+    }
+    printReadyPdfPromise = renderToPdf(bleedHtml, trim!, bleedOverrides);
+    renderTasks.push(printReadyPdfPromise);
+  }
+
+  const results = await Promise.all(renderTasks);
+  const pdfBuffer = results[0];
+  const epubBuffer = results[1];
+  const printReadyPdfBuffer = includeBleed ? results[2] : undefined;
 
   return {
     pdfBuffer,
     epubBuffer,
+    printReadyPdfBuffer,
     chapterCount: book.chapters.length,
     wordCount,
     parsedBook: book,

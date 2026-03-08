@@ -123,6 +123,8 @@ export const productionJobs = pgTable("production_jobs", {
   epubUrl: text("epubUrl"),
   pdfKey: varchar("pdfKey", { length: 512 }),
   epubKey: varchar("epubKey", { length: 512 }),
+  kdpPdfUrl: text("kdpPdfUrl"),
+  kdpPdfKey: varchar("kdpPdfKey", { length: 512 }),
   idmlUrl: text("idmlUrl"),
   idmlKey: varchar("idmlKey", { length: 512 }),
   errorMessage: text("errorMessage"),

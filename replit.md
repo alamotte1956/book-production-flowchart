@@ -89,6 +89,7 @@ PostgreSQL via Replit's built-in database. Use `npx drizzle-kit push` to sync sc
 - **Format Conversion Suggestions**: Smart error guidance when Auto-Produce fails due to unsupported formats
 - **CDP Publisher Partners**: Harvest House, Tyndale, Zondervan, BronzeBow in Resources Hub
 - **CDP Genres**: Christian Living, Devotional, Children's Christian, Prayer, Pastoral, Biography, Academic/Theological, Music/Audio
+- **Amazon KDP Integration**: KDP-ready PDF with 0.125" bleed, KDP trim size validation, compliance checklist, cover template specs
 - **Contact Form**: Public contact form on landing page
 
 ## Database Tables

@@ -613,13 +613,14 @@ export const appRouter = router({
             await updateProductionJob(job.id, { wordCount: parsed.wordCount });
 
             // Step 2: Run the full AI typesetting pipeline (chapter detection + PDF + EPUB + IDML)
-            const { pdfBuffer, epubBuffer, chapterCount, wordCount, parsedBook, trimSize: prodTrimSize, style: prodStyle } = await produceBook(
+            const { pdfBuffer, epubBuffer, printReadyPdfBuffer, chapterCount, wordCount, parsedBook, trimSize: prodTrimSize, style: prodStyle } = await produceBook(
               parsed.text,
               {
                 trimSizeId: input.trimSizeId,
                 styleId: input.styleId,
                 title: project.title,
                 author: project.author ?? "Unknown Author",
+                includeBleed: true,
               }
             );
 
@@ -636,6 +637,13 @@ export const appRouter = router({
               const { url: pdfUrl } = await storagePut(pdfKey, pdfBuffer, "application/pdf");
               updates.pdfUrl = pdfUrl;
               updates.pdfKey = pdfKey;
+
+              if (printReadyPdfBuffer) {
+                const kdpPdfKey = `output/${input.projectId}/${job.id}-interior-kdp.pdf`;
+                const { url: kdpPdfUrl } = await storagePut(kdpPdfKey, printReadyPdfBuffer, "application/pdf");
+                updates.kdpPdfUrl = kdpPdfUrl;
+                updates.kdpPdfKey = kdpPdfKey;
+              }
             }
 
             // Upload EPUB if requested
@@ -743,15 +751,20 @@ export const appRouter = router({
             const mimeType = mimeMap[ext] ?? "application/octet-stream";
             const parsed = await parseManuscript(buffer, mimeType, originalJob.manuscriptFileName ?? "manuscript");
             await updateProductionJob(newJob.id, { wordCount: parsed.wordCount });
-            const { pdfBuffer, epubBuffer, chapterCount, wordCount, parsedBook, trimSize: prodTrimSize, style: prodStyle } = await produceBook(
+            const { pdfBuffer, epubBuffer, printReadyPdfBuffer: prPdf, chapterCount, wordCount, parsedBook, trimSize: prodTrimSize, style: prodStyle } = await produceBook(
               parsed.text,
-              { trimSizeId: originalJob.trimSizeId, styleId: originalJob.styleId, title: project.title, author: project.author ?? "Unknown Author" }
+              { trimSizeId: originalJob.trimSizeId, styleId: originalJob.styleId, title: project.title, author: project.author ?? "Unknown Author", includeBleed: true }
             );
             await updateProductionJob(newJob.id, { wordCount, chapterCount });
             const updates: Record<string, unknown> = { status: "complete" };
             const pdfKey = `output/${originalJob.projectId}/${newJob.id}-interior.pdf`;
             const { url: pdfUrl } = await storagePut(pdfKey, pdfBuffer, "application/pdf");
             updates.pdfUrl = pdfUrl; updates.pdfKey = pdfKey;
+            if (prPdf) {
+              const kdpKey = `output/${originalJob.projectId}/${newJob.id}-interior-kdp.pdf`;
+              const { url: kdpUrl } = await storagePut(kdpKey, prPdf, "application/pdf");
+              updates.kdpPdfUrl = kdpUrl; updates.kdpPdfKey = kdpKey;
+            }
             const epubKey = `output/${originalJob.projectId}/${newJob.id}-ebook.epub`;
             const { url: epubUrl } = await storagePut(epubKey, epubBuffer, "application/epub+zip");
             updates.epubUrl = epubUrl; updates.epubKey = epubKey;

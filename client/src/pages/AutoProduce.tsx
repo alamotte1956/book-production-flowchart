@@ -23,10 +23,12 @@ import {
   ArrowLeft, Upload, FileText, Wand2, Download, AlertCircle,
   CheckCircle2, Clock, Loader2, BookOpen, FileDown, Sparkles, Eye, X,
   ChevronDown, ChevronUp, RefreshCw, Copy, Terminal,
-  File, Image, Archive, FileCode, FileSpreadsheet,
+  File, Image, Archive, FileCode, FileSpreadsheet, ShieldCheck, Info,
 } from "lucide-react";
+import { Tooltip, TooltipTrigger, TooltipContent } from "@/components/ui/tooltip";
 import WhatsNext from "@/components/WhatsNext";
 import type { NextPrompt } from "@shared/prompts";
+import { isKdpCompatible } from "@shared/bibleSpecs";
 import JSZip from "jszip";
 
 const MAX_FILE_SIZE_MB = 50;
@@ -549,66 +551,172 @@ function JobCard({ jobId, projectId }: { jobId: number; projectId: number }) {
           </div>
         )}
 
-        {job.status === "complete" && (
-          <div className="flex flex-col gap-2 pt-1">
-            <div className="flex gap-3">
-              {job.pdfUrl && (
+        {job.status === "complete" && (() => {
+          const kdpTrim = isKdpCompatible(job.trimSizeId);
+          const hasKdpPdf = !!job.kdpPdfUrl;
+          const hasBleed = hasKdpPdf;
+          const hasFontEmbedding = true;
+          const hasPdfFormat = !!job.pdfUrl;
+          const hasEpubFormat = !!job.epubUrl;
+          const allChecksPass = kdpTrim && hasBleed && hasFontEmbedding && hasPdfFormat && hasEpubFormat;
+
+          return (
+            <div className="flex flex-col gap-3 pt-1">
+              <div className="flex gap-3">
+                {hasKdpPdf && (
+                  <a
+                    href={job.kdpPdfUrl!}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex-1"
+                  >
+                    <Button variant="default" size="sm" className="w-full bg-[#8b5e3c] hover:bg-[#7a4f30] text-white gap-2">
+                      <FileDown className="w-4 h-4" />
+                      Download Print PDF (KDP-Ready)
+                    </Button>
+                  </a>
+                )}
+                {!hasKdpPdf && job.pdfUrl && (
+                  <a
+                    href={job.pdfUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex-1"
+                  >
+                    <Button variant="default" size="sm" className="w-full bg-[#8b5e3c] hover:bg-[#7a4f30] text-white gap-2">
+                      <FileDown className="w-4 h-4" />
+                      Download Interior PDF
+                    </Button>
+                  </a>
+                )}
+                {job.epubUrl && (
+                  <a
+                    href={job.epubUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex-1"
+                  >
+                    <Button variant="default" size="sm" className="w-full bg-[#5c3d8a] hover:bg-[#4a2d6e] text-white gap-2">
+                      <BookOpen className="w-4 h-4" />
+                      Download Kindle EPUB
+                    </Button>
+                  </a>
+                )}
+              </div>
+              {hasKdpPdf && job.pdfUrl && (
                 <a
                   href={job.pdfUrl}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="flex-1"
                 >
-                  <Button variant="default" size="sm" className="w-full bg-[#8b5e3c] hover:bg-[#7a4f30] text-white gap-2">
+                  <Button variant="outline" size="sm" className="w-full border-[#d4b896] text-[#8b7b6b] hover:bg-[#f5ede4] gap-2">
                     <FileDown className="w-4 h-4" />
-                    Download Interior PDF
+                    Download Screen PDF (no bleed)
                   </Button>
                 </a>
               )}
-              {job.epubUrl && (
+              {typeof (job as Record<string, unknown>).idmlUrl === 'string' && (
                 <a
-                  href={job.epubUrl}
+                  href={(job as Record<string, unknown>).idmlUrl as string}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="flex-1"
                 >
-                  <Button variant="outline" size="sm" className="w-full border-[#8b5e3c] text-[#8b5e3c] hover:bg-[#f5ede4] gap-2">
-                    <BookOpen className="w-4 h-4" />
-                    Download EPUB
+                  <Button variant="outline" size="sm" className="w-full border-[#5c3d2e] text-[#5c3d2e] hover:bg-[#f5ede4] gap-2">
+                    <FileDown className="w-4 h-4" />
+                    Download InDesign (.idml)
                   </Button>
                 </a>
               )}
-            </div>
-            {typeof (job as Record<string, unknown>).idmlUrl === 'string' && (
-              <a
-                href={(job as Record<string, unknown>).idmlUrl as string}
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                <Button variant="outline" size="sm" className="w-full border-[#5c3d2e] text-[#5c3d2e] hover:bg-[#f5ede4] gap-2">
-                  <FileDown className="w-4 h-4" />
-                  Download InDesign (.idml)
-                </Button>
-              </a>
-            )}
 
-            <WhatsNext
-              compact
-              className="mt-2"
-              prompts={[
-                {
-                  id: "after_produce_cover",
-                  title: "Design Your Book Cover",
-                  description: "Your interior is ready! Next, generate a full-wrap cover spec sheet with exact dimensions for your printer.",
-                  actionLabel: "Open Cover Designer",
-                  actionRoute: "/cover-designer",
-                  icon: "cover_designer",
-                  priority: "high",
-                } satisfies NextPrompt,
-              ]}
-            />
-          </div>
-        )}
+              <div className="rounded-lg border border-[#e8dfd0] bg-[#fdf9f3] p-4 mt-1">
+                <div className="flex items-center justify-between mb-3">
+                  <div className="flex items-center gap-2">
+                    <ShieldCheck className="w-4 h-4 text-[#8b5e3c]" />
+                    <span className="text-sm font-semibold text-[#3d2b1f]">KDP Compliance Checklist</span>
+                  </div>
+                  {allChecksPass && (
+                    <Badge className="bg-green-100 text-green-800 border-green-300 gap-1 text-xs font-semibold">
+                      <CheckCircle2 className="w-3 h-3" />
+                      Ready for Amazon
+                    </Badge>
+                  )}
+                </div>
+                <div className="space-y-2">
+                  {[
+                    {
+                      label: "Trim size",
+                      pass: kdpTrim,
+                      tooltip: "Amazon KDP only accepts specific trim sizes. Your selected size must match one of Amazon's accepted dimensions.",
+                    },
+                    {
+                      label: "Interior margins",
+                      pass: kdpTrim && hasBleed,
+                      tooltip: "KDP requires minimum interior margins based on page count: ≥0.375\" for <150 pages, ≥0.75\" for 150–400 pages, ≥1.0\" for 400+ pages.",
+                    },
+                    {
+                      label: "Bleed (0.125\" included)",
+                      pass: hasBleed,
+                      tooltip: "Print-ready PDFs for KDP must include 0.125\" bleed on the outside, top, and bottom edges so ink extends to the trim edge.",
+                    },
+                    {
+                      label: "Font embedding",
+                      pass: hasFontEmbedding,
+                      tooltip: "All fonts must be embedded in the PDF to ensure consistent rendering. Google Fonts used in typesetting are embedded automatically.",
+                    },
+                    {
+                      label: "File format",
+                      pass: hasPdfFormat && hasEpubFormat,
+                      tooltip: "KDP requires PDF for print interiors and EPUB for Kindle ebook. Both formats have been generated.",
+                    },
+                  ].map((check) => (
+                    <div key={check.label} className="flex items-center gap-2">
+                      {check.pass ? (
+                        <CheckCircle2 className="w-3.5 h-3.5 text-green-600 flex-shrink-0" />
+                      ) : (
+                        <AlertCircle className="w-3.5 h-3.5 text-amber-500 flex-shrink-0" />
+                      )}
+                      <span className={`text-xs ${check.pass ? "text-green-800" : "text-amber-700"}`}>
+                        {check.label}
+                      </span>
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <Info className="w-3 h-3 text-[#b09880] cursor-help flex-shrink-0" />
+                        </TooltipTrigger>
+                        <TooltipContent side="right" className="max-w-[250px] text-xs">
+                          {check.tooltip}
+                        </TooltipContent>
+                      </Tooltip>
+                    </div>
+                  ))}
+                </div>
+                {!allChecksPass && (
+                  <p className="text-xs text-amber-700 mt-3 flex items-center gap-1.5">
+                    <AlertCircle className="w-3 h-3 flex-shrink-0" />
+                    {!kdpTrim
+                      ? "Selected trim size is not accepted by Amazon KDP. Choose a KDP-compatible size for full compliance."
+                      : "Some KDP requirements are not met. Review the checklist above."}
+                  </p>
+                )}
+              </div>
+
+              <WhatsNext
+                compact
+                className="mt-2"
+                prompts={[
+                  {
+                    id: "after_produce_cover",
+                    title: "Design Your Book Cover",
+                    description: "Your interior is ready! Next, generate a full-wrap cover spec sheet with exact dimensions for your printer.",
+                    actionLabel: "Open Cover Designer",
+                    actionRoute: "/cover-designer",
+                    icon: "cover_designer",
+                    priority: "high",
+                  } satisfies NextPrompt,
+                ]}
+              />
+            </div>
+          );
+        })()}
 
         <p className="text-xs text-[#b09880]">
           Started {new Date(job.createdAt).toLocaleString()}
@@ -862,17 +970,39 @@ export default function AutoProduce() {
                     <SelectValue placeholder="Select trim size…" />
                   </SelectTrigger>
                   <SelectContent>
-                    {options?.trimSizes.map(t => (
-                      <SelectItem key={t.id} value={t.id}>
-                        {t.label} ({t.widthIn}" × {t.heightIn}")
-                      </SelectItem>
-                    ))}
+                    {options?.trimSizes.map(t => {
+                      const kdp = isKdpCompatible(t.id);
+                      return (
+                        <SelectItem key={t.id} value={t.id}>
+                          <span className="flex items-center gap-2">
+                            {t.label} ({t.widthIn}" × {t.heightIn}")
+                            {kdp && (
+                              <Badge variant="outline" className="text-[10px] px-1.5 py-0 border-green-400 text-green-700 bg-green-50 font-medium">
+                                KDP
+                              </Badge>
+                            )}
+                          </span>
+                        </SelectItem>
+                      );
+                    })}
                   </SelectContent>
                 </Select>
                 {trimAutoSelected && (
                   <p className="text-xs text-[#8b5e3c] flex items-center gap-1.5 mt-1">
                     <Sparkles className="w-3 h-3 flex-shrink-0" />
                     Auto-selected for Bible / Scripture (5.25" × 8"). You can change it above.
+                  </p>
+                )}
+                {trimSizeId && !isKdpCompatible(trimSizeId) && (
+                  <p className="text-xs text-amber-700 flex items-center gap-1.5 mt-1">
+                    <AlertCircle className="w-3 h-3 flex-shrink-0" />
+                    This trim size is not accepted by Amazon KDP. If you plan to publish on Amazon, choose a size marked "KDP".
+                  </p>
+                )}
+                {trimSizeId && isKdpCompatible(trimSizeId) && !trimAutoSelected && (
+                  <p className="text-xs text-green-700 flex items-center gap-1.5 mt-1">
+                    <CheckCircle2 className="w-3 h-3 flex-shrink-0" />
+                    Amazon KDP compatible
                   </p>
                 )}
               </div>

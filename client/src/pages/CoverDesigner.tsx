@@ -12,7 +12,7 @@ import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
-import { ArrowLeft, Layers, Printer, Copy, Check, Info, Download } from "lucide-react";
+import { ArrowLeft, Layers, Printer, Copy, Check, Info, Download, ShoppingCart, AlertTriangle, CheckCircle2 } from "lucide-react";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { toast } from "sonner";
 import WhatsNext from "@/components/WhatsNext";
@@ -84,6 +84,17 @@ const SPECIAL_FINISHES = [
   "Holographic Foil",
 ];
 
+// ─── Amazon KDP Paper Stocks ─────────────────────────────────────────────────
+const KDP_PAPER_STOCKS = [
+  { id: "white-50", name: "White Paper (50 lb)", ppi: 400 },
+  { id: "cream-50", name: "Cream Paper (50 lb)", ppi: 440 },
+];
+
+// ─── Amazon KDP Accepted Trim Sizes ──────────────────────────────────────────
+const KDP_ACCEPTED_TRIM_SIZES = [
+  "5x8", "5.25x8", "5.5x8.5", "6x9", "6.5x9.25", "7x10", "7.5x9.25", "8x10", "8.5x11",
+];
+
 // ─── Bleed standard ───────────────────────────────────────────────────────────
 const BLEED = 0.125; // 1/8 inch standard bleed
 const SAFE_ZONE = 0.125; // 1/8 inch safe zone from trim edge
@@ -108,6 +119,9 @@ export default function CoverDesigner() {
   const [selectedFinishes, setSelectedFinishes] = useState<string[]>([]);
   const [barcode, setBarcode] = useState(true);
   const [authorPhoto, setAuthorPhoto] = useState(false);
+
+  // KDP section
+  const [kdpPaperStockId, setKdpPaperStockId] = useState("white-50");
 
   // Derived
   const trimSize = TRIM_SIZES.find(t => t.id === trimSizeId)!;
@@ -157,6 +171,35 @@ export default function CoverDesigner() {
     };
   }, [trimW, trimH, pages, ppi, binding.boardThickness, bindingTypeId]);
 
+  const kdpPaperStock = KDP_PAPER_STOCKS.find(p => p.id === kdpPaperStockId)!;
+  const isKdpTrimSize = KDP_ACCEPTED_TRIM_SIZES.includes(trimSizeId);
+
+  const kdpSpecs = useMemo(() => {
+    if (!trimW || !trimH || pages <= 0) return null;
+
+    const kdpPpi = kdpPaperStock.ppi;
+    const kdpSpineIn = pages / kdpPpi;
+    const kdpFullWidth = BLEED + trimW + kdpSpineIn + trimW + BLEED;
+    const kdpFullHeight = trimH + (BLEED * 2);
+
+    const barcodeZoneW = 2.0;
+    const barcodeZoneH = 1.2;
+
+    return {
+      paperName: kdpPaperStock.name,
+      ppi: kdpPpi,
+      spineIn: Math.round(kdpSpineIn * 1000) / 1000,
+      spineMm: Math.round(kdpSpineIn * 25.4 * 10) / 10,
+      fullWidth: Math.round(kdpFullWidth * 1000) / 1000,
+      fullHeight: Math.round(kdpFullHeight * 1000) / 1000,
+      fullWidthMm: Math.round(kdpFullWidth * 25.4 * 10) / 10,
+      fullHeightMm: Math.round(kdpFullHeight * 25.4 * 10) / 10,
+      barcodeZoneW,
+      barcodeZoneH,
+      isAcceptedTrimSize: isKdpTrimSize,
+    };
+  }, [trimW, trimH, pages, kdpPaperStock, isKdpTrimSize]);
+
   const [copied, setCopied] = useState(false);
 
   const specText = specs ? [
@@ -199,6 +242,66 @@ export default function CoverDesigner() {
     "",
     "══════════════════════════════════════════════════",
   ].join("\n") : "";
+
+  const kdpSpecText = kdpSpecs ? [
+    "══════════════════════════════════════════════════",
+    "     AMAZON KDP COVER TEMPLATE SPECIFICATIONS",
+    "══════════════════════════════════════════════════",
+    "",
+    `TRIM SIZE:           ${trimSizeId === "custom" ? `${trimW}" × ${trimH}"` : trimSize.name}`,
+    `KDP COMPATIBLE:      ${kdpSpecs.isAcceptedTrimSize ? "YES ✓" : "NO ✗ — This trim size is not accepted by KDP"}`,
+    `PAGE COUNT:          ${pages.toLocaleString()} pp`,
+    `PAPER STOCK:         ${kdpSpecs.paperName} (${kdpSpecs.ppi} PPI)`,
+    "",
+    "── KDP SPINE CALCULATION ──────────────────────────",
+    `Formula:             Page Count ÷ PPI = Spine Width`,
+    `Calculation:         ${pages} ÷ ${kdpSpecs.ppi} = ${kdpSpecs.spineIn}"`,
+    `Spine Width:         ${kdpSpecs.spineIn}" (${kdpSpecs.spineMm}mm)`,
+    "",
+    "── FULL COVER DIMENSIONS (Amazon Formula) ────────",
+    `Formula:             Bleed + Back + Spine + Front + Bleed`,
+    `Full Width:          ${BLEED}" + ${trimW}" + ${kdpSpecs.spineIn}" + ${trimW}" + ${BLEED}" = ${kdpSpecs.fullWidth}"`,
+    `Full Height:         ${trimH}" + ${BLEED * 2}" (top + bottom bleed) = ${kdpSpecs.fullHeight}"`,
+    `Full Cover Size:     ${kdpSpecs.fullWidth}" × ${kdpSpecs.fullHeight}"`,
+    `Full Cover (mm):     ${kdpSpecs.fullWidthMm} × ${kdpSpecs.fullHeightMm}mm`,
+    "",
+    "── BLEED ──────────────────────────────────────────",
+    `Bleed:               ${BLEED}" (${Math.round(BLEED * 25.4 * 10) / 10}mm) on outside, top, and bottom edges`,
+    "",
+    "── BARCODE PLACEMENT ZONE ─────────────────────────",
+    `Location:            Bottom-right of back cover`,
+    `Size:                ${kdpSpecs.barcodeZoneW}" × ${kdpSpecs.barcodeZoneH}"`,
+    `Note:                Amazon places its own barcode here. Keep this area clear.`,
+    "",
+    "── KDP PAPER STOCK PPI VALUES ─────────────────────",
+    `White Paper (50 lb): 400 PPI`,
+    `Cream Paper (50 lb): 440 PPI`,
+    "",
+    "── KDP FILE REQUIREMENTS ──────────────────────────",
+    `Format:              PDF`,
+    `Color Space:         CMYK (no RGB, no spot colors)`,
+    `Resolution:          300 DPI minimum`,
+    `Bleed:               0.125" on all outside edges`,
+    `Fonts:               All fonts must be embedded`,
+    `Transparency:        Must be flattened`,
+    `Layers:              Must be flattened to single layer`,
+    "",
+    "══════════════════════════════════════════════════",
+  ].join("\n") : "";
+
+  const handleDownloadKdpSpec = () => {
+    if (!kdpSpecText) return;
+    const blob = new Blob([kdpSpecText], { type: "text/plain" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `KDP-Cover-Spec-${trimW}x${trimH}-${pages}pp.txt`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+    toast.success("KDP cover spec downloaded");
+  };
 
   const handleCopy = () => {
     if (!specText) return;
@@ -468,6 +571,133 @@ export default function CoverDesigner() {
                 </CardContent>
               </Card>
             )}
+            {/* Amazon KDP Cover Section */}
+            <Card className="border-[#e8dfd0] bg-white shadow-sm border-l-4 border-l-[#ff9900]">
+              <CardHeader className="pb-3">
+                <CardTitle className="font-serif text-lg text-[#2c1a00] flex items-center gap-2">
+                  <ShoppingCart className="w-5 h-5 text-[#ff9900]" />
+                  Amazon KDP Cover Template
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-5">
+                {!isKdpTrimSize && trimSizeId !== "custom" && (
+                  <div className="flex items-start gap-2 bg-amber-50 border border-amber-200 rounded-lg p-3">
+                    <AlertTriangle className="w-4 h-4 text-amber-600 mt-0.5 shrink-0" />
+                    <p className="text-sm text-amber-800">
+                      The selected trim size <strong>{trimSize.name}</strong> is not accepted by Amazon KDP. Choose a KDP-compatible trim size for print-on-demand.
+                    </p>
+                  </div>
+                )}
+                {trimSizeId === "custom" && (
+                  <div className="flex items-start gap-2 bg-amber-50 border border-amber-200 rounded-lg p-3">
+                    <AlertTriangle className="w-4 h-4 text-amber-600 mt-0.5 shrink-0" />
+                    <p className="text-sm text-amber-800">
+                      Custom trim sizes may not be accepted by Amazon KDP. Verify your dimensions against <a href="https://kdp.amazon.com/en_US/help/topic/G201834180" target="_blank" rel="noopener noreferrer" className="underline font-semibold">KDP's accepted sizes</a>.
+                    </p>
+                  </div>
+                )}
+                {isKdpTrimSize && (
+                  <div className="flex items-start gap-2 bg-green-50 border border-green-200 rounded-lg p-3">
+                    <CheckCircle2 className="w-4 h-4 text-green-600 mt-0.5 shrink-0" />
+                    <p className="text-sm text-green-800">
+                      <strong>{trimSize.name}</strong> is accepted by Amazon KDP.
+                    </p>
+                  </div>
+                )}
+
+                <div>
+                  <Label className="text-[#5c3d2e] font-semibold text-sm">KDP Paper Stock</Label>
+                  <Select value={kdpPaperStockId} onValueChange={setKdpPaperStockId}>
+                    <SelectTrigger className="mt-1 border-[#d4c8b4] bg-white text-[#3a2a1a]">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {KDP_PAPER_STOCKS.map(p => (
+                        <SelectItem key={p.id} value={p.id}>{p.name} — {p.ppi} PPI</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  <p className="text-xs text-[#8b7b6b] mt-1">Amazon KDP uses specific PPI values per paper stock to calculate spine width.</p>
+                </div>
+
+                {kdpSpecs && (
+                  <>
+                    <div className="bg-[#fff8f0] border border-[#ffe0b2] rounded-lg p-4 space-y-3">
+                      <p className="text-xs font-semibold text-[#e65100] uppercase tracking-wide">KDP Cover Dimensions</p>
+
+                      <div className="space-y-2 text-sm">
+                        <div>
+                          <p className="text-xs text-[#8b7b6b] mb-1">Amazon's formula: <strong>Bleed + Back + Spine + Front + Bleed</strong></p>
+                          <p className="text-[#3a2a1a] font-mono text-xs">
+                            {BLEED}" + {trimW}" + {kdpSpecs.spineIn}" + {trimW}" + {BLEED}" = <strong>{kdpSpecs.fullWidth}"</strong>
+                          </p>
+                        </div>
+
+                        <Separator className="bg-[#ffe0b2]" />
+
+                        <div className="grid grid-cols-2 gap-3">
+                          <div>
+                            <span className="text-xs text-[#8b7b6b]">Full Cover Width</span>
+                            <p className="font-bold text-[#e65100]">{kdpSpecs.fullWidth}" <span className="font-normal text-xs text-[#8b7b6b]">({kdpSpecs.fullWidthMm}mm)</span></p>
+                          </div>
+                          <div>
+                            <span className="text-xs text-[#8b7b6b]">Full Cover Height</span>
+                            <p className="font-bold text-[#e65100]">{kdpSpecs.fullHeight}" <span className="font-normal text-xs text-[#8b7b6b]">({kdpSpecs.fullHeightMm}mm)</span></p>
+                          </div>
+                          <div>
+                            <span className="text-xs text-[#8b7b6b]">KDP Spine Width</span>
+                            <p className="font-bold text-[#3a2a1a]">{kdpSpecs.spineIn}" <span className="font-normal text-xs text-[#8b7b6b]">({kdpSpecs.spineMm}mm)</span></p>
+                          </div>
+                          <div>
+                            <span className="text-xs text-[#8b7b6b]">Bleed (all outside edges)</span>
+                            <p className="font-bold text-[#3a2a1a]">{BLEED}" <span className="font-normal text-xs text-[#8b7b6b]">({Math.round(BLEED * 25.4 * 10) / 10}mm)</span></p>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="bg-[#f5f5f5] border border-[#e0e0e0] rounded-lg p-4">
+                      <p className="text-xs font-semibold text-[#5c3d2e] uppercase tracking-wide mb-2">Barcode Placement Zone</p>
+                      <div className="flex items-start gap-3">
+                        <div className="w-16 h-10 border-2 border-dashed border-[#374151] rounded flex items-center justify-center bg-white shrink-0">
+                          <span className="text-[8px] text-[#374151] font-mono">ISBN</span>
+                        </div>
+                        <div className="text-xs text-[#5c3d2e] space-y-1">
+                          <p><strong>{kdpSpecs.barcodeZoneW}" × {kdpSpecs.barcodeZoneH}"</strong> — bottom-right of back cover</p>
+                          <p className="text-[#8b7b6b]">Amazon automatically places its barcode in this area. Keep this zone clear of any design elements.</p>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="bg-[#f5f5f5] border border-[#e0e0e0] rounded-lg p-4">
+                      <p className="text-xs font-semibold text-[#5c3d2e] uppercase tracking-wide mb-2">KDP Paper Stock PPI Reference</p>
+                      <div className="grid grid-cols-2 gap-2 text-xs">
+                        {KDP_PAPER_STOCKS.map(stock => (
+                          <div key={stock.id} className={`flex justify-between p-2 rounded ${stock.id === kdpPaperStockId ? "bg-[#fff3e0] border border-[#ff9900]" : "bg-white border border-[#e0e0e0]"}`}>
+                            <span className="text-[#3a2a1a]">{stock.name}</span>
+                            <span className="font-bold text-[#5c3d2e]">{stock.ppi} PPI</span>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+
+                    <Button
+                      className="w-full bg-[#ff9900] hover:bg-[#e68a00] text-white gap-2 font-semibold"
+                      onClick={handleDownloadKdpSpec}
+                    >
+                      <Download className="w-4 h-4" />
+                      Download KDP Cover Spec
+                    </Button>
+                  </>
+                )}
+
+                {!kdpSpecs && (
+                  <div className="bg-[#f5ede4] rounded-lg p-4 text-center">
+                    <p className="text-sm text-[#7a5c3a]">Enter your trim size and page count above to generate KDP cover template specifications.</p>
+                  </div>
+                )}
+              </CardContent>
+            </Card>
           </div>
 
           {/* Right: Spec summary */}
