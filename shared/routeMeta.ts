@@ -487,6 +487,45 @@ export const ROUTE_META: Array<{ path: string; meta: RouteMeta }> = [
       },
     },
   },
+  {
+    path: "/privacy-terms",
+    meta: {
+      title: "Privacy Policy & Terms of Service | Easy Book Publishers",
+      description: "Read the Easy Book Publishers privacy policy and terms of service. Learn how we protect your data and the terms governing use of our book production platform.",
+      keywords: "privacy policy, terms of service, data protection, book publishing terms, Easy Book Publishers legal",
+      canonical: `${BASE}/privacy-terms`,
+      ogImage: OG_IMAGE,
+      ogType: "website",
+      twitterCard: "summary_large_image",
+      siteName: SITE_NAME,
+      jsonLd: {
+        "@context": "https://schema.org",
+        "@graph": [
+          ORG_SCHEMA,
+          {
+            "@type": "WebPage",
+            name: "Privacy Policy & Terms of Service",
+            description: "Privacy policy and terms of service for Easy Book Publishers book production platform.",
+            url: `${BASE}/privacy-terms`,
+            isPartOf: { "@id": `${BASE}/#website` },
+          },
+        ],
+      },
+    },
+  },
+  {
+    path: "/confirm-email",
+    meta: {
+      title: "Confirm Your Email | Easy Book Publishers",
+      description: "Verify your email address to complete your Easy Book Publishers account registration.",
+      keywords: "email confirmation, account verification, Easy Book Publishers",
+      canonical: `${BASE}/confirm-email`,
+      ogImage: OG_IMAGE,
+      ogType: "website",
+      twitterCard: "summary",
+      siteName: SITE_NAME,
+    },
+  },
 ];
 
 /** Returns the best-matching RouteMeta for a given URL path. */

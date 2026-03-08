@@ -1,4 +1,4 @@
-import { index, integer, jsonb, pgEnum, pgTable, text, timestamp, varchar, bigint, serial } from "drizzle-orm/pg-core";
+import { boolean, index, integer, jsonb, pgEnum, pgTable, text, timestamp, varchar, bigint, serial } from "drizzle-orm/pg-core";
 
 export const roleEnum = pgEnum("role", ["user", "admin"]);
 export const stepStatusEnum = pgEnum("step_status", ["pending", "complete", "skipped"]);
@@ -18,6 +18,11 @@ export const users = pgTable("users", {
   loginMethod: varchar("loginMethod", { length: 64 }),
   role: roleEnum("role").default("user").notNull(),
   plan: planEnum("plan").default("starter").notNull(),
+  emailConfirmed: boolean("emailConfirmed").default(false).notNull(),
+  emailConfirmToken: varchar("emailConfirmToken", { length: 128 }),
+  emailConfirmTokenExpiresAt: timestamp("emailConfirmTokenExpiresAt"),
+  termsAcceptedAt: timestamp("termsAcceptedAt"),
+  checkoutToken: varchar("checkoutToken", { length: 128 }),
   stripeCustomerId: varchar("stripeCustomerId", { length: 255 }).unique(),
   stripeSubscriptionId: varchar("stripeSubscriptionId", { length: 255 }),
   createdAt: timestamp("createdAt").defaultNow().notNull(),

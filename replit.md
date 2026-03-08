@@ -25,10 +25,16 @@ A full-stack book production workflow management platform ("Manuscript to Master
 
 ## Auth Flow
 
-- **No login required** — a guest user (openId: "guest-default-user") is auto-created and used when no Replit Auth session exists
+- **No login required for browsing** — a guest user (openId: "guest-default-user") is auto-created and used when no Replit Auth session exists
+- **Email-confirmed account required for checkout** — before Stripe checkout, users must register with name+email and confirm their email address
+- Registration flow: `account.register` creates user with `openId = "email-{email}"`, generates confirmation token, returns `confirmUrl`
+- Email confirmation: `account.confirmEmail` validates token, sets `emailConfirmed = true`
+- Checkout gate: `stripe.createCheckoutSession` requires `confirmedUserId` and verifies `emailConfirmed` before proceeding
+- `CheckoutGate` modal component (`client/src/components/CheckoutGate.tsx`) handles the registration/confirmation flow inline on the Pricing page
+- Confirmation page at `/confirm-email?token=...` for link-based verification
+- Users table has `emailConfirmed` (boolean) and `emailConfirmToken` (varchar) columns
 - Replit Auth OIDC integration still exists in code but login is not enforced; all pages are accessible without authentication
 - tRPC context falls back to the guest user when no authenticated session is present (`server/_core/context.ts`)
-- All `protectedProcedure` endpoints work automatically since a user context is always available
 - Sessions stored in PostgreSQL `sessions` table
 - App users stored in `users` table, keyed by `openId`
 
@@ -160,3 +166,5 @@ PostgreSQL via Replit's built-in database. Use `npx drizzle-kit push` to sync sc
 - **Sidebar**: Lock icons on gated items for Starter users, plan label under user name, "Upgrade Plan" CTA in footer
 - **Dashboard**: "Unlock Pro Publishing Tools" teaser banner for Starter users, "Upgrade for More Projects" button when project limit reached
 - **Checkout Feedback**: Home.tsx and Pricing.tsx read `?checkout=success&plan=X` / `?checkout=cancelled` query params and show sonner toasts, then clean up URL
+- **Privacy Policy & Terms of Service**: Combined page at `/privacy-terms` covering data collection, security, payments, IP rights, acceptable use, and liability
+- **Email-Confirmed Checkout Gate**: `CheckoutGate` modal on Pricing page requires account creation with name/email + email confirmation + terms agreement before Stripe checkout

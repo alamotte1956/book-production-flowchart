@@ -19,12 +19,16 @@ import ISBNLookup from "./pages/ISBNLookup";
 import GuidedJourney from "./pages/GuidedJourney";
 import PrintSpecs from "./pages/PrintSpecs";
 import Pricing from "./pages/Pricing";
+import PrivacyTerms from "./pages/PrivacyTerms";
+import ConfirmEmail from "./pages/ConfirmEmail";
 
 function Router() {
   return (
     <Switch>
       <Route path={"/"} component={Home} />
       <Route path={"/pricing"} component={Pricing} />
+      <Route path={"/privacy-terms"} component={PrivacyTerms} />
+      <Route path={"/confirm-email"} component={ConfirmEmail} />
       <Route path={"/project/:id"} component={ProjectTracker} />
       <Route path={"/resources"} component={Resources} />
       <Route path={"/timeline/:id"} component={Timeline} />

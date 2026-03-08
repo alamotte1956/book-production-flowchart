@@ -18,7 +18,7 @@ import { generateIdml } from "./idmlGenerator";
 import { invokeLLM } from "./_core/llm";
 import { lookupByIsbn } from "./isbnLookup";
 import { notifyOwner } from "./_core/notification";
-import { createContactSubmission, saveWizardAnswers, getWizardAnswers, getRecentActivity, getDashboardStats, getUserById, updateUserStripeInfo } from "./db";
+import { createContactSubmission, saveWizardAnswers, getWizardAnswers, getRecentActivity, getDashboardStats, getUserById, updateUserStripeInfo, getUserByEmail, createEmailUser, confirmUserEmail, getUserByConfirmToken, getUserByCheckoutToken } from "./db";
 import { TRPCError } from "@trpc/server";
 import { getUncachableStripeClient, getStripePublishableKey } from "./stripeClient";
 import { sql } from "drizzle-orm";
@@ -1058,6 +1058,59 @@ export const appRouter = router({
     }),
   }),
 
+  account: router({
+    register: publicProcedure
+      .input(z.object({
+        name: z.string().min(1).max(200),
+        email: z.string().email().max(320),
+        agreedToTerms: z.boolean(),
+      }))
+      .mutation(async ({ input }) => {
+        if (!input.agreedToTerms) {
+          throw new TRPCError({ code: "BAD_REQUEST", message: "You must agree to the Privacy Policy & Terms of Service" });
+        }
+
+        const existing = await getUserByEmail(input.email);
+        if (existing?.emailConfirmed) {
+          return { status: "already_confirmed" as const, checkoutToken: existing.checkoutToken ?? "" };
+        }
+
+        const token = nanoid(48);
+        const user = await createEmailUser({
+          name: input.name,
+          email: input.email,
+          confirmToken: token,
+          termsAcceptedAt: new Date(),
+        });
+
+        const isDev = process.env.NODE_ENV === "development";
+        if (isDev) {
+          console.log(`[Email Confirmation][DEV] User ${input.email} → /confirm-email?token=${token}`);
+        }
+
+        return { status: "confirmation_needed" as const, userId: user.id, ...(isDev ? { confirmUrl: `/confirm-email?token=${token}` } : {}) };
+      }),
+
+    confirmEmail: publicProcedure
+      .input(z.object({ token: z.string() }))
+      .mutation(async ({ input }) => {
+        const checkoutToken = nanoid(64);
+        const user = await confirmUserEmail(input.token, checkoutToken);
+        if (!user) {
+          throw new TRPCError({ code: "NOT_FOUND", message: "Invalid or expired confirmation token" });
+        }
+        return { success: true, checkoutToken, email: user.email };
+      }),
+
+    checkEmail: publicProcedure
+      .input(z.object({ email: z.string().email() }))
+      .query(async ({ input }) => {
+        const user = await getUserByEmail(input.email);
+        if (!user) return { exists: false, confirmed: false };
+        return { exists: true, confirmed: user.emailConfirmed };
+      }),
+  }),
+
   stripe: router({
     getPublishableKey: publicProcedure.query(async () => {
       try {
@@ -1078,14 +1131,24 @@ export const appRouter = router({
       };
     }),
 
-    createCheckoutSession: protectedProcedure
+    createCheckoutSession: publicProcedure
       .input(z.object({
         priceId: z.string(),
         billingCycle: z.enum(["monthly", "annual", "lifetime"]),
         planName: z.enum(["author_pro", "publisher"]),
+        checkoutToken: z.string().min(1),
       }))
       .mutation(async ({ ctx, input }) => {
         const stripe = await getUncachableStripeClient();
+
+        const user = await getUserByCheckoutToken(input.checkoutToken);
+        if (!user) throw new TRPCError({ code: "FORBIDDEN", message: "Invalid checkout token. Please verify your email first." });
+        if (!user.emailConfirmed) {
+          throw new TRPCError({ code: "FORBIDDEN", message: "Email must be confirmed before checkout" });
+        }
+        if (!user.termsAcceptedAt) {
+          throw new TRPCError({ code: "FORBIDDEN", message: "You must accept the Terms of Service before checkout" });
+        }
 
         const price = await stripe.prices.retrieve(input.priceId, { expand: ['product'] });
         if (!price.active) {
@@ -1109,9 +1172,6 @@ export const appRouter = router({
         if (priceBillingCycle && priceBillingCycle !== input.billingCycle) {
           throw new TRPCError({ code: "BAD_REQUEST", message: "Price does not match requested billing cycle" });
         }
-
-        const user = await getUserById(ctx.user.id);
-        if (!user) throw new TRPCError({ code: "NOT_FOUND", message: "User not found" });
 
         let customerId = user.stripeCustomerId;
         if (!customerId) {

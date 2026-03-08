@@ -552,6 +552,77 @@ export async function getRecentActivity(userId: number): Promise<ActivityItem[]>
   return items.slice(0, 10);
 }
 
+// ─── Email confirmation helpers ─────────────────────────────────────
+export async function getUserByEmail(email: string) {
+  const db = await getDb();
+  if (!db) return null;
+  const [user] = await db.select().from(users).where(eq(users.email, email));
+  return user ?? null;
+}
+
+export async function getUserByConfirmToken(token: string) {
+  const db = await getDb();
+  if (!db) return null;
+  const [user] = await db.select().from(users).where(eq(users.emailConfirmToken, token));
+  return user ?? null;
+}
+
+export async function createEmailUser(data: { name: string; email: string; confirmToken: string; termsAcceptedAt?: Date }) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  const openId = `email-${data.email}`;
+  const tokenExpiry = new Date(Date.now() + 24 * 60 * 60 * 1000);
+  const existing = await getUserByOpenId(openId);
+  if (existing) {
+    const updateData: Record<string, unknown> = {
+      name: data.name,
+      emailConfirmToken: data.confirmToken,
+      emailConfirmTokenExpiresAt: tokenExpiry,
+      emailConfirmed: false,
+      updatedAt: new Date(),
+    };
+    if (data.termsAcceptedAt) updateData.termsAcceptedAt = data.termsAcceptedAt;
+    await db.update(users).set(updateData).where(eq(users.openId, openId));
+    return (await getUserByOpenId(openId))!;
+  }
+  const [user] = await db.insert(users).values({
+    openId,
+    name: data.name,
+    email: data.email,
+    loginMethod: "email",
+    emailConfirmToken: data.confirmToken,
+    emailConfirmTokenExpiresAt: tokenExpiry,
+    emailConfirmed: false,
+    termsAcceptedAt: data.termsAcceptedAt ?? null,
+  }).returning();
+  return user;
+}
+
+export async function confirmUserEmail(token: string, checkoutToken: string) {
+  const db = await getDb();
+  if (!db) return null;
+  const user = await getUserByConfirmToken(token);
+  if (!user) return null;
+  if (user.emailConfirmTokenExpiresAt && user.emailConfirmTokenExpiresAt < new Date()) {
+    return null;
+  }
+  const [updated] = await db.update(users).set({
+    emailConfirmed: true,
+    emailConfirmToken: null,
+    emailConfirmTokenExpiresAt: null,
+    checkoutToken,
+    updatedAt: new Date(),
+  }).where(eq(users.id, user.id)).returning();
+  return updated ?? null;
+}
+
+export async function getUserByCheckoutToken(token: string) {
+  const db = await getDb();
+  if (!db) return null;
+  const [user] = await db.select().from(users).where(eq(users.checkoutToken, token));
+  return user ?? null;
+}
+
 // ─── Stripe helpers ──────────────────────────────────────────────────
 export async function getUserById(userId: number) {
   const db = await getDb();

@@ -102,4 +102,11 @@
     <priority>0.6</priority>
   </url>
 
+  <url>
+    <loc>https://easybookpublishers.replit.app/privacy-terms</loc>
+    <lastmod>2026-03-08</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.4</priority>
+  </url>
+
 </urlset>

@@ -9,6 +9,7 @@ import { trpc } from "@/lib/trpc";
 import { useAuth } from "@/_core/hooks/useAuth";
 import { toast } from "sonner";
 import SiteFooter from "@/components/SiteFooter";
+import CheckoutGate from "@/components/CheckoutGate";
 
 type BillingCycle = "monthly" | "annual" | "lifetime";
 
@@ -159,6 +160,8 @@ export default function Pricing() {
   const [, navigate] = useLocation();
   const [billing, setBilling] = useState<BillingCycle>("lifetime");
   const [loadingTier, setLoadingTier] = useState<string | null>(null);
+  const [gateOpen, setGateOpen] = useState(false);
+  const [pendingTier, setPendingTier] = useState<string | null>(null);
   const { user } = useAuth();
   const checkoutMutation = trpc.stripe.createCheckoutSession.useMutation();
 
@@ -170,7 +173,7 @@ export default function Pricing() {
     }
   }, []);
 
-  const handleSelectPlan = async (tierName: string) => {
+  const handleSelectPlan = (tierName: string) => {
     if (tierName === "Starter") {
       navigate("/");
       return;
@@ -179,13 +182,24 @@ export default function Pricing() {
     const priceId = PRICE_IDS[tierName]?.[billing];
     if (!priceId) return;
 
-    setLoadingTier(tierName);
+    setPendingTier(tierName);
+    setGateOpen(true);
+  };
+
+  const handleConfirmedCheckout = async (checkoutToken: string) => {
+    if (!pendingTier) return;
+    const priceId = PRICE_IDS[pendingTier]?.[billing];
+    if (!priceId) return;
+
+    setGateOpen(false);
+    setLoadingTier(pendingTier);
     try {
-      const planName = tierName === "Author Pro" ? "author_pro" as const : "publisher" as const;
+      const planName = pendingTier === "Author Pro" ? "author_pro" as const : "publisher" as const;
       const result = await checkoutMutation.mutateAsync({
         priceId,
         billingCycle: billing,
         planName,
+        checkoutToken,
       });
       window.location.href = result.url;
     } catch (err) {
@@ -433,6 +447,13 @@ export default function Pricing() {
       </div>
 
       <SiteFooter />
+
+      <CheckoutGate
+        open={gateOpen}
+        onClose={() => { setGateOpen(false); setPendingTier(null); }}
+        onConfirmed={handleConfirmedCheckout}
+        planName={pendingTier || ""}
+      />
     </div>
   );
 }
