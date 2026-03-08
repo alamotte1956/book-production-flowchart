@@ -4,76 +4,102 @@
         xsi:schemaLocation="http://www.sitemaps.org/schemas/sitemap/0.9
           http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd">
 
-  <!-- Home / Landing Page -->
   <url>
     <loc>https://easybookpublishers.replit.app/</loc>
-    <lastmod>2026-03-03</lastmod>
+    <lastmod>2026-03-08</lastmod>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
   </url>
 
-  <!-- Resources Hub -->
   <url>
-    <loc>https://easybookpublishers.replit.app/resources</loc>
-    <lastmod>2026-03-03</lastmod>
+    <loc>https://easybookpublishers.replit.app/pricing</loc>
+    <lastmod>2026-03-08</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.9</priority>
   </url>
 
-  <!-- User Guide -->
   <url>
     <loc>https://easybookpublishers.replit.app/guide</loc>
-    <lastmod>2026-03-03</lastmod>
+    <lastmod>2026-03-08</lastmod>
     <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
+    <priority>0.9</priority>
   </url>
 
-  <!-- Bible Design Studio -->
+  <url>
+    <loc>https://easybookpublishers.replit.app/resources</loc>
+    <lastmod>2026-03-08</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.9</priority>
+  </url>
+
   <url>
     <loc>https://easybookpublishers.replit.app/bible-studio</loc>
-    <lastmod>2026-03-03</lastmod>
+    <lastmod>2026-03-08</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
 
-  <!-- Auto-Produce (AI Layout Engine) -->
   <url>
     <loc>https://easybookpublishers.replit.app/auto-produce</loc>
-    <lastmod>2026-03-03</lastmod>
+    <lastmod>2026-03-08</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
 
-  <!-- Spine Calculator -->
+  <url>
+    <loc>https://easybookpublishers.replit.app/templates</loc>
+    <lastmod>2026-03-08</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
   <url>
     <loc>https://easybookpublishers.replit.app/spine-calculator</loc>
-    <lastmod>2026-03-03</lastmod>
+    <lastmod>2026-03-08</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
 
-  <!-- Cover Designer -->
   <url>
     <loc>https://easybookpublishers.replit.app/cover-designer</loc>
-    <lastmod>2026-03-03</lastmod>
+    <lastmod>2026-03-08</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
 
-  <!-- ISBN & Metadata Manager -->
   <url>
     <loc>https://easybookpublishers.replit.app/isbn-manager</loc>
-    <lastmod>2026-03-03</lastmod>
+    <lastmod>2026-03-08</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
 
-  <!-- Production Timeline -->
   <url>
-    <loc>https://easybookpublishers.replit.app/timeline</loc>
-    <lastmod>2026-03-03</lastmod>
+    <loc>https://easybookpublishers.replit.app/isbn-lookup</loc>
+    <lastmod>2026-03-08</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
+  </url>
+
+  <url>
+    <loc>https://easybookpublishers.replit.app/print-specs</loc>
+    <lastmod>2026-03-08</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+
+  <url>
+    <loc>https://easybookpublishers.replit.app/timeline</loc>
+    <lastmod>2026-03-08</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+
+  <url>
+    <loc>https://easybookpublishers.replit.app/guided-journey</loc>
+    <lastmod>2026-03-08</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
   </url>
 
 </urlset>

@@ -1,0 +1,18 @@
+{
+  "name": "Easy Book Publishers",
+  "short_name": "EBP",
+  "description": "All-in-one self-publishing platform — manuscript to masterpiece. AI typesetting, cover design, ISBN tools, and 30-step workflow.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#faf6ef",
+  "theme_color": "#2c1a00",
+  "orientation": "any",
+  "categories": ["books", "productivity", "business"],
+  "icons": [
+    {
+      "src": "/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml"
+    }
+  ]
+}

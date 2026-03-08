@@ -89,6 +89,13 @@ function injectRouteMeta(html: string, urlPath: string): string {
     `    <!-- og:start -->\n    ${socialTags}\n    <!-- og:end -->\n  </head>`
   );
 
+  // Inject JSON-LD structured data if present
+  if (meta.jsonLd) {
+    html = html.replace(/\s*<!-- jsonld:start -->[\s\S]*?<!-- jsonld:end -->/, "");
+    const jsonLdScript = `<!-- jsonld:start -->\n    <script type="application/ld+json">${JSON.stringify(meta.jsonLd)}</script>\n    <!-- jsonld:end -->`;
+    html = html.replace("</head>", `    ${jsonLdScript}\n  </head>`);
+  }
+
   return html;
 }
 

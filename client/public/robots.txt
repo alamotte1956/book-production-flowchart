@@ -1,5 +1,8 @@
 User-agent: *
 Allow: /
 
-# Sitemap location
-Sitemap: /sitemap.xml
+Disallow: /api/
+Disallow: /project/
+Disallow: /404
+
+Sitemap: https://easybookpublishers.replit.app/sitemap.xml
