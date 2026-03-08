@@ -117,10 +117,12 @@ export default function LandingPage() {
         <div className="absolute inset-0 opacity-10" style={{ backgroundImage: `url(${HERO_URL})`, backgroundSize: "cover", backgroundPosition: "center" }} />
         <div className="relative max-w-7xl mx-auto px-6 py-24 md:py-32 text-center">
           <Badge className="bg-[#c9a96e]/15 text-[#f5d98a] border-[#c9a96e]/30 mb-6">All-in-One Self-Publishing Platform</Badge>
-          <h1 className="font-serif text-4xl md:text-6xl lg:text-7xl text-[#f5efe0] mb-6 leading-tight">
-            From Manuscript<br />
-            to <span className="text-[#f5d98a]">Masterpiece</span>
+          <h1 className="font-serif text-5xl md:text-7xl lg:text-8xl text-[#f5d98a] mb-4 leading-tight tracking-tight">
+            Easy Book Publishers
           </h1>
+          <p className="font-serif text-2xl md:text-4xl lg:text-5xl text-[#f5efe0] mb-6 leading-tight">
+            From Manuscript to <span className="text-[#f5d98a]">Masterpiece</span>
+          </p>
           <p className="text-lg md:text-xl text-[#d4c8b4]/80 max-w-2xl mx-auto mb-10">
             Design, typeset, and produce print-ready books with professional AI-powered tools.
             No software to download. Works on any device.
