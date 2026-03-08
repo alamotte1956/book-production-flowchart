@@ -282,6 +282,10 @@ function StepCard({
   const [noteText, setNoteText] = useState(stepStatus.notes || "");
   const utils = trpc.useUtils();
 
+  useEffect(() => {
+    setExpanded(!!printMode);
+  }, [printMode]);
+
   const updateMutation = trpc.step.updateStatus.useMutation({
     onSuccess: () => { utils.project.get.invalidate({ projectId }); },
   });
