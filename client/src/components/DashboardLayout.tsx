@@ -29,8 +29,7 @@ import { trpc } from "@/lib/trpc";
 
 const menuItems = [
   { icon: LayoutDashboard, label: "Dashboard", path: "/" },
-  { icon: LayoutGrid, label: "Book Templates", path: "/cdp-templates" },
-  { icon: LayoutGrid, label: "KP&A Templates", path: "/kpa-templates" },
+  { icon: LayoutGrid, label: "Templates", path: "/templates" },
   { icon: BookOpen, label: "Bible Studio", path: "/bible-studio" },
   { icon: Ruler, label: "Spine Calculator", path: "/spine-calculator" },
   { icon: Layers, label: "Cover Designer", path: "/cover-designer" },

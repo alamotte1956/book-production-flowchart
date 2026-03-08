@@ -14,9 +14,8 @@ import SpineCalculator from "./pages/SpineCalculator";
 import CoverDesigner from "./pages/CoverDesigner";
 import IsbnManager from "./pages/IsbnManager";
 import UserGuide from "./pages/UserGuide";
-import CDPTemplates from "./pages/CDPTemplates";
+import Templates from "./pages/Templates";
 import ISBNLookup from "./pages/ISBNLookup";
-import KPATemplates from "./pages/KPATemplates";
 import GuidedJourney from "./pages/GuidedJourney";
 import PrintSpecs from "./pages/PrintSpecs";
 import Pricing from "./pages/Pricing";
@@ -35,9 +34,10 @@ function Router() {
       <Route path={"/cover-designer"} component={CoverDesigner} />
       <Route path={"/isbn-manager"} component={IsbnManager} />
       <Route path={"/guide"} component={UserGuide} />
-      <Route path={"/cdp-templates"} component={CDPTemplates} />
+      <Route path={"/templates"} component={Templates} />
+      <Route path={"/cdp-templates"} component={Templates} />
+      <Route path={"/kpa-templates"} component={Templates} />
       <Route path={"/isbn-lookup"} component={ISBNLookup} />
-      <Route path={"/kpa-templates"} component={KPATemplates} />
       <Route path={"/guided-journey"} component={GuidedJourney} />
       <Route path={"/print-specs"} component={PrintSpecs} />
       <Route path={"/404"} component={NotFound} />

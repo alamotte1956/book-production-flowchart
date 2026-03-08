@@ -175,7 +175,7 @@ function generateRoadmap(answers: WizardAnswers): RoadmapStep[] {
     title: "Browse Book Templates",
     description: "Check out production templates from Easy Book Publishers and KP&A to find the right starting point for your book type.",
     icon: Globe,
-    toolPath: "/cdp-templates",
+    toolPath: "/templates",
     toolLabel: "Browse Templates",
     priority: "optional",
     phase: "Templates",

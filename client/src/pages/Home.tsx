@@ -230,11 +230,11 @@ const TOOLS = [
     dark: false,
   },
   {
-    id: "cdp-templates",
-    path: "/cdp-templates",
+    id: "templates",
+    path: "/templates",
     icon: LayoutGrid,
     label: "Book Templates",
-    desc: "One-click presets for every book type — Bibles, devotionals, children's books, theological works, and more.",
+    desc: "One-click presets for every book type — Bibles, devotionals, children's books, theological works, and KP&A design templates.",
     badge: "Templates",
     badgeColor: "bg-amber-100 text-amber-800",
     dark: false,
@@ -247,16 +247,6 @@ const TOOLS = [
     desc: "Enter any ISBN to retrieve a book's production specs and get an instant template recommendation for recreating it.",
     badge: "Lookup",
     badgeColor: "bg-indigo-100 text-indigo-800",
-    dark: false,
-  },
-  {
-    id: "kpa-templates",
-    path: "/kpa-templates",
-    icon: LayoutGrid,
-    label: "KP&A Book Templates",
-    desc: "Templates from Koechel Peterson & Associates — the Minneapolis design firm that shaped Christian publishing for 30+ years.",
-    badge: "KP&A",
-    badgeColor: "bg-violet-100 text-violet-800",
     dark: false,
   },
   {
@@ -433,8 +423,7 @@ export default function Home() {
 
         <nav className="px-3 py-4 flex flex-col gap-1">
           {[
-            { label: "Book Templates", path: "/cdp-templates", icon: LayoutGrid, badge: "New" },
-            { label: "KP&A Templates", path: "/kpa-templates", icon: LayoutGrid, badge: "KP&A" },
+            { label: "Templates", path: "/templates", icon: LayoutGrid, badge: "All" },
             { label: "Bible Design Studio", path: "/bible-studio", icon: BookOpen, badge: "Bible" },
             { label: "Spine Calculator", path: "/spine-calculator", icon: Ruler, badge: "Print" },
             { label: "Cover Designer", path: "/cover-designer", icon: Layers, badge: "Design" },
@@ -485,8 +474,7 @@ export default function Home() {
 
           <nav className="hidden md:flex items-center gap-0.5">
             {[
-              { label: "Templates", path: "/cdp-templates", icon: LayoutGrid },
-              { label: "KP&A", path: "/kpa-templates", icon: LayoutGrid },
+              { label: "Templates", path: "/templates", icon: LayoutGrid },
               { label: "Bible Studio", path: "/bible-studio", icon: BookOpen },
               { label: "Spine Calc", path: "/spine-calculator", icon: Ruler },
               { label: "Cover Designer", path: "/cover-designer", icon: Layers },
