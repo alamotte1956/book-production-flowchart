@@ -74,17 +74,17 @@ export default function HeroSection() {
         >
           <div className="text-center">
             <div className="font-serif text-3xl md:text-4xl font-bold text-[#c9a96e]">{phases.length}</div>
-            <div className="font-sans text-xs text-[#c9a96e]/70 uppercase tracking-wider mt-1">Phases</div>
+            <div className="font-sans text-sm text-[#c9a96e]/80 uppercase tracking-wider mt-1">Phases</div>
           </div>
           <div className="w-px h-10 bg-[#c9a96e]/30" />
           <div className="text-center">
             <div className="font-serif text-3xl md:text-4xl font-bold text-[#c9a96e]">{totalSteps}</div>
-            <div className="font-sans text-xs text-[#c9a96e]/70 uppercase tracking-wider mt-1">Steps</div>
+            <div className="font-sans text-sm text-[#c9a96e]/80 uppercase tracking-wider mt-1">Steps</div>
           </div>
           <div className="w-px h-10 bg-[#c9a96e]/30" />
           <div className="text-center">
             <div className="font-serif text-3xl md:text-4xl font-bold text-[#c9a96e]">100+</div>
-            <div className="font-sans text-xs text-[#c9a96e]/70 uppercase tracking-wider mt-1">Inputs</div>
+            <div className="font-sans text-sm text-[#c9a96e]/80 uppercase tracking-wider mt-1">Inputs</div>
           </div>
         </motion.div>
 
@@ -108,7 +108,7 @@ export default function HeroSection() {
           animate={{ opacity: 1 }}
           transition={{ duration: 0.8, delay: 1.2 }}
         >
-          <span className="font-sans text-xs uppercase tracking-widest">Begin the Journey</span>
+          <span className="font-sans text-sm uppercase tracking-widest">Begin the Journey</span>
           <motion.div
             animate={{ y: [0, 6, 0] }}
             transition={{ repeat: Infinity, duration: 1.5 }}

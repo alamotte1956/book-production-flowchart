@@ -251,7 +251,7 @@ export default function CDPProductionWizard({
             <p className="text-sm text-[#5c3d2e] leading-relaxed">{template.description}</p>
 
             <div>
-              <h4 className="text-xs font-semibold text-[#8b7b6b] uppercase tracking-wider mb-2">
+              <h4 className="text-sm font-semibold text-[#6b5f53] uppercase tracking-wider mb-2">
                 Key Production Features
               </h4>
               <ul className="space-y-1.5">
@@ -266,15 +266,15 @@ export default function CDPProductionWizard({
 
             {prefillBook && (
               <div className="bg-[#f0ebe3] rounded-lg p-3 border border-[#c9a96e]/20">
-                <p className="text-xs font-medium text-[#8b7b6b] uppercase tracking-wider mb-1">
+                <p className="text-sm font-medium text-[#6b5f53] uppercase tracking-wider mb-1">
                   Pre-filled from ISBN lookup
                 </p>
                 <p className="text-sm font-semibold text-[#3b2a1a]">{prefillBook.title}</p>
                 {prefillBook.author && (
-                  <p className="text-xs text-[#8b7b6b]">by {prefillBook.author}</p>
+                  <p className="text-sm text-[#6b5f53]">by {prefillBook.author}</p>
                 )}
                 {prefillBook.isbn && (
-                  <p className="text-xs text-[#b0a090]">ISBN {prefillBook.isbn}</p>
+                  <p className="text-sm text-[#8b7b6b]">ISBN {prefillBook.isbn}</p>
                 )}
               </div>
             )}
@@ -342,7 +342,7 @@ export default function CDPProductionWizard({
         return (
           <div className="space-y-5">
             <div className="bg-[#f0ebe3] rounded-lg p-3 border border-[#c9a96e]/20">
-              <div className="flex items-center gap-2 text-xs text-[#8b7b6b]">
+              <div className="flex items-center gap-2 text-sm text-[#6b5f53]">
                 <Sparkles className="w-3.5 h-3.5 text-[#c9a96e]" />
                 Pre-filled from the{" "}
                 <strong className="text-[#5c3d2e]">{template.label}</strong> template. Adjust if
@@ -386,7 +386,7 @@ export default function CDPProductionWizard({
               </div>
             </div>
 
-            <p className="text-xs text-[#b0a090]">★ = recommended for this template</p>
+            <p className="text-sm text-[#8b7b6b]">★ = recommended for this template</p>
           </div>
         );
       }
@@ -419,7 +419,7 @@ export default function CDPProductionWizard({
                 <div className="flex flex-col items-center gap-2">
                   <CheckCircle2 className="w-8 h-8 text-emerald-500" />
                   <p className="font-medium text-emerald-700">{selectedFile.name}</p>
-                  <p className="text-xs text-emerald-600">
+                  <p className="text-sm text-emerald-600">
                     {(selectedFile.size / 1024 / 1024).toFixed(2)} MB · Click to change
                   </p>
                 </div>
@@ -427,7 +427,7 @@ export default function CDPProductionWizard({
                 <div className="flex flex-col items-center gap-2">
                   <Upload className="w-8 h-8 text-[#c9a96e]/60" />
                   <p className="font-medium text-[#5c3d2e]">Click to upload manuscript</p>
-                  <p className="text-xs text-[#b0a090]">.docx, .doc, .txt, .rtf, .epub · Max 50 MB</p>
+                  <p className="text-sm text-[#8b7b6b]">.docx, .doc, .txt, .rtf, .epub · Max 50 MB</p>
                 </div>
               )}
             </div>
@@ -440,15 +440,15 @@ export default function CDPProductionWizard({
             )}
 
             <div className="bg-[#f0ebe3] rounded-lg p-3 border border-[#c9a96e]/20 space-y-1">
-              <p className="text-xs font-semibold text-[#5c3d2e]">Production summary</p>
-              <p className="text-xs text-[#8b7b6b]">Template: {template.label}</p>
-              <p className="text-xs text-[#8b7b6b]">
+              <p className="text-sm font-semibold text-[#5c3d2e]">Production summary</p>
+              <p className="text-sm text-[#6b5f53]">Template: {template.label}</p>
+              <p className="text-sm text-[#6b5f53]">
                 Style: {TYPESETTING_STYLES.find(s => s.id === styleId)?.label ?? styleId}
               </p>
-              <p className="text-xs text-[#8b7b6b]">
+              <p className="text-sm text-[#6b5f53]">
                 Trim: {TRIM_SIZES.find(t => t.id === trimSizeId)?.label ?? trimSizeId}
               </p>
-              <p className="text-xs text-[#8b7b6b]">Output: PDF + EPUB</p>
+              <p className="text-sm text-[#6b5f53]">Output: PDF + EPUB</p>
             </div>
           </div>
         );
@@ -538,30 +538,30 @@ export default function CDPProductionWizard({
             </div>
 
             <div className="bg-[#f0ebe3] rounded-lg p-4 border border-[#c9a96e]/20 text-left space-y-2">
-              <p className="text-xs font-semibold text-[#5c3d2e] uppercase tracking-wider">
+              <p className="text-sm font-semibold text-[#5c3d2e] uppercase tracking-wider">
                 Final Summary
               </p>
               <Separator className="bg-[#c9a96e]/20" />
-              <div className="grid grid-cols-2 gap-x-4 gap-y-1 text-xs">
-                <span className="text-[#b0a090]">Book</span>
+              <div className="grid grid-cols-2 gap-x-4 gap-y-1.5 text-sm">
+                <span className="text-[#8b7b6b]">Book</span>
                 <span className="text-[#3b2a1a] font-medium truncate">{title}</span>
                 {author && (
                   <>
-                    <span className="text-[#b0a090]">Author</span>
+                    <span className="text-[#8b7b6b]">Author</span>
                     <span className="text-[#3b2a1a] truncate">{author}</span>
                   </>
                 )}
-                <span className="text-[#b0a090]">Template</span>
+                <span className="text-[#8b7b6b]">Template</span>
                 <span className="text-[#3b2a1a]">{template.label}</span>
-                <span className="text-[#b0a090]">Style</span>
+                <span className="text-[#8b7b6b]">Style</span>
                 <span className="text-[#3b2a1a]">
                   {TYPESETTING_STYLES.find(s => s.id === styleId)?.label ?? styleId}
                 </span>
-                <span className="text-[#b0a090]">Trim</span>
+                <span className="text-[#8b7b6b]">Trim</span>
                 <span className="text-[#3b2a1a]">
                   {TRIM_SIZES.find(t => t.id === trimSizeId)?.label ?? trimSizeId}
                 </span>
-                <span className="text-[#b0a090]">Manuscript</span>
+                <span className="text-[#8b7b6b]">Manuscript</span>
                 <span className="text-[#3b2a1a] truncate">{selectedFile?.name ?? "—"}</span>
               </div>
             </div>

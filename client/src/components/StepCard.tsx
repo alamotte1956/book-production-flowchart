@@ -82,7 +82,7 @@ export default function StepCard({ step, stepNumber, isLeft, accentColor, phaseC
               <div className="flex-1">
                 <div className="flex items-center gap-2 mb-1">
                   <span
-                    className="text-xs font-semibold tracking-wider uppercase font-sans"
+                    className="text-sm font-semibold tracking-wider uppercase font-sans"
                     style={{ color: accentColor }}
                   >
                     Step {stepNumber}
@@ -109,7 +109,7 @@ export default function StepCard({ step, stepNumber, isLeft, accentColor, phaseC
             {/* Input count badge */}
             <div className="mt-3 flex items-center gap-2">
               <span
-                className="inline-flex items-center gap-1.5 text-xs font-medium px-3 py-1 rounded-full font-sans"
+                className="inline-flex items-center gap-1.5 text-sm font-medium px-3 py-1 rounded-full font-sans"
                 style={{
                   backgroundColor: `${accentColor}12`,
                   color: accentColor,
@@ -119,7 +119,7 @@ export default function StepCard({ step, stepNumber, isLeft, accentColor, phaseC
                 {step.inputs.length} input{step.inputs.length !== 1 ? "s" : ""}
               </span>
               {!isExpanded && (
-                <span className="text-xs text-[#9b8b7b] font-sans">Click to expand</span>
+                <span className="text-sm text-[#9b8b7b] font-sans">Click to expand</span>
               )}
             </div>
           </div>
@@ -159,7 +159,7 @@ export default function StepCard({ step, stepNumber, isLeft, accentColor, phaseC
                         <p className="font-sans font-semibold text-sm text-[#3a2a1a]">
                           {input.name}
                         </p>
-                        <p className="font-sans text-xs text-[#7b6c5c] mt-0.5 leading-relaxed">
+                        <p className="font-sans text-sm text-[#6b5c4c] mt-0.5 leading-relaxed">
                           {input.description}
                         </p>
                       </div>

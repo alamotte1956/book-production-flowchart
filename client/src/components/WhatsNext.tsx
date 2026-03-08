@@ -88,14 +88,14 @@ function PromptCard({ prompt, index }: { prompt: NextPrompt; index: number }) {
       <div className="flex-1 min-w-0">
         <div className="flex items-start justify-between gap-2 mb-1">
           <h4 className="text-sm font-semibold text-[#2c1810] leading-snug">{prompt.title}</h4>
-          <span className={`flex-shrink-0 text-[10px] font-semibold uppercase tracking-wide px-1.5 py-0.5 rounded ${styles.badge}`}>
+          <span className={`flex-shrink-0 text-xs font-semibold uppercase tracking-wide px-1.5 py-0.5 rounded ${styles.badge}`}>
             {prompt.priority}
           </span>
         </div>
-        <p className="text-xs text-[#8b7b6b] leading-relaxed mb-3">{prompt.description}</p>
+        <p className="text-sm text-[#6b5f53] leading-relaxed mb-3">{prompt.description}</p>
         <Button
           size="sm"
-          className="h-7 text-xs bg-[#2c1810] hover:bg-[#3d2415] text-white gap-1.5"
+          className="h-7 text-sm bg-[#2c1810] hover:bg-[#3d2415] text-white gap-1.5"
           onClick={() => navigate(prompt.actionRoute)}
         >
           {prompt.actionLabel}
@@ -135,12 +135,12 @@ export default function WhatsNext({
           {ICON_MAP[primary.icon]}
         </div>
         <div className="flex-1 min-w-0">
-          <p className="text-xs font-semibold text-[#2c1810]">{primary.title}</p>
-          <p className="text-[11px] text-[#8b7b6b] truncate">{primary.description}</p>
+          <p className="text-sm font-semibold text-[#2c1810]">{primary.title}</p>
+          <p className="text-xs text-[#6b5f53] truncate">{primary.description}</p>
         </div>
         <Button
           size="sm"
-          className="flex-shrink-0 h-7 text-xs bg-[#2c1810] hover:bg-[#3d2415] text-white gap-1"
+          className="flex-shrink-0 h-7 text-sm bg-[#2c1810] hover:bg-[#3d2415] text-white gap-1"
           onClick={() => navigate(primary.actionRoute)}
         >
           {primary.actionLabel}

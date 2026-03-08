@@ -310,28 +310,28 @@ export default function Home() {
                 alt="Create Design Publish LLC"
                 className="h-10 w-auto object-contain"
               />
-              <span className="font-serif text-[#f5d98a] text-sm tracking-wide hidden sm:block">Create Design Publish LLC</span>
+              <span className="font-serif text-[#f5d98a] text-base tracking-wide hidden sm:block">Create Design Publish LLC</span>
             </div>
             <div className="flex items-center gap-3">
               <button
                 onClick={() => document.getElementById('features')?.scrollIntoView({ behavior: 'smooth' })}
-                className="text-xs text-[#c9a96e]/70 hover:text-[#c9a96e] transition-colors hidden md:block px-3 py-1.5"
+                className="text-sm text-[#c9a96e]/80 hover:text-[#c9a96e] transition-colors hidden md:block px-3 py-1.5"
               >
                 Features
               </button>
               <button
                 onClick={() => document.getElementById('tools-section')?.scrollIntoView({ behavior: 'smooth' })}
-                className="text-xs text-[#c9a96e]/70 hover:text-[#c9a96e] transition-colors hidden md:block px-3 py-1.5"
+                className="text-sm text-[#c9a96e]/80 hover:text-[#c9a96e] transition-colors hidden md:block px-3 py-1.5"
               >
                 Tools
               </button>
               <a href={getLoginUrl()}>
-                <button className="text-xs text-[#f5efe0] hover:text-white transition-colors px-4 py-1.5 rounded-md border border-[#c9a96e]/30 hover:border-[#c9a96e]/60">
+                <button className="text-sm text-[#f5efe0] hover:text-white transition-colors px-4 py-1.5 rounded-md border border-[#c9a96e]/30 hover:border-[#c9a96e]/60">
                   Sign In
                 </button>
               </a>
               <a href={getSignUpUrl()}>
-                <button className="text-xs bg-[#c9a96e] hover:bg-[#b8944f] text-[#1a1008] font-semibold px-4 py-1.5 rounded-md transition-colors">
+                <button className="text-sm bg-[#c9a96e] hover:bg-[#b8944f] text-[#1a1008] font-semibold px-4 py-1.5 rounded-md transition-colors">
                   Create Account
                 </button>
               </a>
@@ -367,9 +367,8 @@ export default function Home() {
               <p
                 className="mt-4 font-serif text-2xl md:text-3xl tracking-widest uppercase"
                 style={{
-                  color: "transparent",
-                  WebkitTextStroke: "1.5px #c9a96e",
-                  letterSpacing: "0.2em",
+                  color: "#c9a96e",
+                  letterSpacing: "0.18em",
                   textShadow: "0 0 30px rgba(201,169,110,0.25)",
                 }}
               >
@@ -431,7 +430,7 @@ export default function Home() {
                     <f.icon size={20} className="text-[#c9a96e]" />
                   </div>
                   <h3 className="font-serif text-lg text-[#3a2a1a] mb-2">{f.title}</h3>
-                  <p className="text-sm text-[#8b7b6b] leading-relaxed">{f.desc}</p>
+                  <p className="text-[15px] text-[#6b5f53] leading-relaxed">{f.desc}</p>
                 </div>
               </motion.div>
             ))}
@@ -443,7 +442,7 @@ export default function Home() {
           <div className="max-w-5xl mx-auto px-6">
             <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.6 }} className="text-center mb-14">
               <h2 className="font-serif text-3xl md:text-4xl text-[#f5efe0]">8 Professional Self-Publishing Tools</h2>
-              <p className="mt-3 text-[#c9a96e]/60 max-w-lg mx-auto">Everything you need to create, design, and publish your book — all in one online publishing platform.</p>
+              <p className="mt-3 text-[#c9a96e]/80 max-w-lg mx-auto">Everything you need to create, design, and publish your book — all in one online publishing platform.</p>
             </motion.div>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
               {[
@@ -459,8 +458,8 @@ export default function Home() {
                 <motion.div key={tool.label} initial={{ opacity: 0, y: 12 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: i * 0.05, duration: 0.4 }}>
                   <div className="bg-[#3a2a1a] rounded-xl p-4 border border-[#c9a96e]/10 hover:border-[#c9a96e]/30 transition-colors h-full">
                     <tool.icon size={20} className="text-[#c9a96e] mb-2" />
-                    <h3 className="font-serif text-sm text-[#f5efe0] leading-tight">{tool.label}</h3>
-                    <p className="text-xs text-[#c9a96e]/40 mt-1 leading-relaxed">{tool.desc}</p>
+                    <h3 className="font-serif text-base text-[#f5efe0] leading-tight">{tool.label}</h3>
+                    <p className="text-sm text-[#c9a96e]/60 mt-1 leading-relaxed">{tool.desc}</p>
                   </div>
                 </motion.div>
               ))}
@@ -484,8 +483,8 @@ export default function Home() {
                     </span>
                     <h3 className="font-serif text-base text-[#3a2a1a]">{phase.title}</h3>
                   </div>
-                  <p className="text-sm text-[#8b7b6b]">{phase.subtitle}</p>
-                  <p className="text-xs text-[#a89880] mt-3">{phase.steps.length} steps · {phase.steps.reduce((a, s) => a + s.inputs.length, 0)} inputs</p>
+                  <p className="text-sm text-[#6b5f53]">{phase.subtitle}</p>
+                  <p className="text-sm text-[#8b7b6b] mt-3">{phase.steps.length} steps · {phase.steps.reduce((a, s) => a + s.inputs.length, 0)} inputs</p>
                 </div>
               </motion.div>
             ))}
@@ -498,15 +497,15 @@ export default function Home() {
             <div className="flex-1">
               <div className="flex items-center gap-2 mb-3">
                 <Sparkles size={18} className="text-[#c9a96e]" />
-                <span className="text-xs font-bold uppercase tracking-wider text-[#a89880]">Resources & Success Hub</span>
+                <span className="text-sm font-bold uppercase tracking-wider text-[#8b7b6b]">Resources & Success Hub</span>
               </div>
             <h2 className="font-serif text-2xl md:text-3xl text-[#3a2a1a] mb-3">The Best Self-Publishing Resources</h2>
             <p className="text-[#8b7b6b] leading-relaxed mb-4">We've curated the most trusted online publishing and self-publishing platforms across every phase — from Scrivener for writing to IngramSpark for distribution.</p>
-              <div className="flex flex-wrap gap-2 text-xs">
+              <div className="flex flex-wrap gap-2 text-sm">
                 {["Scrivener", "Reedsy", "QueryTracker", "KDP", "IngramSpark", "BookBub", "NetGalley", "Goodreads"].map(t => (
-                  <span key={t} className="px-2 py-1 rounded-full bg-[#f0e8d8] text-[#8b7b6b]">{t}</span>
+                  <span key={t} className="px-2.5 py-1 rounded-full bg-[#f0e8d8] text-[#6b5f53]">{t}</span>
                 ))}
-                <span className="px-2 py-1 rounded-full bg-[#f0e8d8] text-[#c9a96e]">+35 more</span>
+                <span className="px-2.5 py-1 rounded-full bg-[#f0e8d8] text-[#c9a96e]">+35 more</span>
               </div>
             </div>
             <div className="shrink-0">
@@ -550,14 +549,14 @@ export default function Home() {
                   className="h-10 w-auto object-contain"
                 />
                 <div>
-                  <p className="font-serif text-[#f5d98a] text-sm">Create Design Publish LLC</p>
-                  <p className="text-[10px] text-[#c9a96e]/40 uppercase tracking-widest">Manuscript to Masterpiece</p>
+                  <p className="font-serif text-[#f5d98a] text-base">Create Design Publish LLC</p>
+                  <p className="text-xs text-[#c9a96e]/60 uppercase tracking-widest">Manuscript to Masterpiece</p>
                 </div>
               </div>
               <div className="flex flex-col items-center md:items-end gap-1 text-center md:text-right">
-                <a href="https://createdesignpublish.net" className="text-xs text-[#c9a96e]/50 hover:text-[#c9a96e] transition-colors">createdesignpublish.net</a>
-                <a href="mailto:gs@safarilegacy.org" className="text-xs text-[#c9a96e]/50 hover:text-[#c9a96e] transition-colors">gs@safarilegacy.org</a>
-                <p className="text-[10px] text-[#c9a96e]/25 mt-1">&copy; {new Date().getFullYear()} Create Design Publish LLC. All rights reserved.</p>
+                <a href="https://createdesignpublish.net" className="text-sm text-[#c9a96e]/70 hover:text-[#c9a96e] transition-colors">createdesignpublish.net</a>
+                <a href="mailto:gs@safarilegacy.org" className="text-sm text-[#c9a96e]/70 hover:text-[#c9a96e] transition-colors">gs@safarilegacy.org</a>
+                <p className="text-xs text-[#c9a96e]/50 mt-1">&copy; {new Date().getFullYear()} Create Design Publish LLC. All rights reserved.</p>
               </div>
             </div>
           </div>
