@@ -99,7 +99,10 @@ PostgreSQL via Replit's built-in database. Use `npx drizzle-kit push` to sync sc
 - **Dashboard Command Center**: Stats bar (projects, steps, files, jobs) with real-time aggregated data
 - **User Guide**: 13-chapter comprehensive guide with TOC, expand/collapse, Print Specs chapter, FAQ
 - **Polished Auto-Produce Results**: Animated progress, detail chips, file type icons, status indicators
-- **Contact Form**: Public contact form on landing page
+- **Polished Project Tracker**: Ornamental chapter dividers, color-coded progress lines, phase celebration effects, improved step cards
+- **Project Export**: Export project summary as formatted HTML document from Project Tracker
+- **Polished Landing Page**: Enhanced hero, How It Works section, testimonials/social proof, feature card hover effects
+- **Contact Form**: Public contact form on landing page (backend wired to contact_submissions table)
 
 ## Database Tables
 

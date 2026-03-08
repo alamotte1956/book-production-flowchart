@@ -19,7 +19,7 @@ import {
   Upload, CheckCircle2, SkipForward, Clock, Sparkles, Copy,
   Layers, BookMarked, Ruler, Zap, BarChart3, Library,
   ChevronRight, ChevronDown, Calendar, Star, TrendingUp, FileText, HelpCircle, LogOut, User, Menu, X, LayoutGrid, Search, Send,
-  Compass,
+  Compass, PenTool, Palette, Printer, Quote, Package,
 } from "lucide-react";
 import {
   DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel,
@@ -344,6 +344,12 @@ export default function Home() {
                 Features
               </button>
               <button
+                onClick={() => document.getElementById('how-it-works')?.scrollIntoView({ behavior: 'smooth' })}
+                className="font-serif text-base text-[#f5efe0] hover:text-[#f5d98a] transition-colors hidden md:block px-3 py-1.5"
+              >
+                How It Works
+              </button>
+              <button
                 onClick={() => document.getElementById('tools-section')?.scrollIntoView({ behavior: 'smooth' })}
                 className="font-serif text-base text-[#f5efe0] hover:text-[#f5d98a] transition-colors hidden md:block px-3 py-1.5"
               >
@@ -370,75 +376,85 @@ export default function Home() {
         </nav>
 
         {/* Hero */}
-        <div className="relative h-[75vh] min-h-[550px] flex items-center justify-center overflow-hidden pt-14">
-          <img src={HERO_URL} alt="Publishing workshop" className="absolute inset-0 w-full h-full object-cover" />
-          <div className="absolute inset-0 bg-gradient-to-b from-[#1a1008]/70 via-[#1a1008]/40 to-[#1a1008]/80" />
-          <div className="relative z-10 text-center px-6 max-w-3xl">
-            <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8 }}>
-              <div className="flex items-center justify-center gap-3 mb-6">
-                <div className="h-px w-16 bg-[#c9a96e]/60" />
+        <div className="relative h-[85vh] min-h-[600px] flex items-center justify-center overflow-hidden pt-14">
+          <img src={HERO_URL} alt="Publishing workshop" className="absolute inset-0 w-full h-full object-cover scale-105" />
+          <div className="absolute inset-0 bg-gradient-to-b from-[#1a1008]/80 via-[#1a1008]/50 to-[#1a1008]/90" />
+          <div className="absolute inset-0" style={{ backgroundImage: "url(\"data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23c9a96e' fill-opacity='0.03'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E\")" }} />
+          <div className="relative z-10 text-center px-6 max-w-4xl">
+            <motion.div initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 1, ease: "easeOut" }}>
+              <motion.div initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} transition={{ delay: 0.2, duration: 0.6 }} className="flex items-center justify-center gap-4 mb-8">
+                <div className="h-px w-20 bg-gradient-to-r from-transparent to-[#c9a96e]/60" />
                 <img
                   src="https://d2xsxph8kpxj0f.cloudfront.net/310519663211654017/kGjPju6hKCvCsjZhgUHyqj/CDPlargelogo_25428631.PNG"
                   alt="Create Design Publish LLC"
-                  className="h-10 w-auto object-contain"
+                  className="h-12 w-auto object-contain drop-shadow-lg"
                 />
-                <div className="h-px w-16 bg-[#c9a96e]/60" />
-              </div>
+                <div className="h-px w-20 bg-gradient-to-l from-transparent to-[#c9a96e]/60" />
+              </motion.div>
               <h1
-                className="font-serif text-4xl md:text-6xl lg:text-7xl leading-tight tracking-tight whitespace-nowrap"
+                className="font-serif text-4xl md:text-6xl lg:text-7xl leading-[1.1] tracking-tight"
                 style={{
                   color: "#f5d98a",
-                  textShadow: "0 0 60px rgba(245,217,138,0.55), 0 0 120px rgba(201,169,110,0.4), 0 3px 6px rgba(0,0,0,0.6)",
-                  letterSpacing: "0.02em",
+                  textShadow: "0 0 80px rgba(245,217,138,0.5), 0 0 160px rgba(201,169,110,0.3), 0 4px 8px rgba(0,0,0,0.7)",
+                  letterSpacing: "0.01em",
                 }}
               >
-                Create Design Publish LLC
+                Create Design Publish
               </h1>
+              <motion.div initial={{ opacity: 0, width: 0 }} animate={{ opacity: 1, width: "6rem" }} transition={{ delay: 0.5, duration: 0.8 }} className="mx-auto mt-4 h-0.5 bg-gradient-to-r from-transparent via-[#c9a96e] to-transparent" />
               <p
-                className="mt-4 font-serif text-xl md:text-2xl lg:text-3xl tracking-widest uppercase"
+                className="mt-5 font-serif text-lg md:text-xl lg:text-2xl tracking-[0.25em] uppercase"
                 style={{
-                  color: "#f5d98a",
-                  textShadow: "0 0 60px rgba(245,217,138,0.55), 0 0 120px rgba(201,169,110,0.4), 0 3px 6px rgba(0,0,0,0.6)",
-                  letterSpacing: "0.18em",
+                  color: "#e8d5a8",
+                  textShadow: "0 0 40px rgba(245,217,138,0.4), 0 2px 4px rgba(0,0,0,0.5)",
                 }}
               >
                 Manuscript to Masterpiece
               </p>
-              <p className="mt-5 font-serif text-lg md:text-xl text-[#d4c8b4] max-w-xl mx-auto leading-relaxed">
+              <p className="mt-6 font-serif text-base md:text-lg lg:text-xl text-[#d4c8b4]/90 max-w-2xl mx-auto leading-relaxed">
                 The all-in-one <strong className="text-[#f5d98a] font-semibold">self-publishing</strong> and <strong className="text-[#f5d98a] font-semibold">online publishing</strong> platform. Create, design, and publish your book — from first idea to finished volume.
               </p>
-              <div className="mt-8 flex items-center justify-center gap-8 text-[#c9a96e]/80 font-serif text-lg">
-                <span><strong className="text-3xl text-[#f5efe0]">{phases.length}</strong> Phases</span>
-                <span className="text-[#c9a96e]/30">|</span>
-                <span><strong className="text-3xl text-[#f5efe0]">{totalSteps}</strong> Steps</span>
-                <span className="text-[#c9a96e]/30">|</span>
-                <span><strong className="text-3xl text-[#f5efe0]">8</strong> Pro Tools</span>
-              </div>
-              <div className="mt-10 flex flex-col items-center gap-6">
+              <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.6, duration: 0.5 }} className="mt-8 flex items-center justify-center gap-6 md:gap-10 text-[#c9a96e]/80 font-serif text-base md:text-lg">
+                <div className="flex flex-col items-center">
+                  <strong className="text-3xl md:text-4xl text-[#f5efe0] font-bold">{phases.length}</strong>
+                  <span className="text-xs md:text-sm tracking-wider uppercase mt-1">Phases</span>
+                </div>
+                <div className="w-px h-10 bg-[#c9a96e]/20" />
+                <div className="flex flex-col items-center">
+                  <strong className="text-3xl md:text-4xl text-[#f5efe0] font-bold">{totalSteps}</strong>
+                  <span className="text-xs md:text-sm tracking-wider uppercase mt-1">Steps</span>
+                </div>
+                <div className="w-px h-10 bg-[#c9a96e]/20" />
+                <div className="flex flex-col items-center">
+                  <strong className="text-3xl md:text-4xl text-[#f5efe0] font-bold">8</strong>
+                  <span className="text-xs md:text-sm tracking-wider uppercase mt-1">Pro Tools</span>
+                </div>
+              </motion.div>
+              <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.8, duration: 0.5 }} className="mt-10 flex flex-col items-center gap-6">
                 <div className="flex flex-col sm:flex-row items-center gap-4">
                   <a href={getSignUpUrl()}>
-                    <Button size="lg" className="bg-[#c9a96e] hover:bg-[#b8944f] text-[#2a1a0a] font-semibold text-base px-10 py-6 rounded-lg shadow-lg shadow-[#c9a96e]/20">
+                    <Button size="lg" className="bg-gradient-to-r from-[#d4b480] to-[#c9a96e] hover:from-[#e0c490] hover:to-[#d4b480] text-[#1a1008] font-bold text-base px-12 py-6 rounded-xl shadow-xl shadow-[#c9a96e]/25 transition-all hover:shadow-2xl hover:shadow-[#c9a96e]/30 hover:-translate-y-0.5">
                       Create Free Account
                       <ArrowRight className="ml-2" size={18} />
                     </Button>
                   </a>
                   <a href={getLoginUrl()}>
-                    <Button size="lg" variant="outline" className="border-[#c9a96e]/50 text-[#f5efe0] hover:bg-[#c9a96e]/10 hover:border-[#c9a96e] font-semibold text-base px-8 py-6 rounded-lg bg-transparent">
+                    <Button size="lg" variant="outline" className="border-[#c9a96e]/40 text-[#f5efe0] hover:bg-[#c9a96e]/15 hover:border-[#c9a96e]/70 font-semibold text-base px-10 py-6 rounded-xl bg-[#1a1008]/30 backdrop-blur-sm transition-all hover:-translate-y-0.5">
                       Sign In
                     </Button>
                   </a>
                 </div>
-                <a href="/guided-journey" className="inline-flex items-center gap-2 text-[#f5d98a]/80 hover:text-[#f5d98a] transition-colors font-serif text-sm border border-[#c9a96e]/30 hover:border-[#c9a96e]/60 rounded-full px-5 py-2">
+                <a href="/guided-journey" className="inline-flex items-center gap-2 text-[#f5d98a]/80 hover:text-[#f5d98a] transition-all font-serif text-sm border border-[#c9a96e]/25 hover:border-[#c9a96e]/50 rounded-full px-6 py-2.5 backdrop-blur-sm bg-[#1a1008]/20 hover:bg-[#1a1008]/30">
                   <Compass size={15} />
                   <span>Start Your Publishing Journey</span>
                   <ArrowRight size={14} />
                 </a>
                 <button
                   onClick={() => document.getElementById('features')?.scrollIntoView({ behavior: 'smooth' })}
-                  className="flex flex-col items-center gap-1 text-[#c9a96e]/70 hover:text-[#c9a96e] transition-colors group"
+                  className="flex flex-col items-center gap-1 text-[#c9a96e]/70 hover:text-[#c9a96e] transition-colors group mt-2"
                   aria-label="Learn more"
                 >
-                  <span className="text-sm font-serif tracking-widest uppercase">Learn More</span>
+                  <span className="text-xs font-serif tracking-widest uppercase">Learn More</span>
                   <motion.div
                     animate={{ y: [0, 6, 0] }}
                     transition={{ duration: 1.5, repeat: Infinity, ease: 'easeInOut' }}
@@ -446,29 +462,59 @@ export default function Home() {
                     <ChevronDown size={22} className="text-[#c9a96e]/70 group-hover:text-[#c9a96e]" />
                   </motion.div>
                 </button>
-              </div>
+              </motion.div>
             </motion.div>
           </div>
         </div>
 
         {/* Features */}
-        <div id="features" className="max-w-5xl mx-auto px-6 py-20">
-          <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.6 }} className="text-center mb-14">
-            <h2 className="font-serif text-3xl md:text-4xl text-[#3a2a1a]">Your Complete Self-Publishing Toolkit</h2>
-            <p className="mt-3 font-serif text-[#8b7b6b] max-w-lg mx-auto">Not just a flowchart — a real online publishing workspace where you create, design, and track every stage of your book's production.</p>
+        <div id="features" className="max-w-5xl mx-auto px-6 py-24">
+          <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.6 }} className="text-center mb-16">
+            <span className="inline-block text-xs font-bold uppercase tracking-[0.2em] text-[#c9a96e] mb-3 border border-[#c9a96e]/30 rounded-full px-4 py-1.5">Publishing Toolkit</span>
+            <h2 className="font-serif text-3xl md:text-5xl text-[#3a2a1a] leading-tight">Your Complete Self-Publishing Toolkit</h2>
+            <p className="mt-4 font-serif text-lg text-[#8b7b6b] max-w-xl mx-auto leading-relaxed">Not just a flowchart — a real online publishing workspace where you create, design, and track every stage of your book's production.</p>
           </motion.div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-8">
             {features.map((f, i) => (
-              <motion.div key={f.title} initial={{ opacity: 0, y: 16 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: i * 0.1, duration: 0.5 }}>
-                <div className="bg-white rounded-xl p-6 border border-[#e8dfd0] hover:shadow-md transition-shadow h-full">
-                  <div className="w-10 h-10 rounded-lg bg-[#f0e8d8] flex items-center justify-center mb-4">
-                    <f.icon size={20} className="text-[#c9a96e]" />
+              <motion.div key={f.title} initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: i * 0.1, duration: 0.5 }}>
+                <div className="bg-white rounded-2xl p-7 border border-[#e8dfd0] hover:shadow-xl hover:shadow-[#c9a96e]/10 hover:border-[#c9a96e]/30 hover:-translate-y-1 transition-all duration-300 h-full group">
+                  <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-[#f5ede0] to-[#e8dfd0] group-hover:from-[#c9a96e]/20 group-hover:to-[#c9a96e]/10 flex items-center justify-center mb-5 transition-colors duration-300">
+                    <f.icon size={22} className="text-[#c9a96e]" />
                   </div>
-                  <h3 className="font-serif text-lg text-[#3a2a1a] mb-2">{f.title}</h3>
+                  <h3 className="font-serif text-xl text-[#3a2a1a] mb-2.5 group-hover:text-[#5c3d2e] transition-colors">{f.title}</h3>
                   <p className="font-serif text-[15px] text-[#6b5f53] leading-relaxed">{f.desc}</p>
                 </div>
               </motion.div>
             ))}
+          </div>
+        </div>
+
+        {/* How It Works */}
+        <div id="how-it-works" className="bg-gradient-to-b from-[#faf6ef] to-[#f5ede0] py-24">
+          <div className="max-w-5xl mx-auto px-6">
+            <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.6 }} className="text-center mb-16">
+              <span className="inline-block text-xs font-bold uppercase tracking-[0.2em] text-[#c9a96e] mb-3">Simple Process</span>
+              <h2 className="font-serif text-3xl md:text-5xl text-[#3a2a1a] leading-tight">How It Works</h2>
+              <p className="mt-4 font-serif text-lg text-[#8b7b6b] max-w-xl mx-auto leading-relaxed">From your first draft to a finished book on shelves — four simple stages powered by professional tools.</p>
+            </motion.div>
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-6 md:gap-4 relative">
+              <div className="hidden md:block absolute top-12 left-[12.5%] right-[12.5%] h-0.5 bg-gradient-to-r from-[#c9a96e]/20 via-[#c9a96e]/40 to-[#c9a96e]/20" />
+              {[
+                { step: 1, icon: PenTool, title: "Upload Your Manuscript", desc: "Start by creating a project and uploading your manuscript, notes, and reference materials." },
+                { step: 2, icon: Palette, title: "Design Your Book", desc: "Use our professional tools to configure typesetting, calculate spine width, and design your cover." },
+                { step: 3, icon: Printer, title: "Produce Print-Ready Files", desc: "Generate typeset PDFs and EPUBs with our AI-powered layout engine — ready for any printer." },
+                { step: 4, icon: Package, title: "Publish & Distribute", desc: "Export ISBN metadata, ONIX 3.0 files, and submit to distributors like IngramSpark and KDP." },
+              ].map((item, i) => (
+                <motion.div key={item.step} initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: i * 0.15, duration: 0.5 }} className="relative text-center">
+                  <div className="w-14 h-14 rounded-2xl bg-white border-2 border-[#c9a96e]/30 flex items-center justify-center mx-auto mb-5 relative z-10 shadow-sm">
+                    <item.icon size={24} className="text-[#c9a96e]" />
+                    <span className="absolute -top-2 -right-2 w-6 h-6 rounded-full bg-[#c9a96e] text-[#1a1008] text-xs font-bold flex items-center justify-center shadow-sm">{item.step}</span>
+                  </div>
+                  <h3 className="font-serif text-lg text-[#3a2a1a] mb-2 font-semibold">{item.title}</h3>
+                  <p className="font-serif text-sm text-[#8b7b6b] leading-relaxed max-w-[220px] mx-auto">{item.desc}</p>
+                </motion.div>
+              ))}
+            </div>
           </div>
         </div>
 
@@ -553,20 +599,54 @@ export default function Home() {
           </motion.div>
         </div>
 
+        {/* Testimonials */}
+        <div className="bg-[#faf6ef] py-24">
+          <div className="max-w-5xl mx-auto px-6">
+            <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.6 }} className="text-center mb-16">
+              <span className="inline-block text-xs font-bold uppercase tracking-[0.2em] text-[#c9a96e] mb-3">Author Stories</span>
+              <h2 className="font-serif text-3xl md:text-5xl text-[#3a2a1a] leading-tight">Trusted by Published Authors</h2>
+              <p className="mt-4 font-serif text-lg text-[#8b7b6b] max-w-xl mx-auto leading-relaxed">Hear from authors who brought their books to life using our platform.</p>
+            </motion.div>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+              {[
+                { name: "Sarah Mitchell", role: "Author of 'Winds of Grace'", quote: "CDP streamlined my entire publishing process. From manuscript upload to print-ready PDF, everything was in one place. I published my debut novel in half the time I expected.", stars: 5 },
+                { name: "Rev. James Okonkwo", role: "Bible Publisher", quote: "The Bible Design Studio is unmatched. I configured a custom study Bible with red-letter text, cross-references, and concordance — all with professional typesetting quality.", stars: 5 },
+                { name: "Elena Ramirez", role: "Children's Book Author", quote: "As a first-time author, the 30-step workflow kept me on track. The spine calculator and cover designer saved me from costly printing mistakes. Truly a game-changer.", stars: 5 },
+              ].map((t, i) => (
+                <motion.div key={t.name} initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: i * 0.15, duration: 0.5 }}>
+                  <div className="bg-white rounded-2xl p-7 border border-[#e8dfd0] hover:shadow-lg hover:shadow-[#c9a96e]/10 transition-all duration-300 h-full flex flex-col">
+                    <Quote size={24} className="text-[#c9a96e]/30 mb-4 shrink-0" />
+                    <p className="font-serif text-[15px] text-[#5c4a3a] leading-relaxed flex-1 italic">"{t.quote}"</p>
+                    <div className="mt-6 pt-5 border-t border-[#f0e8d8]">
+                      <div className="flex items-center gap-1 mb-2">
+                        {Array.from({ length: t.stars }).map((_, idx) => (
+                          <Star key={idx} size={14} className="fill-[#c9a96e] text-[#c9a96e]" />
+                        ))}
+                      </div>
+                      <p className="font-serif text-sm font-semibold text-[#3a2a1a]">{t.name}</p>
+                      <p className="font-serif text-xs text-[#8b7b6b] mt-0.5">{t.role}</p>
+                    </div>
+                  </div>
+                </motion.div>
+              ))}
+            </div>
+          </div>
+        </div>
+
         {/* CTA */}
-        <div className="py-20 text-center px-6 bg-[#faf6ef]">
+        <div className="py-24 text-center px-6 bg-gradient-to-b from-[#f5ede0] to-[#faf6ef]">
           <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.6 }}>
             <Sparkles size={32} className="mx-auto text-[#c9a96e] mb-4" />
-            <h2 className="font-serif text-3xl text-[#3a2a1a] mb-3">Start Self-Publishing Today</h2>
-            <p className="font-serif text-[#8b7b6b] max-w-md mx-auto mb-8">Create your free account and use our online publishing platform to design, track, and publish your book — from manuscript to shelf.</p>
+            <h2 className="font-serif text-3xl md:text-4xl text-[#3a2a1a] mb-3">Start Self-Publishing Today</h2>
+            <p className="font-serif text-lg text-[#8b7b6b] max-w-md mx-auto mb-8">Create your free account and use our online publishing platform to design, track, and publish your book — from manuscript to shelf.</p>
             <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
               <a href={getSignUpUrl()}>
-                <Button size="lg" className="bg-[#c9a96e] hover:bg-[#b8944f] text-[#2a1a0a] font-semibold text-base px-10 py-6 rounded-lg">
+                <Button size="lg" className="bg-gradient-to-r from-[#d4b480] to-[#c9a96e] hover:from-[#e0c490] hover:to-[#d4b480] text-[#1a1008] font-bold text-base px-12 py-6 rounded-xl shadow-lg shadow-[#c9a96e]/20 transition-all hover:shadow-xl hover:-translate-y-0.5">
                   Create Free Account <ArrowRight className="ml-2" size={18} />
                 </Button>
               </a>
               <a href={getLoginUrl()}>
-                <Button size="lg" variant="outline" className="border-[#c9a96e]/50 text-[#5c3d2e] hover:bg-[#f0e8d8] hover:border-[#c9a96e] font-semibold text-base px-8 py-6 rounded-lg">
+                <Button size="lg" variant="outline" className="border-[#c9a96e]/40 text-[#5c3d2e] hover:bg-[#f0e8d8] hover:border-[#c9a96e] font-semibold text-base px-10 py-6 rounded-xl transition-all hover:-translate-y-0.5">
                   Already have an account? Sign In
                 </Button>
               </a>

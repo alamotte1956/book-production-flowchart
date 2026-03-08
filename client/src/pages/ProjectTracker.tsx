@@ -18,6 +18,7 @@ import {
   ClipboardCheck, Barcode, Printer, Palette, BookCopy, Microscope,
   Warehouse, Truck, Megaphone, Headphones, TrendingUp, Globe,
   Calendar, AlertTriangle, Clock, Download, ChevronsDown, ChevronsUp, Copy, BarChart2, Wand2,
+  Sparkles, Star,
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 import { useState, useMemo, useCallback, useRef, useEffect, type KeyboardEvent } from "react";
@@ -217,15 +218,15 @@ function StepCard({
   const status = stepStatus.status;
 
   const statusColors: Record<StepStatusType, string> = {
-    pending: "bg-white border-[#e8dfd0]",
-    complete: "bg-[#f0faf2] border-[#4a6741]/30",
-    skipped: "bg-gray-50 border-gray-200",
+    pending: "bg-white border-[#e8dfd0] hover:border-[#c9a96e]/40",
+    complete: "bg-gradient-to-br from-[#f0faf2] to-[#e8f5ea] border-[#4a6741]/30",
+    skipped: "bg-gray-50/80 border-gray-200",
   };
 
-  const statusBadge: Record<StepStatusType, { label: string; color: string }> = {
-    pending: { label: "Pending", color: "bg-[#f0e8d8] text-[#8b7b6b]" },
-    complete: { label: "Complete", color: "bg-[#d4edda] text-[#2d4a3e]" },
-    skipped: { label: "Skipped", color: "bg-gray-200 text-gray-500" },
+  const statusBadge: Record<StepStatusType, { label: string; dotColor: string; bgColor: string; textColor: string }> = {
+    pending: { label: "Pending", dotColor: "bg-amber-400", bgColor: "bg-amber-50", textColor: "text-amber-700" },
+    complete: { label: "Complete", dotColor: "bg-emerald-500", bgColor: "bg-emerald-50", textColor: "text-emerald-700" },
+    skipped: { label: "Skipped", dotColor: "bg-gray-400", bgColor: "bg-gray-100", textColor: "text-gray-500" },
   };
 
   const handleStatusChange = (newStatus: StepStatusType) => {
@@ -246,20 +247,22 @@ function StepCard({
     <motion.div
       initial={{ opacity: 0, y: 12 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ delay: globalIndex * 0.03 }}
+      transition={{ delay: globalIndex * 0.03, duration: 0.35, ease: "easeOut" }}
     >
-      <Card className={`${statusColors[status]} transition-all duration-200 overflow-hidden print:break-inside-avoid hover:shadow-md`}>
+      <Card className={`${statusColors[status]} transition-all duration-300 overflow-hidden print:break-inside-avoid shadow-sm hover:shadow-lg group/card`}>
         <CardContent className="p-0">
           <button
             className="w-full text-left px-5 py-4 flex items-center gap-4"
             onClick={() => !printMode && setExpanded(!expanded)}
           >
             <div
-              className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0 shadow-sm"
+              className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0 shadow-sm transition-transform duration-300 group-hover/card:scale-105"
               style={{ backgroundColor: status === "skipped" ? "#e5e7eb" : `${phase.accentColor}18` }}
             >
               {status === "complete" ? (
-                <Check size={20} className="text-[#4a6741]" />
+                <motion.div initial={{ scale: 0 }} animate={{ scale: 1 }} transition={{ type: "spring", stiffness: 500, damping: 15 }}>
+                  <Check size={20} className="text-emerald-600" />
+                </motion.div>
               ) : status === "skipped" ? (
                 <SkipForward size={18} className="text-gray-400" />
               ) : (
@@ -267,21 +270,26 @@ function StepCard({
               )}
             </div>
             <div className="flex-1 min-w-0">
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-2.5">
                 <h4 className={`font-serif text-base ${status === "skipped" ? "text-gray-400 line-through" : "text-[#3a2a1a]"}`}>
                   {step.title}
                 </h4>
-                <span className={`text-[10px] px-2 py-0.5 rounded-full font-medium ${statusBadge[status].color}`}>
+                <span className={`inline-flex items-center gap-1.5 text-[10px] px-2.5 py-0.5 rounded-full font-semibold ${statusBadge[status].bgColor} ${statusBadge[status].textColor}`}>
+                  <span className={`w-1.5 h-1.5 rounded-full ${statusBadge[status].dotColor}`} />
                   {statusBadge[status].label}
                 </span>
               </div>
-              <div className="flex items-center gap-3 mt-0.5">
+              <div className="flex items-center gap-3 mt-1">
                 <span className="text-xs text-[#a89880]">{step.inputs.length} inputs</span>
-                {fileCount > 0 && <span className="text-xs text-[#4a6741]">{fileCount} file{fileCount > 1 ? "s" : ""}</span>}
-                {stepStatus.notes && <span className="text-xs text-[#c9a96e]">Has notes</span>}
+                {fileCount > 0 && <span className="text-xs text-emerald-600 font-medium">{fileCount} file{fileCount > 1 ? "s" : ""}</span>}
+                {stepStatus.notes && <span className="text-xs text-[#c9a96e] font-medium">Has notes</span>}
               </div>
             </div>
-            {!printMode && (expanded ? <ChevronDown size={18} className="text-[#a89880]" /> : <ChevronRight size={18} className="text-[#a89880]" />)}
+            {!printMode && (
+              <motion.div animate={{ rotate: expanded ? 90 : 0 }} transition={{ duration: 0.25, ease: "easeInOut" }}>
+                <ChevronRight size={18} className="text-[#a89880] group-hover/card:text-[#5c3d2e] transition-colors" />
+              </motion.div>
+            )}
           </button>
 
           <AnimatePresence>
@@ -290,7 +298,7 @@ function StepCard({
                 initial={printMode ? false : { height: 0, opacity: 0 }}
                 animate={{ height: "auto", opacity: 1 }}
                 exit={{ height: 0, opacity: 0 }}
-                transition={{ duration: 0.2 }}
+                transition={{ duration: 0.3, ease: [0.4, 0, 0.2, 1] }}
                 className="overflow-hidden"
               >
                 <div className="px-5 pb-5 space-y-4">
@@ -718,19 +726,57 @@ function PhaseSection({
   const pct = visibleSteps.length > 0 ? Math.round((completedInPhase / visibleSteps.length) * 100) : 0;
   const phaseComplete = visibleSteps.length > 0 && completedInPhase === visibleSteps.length;
 
+  const PhaseIcon = iconMap[phase.steps[0]?.icon] || BookOpen;
+
   return (
     <section id={`phase-${phase.id}`} className="scroll-mt-20 print:break-before-page">
-      <div className="rounded-xl bg-gradient-to-r from-white/80 to-[#f8f5ef]/80 border border-[#e8dfd0] p-5 mb-5 backdrop-blur-sm">
-        <div className="flex items-center gap-4">
-          <div
-            className="w-12 h-12 rounded-xl flex items-center justify-center text-white font-serif font-bold text-lg shrink-0 shadow-sm"
-            style={{ backgroundColor: phase.accentColor }}
-          >
-            {phaseComplete ? <Check size={20} /> : phase.number}
+      <motion.div
+        className={`relative rounded-2xl border-2 p-6 mb-6 backdrop-blur-sm overflow-hidden transition-all duration-500 ${
+          phaseComplete
+            ? "bg-gradient-to-br from-emerald-50/80 via-white/80 to-emerald-50/40 border-emerald-300/50"
+            : "bg-gradient-to-br from-white/90 via-[#fdf9f3]/80 to-white/90 border-[#e8dfd0]"
+        }`}
+        initial={{ opacity: 0, y: 20 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true, margin: "-50px" }}
+        transition={{ duration: 0.5 }}
+      >
+        <div className="flex items-center justify-center gap-3 mb-4">
+          <div className="h-px w-8 sm:w-12" style={{ backgroundColor: `${phase.accentColor}50` }} />
+          <div className="w-1.5 h-1.5 rotate-45" style={{ backgroundColor: phase.accentColor }} />
+          <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-[#a89880]">Chapter {phase.number}</span>
+          <div className="w-1.5 h-1.5 rotate-45" style={{ backgroundColor: phase.accentColor }} />
+          <div className="h-px w-8 sm:w-12" style={{ backgroundColor: `${phase.accentColor}50` }} />
+        </div>
+
+        <div className="flex items-center gap-5">
+          <div className="relative shrink-0">
+            <div
+              className={`w-14 h-14 rounded-2xl flex items-center justify-center text-white font-serif font-bold text-xl shadow-md transition-all duration-500 ${
+                phaseComplete ? "scale-110" : ""
+              }`}
+              style={{ backgroundColor: phaseComplete ? "#059669" : phase.accentColor }}
+            >
+              {phaseComplete ? (
+                <motion.div
+                  initial={{ scale: 0, rotate: -180 }}
+                  animate={{ scale: 1, rotate: 0 }}
+                  transition={{ type: "spring", stiffness: 300, damping: 15 }}
+                >
+                  <Check size={24} strokeWidth={3} />
+                </motion.div>
+              ) : phase.number}
+            </div>
+            <div
+              className="absolute -bottom-1 -right-1 w-6 h-6 rounded-lg flex items-center justify-center shadow-sm"
+              style={{ backgroundColor: `${phase.accentColor}20` }}
+            >
+              <PhaseIcon size={12} style={{ color: phase.accentColor }} />
+            </div>
           </div>
           <div className="flex-1 min-w-0">
-            <h3 className="font-serif text-xl font-semibold text-[#3a2a1a] tracking-wide">{phase.title}</h3>
-            <div className="flex items-center gap-3 mt-1">
+            <h3 className="font-serif text-xl sm:text-2xl font-bold text-[#3a2a1a] tracking-wide leading-tight">{phase.title}</h3>
+            <div className="flex items-center gap-3 mt-1.5 flex-wrap">
               <p className="text-xs text-[#8b7b6b] italic">{phase.subtitle}</p>
               {!printMode && (
                 <DueDatePicker
@@ -746,21 +792,83 @@ function PhaseSection({
             </div>
           </div>
           <div className="text-right shrink-0">
-            <span className="text-lg font-serif font-bold" style={{ color: phase.accentColor }}>{pct}%</span>
-            <div className="w-28 mt-1.5">
-              <div className="h-2 rounded-full overflow-hidden" style={{ backgroundColor: `${phase.accentColor}15` }}>
-                <div
-                  className="h-full rounded-full transition-all duration-500 ease-out"
-                  style={{ width: `${pct}%`, backgroundColor: phase.accentColor }}
+            <div className="flex items-center gap-1.5 justify-end">
+              {phaseComplete && (
+                <motion.div
+                  initial={{ scale: 0, opacity: 0 }}
+                  animate={{ scale: 1, opacity: 1 }}
+                  transition={{ type: "spring", stiffness: 400, damping: 15, delay: 0.2 }}
+                >
+                  <Sparkles size={16} className="text-amber-500" />
+                </motion.div>
+              )}
+              <span className="text-xl font-serif font-bold" style={{ color: phaseComplete ? "#059669" : phase.accentColor }}>{pct}%</span>
+            </div>
+            <div className="w-32 mt-2">
+              <div className="h-2.5 rounded-full overflow-hidden" style={{ backgroundColor: `${phase.accentColor}12` }}>
+                <motion.div
+                  className="h-full rounded-full"
+                  style={{ backgroundColor: phaseComplete ? "#059669" : phase.accentColor }}
+                  initial={{ width: 0 }}
+                  animate={{ width: `${pct}%` }}
+                  transition={{ duration: 0.8, ease: "easeOut" }}
                 />
               </div>
             </div>
-            <span className="text-[10px] text-[#a89880] mt-0.5 block">{completedInPhase}/{visibleSteps.length} steps</span>
+            <span className="text-[10px] text-[#a89880] mt-1 block font-medium">{completedInPhase}/{visibleSteps.length} steps</span>
           </div>
         </div>
-      </div>
 
-      <div className="space-y-3 border-l-2 pl-4 ml-1" style={{ borderColor: `${phase.accentColor}30` }}>
+        {phaseComplete && (
+          <motion.div
+            className="mt-4 flex items-center justify-center gap-2 py-2 rounded-lg bg-emerald-50 border border-emerald-200/50"
+            initial={{ opacity: 0, height: 0 }}
+            animate={{ opacity: 1, height: "auto" }}
+            transition={{ duration: 0.4, delay: 0.3 }}
+          >
+            <motion.div
+              animate={{ rotate: [0, 15, -15, 10, -10, 0] }}
+              transition={{ duration: 0.6, delay: 0.5 }}
+            >
+              <Star size={14} className="text-amber-500 fill-amber-500" />
+            </motion.div>
+            <span className="text-xs font-semibold text-emerald-700">Phase Complete!</span>
+            <motion.div
+              animate={{ rotate: [0, -15, 15, -10, 10, 0] }}
+              transition={{ duration: 0.6, delay: 0.5 }}
+            >
+              <Star size={14} className="text-amber-500 fill-amber-500" />
+            </motion.div>
+          </motion.div>
+        )}
+
+        <div className="flex items-center justify-center gap-3 mt-4">
+          <div className="h-px flex-1" style={{ backgroundColor: `${phase.accentColor}20` }} />
+          <div className="w-1 h-1 rounded-full" style={{ backgroundColor: `${phase.accentColor}40` }} />
+          <div className="h-px flex-1" style={{ backgroundColor: `${phase.accentColor}20` }} />
+        </div>
+      </motion.div>
+
+      <div className="space-y-3 relative ml-1 pl-4">
+        <div className="absolute left-0 top-0 bottom-0 w-0.5">
+          {visibleSteps.map((step, idx) => {
+            const isComplete = statusMap[step.id]?.status === "complete" || statusMap[step.id]?.status === "skipped";
+            const segmentHeight = `${100 / visibleSteps.length}%`;
+            return (
+              <div
+                key={step.id}
+                className="transition-colors duration-500"
+                style={{
+                  position: "absolute",
+                  top: `${(idx / visibleSteps.length) * 100}%`,
+                  height: segmentHeight,
+                  width: "100%",
+                  backgroundColor: isComplete ? "#c9a96e" : "#e0d6c8",
+                }}
+              />
+            );
+          })}
+        </div>
         {visibleSteps.map((step, idx) => (
           <StepCard
             key={step.id}
@@ -1007,6 +1115,151 @@ function AIAssistantPanel({
   );
 }
 
+// ─── Export Project Summary ──────────────────────────────────────
+
+function escHtml(s: string): string {
+  return s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+}
+
+function generateProjectSummaryHTML({
+  project,
+  allPhases,
+  statusMap,
+  fileMap,
+  dueDateMap,
+  overallPct,
+  completedSteps,
+  totalSteps,
+  hiddenStepIds,
+}: {
+  project: { title: string; author?: string | null; genre?: string | null };
+  allPhases: Phase[];
+  statusMap: StepStatusMap;
+  fileMap: FileMap;
+  dueDateMap: DueDateMap;
+  overallPct: number;
+  completedSteps: number;
+  totalSteps: number;
+  hiddenStepIds: Set<string>;
+}): string {
+  const now = new Date().toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" });
+
+  const phaseSections = allPhases.map((phase) => {
+    const visibleSteps = phase.steps.filter(s => !hiddenStepIds.has(s.id));
+    const done = visibleSteps.filter(s => statusMap[s.id]?.status === "complete" || statusMap[s.id]?.status === "skipped").length;
+    const pct = visibleSteps.length > 0 ? Math.round((done / visibleSteps.length) * 100) : 0;
+    const dd = dueDateMap[phase.id];
+
+    const stepRows = visibleSteps.map((step) => {
+      const st = statusMap[step.id] || { status: "pending", notes: null };
+      const statusLabel = st.status === "complete" ? "✓ Complete" : st.status === "skipped" ? "⤳ Skipped" : "○ Pending";
+      const statusColor = st.status === "complete" ? "#2d6a4f" : st.status === "skipped" ? "#6b7280" : "#92400e";
+
+      const stepFiles: string[] = [];
+      step.inputs.forEach((input) => {
+        const key = `${step.id}:${input.name}`;
+        const files = fileMap[key];
+        if (files && files.length > 0) {
+          files.forEach(f => stepFiles.push(f.fileName));
+        }
+      });
+
+      return `
+        <tr>
+          <td style="padding:8px 12px;border-bottom:1px solid #e8dfd0;font-size:14px;color:#3a2a1a;">${escHtml(step.title)}</td>
+          <td style="padding:8px 12px;border-bottom:1px solid #e8dfd0;font-size:13px;color:${statusColor};font-weight:600;">${statusLabel}</td>
+          <td style="padding:8px 12px;border-bottom:1px solid #e8dfd0;font-size:13px;color:#5c3d2e;">${st.notes ? escHtml(st.notes) : "—"}</td>
+          <td style="padding:8px 12px;border-bottom:1px solid #e8dfd0;font-size:13px;color:#8b7b6b;">${stepFiles.length > 0 ? stepFiles.map(f => escHtml(f)).join(", ") : "—"}</td>
+        </tr>`;
+    }).join("");
+
+    return `
+      <div style="margin-bottom:32px;page-break-inside:avoid;">
+        <div style="display:flex;align-items:center;gap:12px;margin-bottom:12px;">
+          <div style="width:36px;height:36px;border-radius:10px;background:${phase.accentColor};color:white;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:16px;font-family:Georgia,serif;">${phase.number}</div>
+          <div style="flex:1;">
+            <h2 style="margin:0;font-family:Georgia,serif;font-size:18px;color:#3a2a1a;">${phase.title}</h2>
+            <p style="margin:2px 0 0;font-size:12px;color:#8b7b6b;font-style:italic;">${phase.subtitle}</p>
+          </div>
+          <div style="text-align:right;">
+            <span style="font-family:Georgia,serif;font-size:18px;font-weight:700;color:${phase.accentColor};">${pct}%</span>
+            <div style="font-size:11px;color:#a89880;">${done}/${visibleSteps.length} steps</div>
+            ${dd ? `<div style="font-size:11px;color:#8b7b6b;margin-top:2px;">Due: ${formatDate(dd)}</div>` : ""}
+          </div>
+        </div>
+        <div style="background:${phase.accentColor}15;border-radius:6px;height:8px;overflow:hidden;margin-bottom:12px;">
+          <div style="height:100%;width:${pct}%;background:${phase.accentColor};border-radius:6px;"></div>
+        </div>
+        <table style="width:100%;border-collapse:collapse;border:1px solid #e8dfd0;border-radius:8px;overflow:hidden;">
+          <thead>
+            <tr style="background:#f8f5ef;">
+              <th style="padding:8px 12px;text-align:left;font-size:12px;font-weight:600;color:#5c3d2e;text-transform:uppercase;letter-spacing:0.5px;border-bottom:2px solid #e8dfd0;">Step</th>
+              <th style="padding:8px 12px;text-align:left;font-size:12px;font-weight:600;color:#5c3d2e;text-transform:uppercase;letter-spacing:0.5px;border-bottom:2px solid #e8dfd0;width:120px;">Status</th>
+              <th style="padding:8px 12px;text-align:left;font-size:12px;font-weight:600;color:#5c3d2e;text-transform:uppercase;letter-spacing:0.5px;border-bottom:2px solid #e8dfd0;">Notes</th>
+              <th style="padding:8px 12px;text-align:left;font-size:12px;font-weight:600;color:#5c3d2e;text-transform:uppercase;letter-spacing:0.5px;border-bottom:2px solid #e8dfd0;">Files</th>
+            </tr>
+          </thead>
+          <tbody>${stepRows}</tbody>
+        </table>
+      </div>`;
+  }).join("");
+
+  return `<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Project Summary — ${escHtml(project.title)}</title>
+  <style>
+    @media print { body { margin: 0; } }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #fff; color: #3a2a1a; margin: 0; padding: 40px; line-height: 1.5; }
+    @page { margin: 1cm; }
+  </style>
+</head>
+<body>
+  <div style="max-width:900px;margin:0 auto;">
+    <div style="text-align:center;margin-bottom:40px;padding-bottom:24px;border-bottom:2px solid #c9a96e;">
+      <h1 style="font-family:Georgia,serif;font-size:28px;color:#2a1a0a;margin:0 0 8px;">${escHtml(project.title)}</h1>
+      <div style="font-size:14px;color:#8b7b6b;">
+        ${project.author ? `<span>by ${escHtml(project.author)}</span>` : ""}
+        ${project.author && project.genre ? " · " : ""}
+        ${project.genre ? `<span>${escHtml(project.genre)}</span>` : ""}
+      </div>
+      <div style="font-size:12px;color:#a89880;margin-top:4px;">Exported on ${now}</div>
+    </div>
+
+    <div style="background:linear-gradient(135deg,#faf6ef,#f5efe0);border:1px solid #e8dfd0;border-radius:12px;padding:24px;margin-bottom:32px;text-align:center;">
+      <div style="font-family:Georgia,serif;font-size:36px;font-weight:700;color:#c9a96e;">${overallPct}%</div>
+      <div style="font-size:14px;color:#5c3d2e;margin-top:4px;">Overall Progress</div>
+      <div style="background:#c9a96e20;border-radius:6px;height:10px;overflow:hidden;margin:12px auto 0;max-width:400px;">
+        <div style="height:100%;width:${overallPct}%;background:linear-gradient(90deg,#c9a96e,#e0c48a);border-radius:6px;"></div>
+      </div>
+      <div style="font-size:12px;color:#a89880;margin-top:8px;">${completedSteps} of ${totalSteps} steps completed</div>
+    </div>
+
+    ${phaseSections}
+
+    <div style="text-align:center;margin-top:40px;padding-top:20px;border-top:1px solid #e8dfd0;">
+      <p style="font-family:Georgia,serif;font-size:14px;color:#c9a96e;font-style:italic;">"Every book is a journey."</p>
+      <p style="font-size:11px;color:#a89880;">Generated by Create Design Publish</p>
+    </div>
+  </div>
+</body>
+</html>`;
+}
+
+function downloadProjectSummary(args: Parameters<typeof generateProjectSummaryHTML>[0]) {
+  const html = generateProjectSummaryHTML(args);
+  const blob = new Blob([html], { type: "text/html" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = `${args.project.title.replace(/[^a-zA-Z0-9 ]/g, "").replace(/\s+/g, "-")}-summary.html`;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+}
+
 // ─── Main Page ──────────────────────────────────────────────────
 
 export default function ProjectTracker() {
@@ -1225,13 +1478,26 @@ export default function ProjectTracker() {
                 <Button
                   variant="ghost" size="sm"
                   className="text-[#c9a96e]/70 hover:text-[#c9a96e] hover:bg-[#c9a96e]/10"
-                  onClick={() => window.print()}
+                  onClick={() => {
+                    downloadProjectSummary({
+                      project,
+                      allPhases,
+                      statusMap,
+                      fileMap,
+                      dueDateMap,
+                      overallPct,
+                      completedSteps,
+                      totalSteps,
+                      hiddenStepIds,
+                    });
+                    toast.success("Project summary exported");
+                  }}
                 >
                   <Download size={16} />
-                  <span className="ml-1.5 text-xs hidden sm:inline">Export</span>
+                  <span className="ml-1.5 text-xs hidden sm:inline">Export Summary</span>
                 </Button>
               </TooltipTrigger>
-              <TooltipContent>Print / Save as PDF</TooltipContent>
+              <TooltipContent>Export project summary as HTML</TooltipContent>
             </Tooltip>
           </div>
 
