@@ -36,6 +36,41 @@ const iconMap: Record<string, LucideIcon> = {
   CheckSquare, MessageSquare, Type, Image, LayoutGrid, Eye, RefreshCw, ShieldCheck,
   ClipboardCheck, BookOpen, Barcode, FileText, Printer, Palette, BookCopy, Microscope,
   Warehouse, Truck, Megaphone, Headphones, TrendingUp, Globe,
+  Wand2, Sparkles, Ruler,
+};
+
+const STEP_TOOL_ACTIONS: Record<string, { label: string; path: string; icon: string }> = {
+  "idea": { label: "Find Resources", path: "/resources", icon: "Search" },
+  "writing": { label: "Find Writing Tools", path: "/resources", icon: "Search" },
+  "self-edit": { label: "Find Editorial Tools", path: "/resources", icon: "Search" },
+  "proposal": { label: "AI Writing Assistant", path: "", icon: "Sparkles" },
+  "text-design": { label: "Browse Templates", path: "/templates", icon: "LayoutGrid" },
+  "cover-design": { label: "Open Cover Designer", path: "/cover-designer", icon: "Layers" },
+  "typesetting": { label: "Start Auto-Produce", path: "/auto-produce/__PROJECT_ID__", icon: "Wand2" },
+  "first-pass": { label: "Start Auto-Produce", path: "/auto-produce/__PROJECT_ID__", icon: "Wand2" },
+  "preflight": { label: "Generate Print Specs", path: "/print-specs", icon: "ClipboardCheck" },
+  "isbn": { label: "Open ISBN Manager", path: "/isbn-manager", icon: "Barcode" },
+  "paper": { label: "Calculate Spine Width", path: "/spine-calculator", icon: "Ruler" },
+  "printing": { label: "Generate Print Specs", path: "/print-specs", icon: "ClipboardCheck" },
+  "cover-print": { label: "Open Cover Designer", path: "/cover-designer", icon: "Layers" },
+  "binding": { label: "Calculate Spine Width", path: "/spine-calculator", icon: "Ruler" },
+  "marketing": { label: "AI Writing Assistant", path: "", icon: "Sparkles" },
+  "digital": { label: "Start Auto-Produce", path: "/auto-produce/__PROJECT_ID__", icon: "Wand2" },
+  "sales": { label: "AI Writing Assistant", path: "", icon: "Sparkles" },
+  "bible-versification": { label: "Open Bible Studio", path: "/bible-studio", icon: "BookOpen" },
+  "bible-red-letter": { label: "Open Bible Studio", path: "/bible-studio", icon: "BookOpen" },
+  "bible-poetry": { label: "Open Bible Studio", path: "/bible-studio", icon: "BookOpen" },
+  "bible-headings": { label: "Open Bible Studio", path: "/bible-studio", icon: "BookOpen" },
+  "bible-xrefs": { label: "Open Bible Studio", path: "/bible-studio", icon: "BookOpen" },
+  "bible-footnotes": { label: "Open Bible Studio", path: "/bible-studio", icon: "BookOpen" },
+  "bible-concordance": { label: "Open Bible Studio", path: "/bible-studio", icon: "BookOpen" },
+  "bible-maps": { label: "Open Bible Studio", path: "/bible-studio", icon: "BookOpen" },
+  "bible-intros": { label: "Open Bible Studio", path: "/bible-studio", icon: "BookOpen" },
+  "bible-paper": { label: "Calculate Spine Width", path: "/spine-calculator", icon: "Ruler" },
+  "bible-spine": { label: "Calculate Spine Width", path: "/spine-calculator", icon: "Ruler" },
+  "bible-cover": { label: "Open Cover Designer", path: "/cover-designer", icon: "Layers" },
+  "bible-preflight": { label: "Generate Print Specs", path: "/print-specs", icon: "ClipboardCheck" },
+  "bible-binding": { label: "Open Bible Studio", path: "/bible-studio", icon: "BookOpen" },
 };
 
 type StepStatusType = "pending" | "complete" | "skipped";
@@ -194,6 +229,43 @@ function InputSlot({
 
 // ─── Step Card Component ────────────────────────────────────────
 
+function ToolActionButton({ step, phase, projectId }: { step: Step; phase: Phase; projectId: number }) {
+  const [, navigate] = useLocation();
+  const action = STEP_TOOL_ACTIONS[step.id];
+  if (!action) return null;
+  const ActionIcon = iconMap[action.icon] || Sparkles;
+  const resolvedPath = action.path.replace("__PROJECT_ID__", String(projectId));
+
+  return (
+    <button
+      onClick={(e) => {
+        e.stopPropagation();
+        if (resolvedPath) {
+          navigate(resolvedPath);
+        } else {
+          const aiPanel = document.getElementById("ai-writing-assistant");
+          if (aiPanel) {
+            aiPanel.scrollIntoView({ behavior: "smooth", block: "start" });
+          } else {
+            const aiToggle = document.querySelector('[data-ai-toggle]') as HTMLButtonElement | null;
+            if (aiToggle) aiToggle.click();
+          }
+        }
+      }}
+      className="flex items-center gap-2 px-3 py-2 rounded-lg text-xs font-medium transition-all border hover:shadow-sm"
+      style={{
+        backgroundColor: `${phase.accentColor}10`,
+        borderColor: `${phase.accentColor}30`,
+        color: phase.accentColor,
+      }}
+    >
+      <ActionIcon size={14} />
+      {action.label}
+      <ChevronRight size={12} className="ml-auto" />
+    </button>
+  );
+}
+
 function StepCard({
   step, phase, projectId, stepStatus, fileMap, globalIndex, printMode,
 }: {
@@ -342,6 +414,11 @@ function StepCard({
                         {showNotes ? "Hide Notes" : "Add Notes"}
                       </Button>
                     </div>
+                  )}
+
+                  {/* Tool action button */}
+                  {!printMode && STEP_TOOL_ACTIONS[step.id] && (
+                    <ToolActionButton step={step} phase={phase} projectId={projectId} />
                   )}
 
                   {/* Notes */}
@@ -1797,7 +1874,7 @@ export default function ProjectTracker() {
 
         {/* AI Writing Assistant — collapsible right panel */}
         {showAI && (
-          <aside className="hidden lg:block w-72 shrink-0 print:hidden order-last">
+          <aside id="ai-writing-assistant" className="hidden lg:block w-72 shrink-0 print:hidden order-last">
             <div className="sticky top-24 bg-white/80 backdrop-blur-sm rounded-xl border border-[#e8dfd0] p-4 overflow-y-auto max-h-[calc(100vh-8rem)]">
               <div className="flex items-center justify-between mb-4">
                 <div className="flex items-center gap-2">

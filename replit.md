@@ -79,6 +79,7 @@ PostgreSQL via Replit's built-in database. Use `npx drizzle-kit push` to sync sc
 - **Spine Calculator**: PPI-based spine width calculation with spec sheets
 - **Cover Designer**: Dimensional cover spec generation
 - **ISBN Manager**: Metadata entry and ONIX 3.0 XML export
+- **Step-to-Tool Actions**: Each production step in the Project Tracker shows a contextual action button linking to the relevant built-in tool (e.g., "Open Cover Designer", "Start Auto-Produce", "Open ISBN Manager"). Defined in `STEP_TOOL_ACTIONS` map in `ProjectTracker.tsx`.
 - **What's Next Banners**: Contextual next-step suggestions on all tool pages after task completion
 - **AI Writing Assistant**: Generate back-cover blurbs, author bios, press releases, marketing copy in Project Tracker
 - **Typeface Pairings**: 8 professional font pairings in Bible Studio with one-click apply and live preview
