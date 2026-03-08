@@ -112,7 +112,7 @@ function SectionHeader({ step, title, subtitle }: { step: number; title: string;
       </div>
       <div>
         <h2 className="text-lg font-serif font-semibold text-[#2c1a00]">{title}</h2>
-        <p className="text-sm text-[#8b7b6b] mt-0.5 leading-relaxed">{subtitle}</p>
+        <p className="text-sm text-[#7a6e60] mt-0.5 leading-relaxed">{subtitle}</p>
       </div>
     </div>
   );
@@ -154,7 +154,7 @@ function OptionCard({
               </Badge>
             )}
           </div>
-          {subtitle && <p className="text-xs text-[#8b7b6b] mt-0.5 leading-relaxed">{subtitle}</p>}
+          {subtitle && <p className="text-xs text-[#7a6e60] mt-0.5 leading-relaxed">{subtitle}</p>}
           {features && features.length > 0 && (
             <div className="flex flex-wrap gap-1 mt-2">
               {features.slice(0, 4).map(f => (
@@ -491,7 +491,7 @@ function AIWritingAssistant() {
           </div>
           <div className="text-left">
             <h3 className="text-sm font-semibold text-[#2c1a00]">AI Writing Assistant</h3>
-            <p className="text-[11px] text-[#8b7b6b]">Generate blurbs, bios, and marketing copy</p>
+            <p className="text-[11px] text-[#7a6e60]">Generate blurbs, bios, and marketing copy</p>
           </div>
         </div>
         <ChevronDown size={16} className={`text-[#a08060] transition-transform ${isOpen ? "rotate-180" : ""}`} />
@@ -589,7 +589,7 @@ function AIWritingAssistant() {
                 </span>
                 <button
                   onClick={handleCopy}
-                  className="flex items-center gap-1 text-[10px] text-[#8b7b6b] hover:text-[#5c3d2e] transition-colors"
+                  className="flex items-center gap-1 text-[10px] text-[#7a6e60] hover:text-[#5c3d2e] transition-colors"
                 >
                   <Copy size={10} /> Copy
                 </button>
@@ -620,7 +620,7 @@ function RecommendedPairings({ onApply }: { onApply: (bodyId: string, headingId:
           </div>
           <div className="text-left">
             <h3 className="text-sm font-semibold text-[#2c1a00]">Typeface Pairings</h3>
-            <p className="text-[11px] text-[#8b7b6b]">Professional font combinations — one-click apply</p>
+            <p className="text-[11px] text-[#7a6e60]">Professional font combinations — one-click apply</p>
           </div>
         </div>
         <ChevronDown size={16} className={`text-[#a08060] transition-transform ${isOpen ? "rotate-180" : ""}`} />
@@ -643,7 +643,7 @@ function RecommendedPairings({ onApply }: { onApply: (bodyId: string, headingId:
                 <div className="flex items-start justify-between gap-2 mb-2">
                   <div>
                     <p className="text-sm font-semibold text-[#2c1a00]">{pairing.name}</p>
-                    <p className="text-[11px] text-[#8b7b6b] mt-0.5 leading-relaxed">{pairing.description}</p>
+                    <p className="text-[11px] text-[#7a6e60] mt-0.5 leading-relaxed">{pairing.description}</p>
                   </div>
                 </div>
 
@@ -691,7 +691,7 @@ function RecommendedPairings({ onApply }: { onApply: (bodyId: string, headingId:
                   </div>
                 </div>
 
-                <div className="flex items-center justify-between text-[10px] text-[#8b7b6b] mb-2">
+                <div className="flex items-center justify-between text-[10px] text-[#7a6e60] mb-2">
                   <span>{bodyFace?.name} · {headingFace?.name} · {verseFace?.name}</span>
                 </div>
 
@@ -926,7 +926,7 @@ export default function BibleStudio() {
                     <div key={key} className="bg-white rounded-xl border border-[#e8ddd0] p-4">
                       <div className="mb-3">
                         <p className="text-sm font-semibold text-[#2c1a00]">{label}</p>
-                        <p className="text-xs text-[#8b7b6b]">{desc}</p>
+                        <p className="text-xs text-[#7a6e60]">{desc}</p>
                       </div>
 
                       {/* Category tabs */}
@@ -1135,7 +1135,7 @@ export default function BibleStudio() {
       {/* Related Tools footer backlinks */}
       <div className="border-t border-[#e8dfd0] bg-[#faf6ef] px-6 py-6">
         <div className="max-w-5xl mx-auto">
-          <p className="text-xs text-[#8b7b6b] mb-3 font-semibold uppercase tracking-wide">Other Self-Publishing Tools</p>
+          <p className="text-xs text-[#7a6e60] mb-3 font-semibold uppercase tracking-wide">Other Self-Publishing Tools</p>
           <div className="flex flex-wrap gap-2">
             {[
               { href: "/spine-calculator", label: "Spine Calculator" },

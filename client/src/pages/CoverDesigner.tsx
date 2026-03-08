@@ -560,7 +560,7 @@ export default function CoverDesigner() {
                       className="border-[#d4c8b4] max-w-[140px]"
                       placeholder="320"
                     />
-                    <span className="text-sm text-[#8b7b6b]">pages</span>
+                    <span className="text-sm text-[#7a6e60]">pages</span>
                     {specs && (
                       <span className="text-sm text-[#5c3d2e] font-medium">
                         → Spine: <strong>{specs.spineIn}"</strong>
@@ -593,7 +593,7 @@ export default function CoverDesigner() {
                         ))}
                       </SelectContent>
                     </Select>
-                    <p className="text-xs text-[#8b7b6b] mt-1">{colorMode.desc}</p>
+                    <p className="text-xs text-[#7a6e60] mt-1">{colorMode.desc}</p>
                   </div>
                   <div>
                     <Label className="text-[#5c3d2e] font-semibold text-sm">Laminate Finish</Label>
@@ -607,7 +607,7 @@ export default function CoverDesigner() {
                         ))}
                       </SelectContent>
                     </Select>
-                    <p className="text-xs text-[#8b7b6b] mt-1">{laminate.desc}</p>
+                    <p className="text-xs text-[#7a6e60] mt-1">{laminate.desc}</p>
                   </div>
                 </div>
 
@@ -674,7 +674,7 @@ export default function CoverDesigner() {
                     barcode={barcode}
                     authorPhoto={authorPhoto}
                   />
-                  <p className="text-xs text-[#8b7b6b] mt-3 text-center">
+                  <p className="text-xs text-[#7a6e60] mt-3 text-center">
                     Diagram is proportional. Red = bleed area, blue dashed = safe zone.
                   </p>
                 </CardContent>
@@ -726,7 +726,7 @@ export default function CoverDesigner() {
                       ))}
                     </SelectContent>
                   </Select>
-                  <p className="text-xs text-[#8b7b6b] mt-1">Amazon KDP uses specific PPI values per paper stock to calculate spine width.</p>
+                  <p className="text-xs text-[#7a6e60] mt-1">Amazon KDP uses specific PPI values per paper stock to calculate spine width.</p>
                 </div>
 
                 {kdpSpecs && (
@@ -736,7 +736,7 @@ export default function CoverDesigner() {
 
                       <div className="space-y-2 text-sm">
                         <div>
-                          <p className="text-xs text-[#8b7b6b] mb-1">Amazon's formula: <strong>Bleed + Back + Spine + Front + Bleed</strong></p>
+                          <p className="text-xs text-[#7a6e60] mb-1">Amazon's formula: <strong>Bleed + Back + Spine + Front + Bleed</strong></p>
                           <p className="text-[#3a2a1a] font-mono text-xs">
                             {BLEED}" + {trimW}" + {kdpSpecs.spineIn}" + {trimW}" + {BLEED}" = <strong>{kdpSpecs.fullWidth}"</strong>
                           </p>
@@ -746,20 +746,20 @@ export default function CoverDesigner() {
 
                         <div className="grid grid-cols-2 gap-3">
                           <div>
-                            <span className="text-xs text-[#8b7b6b]">Full Cover Width</span>
-                            <p className="font-bold text-[#e65100]">{kdpSpecs.fullWidth}" <span className="font-normal text-xs text-[#8b7b6b]">({kdpSpecs.fullWidthMm}mm)</span></p>
+                            <span className="text-xs text-[#7a6e60]">Full Cover Width</span>
+                            <p className="font-bold text-[#e65100]">{kdpSpecs.fullWidth}" <span className="font-normal text-xs text-[#7a6e60]">({kdpSpecs.fullWidthMm}mm)</span></p>
                           </div>
                           <div>
-                            <span className="text-xs text-[#8b7b6b]">Full Cover Height</span>
-                            <p className="font-bold text-[#e65100]">{kdpSpecs.fullHeight}" <span className="font-normal text-xs text-[#8b7b6b]">({kdpSpecs.fullHeightMm}mm)</span></p>
+                            <span className="text-xs text-[#7a6e60]">Full Cover Height</span>
+                            <p className="font-bold text-[#e65100]">{kdpSpecs.fullHeight}" <span className="font-normal text-xs text-[#7a6e60]">({kdpSpecs.fullHeightMm}mm)</span></p>
                           </div>
                           <div>
-                            <span className="text-xs text-[#8b7b6b]">KDP Spine Width</span>
-                            <p className="font-bold text-[#3a2a1a]">{kdpSpecs.spineIn}" <span className="font-normal text-xs text-[#8b7b6b]">({kdpSpecs.spineMm}mm)</span></p>
+                            <span className="text-xs text-[#7a6e60]">KDP Spine Width</span>
+                            <p className="font-bold text-[#3a2a1a]">{kdpSpecs.spineIn}" <span className="font-normal text-xs text-[#7a6e60]">({kdpSpecs.spineMm}mm)</span></p>
                           </div>
                           <div>
-                            <span className="text-xs text-[#8b7b6b]">Bleed (all outside edges)</span>
-                            <p className="font-bold text-[#3a2a1a]">{BLEED}" <span className="font-normal text-xs text-[#8b7b6b]">({Math.round(BLEED * 25.4 * 10) / 10}mm)</span></p>
+                            <span className="text-xs text-[#7a6e60]">Bleed (all outside edges)</span>
+                            <p className="font-bold text-[#3a2a1a]">{BLEED}" <span className="font-normal text-xs text-[#7a6e60]">({Math.round(BLEED * 25.4 * 10) / 10}mm)</span></p>
                           </div>
                         </div>
                       </div>
@@ -773,7 +773,7 @@ export default function CoverDesigner() {
                         </div>
                         <div className="text-xs text-[#5c3d2e] space-y-1">
                           <p><strong>{kdpSpecs.barcodeZoneW}" × {kdpSpecs.barcodeZoneH}"</strong> — bottom-right of back cover</p>
-                          <p className="text-[#8b7b6b]">Amazon automatically places its barcode in this area. Keep this zone clear of any design elements.</p>
+                          <p className="text-[#7a6e60]">Amazon automatically places its barcode in this area. Keep this zone clear of any design elements.</p>
                         </div>
                       </div>
                     </div>
@@ -940,7 +940,7 @@ export default function CoverDesigner() {
       {/* Related Tools footer backlinks */}
       <div className="border-t border-[#e8dfd0] bg-[#faf6ef] px-6 py-6">
         <div className="max-w-5xl mx-auto">
-          <p className="text-xs text-[#8b7b6b] mb-3 font-semibold uppercase tracking-wide">Other Self-Publishing Tools</p>
+          <p className="text-xs text-[#7a6e60] mb-3 font-semibold uppercase tracking-wide">Other Self-Publishing Tools</p>
           <div className="flex flex-wrap gap-2">
             {[
               { href: "/bible-studio", label: "Bible Design Studio" },

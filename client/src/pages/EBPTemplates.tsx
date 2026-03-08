@@ -91,7 +91,7 @@ function TemplateCard({ template, onOpenWizard }: { template: EBPTemplate; onOpe
                 <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-[#c9a96e]/15 text-[#8b6914] font-medium shrink-0">Bible</span>
               )}
             </div>
-            <p className="text-xs text-[#8b7b6b] mt-0.5 leading-relaxed">{template.tagline}</p>
+            <p className="text-xs text-[#7a6e60] mt-0.5 leading-relaxed">{template.tagline}</p>
           </div>
         </div>
       </CardHeader>
@@ -100,8 +100,8 @@ function TemplateCard({ template, onOpenWizard }: { template: EBPTemplate; onOpe
         <p className="text-xs text-[#5c3d2e] leading-relaxed line-clamp-3">{template.description}</p>
 
         <div className="flex flex-wrap gap-x-4 gap-y-1">
-          <span className="text-[11px] text-[#8b7b6b]"><span className="font-medium text-[#5c3d2e]">Trim:</span> {template.trimLabel}</span>
-          <span className="text-[11px] text-[#8b7b6b]"><span className="font-medium text-[#5c3d2e]">Pages:</span> {template.pageCountRange[0]}–{template.pageCountRange[1]}</span>
+          <span className="text-[11px] text-[#7a6e60]"><span className="font-medium text-[#5c3d2e]">Trim:</span> {template.trimLabel}</span>
+          <span className="text-[11px] text-[#7a6e60]"><span className="font-medium text-[#5c3d2e]">Pages:</span> {template.pageCountRange[0]}–{template.pageCountRange[1]}</span>
         </div>
 
         <ul className="flex flex-col gap-1">
@@ -112,14 +112,14 @@ function TemplateCard({ template, onOpenWizard }: { template: EBPTemplate; onOpe
             </li>
           ))}
           {template.features.length > 4 && (
-            <li className="text-[11px] text-[#a89880] pl-4">+{template.features.length - 4} more features</li>
+            <li className="text-[11px] text-[#8b7b6b] pl-4">+{template.features.length - 4} more features</li>
           )}
         </ul>
 
         {template.exampleTitles.length > 0 && (
           <div>
-            <p className="text-[10px] font-medium text-[#a89880] uppercase tracking-wide mb-1">Similar Published Titles</p>
-            <p className="text-[11px] text-[#8b7b6b] italic leading-relaxed">
+            <p className="text-[10px] font-medium text-[#8b7b6b] uppercase tracking-wide mb-1">Similar Published Titles</p>
+            <p className="text-[11px] text-[#7a6e60] italic leading-relaxed">
               {template.exampleTitles.slice(0, 2).join(" · ")}
             </p>
           </div>
@@ -197,7 +197,7 @@ export default function EBPTemplates() {
           <div className="flex items-center gap-3">
             <button
               onClick={() => navigate("/dashboard")}
-              className="flex items-center gap-1.5 text-[#c9a96e]/60 hover:text-[#c9a96e] text-xs transition-colors"
+              className="flex items-center gap-1.5 text-[#c9a96e]/80 hover:text-[#c9a96e] text-xs transition-colors"
             >
               <ArrowLeft size={14} />
               Dashboard
@@ -216,7 +216,7 @@ export default function EBPTemplates() {
               <button
                 key={item.path}
                 onClick={() => navigate(item.path)}
-                className="flex items-center gap-1.5 text-xs text-[#c9a96e]/60 hover:text-[#c9a96e] hover:bg-[#c9a96e]/10 px-3 py-1.5 rounded-md transition-all"
+                className="flex items-center gap-1.5 text-xs text-[#c9a96e]/80 hover:text-[#c9a96e] hover:bg-[#c9a96e]/10 px-3 py-1.5 rounded-md transition-all"
               >
                 <item.icon size={13} />
                 {item.label}
@@ -235,15 +235,15 @@ export default function EBPTemplates() {
               alt="Easy Book Publishers"
               className="h-8 w-auto object-contain opacity-80"
             />
-            <span className="text-[#c9a96e]/50 text-xs uppercase tracking-widest">Publishing Catalog</span>
+            <span className="text-[#c9a96e]/75 text-xs uppercase tracking-widest">Publishing Catalog</span>
           </div>
           <h1 className="font-serif text-3xl md:text-4xl text-[#f5d98a] mb-3">Book Templates</h1>
-          <p className="text-[#c9a96e]/70 text-sm max-w-2xl leading-relaxed">
+          <p className="text-[#c9a96e]/90 text-sm max-w-2xl leading-relaxed">
             One-click presets for every book type Easy Book Publishers has historically produced —
             from Study Bibles and Devotional Bibles to Christian Living books, children's titles,
             theological commentaries, and hymnals. Select a template to pre-fill all formatting settings.
           </p>
-          <div className="flex flex-wrap gap-3 mt-5 text-xs text-[#c9a96e]/50">
+          <div className="flex flex-wrap gap-3 mt-5 text-xs text-[#c9a96e]/75">
             <span className="flex items-center gap-1.5"><BookOpen size={12} />{EBP_TEMPLATES.filter(t => t.isBible).length} Bible Edition Templates</span>
             <span className="text-[#c9a96e]/20">·</span>
             <span className="flex items-center gap-1.5"><BookMarked size={12} />{EBP_TEMPLATES.filter(t => !t.isBible).length} Christian Literature Templates</span>
@@ -256,7 +256,7 @@ export default function EBPTemplates() {
       <div className="sticky top-0 z-20 bg-[#faf6ef]/95 backdrop-blur border-b border-[#e8dfd0] shadow-sm">
         <div className="max-w-7xl mx-auto px-6 py-3 flex flex-col sm:flex-row gap-3 items-start sm:items-center">
           <div className="relative flex-1 max-w-xs">
-            <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-[#a89880]" />
+            <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-[#8b7b6b]" />
             <Input
               placeholder="Search templates…"
               value={search}
@@ -303,7 +303,7 @@ export default function EBPTemplates() {
         {filtered.length === 0 ? (
           <div className="text-center py-20">
             <BookOpen size={40} className="mx-auto text-[#d0c8bc] mb-4" />
-            <p className="text-[#8b7b6b] text-sm">No templates match your search.</p>
+            <p className="text-[#7a6e60] text-sm">No templates match your search.</p>
             <button
               onClick={() => { setSearch(""); setActiveCategory("All"); }}
               className="mt-3 text-xs text-[#c9a96e] hover:underline"
@@ -348,7 +348,7 @@ export default function EBPTemplates() {
                 </div>
                 <div>
                   <h3 className="font-serif font-semibold text-[#3a2a1a] text-sm mb-1">{item.title}</h3>
-                  <p className="text-xs text-[#8b7b6b] leading-relaxed">{item.desc}</p>
+                  <p className="text-xs text-[#7a6e60] leading-relaxed">{item.desc}</p>
                 </div>
               </div>
             ))}
@@ -357,7 +357,7 @@ export default function EBPTemplates() {
 
         {/* Related tools backlinks */}
         <div className="mt-8 pt-6 border-t border-[#e8dfd0]">
-          <p className="text-xs text-[#a89880] uppercase tracking-wide font-medium mb-3">Related Self-Publishing Tools</p>
+          <p className="text-xs text-[#8b7b6b] uppercase tracking-wide font-medium mb-3">Related Self-Publishing Tools</p>
           <div className="flex flex-wrap gap-3">
             {[
               { label: "Bible Design Studio", path: "/bible-studio" },

@@ -232,27 +232,27 @@ export default function Pricing() {
           <h1 className="font-serif text-4xl md:text-5xl text-[#1a1008] mb-4">
             Professional publishing tools, fairly priced
           </h1>
-          <p className="text-lg text-[#5c4a2a]/70 max-w-2xl mx-auto mb-8">
+          <p className="text-lg text-[#5c4a2a]/90 max-w-2xl mx-auto mb-8">
             One platform replaces Atticus + Vellum + IngramSpark. Start free, upgrade when you're ready to publish.
           </p>
 
           <div className="inline-flex items-center bg-[#1a1008]/5 rounded-full p-1 gap-1">
             <button
               onClick={() => setBilling("monthly")}
-              className={`px-5 py-2 rounded-full text-sm font-medium transition-all ${billing === "monthly" ? "bg-white shadow text-[#1a1008]" : "text-[#5c4a2a]/60 hover:text-[#5c4a2a]"}`}
+              className={`px-5 py-2 rounded-full text-sm font-medium transition-all ${billing === "monthly" ? "bg-white shadow text-[#1a1008]" : "text-[#5c4a2a]/80 hover:text-[#5c4a2a]"}`}
             >
               Monthly
             </button>
             <button
               onClick={() => setBilling("annual")}
-              className={`px-5 py-2 rounded-full text-sm font-medium transition-all ${billing === "annual" ? "bg-white shadow text-[#1a1008]" : "text-[#5c4a2a]/60 hover:text-[#5c4a2a]"}`}
+              className={`px-5 py-2 rounded-full text-sm font-medium transition-all ${billing === "annual" ? "bg-white shadow text-[#1a1008]" : "text-[#5c4a2a]/80 hover:text-[#5c4a2a]"}`}
             >
               Annual
               <span className="ml-1.5 text-xs text-green-700 font-bold">Save 33%</span>
             </button>
             <button
               onClick={() => setBilling("lifetime")}
-              className={`px-5 py-2 rounded-full text-sm font-medium transition-all ${billing === "lifetime" ? "bg-white shadow text-[#1a1008]" : "text-[#5c4a2a]/60 hover:text-[#5c4a2a]"}`}
+              className={`px-5 py-2 rounded-full text-sm font-medium transition-all ${billing === "lifetime" ? "bg-white shadow text-[#1a1008]" : "text-[#5c4a2a]/80 hover:text-[#5c4a2a]"}`}
             >
               Lifetime
               <span className="ml-1.5 text-xs text-green-700 font-bold">Best Value</span>
@@ -292,9 +292,9 @@ export default function Pricing() {
                   </div>
                   <div className="flex items-baseline gap-1">
                     <span className="font-serif text-4xl font-bold text-[#1a1008]">{price}</span>
-                    <span className="text-[#5c4a2a]/60 text-sm">{period}</span>
+                    <span className="text-[#5c4a2a]/80 text-sm">{period}</span>
                   </div>
-                  <p className="text-sm text-[#5c4a2a]/70 mt-2">{tier.description}</p>
+                  <p className="text-sm text-[#5c4a2a]/90 mt-2">{tier.description}</p>
                 </CardHeader>
                 <CardContent>
                     <Button
@@ -325,9 +325,9 @@ export default function Pricing() {
                         {feature.included ? (
                           <Check size={16} className="text-green-600 shrink-0" />
                         ) : (
-                          <X size={16} className="text-[#5c4a2a]/25 shrink-0" />
+                          <X size={16} className="text-[#5c4a2a]/45 shrink-0" />
                         )}
-                        <span className={feature.included ? "text-[#1a1008]" : "text-[#5c4a2a]/40"}>
+                        <span className={feature.included ? "text-[#1a1008]" : "text-[#5c4a2a]/60"}>
                           {feature.name}
                         </span>
                       </li>
@@ -341,7 +341,7 @@ export default function Pricing() {
 
         <div className="mb-20 bg-white rounded-2xl border border-[#c9a96e]/15 p-8">
           <h2 className="font-serif text-3xl text-[#1a1008] text-center mb-3">How We Compare</h2>
-          <p className="text-center text-[#5c4a2a]/60 mb-8 max-w-xl mx-auto">
+          <p className="text-center text-[#5c4a2a]/80 mb-8 max-w-xl mx-auto">
             Other platforms charge hundreds of dollars for a fraction of what you get with Easy Book Publishers.
           </p>
           <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-2">
@@ -349,14 +349,14 @@ export default function Pricing() {
               <div key={c.name} className="border border-[#e8dfd0] rounded-xl p-5 bg-[#faf6ef]/50">
                 <p className="font-serif font-bold text-[#1a1008] text-lg">{c.name}</p>
                 <p className="text-[#8b6914] font-semibold text-sm mt-1">{c.price}</p>
-                <p className="text-xs text-[#5c4a2a]/50 mt-2">{c.scope}</p>
+                <p className="text-xs text-[#5c4a2a]/70 mt-2">{c.scope}</p>
               </div>
             ))}
           </div>
           <div className="text-center mt-6 bg-gradient-to-r from-[#c9a96e]/10 to-[#d4b480]/10 rounded-xl p-5 border border-[#c9a96e]/20">
             <p className="font-serif text-lg text-[#1a1008] font-bold">Easy Book Publishers — Author Pro</p>
-            <p className="text-[#8b6914] font-bold text-xl mt-1">$132 lifetime <span className="text-sm font-normal text-[#5c4a2a]/60">or $8.99/mo annually</span></p>
-            <p className="text-sm text-[#5c4a2a]/70 mt-2">Writing workflow + AI typesetting + cover specs + ISBN manager + KDP export + IDML + production timeline — all in one platform, on any device.</p>
+            <p className="text-[#8b6914] font-bold text-xl mt-1">$132 lifetime <span className="text-sm font-normal text-[#5c4a2a]/80">or $8.99/mo annually</span></p>
+            <p className="text-sm text-[#5c4a2a]/90 mt-2">Writing workflow + AI typesetting + cover specs + ISBN manager + KDP export + IDML + production timeline — all in one platform, on any device.</p>
           </div>
         </div>
 
@@ -382,7 +382,7 @@ export default function Pricing() {
                           {feature.tooltip && (
                             <Tooltip>
                               <TooltipTrigger>
-                                <HelpCircle size={13} className="text-[#5c4a2a]/30" />
+                                <HelpCircle size={13} className="text-[#5c4a2a]/50" />
                               </TooltipTrigger>
                               <TooltipContent className="max-w-xs">
                                 <p className="text-xs">{feature.tooltip}</p>
@@ -400,7 +400,7 @@ export default function Pricing() {
                             feature[plan] ? (
                               <Check size={16} className="text-green-600 mx-auto" />
                             ) : (
-                              <X size={16} className="text-[#5c4a2a]/25 mx-auto" />
+                              <X size={16} className="text-[#5c4a2a]/45 mx-auto" />
                             )
                           ) : (
                             <span className="font-medium text-[#1a1008]">{feature[plan]}</span>
@@ -428,7 +428,7 @@ export default function Pricing() {
             ].map(({ q, a }) => (
               <div key={q} className="bg-white rounded-xl border border-[#c9a96e]/15 p-6">
                 <h3 className="font-serif font-bold text-[#1a1008] mb-2">{q}</h3>
-                <p className="text-sm text-[#5c4a2a]/70 leading-relaxed">{a}</p>
+                <p className="text-sm text-[#5c4a2a]/90 leading-relaxed">{a}</p>
               </div>
             ))}
           </div>
@@ -436,7 +436,7 @@ export default function Pricing() {
 
         <div className="text-center py-16 px-6 bg-gradient-to-r from-[#1a1008] to-[#2a1a10] rounded-2xl">
           <h2 className="font-serif text-3xl text-[#f5d98a] mb-4">Ready to publish your book?</h2>
-          <p className="text-[#d4c8b4]/80 mb-8 max-w-xl mx-auto">
+          <p className="text-[#d4c8b4] mb-8 max-w-xl mx-auto">
             Join authors and publishers using Easy Book Publishers to bring their books to life — from first idea to finished volume.
           </p>
           <Button onClick={() => navigate("/dashboard")} size="lg" className="bg-gradient-to-r from-[#d4b480] to-[#c9a96e] hover:from-[#e0c490] hover:to-[#d4b480] text-[#1a1008] font-bold text-base px-10 py-6 rounded-xl shadow-xl shadow-[#c9a96e]/25">

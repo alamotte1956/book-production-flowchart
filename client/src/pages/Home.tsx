@@ -366,7 +366,7 @@ export default function Home() {
           </a>
           <button
             onClick={() => setMobileMenuOpen(false)}
-            className="w-8 h-8 flex items-center justify-center rounded-md text-[#c9a96e]/60 hover:text-[#c9a96e] hover:bg-[#c9a96e]/10 transition-colors"
+            className="w-8 h-8 flex items-center justify-center rounded-md text-[#c9a96e]/80 hover:text-[#c9a96e] hover:bg-[#c9a96e]/10 transition-colors"
             aria-label="Close menu"
           >
             <X size={18} />
@@ -382,7 +382,7 @@ export default function Home() {
             </div>
             <div className="min-w-0">
               <p className="text-sm text-[#f5efe0] font-semibold truncate">{user?.name || "Account"}</p>
-              <p className="text-xs text-[#c9a96e]/40 truncate">{user?.email || ""}</p>
+              <p className="text-xs text-[#c9a96e]/65 truncate">{user?.email || ""}</p>
             </div>
           </div>
         </div>
@@ -400,12 +400,12 @@ export default function Home() {
             <button
               key={item.path}
               onClick={() => { navigate(item.path); setMobileMenuOpen(false); }}
-              className="flex items-center gap-3 w-full text-left px-3 py-3 rounded-lg text-[#c9a96e]/70 hover:text-[#f5efe0] hover:bg-[#c9a96e]/10 transition-all group"
+              className="flex items-center gap-3 w-full text-left px-3 py-3 rounded-lg text-[#c9a96e]/90 hover:text-[#f5efe0] hover:bg-[#c9a96e]/10 transition-all group"
             >
-              <item.icon size={16} className="shrink-0 text-[#c9a96e]/50 group-hover:text-[#c9a96e]" />
+              <item.icon size={16} className="shrink-0 text-[#c9a96e]/75 group-hover:text-[#c9a96e]" />
               <span className="text-sm font-serif flex-1">{item.label}</span>
               {item.badge && (
-                <span className="text-[10px] px-1.5 py-0.5 rounded bg-[#c9a96e]/10 text-[#c9a96e]/60 font-medium">{item.badge}</span>
+                <span className="text-[10px] px-1.5 py-0.5 rounded bg-[#c9a96e]/10 text-[#c9a96e]/80 font-medium">{item.badge}</span>
               )}
             </button>
           ))}
@@ -433,7 +433,7 @@ export default function Home() {
               />
               <div>
                 <h1 className="font-serif text-xl leading-tight text-[#f5d98a] tracking-wide group-hover:text-[#ffe6a0] transition-colors" style={{ textShadow: "0 0 30px rgba(245,217,138,0.3)" }}>Publisher Command Center</h1>
-                <p className="text-[10px] text-[#c9a96e]/50 uppercase tracking-[0.2em] hidden sm:block font-serif">Easy Book Publishers</p>
+                <p className="text-[10px] text-[#c9a96e]/75 uppercase tracking-[0.2em] hidden sm:block font-serif">Easy Book Publishers</p>
               </div>
             </div>
           </a>
@@ -451,7 +451,7 @@ export default function Home() {
               <button
                 key={item.path}
                 onClick={() => navigate(item.path)}
-                className="flex items-center gap-1.5 text-xs font-serif text-[#c9a96e]/60 hover:text-[#f5d98a] hover:bg-[#c9a96e]/10 px-3 py-2 rounded-lg transition-all"
+                className="flex items-center gap-1.5 text-xs font-serif text-[#c9a96e]/80 hover:text-[#f5d98a] hover:bg-[#c9a96e]/10 px-3 py-2 rounded-lg transition-all"
               >
                 <item.icon size={13} />
                 {item.label}
@@ -469,7 +469,7 @@ export default function Home() {
                 </button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="w-56 bg-[#2a1a0a] border-[#c9a96e]/20 text-[#f5efe0] shadow-xl">
-                <DropdownMenuLabel className="text-[#c9a96e]/70 text-xs font-serif">
+                <DropdownMenuLabel className="text-[#c9a96e]/90 text-xs font-serif">
                   <div className="flex items-center gap-2">
                     <User size={13} />
                     <span className="truncate">{user?.name || user?.email || "Account"}</span>
@@ -480,7 +480,7 @@ export default function Home() {
                   className="text-xs font-serif text-[#f5efe0] hover:bg-[#c9a96e]/10 focus:bg-[#c9a96e]/10 cursor-pointer"
                   onClick={() => navigate("/guide")}
                 >
-                  <HelpCircle size={13} className="mr-2 text-[#c9a96e]/60" />
+                  <HelpCircle size={13} className="mr-2 text-[#c9a96e]/80" />
                   User Guide
                 </DropdownMenuItem>
                 <DropdownMenuSeparator className="bg-[#c9a96e]/15" />
@@ -495,7 +495,7 @@ export default function Home() {
             </DropdownMenu>
 
             <button
-              className="md:hidden w-8 h-8 flex items-center justify-center rounded-md text-[#c9a96e]/70 hover:text-[#c9a96e] hover:bg-[#c9a96e]/10 transition-colors"
+              className="md:hidden w-8 h-8 flex items-center justify-center rounded-md text-[#c9a96e]/90 hover:text-[#c9a96e] hover:bg-[#c9a96e]/10 transition-colors"
               onClick={() => setMobileMenuOpen(true)}
               aria-label="Open menu"
             >
@@ -519,7 +519,7 @@ export default function Home() {
               </div>
               <div>
                 <p className="text-xl font-bold text-[#f5efe0] leading-none font-serif">{stat.value}</p>
-                <p className="text-[10px] text-[#c9a96e]/50 uppercase tracking-wider font-serif">{stat.label}</p>
+                <p className="text-[10px] text-[#c9a96e]/75 uppercase tracking-wider font-serif">{stat.label}</p>
               </div>
               {idx < 3 && <div className="hidden sm:block h-8 w-px bg-[#c9a96e]/10 ml-3" />}
             </div>
@@ -611,28 +611,28 @@ export default function Home() {
                     <div className="bg-white/70 rounded-lg border border-[#e8dfd0] p-3">
                       <div className="flex items-center gap-1.5 mb-1">
                         <BookOpen size={12} className="text-[#c9a96e]" />
-                        <span className="text-[10px] uppercase tracking-wider text-[#a89880] font-semibold">Book Type</span>
+                        <span className="text-[10px] uppercase tracking-wider text-[#8b7b6b] font-semibold">Book Type</span>
                       </div>
                       <p className="text-sm font-medium text-[#3a2a1a] font-serif">{wa.bookType}</p>
                     </div>
                     <div className="bg-white/70 rounded-lg border border-[#e8dfd0] p-3">
                       <div className="flex items-center gap-1.5 mb-1">
                         <Layers size={12} className="text-[#c9a96e]" />
-                        <span className="text-[10px] uppercase tracking-wider text-[#a89880] font-semibold">Format</span>
+                        <span className="text-[10px] uppercase tracking-wider text-[#8b7b6b] font-semibold">Format</span>
                       </div>
                       <p className="text-sm font-medium text-[#3a2a1a] font-serif">{getWizardFormatLabel(wa.format || "")}</p>
                     </div>
                     <div className="bg-white/70 rounded-lg border border-[#e8dfd0] p-3">
                       <div className="flex items-center gap-1.5 mb-1">
                         <Clock size={12} className="text-[#c9a96e]" />
-                        <span className="text-[10px] uppercase tracking-wider text-[#a89880] font-semibold">Timeline</span>
+                        <span className="text-[10px] uppercase tracking-wider text-[#8b7b6b] font-semibold">Timeline</span>
                       </div>
                       <p className="text-sm font-medium text-[#3a2a1a] font-serif">{getWizardTimelineLabel(wa.timeline || "")}</p>
                     </div>
                     <div className="bg-white/70 rounded-lg border border-[#e8dfd0] p-3">
                       <div className="flex items-center gap-1.5 mb-1">
                         <Star size={12} className="text-[#c9a96e]" />
-                        <span className="text-[10px] uppercase tracking-wider text-[#a89880] font-semibold">Experience</span>
+                        <span className="text-[10px] uppercase tracking-wider text-[#8b7b6b] font-semibold">Experience</span>
                       </div>
                       <p className="text-sm font-medium text-[#3a2a1a] font-serif">{getWizardExperienceLabel(wa.experience || "")}</p>
                     </div>
@@ -651,7 +651,7 @@ export default function Home() {
                 <span className="text-[10px] font-semibold uppercase tracking-[0.2em] text-[#c9a96e]">Professional Suite</span>
               </div>
               <h2 className="font-serif text-2xl text-[#2c1a00]">Publisher Tools Hub</h2>
-              <p className="text-sm text-[#8b7b6b] mt-1">Everything you need to create, design, and publish your book</p>
+              <p className="text-sm text-[#7a6e60] mt-1">Everything you need to create, design, and publish your book</p>
             </div>
           </div>
 
@@ -686,7 +686,7 @@ export default function Home() {
                       tool.dark ? "bg-[#c9a96e]/15 border border-[#c9a96e]/20" : tool.cta ? "bg-[#2a1a0a]/10" : "bg-gradient-to-br from-[#f5ede0] to-[#e8dfd0]"
                     }`}>
                       {isToolLocked ? (
-                        <Lock size={18} className="text-[#c9a96e]/60" />
+                        <Lock size={18} className="text-[#c9a96e]/80" />
                       ) : (
                         <tool.icon size={18} className={tool.dark ? "text-[#f5d98a]" : tool.cta ? "text-[#2a1a0a]" : "text-[#8b5e3c]"} />
                       )}
@@ -703,12 +703,12 @@ export default function Home() {
                     {tool.label}
                   </h3>
                   <p className={`text-[11px] leading-relaxed ${
-                    tool.dark ? "text-[#a08060]" : tool.cta ? "text-[#2a1a0a]/70" : "text-[#8b7b6b]"
+                    tool.dark ? "text-[#a08060]" : tool.cta ? "text-[#2a1a0a]/70" : "text-[#7a6e60]"
                   }`}>
                     {tool.desc}
                   </p>
                   <div className={`flex items-center gap-1 mt-3 text-[11px] font-semibold ${
-                    isToolLocked ? "text-[#c9a96e]/60" : tool.dark ? "text-[#c9a96e]" : tool.cta ? "text-[#2a1a0a]" : "text-[#c9a96e]"
+                    isToolLocked ? "text-[#c9a96e]/80" : tool.dark ? "text-[#c9a96e]" : tool.cta ? "text-[#2a1a0a]" : "text-[#c9a96e]"
                   }`}>
                     {isToolLocked ? "Upgrade" : "Open"} <ChevronRight size={11} className="group-hover:translate-x-0.5 transition-transform" />
                   </div>
@@ -735,7 +735,7 @@ export default function Home() {
               <span className="text-[10px] font-semibold uppercase tracking-[0.2em] text-[#c9a96e]">Activity</span>
             </div>
             <h2 className="font-serif text-2xl text-[#2c1a00] mb-1">Recent Activity</h2>
-            <p className="text-sm text-[#8b7b6b] mb-5">Your latest publishing actions across all projects</p>
+            <p className="text-sm text-[#7a6e60] mb-5">Your latest publishing actions across all projects</p>
             <div className="bg-white/90 backdrop-blur-sm rounded-2xl border border-[#e8dfd0] shadow-sm overflow-hidden">
               {activityQuery.data.map((item, idx) => (
                 <div
@@ -756,9 +756,9 @@ export default function Home() {
                   </div>
                   <div className="flex-1 min-w-0">
                     <p className="text-sm text-[#3a2a1a] truncate">{item.detail}</p>
-                    <p className="text-[11px] text-[#a89880] truncate">{item.projectTitle}</p>
+                    <p className="text-[11px] text-[#8b7b6b] truncate">{item.projectTitle}</p>
                   </div>
-                  <span className="text-[11px] text-[#a89880] shrink-0 whitespace-nowrap">
+                  <span className="text-[11px] text-[#8b7b6b] shrink-0 whitespace-nowrap">
                     {new Date(item.timestamp).toLocaleDateString("en-US", { month: "short", day: "numeric" })}
                     {" "}
                     {new Date(item.timestamp).toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit" })}
@@ -778,7 +778,7 @@ export default function Home() {
                 </div>
                 <div className="flex-1 min-w-0">
                   <h3 className="font-serif text-lg text-[#2c1a00] mb-1">Unlock Pro Publishing Tools</h3>
-                  <p className="text-sm text-[#8b7b6b] mb-3">
+                  <p className="text-sm text-[#7a6e60] mb-3">
                     Upgrade to Author Pro for AI-powered typesetting, KDP-ready exports, production timelines, 42 book templates, and unlimited projects.
                   </p>
                   <div className="flex flex-wrap gap-2 mb-4">
@@ -807,7 +807,7 @@ export default function Home() {
                 <span className="text-[10px] font-semibold uppercase tracking-[0.2em] text-[#c9a96e]">Library</span>
               </div>
               <h2 className="font-serif text-2xl text-[#2c1a00]">Your Book Projects</h2>
-              <p className="text-sm text-[#8b7b6b] mt-1">
+              <p className="text-sm text-[#7a6e60] mt-1">
                 {projectList.length} project{projectList.length !== 1 ? "s" : ""} · {phases.length} phases · {totalSteps} steps each
               </p>
             </div>
@@ -833,7 +833,7 @@ export default function Home() {
                     <span className="text-[10px] font-semibold uppercase tracking-[0.2em] text-[#c9a96e]">New Project</span>
                   </div>
                   <DialogTitle className="font-serif text-2xl text-[#3a2a1a]">Start a New Book Project</DialogTitle>
-                  <p className="text-sm text-[#8b7b6b] mt-1">Fill in your book details to begin tracking production across all {totalSteps} steps.</p>
+                  <p className="text-sm text-[#7a6e60] mt-1">Fill in your book details to begin tracking production across all {totalSteps} steps.</p>
                 </DialogHeader>
                 <form
                   onSubmit={(e) => {
@@ -914,7 +914,7 @@ export default function Home() {
                 <BookOpen size={32} className="text-[#c9a96e]" />
               </div>
               <p className="font-serif text-2xl text-[#3a2a1a]">No projects yet</p>
-              <p className="text-sm text-[#8b7b6b] mt-2 max-w-sm mx-auto leading-relaxed">Create your first book project to start tracking production across all {totalSteps} steps.</p>
+              <p className="text-sm text-[#7a6e60] mt-2 max-w-sm mx-auto leading-relaxed">Create your first book project to start tracking production across all {totalSteps} steps.</p>
               <Button className="mt-8 bg-gradient-to-r from-[#c9a96e] to-[#b8944f] hover:from-[#d4b480] hover:to-[#c9a96e] text-[#2a1a0a] font-semibold shadow-md shadow-[#c9a96e]/15 px-6 py-3" onClick={() => setOpen(true)}>
                 <Plus size={18} className="mr-2" /> Create Your First Project
               </Button>
@@ -931,12 +931,12 @@ export default function Home() {
                       <div className="flex items-start justify-between mb-2">
                         <div className="flex-1 min-w-0">
                           <h3 className="font-serif text-lg text-[#3a2a1a] truncate group-hover:text-[#5c3d2e] transition-colors leading-tight font-semibold">{project.title}</h3>
-                          {project.author && <p className="text-xs text-[#8b7b6b] mt-1 italic">by {project.author}</p>}
+                          {project.author && <p className="text-xs text-[#7a6e60] mt-1 italic">by {project.author}</p>}
                         </div>
                         <div className="flex items-center gap-0.5 opacity-0 group-hover:opacity-100 transition-opacity shrink-0 ml-2">
                           <Button
                             variant="ghost" size="icon"
-                            className="w-7 h-7 text-[#a89880] hover:text-[#c9a96e] hover:bg-[#f5ede0]"
+                            className="w-7 h-7 text-[#8b7b6b] hover:text-[#c9a96e] hover:bg-[#f5ede0]"
                             title="Duplicate project"
                             onClick={(e) => { e.stopPropagation(); duplicateMutation.mutate({ projectId: project.id }); }}
                           >
@@ -944,7 +944,7 @@ export default function Home() {
                           </Button>
                           <Button
                             variant="ghost" size="icon"
-                            className="w-7 h-7 text-[#a89880] hover:text-red-600 hover:bg-red-50"
+                            className="w-7 h-7 text-[#8b7b6b] hover:text-red-600 hover:bg-red-50"
                             title="Delete project"
                             onClick={(e) => {
                               e.stopPropagation();
@@ -960,7 +960,7 @@ export default function Home() {
 
                       <div className="flex flex-wrap gap-1.5 mt-2.5">
                         {project.genre && (
-                          <span className="text-[10px] px-2.5 py-0.5 rounded-full bg-[#f5ede0] text-[#8b7b6b] font-medium border border-[#e8dfd0]">
+                          <span className="text-[10px] px-2.5 py-0.5 rounded-full bg-[#f5ede0] text-[#7a6e60] font-medium border border-[#e8dfd0]">
                             {project.genre}
                           </span>
                         )}
@@ -977,7 +977,7 @@ export default function Home() {
                       </div>
 
                       <div className="mt-5">
-                        <div className="flex items-center justify-between text-[10px] text-[#a89880] mb-1.5 font-medium">
+                        <div className="flex items-center justify-between text-[10px] text-[#8b7b6b] mb-1.5 font-medium">
                           <span>Production Progress</span>
                           <span>—</span>
                         </div>
@@ -985,12 +985,12 @@ export default function Home() {
                       </div>
 
                       <div className="mt-4 pt-4 border-t border-[#f0e8d8] flex items-center justify-between">
-                        <span className="text-[11px] text-[#a89880]">
+                        <span className="text-[11px] text-[#8b7b6b]">
                           Created {new Date(project.createdAt).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}
                         </span>
                         <div className="flex items-center gap-3">
                           <button
-                            className="text-[11px] text-[#a89880] hover:text-[#5c3d2e] transition-colors font-medium"
+                            className="text-[11px] text-[#8b7b6b] hover:text-[#5c3d2e] transition-colors font-medium"
                             onClick={(e) => { e.stopPropagation(); navigate(`/timeline/${project.id}`); }}
                           >
                             Timeline
@@ -1018,17 +1018,17 @@ export default function Home() {
                   <div className="h-px w-8 bg-[#c9a96e]/40" />
                 </div>
                 <h2 className="font-serif text-2xl text-[#2c1a00]">Get in Touch</h2>
-                <p className="text-sm text-[#8b7b6b] mt-1">Questions about your project? Need help with a tool? We're here to help.</p>
+                <p className="text-sm text-[#7a6e60] mt-1">Questions about your project? Need help with a tool? We're here to help.</p>
               </div>
 
               {contactSent ? (
                 <div className="text-center py-8">
                   <CheckCircle2 className="w-12 h-12 text-emerald-500 mx-auto mb-3" />
                   <h3 className="font-serif text-lg text-[#2c1a00] mb-1">Message Sent</h3>
-                  <p className="text-sm text-[#8b7b6b]">We'll get back to you as soon as possible.</p>
+                  <p className="text-sm text-[#7a6e60]">We'll get back to you as soon as possible.</p>
                   <Button
                     variant="outline"
-                    className="mt-4 border-[#e8dfd0] text-[#8b7b6b] hover:bg-[#f5ede0]"
+                    className="mt-4 border-[#e8dfd0] text-[#7a6e60] hover:bg-[#f5ede0]"
                     onClick={() => setContactSent(false)}
                   >
                     Send Another Message

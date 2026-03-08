@@ -312,7 +312,7 @@ function DashboardLayoutContent({
                       />
                       <span className="tracking-wide text-[13px] flex-1">{item.label}</span>
                       {isLocked && !isCollapsed && (
-                        <Lock className="h-3 w-3 text-[#c9a96e]/50 shrink-0" />
+                        <Lock className="h-3 w-3 text-[#c9a96e]/75 shrink-0" />
                       )}
                     </SidebarMenuButton>
                   </SidebarMenuItem>

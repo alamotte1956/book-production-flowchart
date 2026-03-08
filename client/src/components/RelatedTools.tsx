@@ -41,7 +41,7 @@ export default function RelatedTools({ currentPage, maxItems = 6 }: RelatedTools
             <tool.icon className="w-5 h-5 mt-0.5 text-[#c9a96e] flex-shrink-0 group-hover:text-[#8b6914] transition-colors" />
             <div>
               <span className="text-sm font-semibold text-[#2c1a00] group-hover:text-[#5c3d2e] transition-colors">{tool.label}</span>
-              <p className="text-xs text-[#8b7b6b] mt-0.5 leading-relaxed">{tool.desc}</p>
+              <p className="text-xs text-[#7a6e60] mt-0.5 leading-relaxed">{tool.desc}</p>
             </div>
           </a>
         ))}

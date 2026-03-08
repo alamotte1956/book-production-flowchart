@@ -562,9 +562,9 @@ export default function Resources() {
           </Button>
           <div className="flex-1">
             <h1 className="font-serif text-xl">Self-Publishing &amp; Online Publishing Resources</h1>
-            <p className="text-xs text-[#c9a96e]/70">The most trusted tools and platforms to create, design, and publish your book at every stage</p>
+            <p className="text-xs text-[#c9a96e]/90">The most trusted tools and platforms to create, design, and publish your book at every stage</p>
           </div>
-          <div className="hidden sm:flex items-center gap-2 text-xs text-[#c9a96e]/50">
+          <div className="hidden sm:flex items-center gap-2 text-xs text-[#c9a96e]/75">
             <span className="px-2 py-1 rounded-full bg-[#c9a96e]/10">
               {categories.reduce((acc, c) => acc + c.resources.length, 0)} curated resources
             </span>
@@ -577,18 +577,18 @@ export default function Resources() {
         {/* Search & Filter */}
         <section className="space-y-4">
           <div className="relative">
-            <Search size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-[#a89880]" />
+            <Search size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-[#8b7b6b]" />
             <Input
               type="text"
               placeholder="Search resources by name, description, or tag…"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="pl-10 pr-10 h-11 bg-white border-[#e8dfd0] text-[#3a2a1a] placeholder:text-[#a89880] focus-visible:ring-[#c9a96e]/40"
+              className="pl-10 pr-10 h-11 bg-white border-[#e8dfd0] text-[#3a2a1a] placeholder:text-[#8b7b6b] focus-visible:ring-[#c9a96e]/40"
             />
             {searchQuery && (
               <button
                 onClick={() => setSearchQuery("")}
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-[#a89880] hover:text-[#3a2a1a] transition-colors"
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-[#8b7b6b] hover:text-[#3a2a1a] transition-colors"
               >
                 <X size={16} />
               </button>
@@ -610,7 +610,7 @@ export default function Resources() {
             ))}
           </div>
           {hasActiveFilters && (
-            <div className="flex items-center gap-3 text-sm text-[#8b7b6b]">
+            <div className="flex items-center gap-3 text-sm text-[#7a6e60]">
               <span>
                 {filteredCategories.reduce((acc, c) => acc + c.resources.length, 0)} resource{filteredCategories.reduce((acc, c) => acc + c.resources.length, 0) !== 1 ? "s" : ""} found
               </span>
@@ -630,7 +630,7 @@ export default function Resources() {
         {/* Industry Stats */}
         <section>
           <h2 className="font-serif text-2xl text-[#3a2a1a] mb-2">The Self-Publishing Landscape</h2>
-          <p className="text-sm text-[#8b7b6b] mb-6 max-w-2xl">
+          <p className="text-sm text-[#7a6e60] mb-6 max-w-2xl">
             Understanding the online publishing market helps you set realistic goals and make informed decisions about your self-publishing path.
           </p>
           <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
@@ -653,7 +653,7 @@ export default function Resources() {
                     </span>
                   </div>
                   <p className="text-sm text-[#3a2a1a] leading-snug">{stat.label}</p>
-                  <p className="text-[11px] text-[#a89880]">— {stat.source}</p>
+                  <p className="text-[11px] text-[#8b7b6b]">— {stat.source}</p>
                 </div>
               );
             })}
@@ -670,7 +670,7 @@ export default function Resources() {
               <h2 className="font-serif text-2xl text-[#3a2a1a]">Publisher Partners</h2>
             </div>
           </div>
-          <p className="text-sm text-[#8b7b6b] mb-6 max-w-2xl">
+          <p className="text-sm text-[#7a6e60] mb-6 max-w-2xl">
             Easy Book Publishers works with these trusted publishing partners to bring faith-based content to readers worldwide.
           </p>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -686,7 +686,7 @@ export default function Resources() {
                   <h3 className="font-serif text-base text-[#3a2a1a] group-hover:text-[#5c3d2e] transition-colors">
                     {partner.name}
                   </h3>
-                  <ExternalLink size={14} className="text-[#a89880] group-hover:text-[#7c5cbf] shrink-0 mt-0.5 transition-colors" />
+                  <ExternalLink size={14} className="text-[#8b7b6b] group-hover:text-[#7c5cbf] shrink-0 mt-0.5 transition-colors" />
                 </div>
                 <p className="text-sm text-[#5c3d2e] leading-relaxed">{partner.description}</p>
                 <div className="flex flex-wrap gap-1.5 mt-auto">
@@ -709,7 +709,7 @@ export default function Resources() {
           <div className="text-center py-16">
             <Search size={40} className="mx-auto text-[#e8dfd0] mb-4" />
             <p className="font-serif text-lg text-[#3a2a1a]">No resources found</p>
-            <p className="text-sm text-[#8b7b6b] mt-1">Try adjusting your search or category filter.</p>
+            <p className="text-sm text-[#7a6e60] mt-1">Try adjusting your search or category filter.</p>
           </div>
         )}
         {filteredCategories.map((category) => (
@@ -726,7 +726,7 @@ export default function Resources() {
                 <h2 className="font-serif text-xl text-[#3a2a1a]">
                   {category.icon} {category.phase}
                 </h2>
-                <p className="text-xs text-[#a89880]">{category.resources.length} resources</p>
+                <p className="text-xs text-[#8b7b6b]">{category.resources.length} resources</p>
               </div>
             </div>
 
@@ -747,12 +747,12 @@ export default function Resources() {
                       </h3>
                       <Badge
                         variant="outline"
-                        className={`text-[10px] px-2 py-0 ${resource.free ? "border-[#4a6741]/40 text-[#4a6741]" : "border-[#c9a96e]/40 text-[#8b7b6b]"}`}
+                        className={`text-[10px] px-2 py-0 ${resource.free ? "border-[#4a6741]/40 text-[#4a6741]" : "border-[#c9a96e]/40 text-[#7a6e60]"}`}
                       >
                         {resource.free ? "Free" : "Paid"}
                       </Badge>
                     </div>
-                    <ExternalLink size={14} className="text-[#a89880] group-hover:text-[#c9a96e] shrink-0 mt-0.5 transition-colors" />
+                    <ExternalLink size={14} className="text-[#8b7b6b] group-hover:text-[#c9a96e] shrink-0 mt-0.5 transition-colors" />
                   </div>
                   <p className="text-sm text-[#5c3d2e] leading-relaxed">
                     <HighlightText text={resource.description} query={searchQuery} />
@@ -761,7 +761,7 @@ export default function Resources() {
                     {resource.tags.map((tag) => (
                       <span
                         key={tag}
-                        className="text-[10px] px-2 py-0.5 rounded-full bg-[#f0e8d8] text-[#8b7b6b]"
+                        className="text-[10px] px-2 py-0.5 rounded-full bg-[#f0e8d8] text-[#7a6e60]"
                       >
                         <HighlightText text={tag} query={searchQuery} />
                       </span>
@@ -776,7 +776,7 @@ export default function Resources() {
         {/* Related Tools — internal backlinks */}
         <div className="py-10 border-t border-[#e8dfd0]">
           <h2 className="font-serif text-2xl text-[#3a2a1a] text-center mb-2">Self-Publishing Tools</h2>
-          <p className="text-sm text-[#8b7b6b] text-center mb-8">Use these free online publishing tools alongside the resources above.</p>
+          <p className="text-sm text-[#7a6e60] text-center mb-8">Use these free online publishing tools alongside the resources above.</p>
           <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
             {[
               { href: "/bible-studio", icon: <BookMarked size={18} />, label: "Bible Design Studio", desc: "Configure trim, paper & binding" },
@@ -791,7 +791,7 @@ export default function Resources() {
                 <span className="mt-0.5 text-[#c9a96e] shrink-0">{icon}</span>
                 <span>
                   <span className="block font-semibold text-sm text-[#3a2a1a] group-hover:text-[#5c3d2e] transition-colors">{label}</span>
-                  <span className="block text-xs text-[#8b7b6b] mt-0.5">{desc}</span>
+                  <span className="block text-xs text-[#7a6e60] mt-0.5">{desc}</span>
                 </span>
               </Link>
             ))}
@@ -800,10 +800,10 @@ export default function Resources() {
 
         {/* Footer note */}
         <div className="text-center py-8 border-t border-[#e8dfd0]">
-          <p className="font-serif text-lg text-[#c9a96e]/60 italic">
+          <p className="font-serif text-lg text-[#c9a96e]/80 italic">
             "The right tool at the right stage makes all the difference."
           </p>
-          <p className="text-xs text-[#a89880] mt-2">
+          <p className="text-xs text-[#8b7b6b] mt-2">
             Resources are curated based on industry adoption, community trust, and practical value. Inclusion does not constitute endorsement.
           </p>
         </div>

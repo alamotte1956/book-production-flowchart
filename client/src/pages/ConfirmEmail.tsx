@@ -57,7 +57,7 @@ export default function ConfirmEmail() {
             <p className="text-[#5c4a2a] text-lg">
               {email ? `Your email ${email} has been verified.` : "Your email has been verified."}
             </p>
-            <p className="text-[#5c4a2a]/70">
+            <p className="text-[#5c4a2a]/90">
               You can now return to the pricing page to complete your purchase.
             </p>
             <Button

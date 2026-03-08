@@ -174,14 +174,14 @@ function InputSlot({
       <div className="flex items-start justify-between gap-3">
         <div className="flex-1 min-w-0">
           <h5 className="font-semibold text-sm text-[#3a2a1a]">{input.name}</h5>
-          <p className="text-xs text-[#8b7b6b] mt-0.5">{input.description}</p>
+          <p className="text-xs text-[#7a6e60] mt-0.5">{input.description}</p>
         </div>
         {!isDisabled && !printMode && (
           <>
             <input ref={fileInputRef} type="file" className="hidden" onChange={handleFileSelect} />
             <Button
               variant="outline" size="sm"
-              className="shrink-0 border-[#c9a96e]/40 text-[#8b7b6b] hover:bg-[#f5efe0] hover:text-[#5c3d2e]"
+              className="shrink-0 border-[#c9a96e]/40 text-[#7a6e60] hover:bg-[#f5efe0] hover:text-[#5c3d2e]"
               onClick={() => fileInputRef.current?.click()}
               disabled={uploadMutation.isPending}
             >
@@ -203,14 +203,14 @@ function InputSlot({
                   className="text-[#5c3d2e] hover:underline truncate flex-1 min-w-0">
                   {f.fileName}
                 </a>
-                {f.fileSize && <span className="text-[#a89880] shrink-0">{formatFileSize(f.fileSize)}</span>}
+                {f.fileSize && <span className="text-[#8b7b6b] shrink-0">{formatFileSize(f.fileSize)}</span>}
                 <a href={f.fileUrl} target="_blank" rel="noopener noreferrer" className="shrink-0">
-                  <ExternalLink size={12} className="text-[#a89880] hover:text-[#5c3d2e]" />
+                  <ExternalLink size={12} className="text-[#8b7b6b] hover:text-[#5c3d2e]" />
                 </a>
                 {!isDisabled && !printMode && (
                   <button
                     onClick={() => deleteMutation.mutate({ fileId: f.id, projectId })}
-                    className="shrink-0 text-[#a89880] hover:text-red-500 transition-colors"
+                    className="shrink-0 text-[#8b7b6b] hover:text-red-500 transition-colors"
                   >
                     <Trash2 size={12} />
                   </button>
@@ -221,7 +221,7 @@ function InputSlot({
         </div>
       )}
       {(!files || files.length === 0) && printMode && (
-        <p className="text-xs text-[#a89880] italic mt-1">No files uploaded</p>
+        <p className="text-xs text-[#8b7b6b] italic mt-1">No files uploaded</p>
       )}
     </div>
   );
@@ -356,14 +356,14 @@ function StepCard({
                 </span>
               </div>
               <div className="flex items-center gap-3 mt-1">
-                <span className="text-xs text-[#a89880]">{step.inputs.length} inputs</span>
+                <span className="text-xs text-[#8b7b6b]">{step.inputs.length} inputs</span>
                 {fileCount > 0 && <span className="text-xs text-emerald-600 font-medium">{fileCount} file{fileCount > 1 ? "s" : ""}</span>}
                 {stepStatus.notes && <span className="text-xs text-[#c9a96e] font-medium">Has notes</span>}
               </div>
             </div>
             {!printMode && (
               <motion.div animate={{ rotate: expanded ? 90 : 0 }} transition={{ duration: 0.25, ease: "easeInOut" }}>
-                <ChevronRight size={18} className="text-[#a89880] group-hover/card:text-[#5c3d2e] transition-colors" />
+                <ChevronRight size={18} className="text-[#8b7b6b] group-hover/card:text-[#5c3d2e] transition-colors" />
               </motion.div>
             )}
           </button>
@@ -378,7 +378,7 @@ function StepCard({
                 className="overflow-hidden"
               >
                 <div className="px-5 pb-5 space-y-4">
-                  <p className="text-sm text-[#8b7b6b] leading-relaxed">{step.description}</p>
+                  <p className="text-sm text-[#7a6e60] leading-relaxed">{step.description}</p>
 
                   {/* Status dropdown + notes toggle — hidden in print mode */}
                   {!printMode && (
@@ -394,7 +394,7 @@ function StepCard({
                               ? "border-[#4a6741]/40 bg-[#f0faf2] text-[#2d4a3e]"
                               : status === "skipped"
                               ? "border-gray-300 bg-gray-50 text-gray-500"
-                              : "border-[#c9a96e]/40 bg-[#fdf9f3] text-[#8b7b6b]"
+                              : "border-[#c9a96e]/40 bg-[#fdf9f3] text-[#7a6e60]"
                           }`}
                           onClick={(e) => e.stopPropagation()}
                         >
@@ -402,7 +402,7 @@ function StepCard({
                         </SelectTrigger>
                         <SelectContent onClick={(e) => e.stopPropagation()}>
                           <SelectItem value="pending">
-                            <span className="flex items-center gap-1.5"><Clock size={12} className="text-[#a89880]" /> Pending</span>
+                            <span className="flex items-center gap-1.5"><Clock size={12} className="text-[#8b7b6b]" /> Pending</span>
                           </SelectItem>
                           <SelectItem value="complete">
                             <span className="flex items-center gap-1.5"><Check size={12} className="text-[#4a6741]" /> Complete</span>
@@ -413,7 +413,7 @@ function StepCard({
                         </SelectContent>
                       </Select>
                       {updateMutation.isPending && <Loader2 size={14} className="animate-spin text-[#c9a96e]" />}
-                      <Button size="sm" variant="ghost" className="text-[#8b7b6b] h-8 text-xs"
+                      <Button size="sm" variant="ghost" className="text-[#7a6e60] h-8 text-xs"
                         onClick={(e) => { e.stopPropagation(); setShowNotes(!showNotes); }}>
                         {showNotes ? "Hide Notes" : "Add Notes"}
                       </Button>
@@ -430,7 +430,7 @@ function StepCard({
                     <div className="space-y-2">
                       {printMode ? (
                         <div className="bg-[#f8f5ef] rounded-lg p-3 text-sm text-[#5c3d2e]">
-                          <span className="text-xs font-bold uppercase tracking-wider text-[#a89880]">Notes</span>
+                          <span className="text-xs font-bold uppercase tracking-wider text-[#8b7b6b]">Notes</span>
                           <p className="mt-1">{stepStatus.notes}</p>
                         </div>
                       ) : (
@@ -448,7 +448,7 @@ function StepCard({
                   {/* Input slots */}
                   <div className="space-y-3">
                     <div className="flex items-center justify-between">
-                      <h5 className="text-xs font-bold uppercase tracking-wider text-[#a89880]">Required Inputs</h5>
+                      <h5 className="text-xs font-bold uppercase tracking-wider text-[#8b7b6b]">Required Inputs</h5>
                       {!printMode && (
                         <a
                           href={`/resources#resources-${step.resourceSection}`}
@@ -515,7 +515,7 @@ function DueDatePicker({
               {formatDate(currentDueDate)}
             </span>
           ) : (
-            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-[#f0e8d8] text-[#8b7b6b]">
+            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-[#f0e8d8] text-[#7a6e60]">
               <Calendar size={10} />
               Set due date
             </span>
@@ -591,10 +591,10 @@ function GenreEditor({ projectId, currentGenre }: { projectId: number; currentGe
           {currentGenre ? (
             <>
               <span>• {currentGenre}</span>
-              <span className="opacity-0 group-hover:opacity-100 transition-opacity text-[#c9a96e]/60 text-[10px] ml-0.5">(edit)</span>
+              <span className="opacity-0 group-hover:opacity-100 transition-opacity text-[#c9a96e]/80 text-[10px] ml-0.5">(edit)</span>
             </>
           ) : (
-            <span className="text-[#c9a96e]/40 hover:text-[#c9a96e]/70 italic">+ Add genre</span>
+            <span className="text-[#c9a96e]/65 hover:text-[#c9a96e]/90 italic">+ Add genre</span>
           )}
         </button>
       </PopoverTrigger>
@@ -671,7 +671,7 @@ function TitleEditor({ projectId, currentTitle }: { projectId: number; currentTi
       <PopoverTrigger asChild>
         <button data-title-editor className="font-serif text-xl truncate tracking-wide hover:text-[#c9a96e] transition-colors group flex items-center gap-1.5 print:pointer-events-none">
           {currentTitle}
-          <span className="opacity-0 group-hover:opacity-100 transition-opacity text-[#c9a96e]/60 text-[10px] print:hidden">(edit)</span>
+          <span className="opacity-0 group-hover:opacity-100 transition-opacity text-[#c9a96e]/80 text-[10px] print:hidden">(edit)</span>
         </button>
       </PopoverTrigger>
       <PopoverContent className="w-72 p-3" align="start">
@@ -743,10 +743,10 @@ function AuthorEditor({ projectId, currentAuthor }: { projectId: number; current
           {currentAuthor ? (
             <>
               <span className="italic">by {currentAuthor}</span>
-              <span className="opacity-0 group-hover:opacity-100 transition-opacity text-[#c9a96e]/60 text-[10px] ml-0.5">(edit)</span>
+              <span className="opacity-0 group-hover:opacity-100 transition-opacity text-[#c9a96e]/80 text-[10px] ml-0.5">(edit)</span>
             </>
           ) : (
-            <span className="text-[#c9a96e]/40 hover:text-[#c9a96e]/70 italic">+ Add author</span>
+            <span className="text-[#c9a96e]/65 hover:text-[#c9a96e]/90 italic">+ Add author</span>
           )}
         </button>
       </PopoverTrigger>
@@ -825,7 +825,7 @@ function PhaseSection({
         <div className="flex items-center justify-center gap-3 mb-4">
           <div className="h-px w-8 sm:w-12" style={{ backgroundColor: `${phase.accentColor}50` }} />
           <div className="w-1.5 h-1.5 rotate-45" style={{ backgroundColor: phase.accentColor }} />
-          <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-[#a89880]">Chapter {phase.number}</span>
+          <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-[#8b7b6b]">Chapter {phase.number}</span>
           <div className="w-1.5 h-1.5 rotate-45" style={{ backgroundColor: phase.accentColor }} />
           <div className="h-px w-8 sm:w-12" style={{ backgroundColor: `${phase.accentColor}50` }} />
         </div>
@@ -858,7 +858,7 @@ function PhaseSection({
           <div className="flex-1 min-w-0">
             <h3 className="font-serif text-xl sm:text-2xl font-bold text-[#3a2a1a] tracking-wide leading-tight">{phase.title}</h3>
             <div className="flex items-center gap-3 mt-1.5 flex-wrap">
-              <p className="text-xs text-[#8b7b6b] italic">{phase.subtitle}</p>
+              <p className="text-xs text-[#7a6e60] italic">{phase.subtitle}</p>
               {!printMode && (
                 <DueDatePicker
                   phaseId={phase.id}
@@ -868,7 +868,7 @@ function PhaseSection({
                 />
               )}
               {printMode && dueDateMap[phase.id] && (
-                <span className="text-xs text-[#8b7b6b]">Due: {formatDate(dueDateMap[phase.id])}</span>
+                <span className="text-xs text-[#7a6e60]">Due: {formatDate(dueDateMap[phase.id])}</span>
               )}
             </div>
           </div>
@@ -896,7 +896,7 @@ function PhaseSection({
                 />
               </div>
             </div>
-            <span className="text-[10px] text-[#a89880] mt-1 block font-medium">{completedInPhase}/{visibleSteps.length} steps</span>
+            <span className="text-[10px] text-[#8b7b6b] mt-1 block font-medium">{completedInPhase}/{visibleSteps.length} steps</span>
           </div>
         </div>
 
@@ -964,7 +964,7 @@ function PhaseSection({
           <div className="mt-1">
             <button
               onClick={() => setShowHidden(v => !v)}
-              className="flex items-center gap-2 text-xs text-[#a89880] hover:text-[#8b7b6b] transition-colors py-1.5 px-2 rounded-md hover:bg-[#f0e8d8]/60"
+              className="flex items-center gap-2 text-xs text-[#8b7b6b] hover:text-[#7a6e60] transition-colors py-1.5 px-2 rounded-md hover:bg-[#f0e8d8]/60"
             >
               <Eye size={13} className={showHidden ? "opacity-100" : "opacity-50"} />
               {showHidden
@@ -1100,7 +1100,7 @@ function AIAssistantPanel({
   return (
     <div className="space-y-4">
       <div>
-        <label className="text-xs font-bold uppercase tracking-wider text-[#a89880] mb-2 block">Copy Type</label>
+        <label className="text-xs font-bold uppercase tracking-wider text-[#8b7b6b] mb-2 block">Copy Type</label>
         <div className="space-y-1">
           {allCopyTypes.map(ct => (
             <button
@@ -1113,14 +1113,14 @@ function AIAssistantPanel({
               }`}
             >
               <span className="font-medium text-xs">{ct.label}</span>
-              <span className="text-[10px] text-[#a89880]">{ct.desc}</span>
+              <span className="text-[10px] text-[#8b7b6b]">{ct.desc}</span>
             </button>
           ))}
         </div>
       </div>
 
       <div className="space-y-2">
-        <label className="text-xs font-bold uppercase tracking-wider text-[#a89880] block">Book Details</label>
+        <label className="text-xs font-bold uppercase tracking-wider text-[#8b7b6b] block">Book Details</label>
         <Input
           value={bookTitle}
           onChange={e => setBookTitle(e.target.value)}
@@ -1151,7 +1151,7 @@ function AIAssistantPanel({
       </div>
 
       <div>
-        <label className="text-xs font-bold uppercase tracking-wider text-[#a89880] mb-2 block">Tone</label>
+        <label className="text-xs font-bold uppercase tracking-wider text-[#8b7b6b] mb-2 block">Tone</label>
         <Select value={tone} onValueChange={(v) => setTone(v as typeof tone)}>
           <SelectTrigger className="border-[#e8dfd0] text-sm">
             <SelectValue />
@@ -1184,7 +1184,7 @@ function AIAssistantPanel({
             </span>
             <button
               onClick={handleCopy}
-              className="flex items-center gap-1 text-[10px] text-[#8b7b6b] hover:text-[#5c3d2e] transition-colors"
+              className="flex items-center gap-1 text-[10px] text-[#7a6e60] hover:text-[#5c3d2e] transition-colors"
             >
               <Copy size={10} /> Copy
             </button>
@@ -1424,7 +1424,7 @@ function GettingStartedChecklist({
             </div>
             <div>
               <h3 className="font-serif text-lg font-semibold text-[#3a2a1a]">Getting Started</h3>
-              <p className="text-xs text-[#8b7b6b]">Complete these steps to set up your project</p>
+              <p className="text-xs text-[#7a6e60]">Complete these steps to set up your project</p>
             </div>
             <div className="ml-auto text-right">
               <span className="text-sm font-semibold text-[#c9a96e]">{doneCount}/{items.length}</span>
@@ -1452,14 +1452,14 @@ function GettingStartedChecklist({
                   {item.done ? (
                     <CircleCheck size={18} className="text-emerald-500 shrink-0" />
                   ) : (
-                    <Circle size={18} className="text-[#c9a96e]/40 shrink-0" />
+                    <Circle size={18} className="text-[#c9a96e]/65 shrink-0" />
                   )}
                   <ItemIcon size={16} className={item.done ? "text-emerald-500/60 shrink-0" : "text-[#c9a96e] shrink-0"} />
                   <span className={`text-sm font-medium ${item.done ? "text-[#4a6741] line-through" : "text-[#3a2a1a]"}`}>
                     {item.label}
                   </span>
                   {!item.done && (
-                    <ChevronRight size={14} className="ml-auto text-[#a89880]" />
+                    <ChevronRight size={14} className="ml-auto text-[#8b7b6b]" />
                   )}
                 </button>
               );
@@ -1579,7 +1579,7 @@ export default function ProjectTracker() {
     return (
       <div className="min-h-screen bg-[#faf6ef] flex items-center justify-center">
         <div className="text-center">
-          <p className="text-[#8b7b6b]">Project not found</p>
+          <p className="text-[#7a6e60]">Project not found</p>
           <Button variant="outline" className="mt-4" onClick={() => navigate("/dashboard")}>
             <ArrowLeft size={16} className="mr-2" /> Back to projects
           </Button>
@@ -1607,7 +1607,7 @@ export default function ProjectTracker() {
           </Button>
           <div className="flex-1 min-w-0">
             <TitleEditor projectId={projectId} currentTitle={project.title} />
-            <div className="flex items-center gap-3 text-xs text-[#c9a96e]/70 print:text-[#8b7b6b]">
+            <div className="flex items-center gap-3 text-xs text-[#c9a96e]/90 print:text-[#7a6e60]">
               <AuthorEditor projectId={projectId} currentAuthor={project.author} />
               <GenreEditor projectId={projectId} currentGenre={project.genre} />
             </div>
@@ -1619,7 +1619,7 @@ export default function ProjectTracker() {
               <TooltipTrigger asChild>
                 <Button
                   variant="ghost" size="sm"
-                  className={`text-[#c9a96e]/70 hover:text-[#c9a96e] hover:bg-[#c9a96e]/10 ${printMode ? "bg-[#c9a96e]/20 text-[#c9a96e]" : ""}`}
+                  className={`text-[#c9a96e]/90 hover:text-[#c9a96e] hover:bg-[#c9a96e]/10 ${printMode ? "bg-[#c9a96e]/20 text-[#c9a96e]" : ""}`}
                   onClick={() => setPrintMode(!printMode)}
                 >
                   {printMode ? <ChevronsUp size={16} /> : <ChevronsDown size={16} />}
@@ -1633,7 +1633,7 @@ export default function ProjectTracker() {
               <TooltipTrigger asChild>
                 <Button
                   variant="ghost" size="sm"
-                  className="text-[#c9a96e]/70 hover:text-[#c9a96e] hover:bg-[#c9a96e]/10"
+                  className="text-[#c9a96e]/90 hover:text-[#c9a96e] hover:bg-[#c9a96e]/10"
                   onClick={() => duplicateMutation.mutate({ projectId })}
                   disabled={duplicateMutation.isPending}
                 >
@@ -1648,7 +1648,7 @@ export default function ProjectTracker() {
               <TooltipTrigger asChild>
                 <Button
                   variant="ghost" size="sm"
-                  className="text-[#c9a96e]/70 hover:text-[#c9a96e] hover:bg-[#c9a96e]/10"
+                  className="text-[#c9a96e]/90 hover:text-[#c9a96e] hover:bg-[#c9a96e]/10"
                   onClick={() => navigate(`/timeline/${projectId}`)}
                 >
                   <BarChart2 size={16} />
@@ -1676,7 +1676,7 @@ export default function ProjectTracker() {
               <TooltipTrigger asChild>
                 <Button
                   variant="ghost" size="sm"
-                  className="text-[#c9a96e]/70 hover:text-[#c9a96e] hover:bg-[#c9a96e]/10"
+                  className="text-[#c9a96e]/90 hover:text-[#c9a96e] hover:bg-[#c9a96e]/10"
                   onClick={() => {
                     downloadProjectSummary({
                       project,
@@ -1712,7 +1712,7 @@ export default function ProjectTracker() {
           {/* Notes toggle */}
           <button
             onClick={() => setShowNotes(v => !v)}
-            className="hidden sm:flex items-center gap-1.5 text-xs text-[#c9a96e]/60 hover:text-[#c9a96e] transition-colors print:hidden"
+            className="hidden sm:flex items-center gap-1.5 text-xs text-[#c9a96e]/80 hover:text-[#c9a96e] transition-colors print:hidden"
           >
             <MessageSquare size={14} />
             Notes
@@ -1737,7 +1737,7 @@ export default function ProjectTracker() {
                 />
               </div>
             </div>
-            <span className="text-[10px] text-[#c9a96e]/50 print:text-[#8b7b6b]">{completedSteps}/{totalSteps} steps</span>
+            <span className="text-[10px] text-[#c9a96e]/75 print:text-[#7a6e60]">{completedSteps}/{totalSteps} steps</span>
           </div>
         </div>
       </header>
@@ -1757,12 +1757,12 @@ export default function ProjectTracker() {
                   <MessageSquare size={14} className="text-[#c9a96e]" />
                   Notes Summary ({stepsWithNotes.length} step{stepsWithNotes.length !== 1 ? "s" : ""})
                 </h3>
-                <button onClick={() => setShowNotes(false)} className="text-[#a89880] hover:text-[#5c3d2e]">
+                <button onClick={() => setShowNotes(false)} className="text-[#8b7b6b] hover:text-[#5c3d2e]">
                   <X size={14} />
                 </button>
               </div>
               {stepsWithNotes.length === 0 ? (
-                <p className="text-xs text-[#a89880] italic">No notes added to any steps yet. Expand a step and add notes to see them here.</p>
+                <p className="text-xs text-[#8b7b6b] italic">No notes added to any steps yet. Expand a step and add notes to see them here.</p>
               ) : (
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
                   {stepsWithNotes.map(({ phase, step, notes }) => (
@@ -1816,7 +1816,7 @@ export default function ProjectTracker() {
           <nav className="sticky top-24 space-y-1 bg-white/60 backdrop-blur-sm rounded-xl border border-[#e8dfd0] p-4">
             <div className="flex items-center gap-2 mb-4">
               <div className="h-px flex-1 bg-[#c9a96e]/20" />
-              <p className="text-xs font-serif font-semibold uppercase tracking-widest text-[#a89880]">Chapters</p>
+              <p className="text-xs font-serif font-semibold uppercase tracking-widest text-[#8b7b6b]">Chapters</p>
               <div className="h-px flex-1 bg-[#c9a96e]/20" />
             </div>
             {allPhases.map((phase) => {
@@ -1845,7 +1845,7 @@ export default function ProjectTracker() {
                     {phaseComplete ? <Check size={11} /> : phase.number}
                   </span>
                   <span className="truncate flex-1 font-medium">{phase.title}</span>
-                  <span className="text-[10px] font-medium text-[#a89880]">{done}/{phase.steps.length}</span>
+                  <span className="text-[10px] font-medium text-[#8b7b6b]">{done}/{phase.steps.length}</span>
                 </a>
               );
             })}
@@ -1863,14 +1863,14 @@ export default function ProjectTracker() {
                   </div>
                   <h3 className="text-sm font-serif font-semibold text-[#2c1a00]">What's Next?</h3>
                 </div>
-                <button onClick={() => setShowWhatsNext(false)} className="text-[#a89880] hover:text-[#5c3d2e] transition-colors">
+                <button onClick={() => setShowWhatsNext(false)} className="text-[#8b7b6b] hover:text-[#5c3d2e] transition-colors">
                   <X size={14} />
                 </button>
               </div>
               {whatsNextPrompts.length > 0 ? (
                 <WhatsNext prompts={whatsNextPrompts} title="Suggested Actions" />
               ) : (
-                <p className="text-xs text-[#a89880] italic">No suggestions available for this project yet.</p>
+                <p className="text-xs text-[#8b7b6b] italic">No suggestions available for this project yet.</p>
               )}
             </div>
           </aside>
@@ -1887,7 +1887,7 @@ export default function ProjectTracker() {
                   </div>
                   <h3 className="text-sm font-serif font-semibold text-[#2c1a00]">AI Assistant</h3>
                 </div>
-                <button onClick={() => setShowAI(false)} className="text-[#a89880] hover:text-[#5c3d2e] transition-colors">
+                <button onClick={() => setShowAI(false)} className="text-[#8b7b6b] hover:text-[#5c3d2e] transition-colors">
                   <X size={14} />
                 </button>
               </div>
@@ -1932,14 +1932,14 @@ export default function ProjectTracker() {
             <div className="flex items-center justify-center gap-4 mb-6">
               <div className="h-px w-16 bg-gradient-to-r from-transparent to-[#c9a96e]/30" />
               <div className="w-8 h-8 rounded-full border-2 border-[#c9a96e]/20 flex items-center justify-center">
-                <BookOpen size={16} className="text-[#c9a96e]/40" />
+                <BookOpen size={16} className="text-[#c9a96e]/65" />
               </div>
               <div className="h-px w-16 bg-gradient-to-l from-transparent to-[#c9a96e]/30" />
             </div>
-            <p className="font-serif text-lg text-[#c9a96e]/50 italic tracking-wide">
+            <p className="font-serif text-lg text-[#c9a96e]/75 italic tracking-wide">
               "Every book is a journey."
             </p>
-            <p className="text-xs text-[#a89880]/40 mt-2 tracking-wider uppercase">
+            <p className="text-xs text-[#8b7b6b]/40 mt-2 tracking-wider uppercase">
               {completedSteps} of {totalSteps} steps complete
             </p>
           </div>

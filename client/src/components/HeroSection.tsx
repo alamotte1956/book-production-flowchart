@@ -103,7 +103,7 @@ export default function HeroSection() {
         {/* Scroll indicator */}
         <motion.button
           onClick={scrollToContent}
-          className="inline-flex flex-col items-center gap-1 text-[#c9a96e]/70 hover:text-[#c9a96e] transition-colors"
+          className="inline-flex flex-col items-center gap-1 text-[#c9a96e]/90 hover:text-[#c9a96e] transition-colors"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ duration: 0.8, delay: 1.2 }}

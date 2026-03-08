@@ -108,7 +108,7 @@ export default function AffiliateProgram() {
           <h1 className="font-serif text-4xl md:text-6xl text-[#1a1008] mb-4 leading-tight">
             Earn <span className="text-[#8b6914]">20% Commission</span><br />on Every Referral
           </h1>
-          <p className="text-lg text-[#5c4a2a]/70 max-w-2xl mx-auto mb-8">
+          <p className="text-lg text-[#5c4a2a]/90 max-w-2xl mx-auto mb-8">
             Join the Easy Book Publishers affiliate program and earn money by sharing the tools
             you love with fellow authors and publishers. No cap on earnings.
           </p>
@@ -128,7 +128,7 @@ export default function AffiliateProgram() {
               <CardContent className="p-6">
                 <item.icon className="w-8 h-8 text-[#c9a96e] mb-3" />
                 <h3 className="font-serif text-lg text-[#1a1008] font-semibold mb-2">{item.title}</h3>
-                <p className="text-sm text-[#5c4a2a]/70 leading-relaxed">{item.description}</p>
+                <p className="text-sm text-[#5c4a2a]/90 leading-relaxed">{item.description}</p>
               </CardContent>
             </Card>
           ))}
@@ -137,7 +137,7 @@ export default function AffiliateProgram() {
         <div id="how-it-works" className="mb-20">
           <div className="text-center mb-10">
             <h2 className="font-serif text-3xl text-[#1a1008] mb-3">How It Works</h2>
-            <p className="text-[#5c4a2a]/70">Three simple steps to start earning</p>
+            <p className="text-[#5c4a2a]/90">Three simple steps to start earning</p>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             {steps.map((step) => (
@@ -147,7 +147,7 @@ export default function AffiliateProgram() {
                 </div>
                 <div className="text-xs font-bold text-[#c9a96e] uppercase tracking-wider mb-1">Step {step.number}</div>
                 <h3 className="font-serif text-xl text-[#1a1008] mb-2">{step.title}</h3>
-                <p className="text-sm text-[#5c4a2a]/70 leading-relaxed">{step.description}</p>
+                <p className="text-sm text-[#5c4a2a]/90 leading-relaxed">{step.description}</p>
               </div>
             ))}
           </div>
@@ -156,14 +156,14 @@ export default function AffiliateProgram() {
         <div className="mb-20">
           <div className="text-center mb-10">
             <h2 className="font-serif text-3xl text-[#1a1008] mb-3">Earnings Potential</h2>
-            <p className="text-[#5c4a2a]/70">Here's what you could earn at 20% commission</p>
+            <p className="text-[#5c4a2a]/90">Here's what you could earn at 20% commission</p>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             <Card className="bg-white border-[#c9a96e]/15">
               <CardContent className="p-6 text-center">
                 <Zap className="w-8 h-8 text-[#c9a96e] mx-auto mb-3" />
                 <div className="font-serif text-3xl text-[#1a1008] font-bold">$26.40</div>
-                <div className="text-sm text-[#5c4a2a]/70 mt-1">per Author Pro lifetime sale</div>
+                <div className="text-sm text-[#5c4a2a]/90 mt-1">per Author Pro lifetime sale</div>
                 <div className="text-xs text-[#8b6914] mt-2">Plan price: $132</div>
               </CardContent>
             </Card>
@@ -171,7 +171,7 @@ export default function AffiliateProgram() {
               <CardContent className="p-6 text-center">
                 <TrendingUp className="w-8 h-8 text-[#c9a96e] mx-auto mb-3" />
                 <div className="font-serif text-3xl text-[#1a1008] font-bold">$69.80</div>
-                <div className="text-sm text-[#5c4a2a]/70 mt-1">per Publisher lifetime sale</div>
+                <div className="text-sm text-[#5c4a2a]/90 mt-1">per Publisher lifetime sale</div>
                 <div className="text-xs text-[#8b6914] mt-2">Plan price: $349</div>
               </CardContent>
             </Card>
@@ -179,7 +179,7 @@ export default function AffiliateProgram() {
               <CardContent className="p-6 text-center">
                 <Wallet className="w-8 h-8 text-[#c9a96e] mx-auto mb-3" />
                 <div className="font-serif text-3xl text-[#1a1008] font-bold">$2.60+</div>
-                <div className="text-sm text-[#5c4a2a]/70 mt-1">per monthly subscription</div>
+                <div className="text-sm text-[#5c4a2a]/90 mt-1">per monthly subscription</div>
                 <div className="text-xs text-[#8b6914] mt-2">Recurring every month</div>
               </CardContent>
             </Card>
@@ -194,7 +194,7 @@ export default function AffiliateProgram() {
         <div className="mb-20">
           <div className="text-center mb-10">
             <h2 className="font-serif text-3xl text-[#1a1008] mb-3">How We Compare</h2>
-            <p className="text-[#5c4a2a]/70">Our program stacks up against the best in the industry</p>
+            <p className="text-[#5c4a2a]/90">Our program stacks up against the best in the industry</p>
           </div>
           <div className="overflow-x-auto">
             <table className="w-full bg-white rounded-xl border border-[#c9a96e]/15 overflow-hidden">
@@ -217,7 +217,7 @@ export default function AffiliateProgram() {
                     <td className="px-4 py-3 text-sm text-[#1a1008]">{row.rate}</td>
                     <td className="px-4 py-3 text-sm text-[#5c4a2a]">{row.cookie}</td>
                     <td className="px-4 py-3 text-sm text-[#5c4a2a]">{row.payout}</td>
-                    <td className="px-4 py-3 text-sm text-[#5c4a2a]/70 hidden md:table-cell">{row.notes}</td>
+                    <td className="px-4 py-3 text-sm text-[#5c4a2a]/90 hidden md:table-cell">{row.notes}</td>
                   </tr>
                 ))}
               </tbody>
@@ -267,7 +267,7 @@ export default function AffiliateProgram() {
           <div className="max-w-xl mx-auto">
             <div className="text-center mb-8">
               <h2 className="font-serif text-3xl text-[#1a1008] mb-3">Apply to Join</h2>
-              <p className="text-[#5c4a2a]/70">Most applications are reviewed within 24 hours</p>
+              <p className="text-[#5c4a2a]/90">Most applications are reviewed within 24 hours</p>
             </div>
 
             {submitted ? (
@@ -275,7 +275,7 @@ export default function AffiliateProgram() {
                 <CardContent className="p-8 text-center">
                   <CheckCircle2 className="w-16 h-16 text-green-600 mx-auto mb-4" />
                   <h3 className="font-serif text-2xl text-[#1a1008] mb-2">Application Submitted!</h3>
-                  <p className="text-[#5c4a2a]/70 mb-4">
+                  <p className="text-[#5c4a2a]/90 mb-4">
                     We'll review your application and send you an email within 24 hours with your affiliate link and dashboard access.
                   </p>
                   <Button onClick={() => navigate("/dashboard")} className="bg-[#c9a96e] hover:bg-[#b8944f] text-[#1a1008] font-semibold">
@@ -333,7 +333,7 @@ export default function AffiliateProgram() {
             {faqs.map(({ q, a }) => (
               <div key={q} className="bg-white rounded-xl border border-[#c9a96e]/15 p-5">
                 <h3 className="font-serif font-bold text-[#1a1008] mb-2">{q}</h3>
-                <p className="text-sm text-[#5c4a2a]/70 leading-relaxed">{a}</p>
+                <p className="text-sm text-[#5c4a2a]/90 leading-relaxed">{a}</p>
               </div>
             ))}
           </div>
@@ -341,7 +341,7 @@ export default function AffiliateProgram() {
 
         <div className="text-center py-16 px-6 bg-gradient-to-r from-[#1a1008] to-[#2a1a10] rounded-2xl mb-10">
           <h2 className="font-serif text-3xl text-[#f5d98a] mb-4">Ready to start earning?</h2>
-          <p className="text-[#d4c8b4]/80 mb-8 max-w-xl mx-auto">
+          <p className="text-[#d4c8b4] mb-8 max-w-xl mx-auto">
             Join our affiliate program today and turn your audience into a revenue stream. No upfront costs, no commitments.
           </p>
           <a href="#apply" className="inline-flex items-center gap-2 bg-gradient-to-r from-[#d4b480] to-[#c9a96e] hover:from-[#e0c490] hover:to-[#d4b480] text-[#1a1008] font-bold text-base px-10 py-4 rounded-xl shadow-xl shadow-[#c9a96e]/25 transition-all">

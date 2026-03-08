@@ -397,7 +397,7 @@ export default function SpineCalculator() {
                   type="number"
                   min={2}
                 />
-                <p className="text-xs text-[#8b7b6b] mt-1">Must be an even number. A standard complete Bible is typically 1,100–1,600 pages.</p>
+                <p className="text-xs text-[#7a6e60] mt-1">Must be an even number. A standard complete Bible is typically 1,100–1,600 pages.</p>
               </div>
               <div>
                 <Label className="text-[#5c3d2e] font-semibold">Paper Type</Label>
@@ -409,7 +409,7 @@ export default function SpineCalculator() {
                     {PAPER_TYPES.map(p => <SelectItem key={p.id} value={p.id}>{p.name}</SelectItem>)}
                   </SelectContent>
                 </Select>
-                <p className="text-xs text-[#8b7b6b] mt-1">{paper.description}</p>
+                <p className="text-xs text-[#7a6e60] mt-1">{paper.description}</p>
               </div>
               {paperTypeId === "custom" && (
                 <div>
@@ -437,7 +437,7 @@ export default function SpineCalculator() {
                   {BINDING_METHODS.map(b => <SelectItem key={b.id} value={b.id}>{b.name}</SelectItem>)}
                 </SelectContent>
               </Select>
-              <p className="text-xs text-[#8b7b6b]">{binding.description}</p>
+              <p className="text-xs text-[#7a6e60]">{binding.description}</p>
             </CardContent>
           </Card>
 
@@ -458,7 +458,7 @@ export default function SpineCalculator() {
                   {COVER_MATERIALS.map(c => <SelectItem key={c.id} value={c.id}>{c.name}</SelectItem>)}
                 </SelectContent>
               </Select>
-              <p className="text-xs text-[#8b7b6b]">{coverMaterial.description}</p>
+              <p className="text-xs text-[#7a6e60]">{coverMaterial.description}</p>
               {coverMaterialId === "custom" && (
                 <div>
                   <Label className="text-xs text-[#5c3d2e]">Cover Thickness (inches)</Label>
@@ -544,7 +544,7 @@ export default function SpineCalculator() {
                     className={`flex items-center gap-2 px-3 py-2 rounded-lg border text-sm font-medium transition-colors ${
                       value
                         ? "border-[#c9a96e] bg-[#fdf5e4] text-[#8b5e3c]"
-                        : "border-[#e8dfd0] bg-white text-[#8b7b6b] hover:bg-[#f5f0e8]"
+                        : "border-[#e8dfd0] bg-white text-[#7a6e60] hover:bg-[#f5f0e8]"
                     }`}
                   >
                     <span className={`w-4 h-4 rounded border flex items-center justify-center ${value ? "bg-[#c9a96e] border-[#c9a96e]" : "border-[#d4c8b4]"}`}>
@@ -626,22 +626,22 @@ export default function SpineCalculator() {
               <CardContent className="space-y-3">
                 <div className="grid grid-cols-2 gap-4 text-sm">
                   <div className="p-3 rounded-lg bg-[#f5f0e8] text-center">
-                    <p className="text-xs text-[#8b7b6b] mb-1">Cover Width (full wrap)</p>
+                    <p className="text-xs text-[#7a6e60] mb-1">Cover Width (full wrap)</p>
                     <p className="font-mono font-bold text-[#3a2a1a] text-lg">{coverW}"</p>
-                    <p className="font-mono text-[#8b7b6b] text-xs">{coverWmm} mm</p>
+                    <p className="font-mono text-[#7a6e60] text-xs">{coverWmm} mm</p>
                   </div>
                   <div className="p-3 rounded-lg bg-[#f5f0e8] text-center">
-                    <p className="text-xs text-[#8b7b6b] mb-1">Cover Height</p>
+                    <p className="text-xs text-[#7a6e60] mb-1">Cover Height</p>
                     <p className="font-mono font-bold text-[#3a2a1a] text-lg">{coverHin}"</p>
-                    <p className="font-mono text-[#8b7b6b] text-xs">{coverHmm} mm</p>
+                    <p className="font-mono text-[#7a6e60] text-xs">{coverHmm} mm</p>
                   </div>
                 </div>
-                <p className="text-xs text-[#8b7b6b]">Includes 0.125" bleed on all sides. Spine starts at {trimW + 0.125}" from the left edge of the cover file.</p>
+                <p className="text-xs text-[#7a6e60]">Includes 0.125" bleed on all sides. Spine starts at {trimW + 0.125}" from the left edge of the cover file.</p>
 
                 {/* Visual spine diagram */}
                 <div className="mt-4 border border-[#e8dfd0] rounded-lg overflow-hidden">
                   <div className="flex h-16 text-[10px] font-mono">
-                    <div className="flex-1 bg-[#f0e8d8] flex items-center justify-center text-[#8b7b6b] border-r border-[#e8dfd0]">
+                    <div className="flex-1 bg-[#f0e8d8] flex items-center justify-center text-[#7a6e60] border-r border-[#e8dfd0]">
                       Back Cover<br />{trimW}"
                     </div>
                     <div
@@ -650,7 +650,7 @@ export default function SpineCalculator() {
                     >
                       Spine<br />{spine.spineIn}"
                     </div>
-                    <div className="flex-1 bg-[#f0e8d8] flex items-center justify-center text-[#8b7b6b] border-l border-[#e8dfd0]">
+                    <div className="flex-1 bg-[#f0e8d8] flex items-center justify-center text-[#7a6e60] border-l border-[#e8dfd0]">
                       Front Cover<br />{trimW}"
                     </div>
                   </div>

@@ -113,7 +113,7 @@ function BookResultCard({
                 {result.title}
               </h2>
               {result.subtitle && (
-                <p className="mt-1 text-sm text-[#8b7b6b] italic">{result.subtitle}</p>
+                <p className="mt-1 text-sm text-[#7a6e60] italic">{result.subtitle}</p>
               )}
 
               <div className="mt-3 space-y-1.5">
@@ -152,7 +152,7 @@ function BookResultCard({
               {result.subjects && result.subjects.length > 0 && (
                 <div className="mt-3 flex flex-wrap gap-1.5">
                   {result.subjects.slice(0, 5).map(s => (
-                    <Badge key={s} variant="outline" className="text-xs text-[#8b7b6b] border-[#c9a96e]/30">
+                    <Badge key={s} variant="outline" className="text-xs text-[#7a6e60] border-[#c9a96e]/30">
                       {s}
                     </Badge>
                   ))}
@@ -306,7 +306,7 @@ function BookResultCard({
               </div>
               <div className="flex-1 min-w-0">
                 <h3 className="font-semibold text-[#3b2a1a]">{result.suggestedTemplate.label}</h3>
-                <p className="text-sm text-[#8b7b6b] mt-0.5">{result.suggestedTemplate.tagline}</p>
+                <p className="text-sm text-[#7a6e60] mt-0.5">{result.suggestedTemplate.tagline}</p>
                 <p className="text-xs text-[#b0a090] mt-1 italic">{result.matchReason}</p>
 
                 <div className="mt-3 flex flex-wrap gap-1.5">
@@ -502,10 +502,10 @@ export default function ISBNLookup() {
         {recentLookups.length > 0 && (
           <div className="mt-4 border border-[#c9a96e]/20 rounded-lg bg-white/60 px-4 py-3">
             <div className="flex items-center justify-between mb-2">
-              <span className="text-xs font-medium text-[#8b7b6b] tracking-wide uppercase">Recent Lookups</span>
+              <span className="text-xs font-medium text-[#7a6e60] tracking-wide uppercase">Recent Lookups</span>
               <button
                 onClick={clearRecent}
-                className="text-[10px] text-[#b0a090] hover:text-[#8b7b6b] transition-colors underline"
+                className="text-[10px] text-[#b0a090] hover:text-[#7a6e60] transition-colors underline"
               >
                 Clear
               </button>
@@ -532,7 +532,7 @@ export default function ISBNLookup() {
           {isLoading && (
             <div className="flex flex-col items-center justify-center py-16 gap-4">
               <Loader2 className="w-8 h-8 animate-spin text-[#c9a96e]" />
-              <p className="text-[#8b7b6b] text-sm">Searching Open Library and Google Books…</p>
+              <p className="text-[#7a6e60] text-sm">Searching Open Library and Google Books…</p>
             </div>
           )}
 
@@ -552,8 +552,8 @@ export default function ISBNLookup() {
 
           {!searchIsbn && !isLoading && (
             <div className="text-center py-16">
-              <BookOpen className="w-12 h-12 text-[#c9a96e]/40 mx-auto mb-4" />
-              <p className="text-[#8b7b6b] text-sm">
+              <BookOpen className="w-12 h-12 text-[#c9a96e]/65 mx-auto mb-4" />
+              <p className="text-[#7a6e60] text-sm">
                 Enter an ISBN above to look up any book's production specifications.
               </p>
               <p className="text-[#b0a090] text-xs mt-2">
@@ -561,7 +561,7 @@ export default function ISBNLookup() {
               </p>
               <div className="mt-8 mx-auto max-w-md border border-[#e8dfd0] rounded-lg bg-white/80 px-5 py-4">
                 <p className="text-sm font-semibold text-[#5c3d2e] mb-1">Need to purchase an ISBN?</p>
-                <p className="text-xs text-[#8b7b6b] mb-3">
+                <p className="text-xs text-[#7a6e60] mb-3">
                   In the US, ISBNs are issued exclusively by Bowker. A single ISBN costs $125; a block of 10 costs $295. Each format (hardcover, paperback, EPUB) requires its own ISBN.
                 </p>
                 <a
@@ -581,7 +581,7 @@ export default function ISBNLookup() {
       {/* Related Tools footer backlinks */}
       <div className="border-t border-[#e8dfd0] bg-[#faf6ef] px-6 py-6">
         <div className="max-w-2xl mx-auto">
-          <p className="text-xs text-[#8b7b6b] mb-3 font-semibold uppercase tracking-wide">Other Self-Publishing Tools</p>
+          <p className="text-xs text-[#7a6e60] mb-3 font-semibold uppercase tracking-wide">Other Self-Publishing Tools</p>
           <div className="flex flex-wrap gap-2">
             {[
               { href: "/isbn-manager", label: "ISBN & Metadata" },

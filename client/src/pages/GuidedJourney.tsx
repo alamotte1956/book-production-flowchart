@@ -248,7 +248,7 @@ function Roadmap({ answers, onReset }: { answers: WizardAnswers; onReset: () => 
               Publishing Roadmap for<br />
               <span className="text-[#c9a96e]">{answers.bookTitle}</span>
             </h1>
-            <p className="text-[#8b7b6b] mt-3 text-sm max-w-lg mx-auto">
+            <p className="text-[#7a6e60] mt-3 text-sm max-w-lg mx-auto">
               Based on your answers, here's your personalized step-by-step publishing plan with {essentialCount} essential steps across {totalPhases} phases.
             </p>
           </div>
@@ -296,7 +296,7 @@ function Roadmap({ answers, onReset }: { answers: WizardAnswers; onReset: () => 
                           <step.icon size={16} className="text-[#c9a96e] shrink-0" />
                           <h3 className="font-serif text-base font-semibold text-[#2c1a00] leading-tight">{step.title}</h3>
                           {getPriorityBadge(step.priority)}
-                          <Badge variant="outline" className="text-[10px] text-[#a89880] border-[#e8dfd0]">{step.phase}</Badge>
+                          <Badge variant="outline" className="text-[10px] text-[#8b7b6b] border-[#e8dfd0]">{step.phase}</Badge>
                         </div>
                         <p className="text-sm text-[#6b5f53] mt-1.5 leading-relaxed">{step.description}</p>
                         {step.toolPath && (
@@ -310,7 +310,7 @@ function Roadmap({ answers, onReset }: { answers: WizardAnswers; onReset: () => 
                           </Button>
                         )}
                         {!step.toolPath && step.toolLabel && (
-                          <span className="inline-flex items-center gap-1 mt-2 text-xs text-[#a89880]">
+                          <span className="inline-flex items-center gap-1 mt-2 text-xs text-[#8b7b6b]">
                             <ArrowRight size={10} /> {step.toolLabel}
                           </span>
                         )}
@@ -338,7 +338,7 @@ function Roadmap({ answers, onReset }: { answers: WizardAnswers; onReset: () => 
             </Button>
           </div>
 
-          <p className="text-center text-xs text-[#a89880] mt-6">
+          <p className="text-center text-xs text-[#8b7b6b] mt-6">
             This roadmap is saved to your account. You can retake the wizard anytime to update your plan.
           </p>
         </motion.div>

@@ -134,15 +134,15 @@ function BookTemplateCard({ template, onOpenWizard }: { template: EBPTemplate; o
                 <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-[#c9a96e]/15 text-[#8b6914] font-medium shrink-0">Bible</span>
               )}
             </div>
-            <p className="text-xs text-[#8b7b6b] mt-0.5 leading-relaxed">{template.tagline}</p>
+            <p className="text-xs text-[#7a6e60] mt-0.5 leading-relaxed">{template.tagline}</p>
           </div>
         </div>
       </CardHeader>
       <CardContent className="px-5 pb-4 flex flex-col flex-1 gap-3">
         <p className="text-xs text-[#5c3d2e] leading-relaxed line-clamp-3">{template.description}</p>
         <div className="flex flex-wrap gap-x-4 gap-y-1">
-          <span className="text-[11px] text-[#8b7b6b]"><span className="font-medium text-[#5c3d2e]">Trim:</span> {template.trimLabel}</span>
-          <span className="text-[11px] text-[#8b7b6b]"><span className="font-medium text-[#5c3d2e]">Pages:</span> {template.pageCountRange[0]}–{template.pageCountRange[1]}</span>
+          <span className="text-[11px] text-[#7a6e60]"><span className="font-medium text-[#5c3d2e]">Trim:</span> {template.trimLabel}</span>
+          <span className="text-[11px] text-[#7a6e60]"><span className="font-medium text-[#5c3d2e]">Pages:</span> {template.pageCountRange[0]}–{template.pageCountRange[1]}</span>
         </div>
         <ul className="flex flex-col gap-1">
           {template.features.slice(0, 4).map((f) => (
@@ -152,13 +152,13 @@ function BookTemplateCard({ template, onOpenWizard }: { template: EBPTemplate; o
             </li>
           ))}
           {template.features.length > 4 && (
-            <li className="text-[11px] text-[#a89880] pl-4">+{template.features.length - 4} more</li>
+            <li className="text-[11px] text-[#8b7b6b] pl-4">+{template.features.length - 4} more</li>
           )}
         </ul>
         {template.exampleTitles.length > 0 && (
           <div>
-            <p className="text-[10px] font-medium text-[#a89880] uppercase tracking-wide mb-1">Similar Published Titles</p>
-            <p className="text-[11px] text-[#8b7b6b] italic leading-relaxed">
+            <p className="text-[10px] font-medium text-[#8b7b6b] uppercase tracking-wide mb-1">Similar Published Titles</p>
+            <p className="text-[11px] text-[#7a6e60] italic leading-relaxed">
               {template.exampleTitles.slice(0, 2).join(" · ")}
             </p>
           </div>
@@ -193,10 +193,10 @@ function KPATemplateCard({ template, onOpenWizard }: { template: KPATemplate; on
           </div>
         </div>
         <CardTitle className="font-serif text-sm mt-2 text-[#3a2a1a]">{template.label}</CardTitle>
-        <CardDescription className="text-xs leading-relaxed text-[#8b7b6b]">{template.tagline}</CardDescription>
+        <CardDescription className="text-xs leading-relaxed text-[#7a6e60]">{template.tagline}</CardDescription>
       </CardHeader>
       <CardContent className="px-5 pb-4 flex flex-col gap-3 flex-1">
-        <div className="flex flex-wrap gap-1.5 text-[11px] text-[#8b7b6b]">
+        <div className="flex flex-wrap gap-1.5 text-[11px] text-[#7a6e60]">
           <span className="bg-[#faf6ef] px-2 py-0.5 rounded">{template.trimLabel}</span>
           <span className="bg-[#faf6ef] px-2 py-0.5 rounded">{template.pageCountRange[0]}–{template.pageCountRange[1]} pp</span>
           <span className="bg-[#faf6ef] px-2 py-0.5 rounded capitalize">{template.bindingTypeId.replace(/-/g, " ")}</span>
@@ -211,7 +211,7 @@ function KPATemplateCard({ template, onOpenWizard }: { template: KPATemplate; on
         </ul>
         <Collapsible open={titlesOpen} onOpenChange={setTitlesOpen}>
           <CollapsibleTrigger asChild>
-            <button className="flex items-center gap-1 text-xs text-[#a89880] hover:text-[#5c3d2e] transition-colors mt-1">
+            <button className="flex items-center gap-1 text-xs text-[#8b7b6b] hover:text-[#5c3d2e] transition-colors mt-1">
               {titlesOpen ? <ChevronUp className="w-3 h-3" /> : <ChevronDown className="w-3 h-3" />}
               {template.kpaTitles.length} KP&A title{template.kpaTitles.length !== 1 ? "s" : ""}
             </button>
@@ -221,7 +221,7 @@ function KPATemplateCard({ template, onOpenWizard }: { template: KPATemplate; on
               {template.kpaTitles.map((book) => (
                 <div key={book.title} className="text-xs">
                   <div className="font-medium text-[#3a2a1a] leading-tight">{book.title}</div>
-                  <div className="text-[#8b7b6b] mt-0.5">
+                  <div className="text-[#7a6e60] mt-0.5">
                     {book.author} · {book.publisher} · {book.year}
                     {book.pages ? ` · ${book.pages} pp` : ""}
                   </div>
@@ -360,7 +360,7 @@ function TemplatesInner() {
       <header className="bg-[#1e1108] text-[#f5efe0] border-b border-[#c9a96e]/10">
         <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <button onClick={() => navigate("/dashboard")} className="flex items-center gap-1.5 text-[#c9a96e]/60 hover:text-[#c9a96e] text-xs transition-colors">
+            <button onClick={() => navigate("/dashboard")} className="flex items-center gap-1.5 text-[#c9a96e]/80 hover:text-[#c9a96e] text-xs transition-colors">
               <ArrowLeft size={14} />
               Dashboard
             </button>
@@ -375,7 +375,7 @@ function TemplatesInner() {
               { label: "Resources", path: "/resources", icon: Library },
               { label: "Guide", path: "/guide", icon: HelpCircle },
             ].map((item) => (
-              <button key={item.path} onClick={() => navigate(item.path)} className="flex items-center gap-1.5 text-xs text-[#c9a96e]/60 hover:text-[#c9a96e] hover:bg-[#c9a96e]/10 px-3 py-1.5 rounded-md transition-all">
+              <button key={item.path} onClick={() => navigate(item.path)} className="flex items-center gap-1.5 text-xs text-[#c9a96e]/80 hover:text-[#c9a96e] hover:bg-[#c9a96e]/10 px-3 py-1.5 rounded-md transition-all">
                 <item.icon size={13} />
                 {item.label}
               </button>
@@ -390,10 +390,10 @@ function TemplatesInner() {
             <div>
               <div className="flex items-center gap-2 mb-3">
                 <img src="https://d2xsxph8kpxj0f.cloudfront.net/310519663211654017/kGjPju6hKCvCsjZhgUHyqj/CDPlargelogo_25428631.PNG" alt="Easy Book Publishers" className="h-8 w-auto object-contain opacity-80" />
-                <span className="text-[#c9a96e]/50 text-xs uppercase tracking-widest">Template Library</span>
+                <span className="text-[#c9a96e]/75 text-xs uppercase tracking-widest">Template Library</span>
               </div>
               <h1 className="font-serif text-3xl md:text-4xl text-[#f5d98a] mb-3">Book Templates</h1>
-              <p className="text-[#c9a96e]/70 text-sm max-w-2xl leading-relaxed">
+              <p className="text-[#c9a96e]/90 text-sm max-w-2xl leading-relaxed">
                 One-click presets for every book type — from Study Bibles and Devotional Bibles to Christian Living books,
                 children's titles, theological commentaries, and hymnals. Includes both Easy Book Publishers originals
                 and Koechel Peterson & Associates (KP&A) design templates. Select a template to pre-fill all formatting settings.
@@ -402,15 +402,15 @@ function TemplatesInner() {
             <div className="flex gap-6 text-center flex-shrink-0">
               <div>
                 <div className="font-serif text-2xl font-bold text-[#f5d98a]">{EBP_TEMPLATES.length + KPA_TEMPLATES.length}</div>
-                <div className="text-xs text-[#c9a96e]/50">Templates</div>
+                <div className="text-xs text-[#c9a96e]/75">Templates</div>
               </div>
               <div>
                 <div className="font-serif text-2xl font-bold text-[#f5d98a]">{ALL_CATEGORIES.length}</div>
-                <div className="text-xs text-[#c9a96e]/50">Categories</div>
+                <div className="text-xs text-[#c9a96e]/75">Categories</div>
               </div>
               <div>
                 <div className="font-serif text-2xl font-bold text-[#f5d98a]">{totalKPATitles}</div>
-                <div className="text-xs text-[#c9a96e]/50">KP&A Titles</div>
+                <div className="text-xs text-[#c9a96e]/75">KP&A Titles</div>
               </div>
             </div>
           </div>
@@ -421,7 +421,7 @@ function TemplatesInner() {
         <div className="max-w-7xl mx-auto px-6 py-3 flex flex-col gap-3">
           <div className="flex flex-col sm:flex-row gap-3 items-start sm:items-center">
             <div className="relative flex-1 max-w-xs">
-              <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-[#a89880]" />
+              <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-[#8b7b6b]" />
               <Input placeholder="Search templates…" value={search} onChange={(e) => setSearch(e.target.value)} className="pl-8 h-8 text-xs border-[#e8dfd0] bg-white" />
             </div>
 
@@ -483,7 +483,7 @@ function TemplatesInner() {
         {filtered.length === 0 ? (
           <div className="text-center py-20">
             <BookOpen size={40} className="mx-auto text-[#d0c8bc] mb-4" />
-            <p className="text-[#8b7b6b] text-sm">No templates match your search.</p>
+            <p className="text-[#7a6e60] text-sm">No templates match your search.</p>
             <button onClick={() => { setSearch(""); setActiveCategory("All"); setSourceFilter("all"); }} className="mt-3 text-xs text-[#c9a96e] hover:underline">
               Clear filters
             </button>
@@ -507,7 +507,7 @@ function TemplatesInner() {
                 <div className={`w-8 h-8 rounded-full flex items-center justify-center shrink-0 font-bold text-sm ${item.color}`}>{item.step}</div>
                 <div>
                   <h3 className="font-serif font-semibold text-[#3a2a1a] text-sm mb-1">{item.title}</h3>
-                  <p className="text-xs text-[#8b7b6b] leading-relaxed">{item.desc}</p>
+                  <p className="text-xs text-[#7a6e60] leading-relaxed">{item.desc}</p>
                 </div>
               </div>
             ))}
@@ -515,7 +515,7 @@ function TemplatesInner() {
         </section>
 
         <div className="mt-8 pt-6 border-t border-[#e8dfd0]">
-          <p className="text-xs text-[#a89880] uppercase tracking-wide font-medium mb-3">Related Self-Publishing Tools</p>
+          <p className="text-xs text-[#8b7b6b] uppercase tracking-wide font-medium mb-3">Related Self-Publishing Tools</p>
           <div className="flex flex-wrap gap-3">
             {[
               { label: "Bible Design Studio", path: "/bible-studio" },

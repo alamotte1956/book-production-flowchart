@@ -33,7 +33,7 @@ function SectionCard({ section, isOpen, onToggle }: { section: Section; isOpen: 
           </div>
           <span className="font-serif text-lg text-[#2c1a00] font-medium">{section.title}</span>
         </div>
-        {isOpen ? <ChevronDown size={18} className="text-[#c9a96e]" /> : <ChevronRight size={18} className="text-[#8b7b6b]" />}
+        {isOpen ? <ChevronDown size={18} className="text-[#c9a96e]" /> : <ChevronRight size={18} className="text-[#7a6e60]" />}
       </button>
       {isOpen && (
         <div className="px-6 pb-6 pt-2 border-t border-[#e8ddd0] prose prose-stone max-w-none text-[#3a2a1a]">
@@ -529,7 +529,7 @@ export default function UserGuide() {
           <div className="flex items-center gap-3">
             <button
               onClick={() => navigate("/dashboard")}
-              className="flex items-center gap-1.5 text-[#c9a96e]/60 hover:text-[#c9a96e] transition-colors text-sm"
+              className="flex items-center gap-1.5 text-[#c9a96e]/80 hover:text-[#c9a96e] transition-colors text-sm"
             >
               <ArrowLeft size={15} />
               Dashboard
@@ -543,7 +543,7 @@ export default function UserGuide() {
           <div className="flex items-center gap-2">
             <button
               onClick={handleDownloadPdf}
-              className="flex items-center gap-1.5 text-xs text-[#c9a96e]/60 hover:text-[#c9a96e] transition-colors px-3 py-1.5 rounded-md hover:bg-[#c9a96e]/10"
+              className="flex items-center gap-1.5 text-xs text-[#c9a96e]/80 hover:text-[#c9a96e] transition-colors px-3 py-1.5 rounded-md hover:bg-[#c9a96e]/10"
             >
               <Download size={13} />
               Download PDF
@@ -579,7 +579,7 @@ export default function UserGuide() {
           <p className="mt-4 text-[#d4c8b4] max-w-xl mx-auto text-sm leading-relaxed">
             Everything you need to create, design, and publish your book — from first idea to finished, print-ready volume using our online publishing platform.
           </p>
-          <div className="mt-6 flex items-center justify-center gap-6 text-[#c9a96e]/70 text-sm">
+          <div className="mt-6 flex items-center justify-center gap-6 text-[#c9a96e]/90 text-sm">
             <span><strong className="text-[#f5efe0]">13</strong> Chapters</span>
             <span className="text-[#c9a96e]/30">|</span>
             <span><strong className="text-[#f5efe0]">9</strong> Production Phases</span>
@@ -591,7 +591,7 @@ export default function UserGuide() {
 
       {/* Controls */}
       <div className="max-w-4xl mx-auto px-6 py-5 flex items-center justify-between guide-print-hide">
-        <p className="text-sm text-[#8b7b6b]">Click any chapter to expand it. All chapters can be open simultaneously.</p>
+        <p className="text-sm text-[#7a6e60]">Click any chapter to expand it. All chapters can be open simultaneously.</p>
         <div className="flex gap-2">
           <Button variant="outline" size="sm" onClick={expandAll} className="text-xs border-[#c9a96e]/30 text-[#5c3d2e] hover:bg-[#faf6ef]">
             Expand All
@@ -621,7 +621,7 @@ export default function UserGuide() {
                   className="flex items-center gap-2.5 px-3 py-2 rounded-lg text-left hover:bg-[#faf6ef] transition-colors group"
                 >
                   <span className="w-6 h-6 rounded-full bg-[#c9a96e]/10 flex items-center justify-center text-xs font-semibold text-[#c9a96e] flex-shrink-0">{index + 1}</span>
-                  <Icon size={14} className="text-[#8b7b6b] group-hover:text-[#c9a96e] transition-colors flex-shrink-0" />
+                  <Icon size={14} className="text-[#7a6e60] group-hover:text-[#c9a96e] transition-colors flex-shrink-0" />
                   <span className="text-sm text-[#3a2a1a] group-hover:text-[#2c1a00] transition-colors">{section.title.replace(/^Chapter \d+ — /, "")}</span>
                 </button>
               );
@@ -645,7 +645,7 @@ export default function UserGuide() {
         {/* Related Tools — internal backlinks */}
         <div className="mt-8 p-6 bg-[#faf6ef] rounded-xl border border-[#e8dfd0] guide-print-hide">
           <h2 className="font-serif text-xl text-[#3a2a1a] text-center mb-1">Self-Publishing Tools</h2>
-          <p className="text-xs text-[#8b7b6b] text-center mb-5">Jump directly to any tool in the platform.</p>
+          <p className="text-xs text-[#7a6e60] text-center mb-5">Jump directly to any tool in the platform.</p>
           <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
             {[
               { href: "/bible-studio", icon: <BookMarked size={16} />, label: "Bible Design Studio" },
@@ -670,7 +670,7 @@ export default function UserGuide() {
         {/* Footer note */}
         <div className="mt-8 p-6 bg-[#2a1a0a] rounded-xl text-center guide-footer-print">
           <p className="text-[#c9a96e] font-serif text-lg mb-1">Easy Book Publishers</p>
-          <p className="text-[#8b7b6b] text-sm">A creator, designer, and publisher's dream platform.</p>
+          <p className="text-[#7a6e60] text-sm">A creator, designer, and publisher's dream platform.</p>
           <div className="mt-4 flex items-center justify-center gap-4">
             <Badge className="bg-[#c9a96e]/20 text-[#c9a96e] border-[#c9a96e]/30 text-xs">9 Phases</Badge>
             <Badge className="bg-[#c9a96e]/20 text-[#c9a96e] border-[#c9a96e]/30 text-xs">30 Steps</Badge>

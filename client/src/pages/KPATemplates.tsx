@@ -145,13 +145,13 @@ function KPATemplateCard({
           </div>
         </div>
         <CardTitle className="font-serif text-base mt-2 text-[#3a2a1a]">{template.label}</CardTitle>
-        <CardDescription className="text-xs leading-relaxed text-[#8b7b6b]">
+        <CardDescription className="text-xs leading-relaxed text-[#7a6e60]">
           {template.tagline}
         </CardDescription>
       </CardHeader>
 
       <CardContent className="flex flex-col gap-3 flex-1">
-        <div className="flex flex-wrap gap-1.5 text-[11px] text-[#8b7b6b]">
+        <div className="flex flex-wrap gap-1.5 text-[11px] text-[#7a6e60]">
           <span className="bg-[#faf6ef] px-2 py-0.5 rounded">{template.trimLabel}</span>
           <span className="bg-[#faf6ef] px-2 py-0.5 rounded">
             {template.pageCountRange[0]}–{template.pageCountRange[1]} pp
@@ -175,7 +175,7 @@ function KPATemplateCard({
 
         <Collapsible open={titlesOpen} onOpenChange={setTitlesOpen}>
           <CollapsibleTrigger asChild>
-            <button className="flex items-center gap-1 text-xs text-[#a89880] hover:text-[#5c3d2e] transition-colors mt-1">
+            <button className="flex items-center gap-1 text-xs text-[#8b7b6b] hover:text-[#5c3d2e] transition-colors mt-1">
               {titlesOpen ? (
                 <ChevronUp className="w-3 h-3" />
               ) : (
@@ -192,7 +192,7 @@ function KPATemplateCard({
                   <div className="font-medium text-[#3a2a1a] leading-tight">
                     {book.title}
                   </div>
-                  <div className="text-[#8b7b6b] mt-0.5">
+                  <div className="text-[#7a6e60] mt-0.5">
                     {book.author} · {book.publisher} · {book.year}
                     {book.pages ? ` · ${book.pages} pp` : ""}
                     {book.isbn ? ` · ISBN: ${book.isbn}` : ""}
@@ -254,7 +254,7 @@ function CategorySection({
           style={{ backgroundColor: templates[0].accentColor }}
         />
         {category}
-        <span className="text-sm font-normal text-[#a89880]">
+        <span className="text-sm font-normal text-[#8b7b6b]">
           ({templates.length} template{templates.length !== 1 ? "s" : ""})
         </span>
       </h2>
@@ -304,7 +304,7 @@ export default function KPATemplates() {
       <header className="bg-[#1e1108] text-[#f5efe0] border-b border-[#c9a96e]/10">
         <div className="max-w-7xl mx-auto px-6 py-4 flex items-center gap-3">
           <Link href="/dashboard">
-            <Button variant="ghost" size="sm" className="gap-1 text-[#c9a96e]/60 hover:text-[#c9a96e] hover:bg-[#c9a96e]/10">
+            <Button variant="ghost" size="sm" className="gap-1 text-[#c9a96e]/80 hover:text-[#c9a96e] hover:bg-[#c9a96e]/10">
               <ArrowLeft className="w-4 h-4" />
               Dashboard
             </Button>
@@ -322,7 +322,7 @@ export default function KPATemplates() {
                 <h1 className="font-serif text-3xl md:text-4xl text-[#f5d98a]">Koechel Peterson &amp; Associates</h1>
                 <UIBadge className="bg-[#c9a96e]/20 text-[#c9a96e] border-[#c9a96e]/30 text-xs">Design Firm</UIBadge>
               </div>
-              <p className="text-[#c9a96e]/70 text-sm max-w-2xl leading-relaxed">
+              <p className="text-[#c9a96e]/90 text-sm max-w-2xl leading-relaxed">
                 Minneapolis-based book design firm (est. 1974) credited with "changing the look
                 of Christian publishing." KP&A provided cover design, interior layout, and
                 typesetting for Harvest House, Tyndale, Bethany House, Multnomah, Thomas Nelson,
@@ -333,15 +333,15 @@ export default function KPATemplates() {
             <div className="flex gap-6 text-center flex-shrink-0">
               <div>
                 <div className="font-serif text-2xl font-bold text-[#f5d98a]">{KPA_TEMPLATES.length}</div>
-                <div className="text-xs text-[#c9a96e]/50">Templates</div>
+                <div className="text-xs text-[#c9a96e]/75">Templates</div>
               </div>
               <div>
                 <div className="font-serif text-2xl font-bold text-[#f5d98a]">{totalTitles}</div>
-                <div className="text-xs text-[#c9a96e]/50">KP&A Titles</div>
+                <div className="text-xs text-[#c9a96e]/75">KP&A Titles</div>
               </div>
               <div>
                 <div className="font-serif text-2xl font-bold text-[#f5d98a]">8+</div>
-                <div className="text-xs text-[#c9a96e]/50">Publishers</div>
+                <div className="text-xs text-[#c9a96e]/75">Publishers</div>
               </div>
             </div>
           </div>

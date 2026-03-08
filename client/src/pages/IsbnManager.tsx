@@ -363,7 +363,7 @@ ${bisacElements}
                           <Button
                             variant="ghost"
                             size="icon"
-                            className="text-[#a89880] hover:text-red-600 shrink-0"
+                            className="text-[#8b7b6b] hover:text-red-600 shrink-0"
                             onClick={() => removeAuthor(i)}
                           >
                             <X className="w-4 h-4" />
@@ -500,7 +500,7 @@ ${bisacElements}
                     </div>
                   </div>
                 </div>
-                <p className="text-xs text-[#8b7b6b] flex items-center gap-1 pt-1">
+                <p className="text-xs text-[#7a6e60] flex items-center gap-1 pt-1">
                   Need ISBNs?{" "}
                   <a href="https://www.myidentifiers.com/identify-protect-your-book/isbn/buy-isbn" target="_blank" rel="noopener noreferrer" className="text-[#c9a96e] hover:text-[#b8923e] underline inline-flex items-center gap-0.5">
                     Purchase from Bowker <ExternalLink className="w-3 h-3" />
@@ -537,7 +537,7 @@ ${bisacElements}
                       <Button
                         variant="ghost"
                         size="icon"
-                        className="text-[#a89880] hover:text-red-600 shrink-0"
+                        className="text-[#8b7b6b] hover:text-red-600 shrink-0"
                         onClick={() => removeBisac(i)}
                       >
                         <X className="w-4 h-4" />
@@ -578,7 +578,7 @@ ${bisacElements}
                     placeholder="Brief description for catalog listings and metadata feeds"
                     maxLength={200}
                   />
-                  <p className="text-xs text-[#a89880] mt-1 text-right">{shortDesc.length}/200</p>
+                  <p className="text-xs text-[#8b7b6b] mt-1 text-right">{shortDesc.length}/200</p>
                 </div>
                 <div>
                   <Label className="text-[#5c3d2e] font-semibold text-sm">Long Description (back cover / online)</Label>
@@ -633,7 +633,7 @@ ${bisacElements}
                   <div>
                     <span className="text-[#a08060] text-xs">Title</span>
                     <p className="text-white font-medium leading-tight">{title || "—"}</p>
-                    {subtitle && <p className="text-[#c9a96e]/70 text-xs">{subtitle}</p>}
+                    {subtitle && <p className="text-[#c9a96e]/90 text-xs">{subtitle}</p>}
                   </div>
                   <div>
                     <span className="text-[#a08060] text-xs">Author(s)</span>
@@ -719,7 +719,7 @@ ${bisacElements}
       {/* Related Tools footer backlinks */}
       <div className="border-t border-[#e8dfd0] bg-[#faf6ef] px-6 py-6">
         <div className="max-w-5xl mx-auto">
-          <p className="text-xs text-[#8b7b6b] mb-3 font-semibold uppercase tracking-wide">Other Self-Publishing Tools</p>
+          <p className="text-xs text-[#7a6e60] mb-3 font-semibold uppercase tracking-wide">Other Self-Publishing Tools</p>
           <div className="flex flex-wrap gap-2">
             {[
               { href: "/bible-studio", label: "Bible Design Studio" },

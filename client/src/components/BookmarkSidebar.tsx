@@ -101,7 +101,7 @@ export default function BookmarkSidebar() {
                   >
                     <span
                       className={`shrink-0 w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold font-sans transition-all duration-200 ${
-                        isActive ? "text-white" : "text-[#8b7b6b]"
+                        isActive ? "text-white" : "text-[#7a6e60]"
                       }`}
                       style={{
                         backgroundColor: isActive ? phase.accentColor : `${phase.accentColor}15`,

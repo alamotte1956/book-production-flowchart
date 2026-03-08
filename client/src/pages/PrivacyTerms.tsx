@@ -35,7 +35,7 @@ export default function PrivacyTerms() {
           <h1 className="font-serif text-4xl md:text-5xl text-[#1a1008] mb-3">
             Privacy Policy & Terms of Service
           </h1>
-          <p className="text-[#5c4a2a]/70 text-sm">Last updated: {lastUpdated}</p>
+          <p className="text-[#5c4a2a]/90 text-sm">Last updated: {lastUpdated}</p>
         </div>
 
         <div className="space-y-12">

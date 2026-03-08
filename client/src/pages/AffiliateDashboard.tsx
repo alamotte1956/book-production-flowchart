@@ -71,7 +71,7 @@ export default function AffiliateDashboard() {
           <div className="text-center mb-8">
             <BarChart3 className="w-12 h-12 text-[#c9a96e] mx-auto mb-4" />
             <h1 className="font-serif text-3xl text-[#1a1008] mb-2">Affiliate Dashboard</h1>
-            <p className="text-[#5c4a2a]/70">Enter your affiliate code to access your dashboard</p>
+            <p className="text-[#5c4a2a]/90">Enter your affiliate code to access your dashboard</p>
           </div>
           <Card className="bg-white border-[#c9a96e]/15">
             <CardContent className="p-6">
@@ -81,7 +81,7 @@ export default function AffiliateDashboard() {
                   Access Dashboard <ArrowRight className="w-4 h-4 ml-2" />
                 </Button>
               </form>
-              <p className="text-xs text-[#5c4a2a]/50 text-center mt-4">
+              <p className="text-xs text-[#5c4a2a]/70 text-center mt-4">
                 Don't have an affiliate code? <a href="/affiliates" className="text-[#8b6914] underline">Apply here</a>
               </p>
             </CardContent>
@@ -113,7 +113,7 @@ export default function AffiliateDashboard() {
         </nav>
         <div className="max-w-md mx-auto px-6 py-24 text-center">
           <h1 className="font-serif text-2xl text-[#1a1008] mb-4">Affiliate Not Found</h1>
-          <p className="text-[#5c4a2a]/70 mb-6">The affiliate code you entered was not found.</p>
+          <p className="text-[#5c4a2a]/90 mb-6">The affiliate code you entered was not found.</p>
           <Button onClick={handleLogout} className="bg-[#c9a96e] hover:bg-[#b8944f] text-[#1a1008]">Try Another Code</Button>
         </div>
         <SiteFooter />
@@ -151,10 +151,10 @@ export default function AffiliateDashboard() {
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8">
           <div>
             <h1 className="font-serif text-3xl text-[#1a1008]">Welcome, {affiliate.name}</h1>
-            <p className="text-[#5c4a2a]/70">Commission rate: {affiliate.commissionRate}% per sale</p>
+            <p className="text-[#5c4a2a]/90">Commission rate: {affiliate.commissionRate}% per sale</p>
           </div>
           <div className="flex items-center gap-2 bg-white border border-[#c9a96e]/20 rounded-lg px-3 py-2">
-            <span className="text-xs text-[#5c4a2a]/50">Your link:</span>
+            <span className="text-xs text-[#5c4a2a]/70">Your link:</span>
             <code className="text-xs text-[#1a1008] font-mono max-w-[200px] truncate">{refLink}</code>
             <Button onClick={() => handleCopy(refLink)} variant="ghost" size="sm" className="h-7 w-7 p-0">
               {copied ? <CheckCircle2 className="w-3.5 h-3.5 text-green-600" /> : <Copy className="w-3.5 h-3.5 text-[#c9a96e]" />}
@@ -167,35 +167,35 @@ export default function AffiliateDashboard() {
             <CardContent className="p-4 text-center">
               <MousePointerClick className="w-5 h-5 text-[#c9a96e] mx-auto mb-1" />
               <div className="font-serif text-2xl text-[#1a1008] font-bold">{affiliate.totalClicks}</div>
-              <div className="text-xs text-[#5c4a2a]/60">Total Clicks</div>
+              <div className="text-xs text-[#5c4a2a]/80">Total Clicks</div>
             </CardContent>
           </Card>
           <Card className="bg-white border-[#c9a96e]/15">
             <CardContent className="p-4 text-center">
               <TrendingUp className="w-5 h-5 text-[#c9a96e] mx-auto mb-1" />
               <div className="font-serif text-2xl text-[#1a1008] font-bold">{affiliate.totalConversions}</div>
-              <div className="text-xs text-[#5c4a2a]/60">Conversions</div>
+              <div className="text-xs text-[#5c4a2a]/80">Conversions</div>
             </CardContent>
           </Card>
           <Card className="bg-white border-[#c9a96e]/15">
             <CardContent className="p-4 text-center">
               <BarChart3 className="w-5 h-5 text-[#c9a96e] mx-auto mb-1" />
               <div className="font-serif text-2xl text-[#1a1008] font-bold">{conversionRate}%</div>
-              <div className="text-xs text-[#5c4a2a]/60">Conv. Rate</div>
+              <div className="text-xs text-[#5c4a2a]/80">Conv. Rate</div>
             </CardContent>
           </Card>
           <Card className="bg-white border-[#c9a96e]/15">
             <CardContent className="p-4 text-center">
               <DollarSign className="w-5 h-5 text-green-600 mx-auto mb-1" />
               <div className="font-serif text-2xl text-[#1a1008] font-bold">${affiliate.totalEarnings}</div>
-              <div className="text-xs text-[#5c4a2a]/60">Total Earned</div>
+              <div className="text-xs text-[#5c4a2a]/80">Total Earned</div>
             </CardContent>
           </Card>
           <Card className="bg-white border-[#c9a96e]/15">
             <CardContent className="p-4 text-center">
               <Wallet className="w-5 h-5 text-amber-600 mx-auto mb-1" />
               <div className="font-serif text-2xl text-[#1a1008] font-bold">${affiliate.pendingEarnings}</div>
-              <div className="text-xs text-[#5c4a2a]/60">Pending</div>
+              <div className="text-xs text-[#5c4a2a]/80">Pending</div>
             </CardContent>
           </Card>
         </div>
@@ -219,7 +219,7 @@ export default function AffiliateDashboard() {
               className={`px-4 py-2 text-sm font-medium rounded-t-lg transition-colors ${
                 activeTab === tab
                   ? "bg-white text-[#1a1008] border border-[#c9a96e]/20 border-b-white -mb-[1px]"
-                  : "text-[#5c4a2a]/60 hover:text-[#1a1008]"
+                  : "text-[#5c4a2a]/80 hover:text-[#1a1008]"
               }`}
             >
               {tab.charAt(0).toUpperCase() + tab.slice(1)}
@@ -240,7 +240,7 @@ export default function AffiliateDashboard() {
                     <Copy className="w-4 h-4 mr-1" /> Copy
                   </Button>
                 </div>
-                <p className="text-xs text-[#5c4a2a]/50">Share this link on your blog, social media, or email. Anyone who clicks and purchases within 90 days earns you a commission.</p>
+                <p className="text-xs text-[#5c4a2a]/70">Share this link on your blog, social media, or email. Anyone who clicks and purchases within 90 days earns you a commission.</p>
               </CardContent>
             </Card>
 
@@ -323,7 +323,7 @@ export default function AffiliateDashboard() {
                   <div key={link.label} className="flex items-center justify-between bg-[#faf6ef] rounded-lg px-3 py-2">
                     <div>
                       <span className="text-sm font-medium text-[#3a2a14]">{link.label}</span>
-                      <span className="text-xs text-[#5c4a2a]/50 ml-2 font-mono">{link.url}</span>
+                      <span className="text-xs text-[#5c4a2a]/70 ml-2 font-mono">{link.url}</span>
                     </div>
                     <Button onClick={() => handleCopy(link.url)} variant="ghost" size="sm"><Copy className="w-3.5 h-3.5" /></Button>
                   </div>
@@ -340,11 +340,11 @@ export default function AffiliateDashboard() {
                   {marketingQuery.data.bannerSizes.map((banner) => (
                     <div key={banner.size} className="bg-[#faf6ef] rounded-lg p-3 text-center">
                       <div className="text-sm font-mono text-[#1a1008]">{banner.size}</div>
-                      <div className="text-xs text-[#5c4a2a]/50">{banner.label}</div>
+                      <div className="text-xs text-[#5c4a2a]/70">{banner.label}</div>
                     </div>
                   ))}
                 </div>
-                <p className="text-xs text-[#5c4a2a]/50 mt-3">Banner images coming soon. Contact us if you need custom creative assets.</p>
+                <p className="text-xs text-[#5c4a2a]/70 mt-3">Banner images coming soon. Contact us if you need custom creative assets.</p>
               </CardContent>
             </Card>
           </div>
@@ -361,11 +361,11 @@ export default function AffiliateDashboard() {
                   <table className="w-full text-sm">
                     <thead>
                       <tr className="border-b border-[#c9a96e]/15 text-left">
-                        <th className="pb-2 text-[#5c4a2a]/60 font-medium">Date</th>
-                        <th className="pb-2 text-[#5c4a2a]/60 font-medium">Plan</th>
-                        <th className="pb-2 text-[#5c4a2a]/60 font-medium">Sale</th>
-                        <th className="pb-2 text-[#5c4a2a]/60 font-medium">Commission</th>
-                        <th className="pb-2 text-[#5c4a2a]/60 font-medium">Status</th>
+                        <th className="pb-2 text-[#5c4a2a]/80 font-medium">Date</th>
+                        <th className="pb-2 text-[#5c4a2a]/80 font-medium">Plan</th>
+                        <th className="pb-2 text-[#5c4a2a]/80 font-medium">Sale</th>
+                        <th className="pb-2 text-[#5c4a2a]/80 font-medium">Commission</th>
+                        <th className="pb-2 text-[#5c4a2a]/80 font-medium">Status</th>
                       </tr>
                     </thead>
                     <tbody>
@@ -386,7 +386,7 @@ export default function AffiliateDashboard() {
                   </table>
                 </div>
               ) : (
-                <div className="text-center py-8 text-[#5c4a2a]/50">
+                <div className="text-center py-8 text-[#5c4a2a]/70">
                   <TrendingUp className="w-8 h-8 mx-auto mb-2 opacity-30" />
                   <p>No conversions yet. Share your referral link to start earning!</p>
                 </div>
@@ -406,10 +406,10 @@ export default function AffiliateDashboard() {
                   <table className="w-full text-sm">
                     <thead>
                       <tr className="border-b border-[#c9a96e]/15 text-left">
-                        <th className="pb-2 text-[#5c4a2a]/60 font-medium">Date</th>
-                        <th className="pb-2 text-[#5c4a2a]/60 font-medium">Amount</th>
-                        <th className="pb-2 text-[#5c4a2a]/60 font-medium">PayPal</th>
-                        <th className="pb-2 text-[#5c4a2a]/60 font-medium">Status</th>
+                        <th className="pb-2 text-[#5c4a2a]/80 font-medium">Date</th>
+                        <th className="pb-2 text-[#5c4a2a]/80 font-medium">Amount</th>
+                        <th className="pb-2 text-[#5c4a2a]/80 font-medium">PayPal</th>
+                        <th className="pb-2 text-[#5c4a2a]/80 font-medium">Status</th>
                       </tr>
                     </thead>
                     <tbody>
@@ -417,7 +417,7 @@ export default function AffiliateDashboard() {
                         <tr key={p.id} className="border-b border-[#c9a96e]/10">
                           <td className="py-2 text-[#3a2a14]">{new Date(p.createdAt).toLocaleDateString()}</td>
                           <td className="py-2 text-[#3a2a14] font-medium">${p.amount}</td>
-                          <td className="py-2 text-[#5c4a2a]/70">{p.paypalEmail}</td>
+                          <td className="py-2 text-[#5c4a2a]/90">{p.paypalEmail}</td>
                           <td className="py-2">
                             <Badge variant="outline" className={p.status === "completed" ? "text-green-700 border-green-300" : "text-amber-700 border-amber-300"}>
                               {p.status}
@@ -429,7 +429,7 @@ export default function AffiliateDashboard() {
                   </table>
                 </div>
               ) : (
-                <div className="text-center py-8 text-[#5c4a2a]/50">
+                <div className="text-center py-8 text-[#5c4a2a]/70">
                   <Wallet className="w-8 h-8 mx-auto mb-2 opacity-30" />
                   <p>No payouts yet. Payouts are processed monthly once you reach the $50 minimum.</p>
                 </div>

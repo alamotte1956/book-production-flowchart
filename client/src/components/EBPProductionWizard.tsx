@@ -235,7 +235,7 @@ export default function EBPProductionWizard({
                 </div>
                 <div>
                   <h3 className="font-bold text-[#3b2a1a] text-lg">{template.label}</h3>
-                  <p className="text-sm text-[#8b7b6b] mt-0.5">{template.tagline}</p>
+                  <p className="text-sm text-[#7a6e60] mt-0.5">{template.tagline}</p>
                   <div className="mt-2 flex flex-wrap gap-1.5">
                     <Badge variant="outline" className="text-xs">{template.trimLabel}</Badge>
                     <Badge variant="outline" className="text-xs">
@@ -273,7 +273,7 @@ export default function EBPProductionWizard({
                   <p className="text-sm text-[#6b5f53]">by {prefillBook.author}</p>
                 )}
                 {prefillBook.isbn && (
-                  <p className="text-sm text-[#8b7b6b]">ISBN {prefillBook.isbn}</p>
+                  <p className="text-sm text-[#7a6e60]">ISBN {prefillBook.isbn}</p>
                 )}
               </div>
             )}
@@ -284,7 +284,7 @@ export default function EBPProductionWizard({
       case 2:
         return (
           <div className="space-y-4">
-            <p className="text-sm text-[#8b7b6b]">
+            <p className="text-sm text-[#7a6e60]">
               Enter the details for the book you want to recreate. These will be used to create a
               new project.
             </p>
@@ -385,7 +385,7 @@ export default function EBPProductionWizard({
               </div>
             </div>
 
-            <p className="text-sm text-[#8b7b6b]">★ = recommended for this template</p>
+            <p className="text-sm text-[#7a6e60]">★ = recommended for this template</p>
           </div>
         );
       }
@@ -394,7 +394,7 @@ export default function EBPProductionWizard({
       case 4:
         return (
           <div className="space-y-5">
-            <p className="text-sm text-[#8b7b6b]">
+            <p className="text-sm text-[#7a6e60]">
               Upload your manuscript file. The AI typesetting engine will format it using the
               selected style and trim size to produce a press-ready PDF and EPUB.
             </p>
@@ -424,9 +424,9 @@ export default function EBPProductionWizard({
                 </div>
               ) : (
                 <div className="flex flex-col items-center gap-2">
-                  <Upload className="w-8 h-8 text-[#c9a96e]/60" />
+                  <Upload className="w-8 h-8 text-[#c9a96e]/80" />
                   <p className="font-medium text-[#5c3d2e]">Click to upload manuscript</p>
-                  <p className="text-sm text-[#8b7b6b]">All text formats accepted · Max 50 MB</p>
+                  <p className="text-sm text-[#7a6e60]">All text formats accepted · Max 50 MB</p>
                 </div>
               )}
             </div>
@@ -459,7 +459,7 @@ export default function EBPProductionWizard({
             <div className="flex flex-col items-center gap-4 py-8">
               <Loader2 className="w-10 h-10 animate-spin text-[#7c3aed]" />
               <p className="font-medium text-[#3b2a1a]">Launching production job…</p>
-              <p className="text-sm text-[#8b7b6b]">
+              <p className="text-sm text-[#7a6e60]">
                 Creating your project and starting the AI typesetting pipeline.
               </p>
             </div>
@@ -494,7 +494,7 @@ export default function EBPProductionWizard({
               </div>
               <div>
                 <h3 className="font-bold text-[#3b2a1a] text-lg">Production job launched!</h3>
-                <p className="text-sm text-[#8b7b6b] mt-1">
+                <p className="text-sm text-[#7a6e60] mt-1">
                   Job #{jobId} is now running. The AI is typesetting your manuscript.
                 </p>
               </div>
@@ -530,7 +530,7 @@ export default function EBPProductionWizard({
               </div>
               <div>
                 <h3 className="font-bold text-[#3b2a1a] text-lg">Ready to produce</h3>
-                <p className="text-sm text-[#8b7b6b] mt-1">
+                <p className="text-sm text-[#7a6e60] mt-1">
                   Click below to create your project and start the AI typesetting pipeline.
                 </p>
               </div>
@@ -542,25 +542,25 @@ export default function EBPProductionWizard({
               </p>
               <Separator className="bg-[#c9a96e]/20" />
               <div className="grid grid-cols-2 gap-x-4 gap-y-1.5 text-sm">
-                <span className="text-[#8b7b6b]">Book</span>
+                <span className="text-[#7a6e60]">Book</span>
                 <span className="text-[#3b2a1a] font-medium truncate">{title}</span>
                 {author && (
                   <>
-                    <span className="text-[#8b7b6b]">Author</span>
+                    <span className="text-[#7a6e60]">Author</span>
                     <span className="text-[#3b2a1a] truncate">{author}</span>
                   </>
                 )}
-                <span className="text-[#8b7b6b]">Template</span>
+                <span className="text-[#7a6e60]">Template</span>
                 <span className="text-[#3b2a1a]">{template.label}</span>
-                <span className="text-[#8b7b6b]">Style</span>
+                <span className="text-[#7a6e60]">Style</span>
                 <span className="text-[#3b2a1a]">
                   {TYPESETTING_STYLES.find(s => s.id === styleId)?.label ?? styleId}
                 </span>
-                <span className="text-[#8b7b6b]">Trim</span>
+                <span className="text-[#7a6e60]">Trim</span>
                 <span className="text-[#3b2a1a]">
                   {TRIM_SIZES.find(t => t.id === trimSizeId)?.label ?? trimSizeId}
                 </span>
-                <span className="text-[#8b7b6b]">Manuscript</span>
+                <span className="text-[#7a6e60]">Manuscript</span>
                 <span className="text-[#3b2a1a] truncate">{selectedFile?.name ?? "—"}</span>
               </div>
             </div>
@@ -605,7 +605,7 @@ export default function EBPProductionWizard({
               <X className="w-4 h-4" />
             </button>
           </div>
-          <p className="text-sm text-[#8b7b6b] mt-1">{stepTitles[step]}</p>
+          <p className="text-sm text-[#7a6e60] mt-1">{stepTitles[step]}</p>
         </DialogHeader>
 
         <StepIndicator current={step} />

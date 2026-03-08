@@ -159,7 +159,7 @@ export default function WhatsNext({
         </div>
         <div>
           <h3 className="text-sm font-bold text-[#2c1810]">{title}</h3>
-          <p className="text-[11px] text-[#8b7b6b]">
+          <p className="text-[11px] text-[#7a6e60]">
             {prompts.length === 1
               ? "Your next recommended action"
               : `${prompts.length} recommended actions, in priority order`}

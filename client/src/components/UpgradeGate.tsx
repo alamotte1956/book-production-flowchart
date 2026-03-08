@@ -28,7 +28,7 @@ export function UpgradeGate({ feature, children, inline = false }: UpgradeGatePr
         </div>
         <div className="flex-1 min-w-0">
           <p className="text-sm font-semibold text-[#2c1a00]">{label}</p>
-          <p className="text-xs text-[#8b7b6b]">Available on {requiredPlan} and above</p>
+          <p className="text-xs text-[#7a6e60]">Available on {requiredPlan} and above</p>
         </div>
         <Button
           size="sm"
@@ -50,10 +50,10 @@ export function UpgradeGate({ feature, children, inline = false }: UpgradeGatePr
         <h2 className="font-serif text-2xl text-[#2c1a00] mb-3">
           Unlock {label}
         </h2>
-        <p className="text-[#8b7b6b] text-sm mb-2">
+        <p className="text-[#7a6e60] text-sm mb-2">
           This feature is available on the <strong className="text-[#5c3d2e]">{requiredPlan}</strong> plan and above.
         </p>
-        <p className="text-[#8b7b6b] text-xs mb-8">
+        <p className="text-[#7a6e60] text-xs mb-8">
           Upgrade to access AI-powered typesetting, KDP exports, production timelines, templates, and unlimited book projects.
         </p>
         <div className="flex flex-col gap-3">

@@ -135,7 +135,7 @@ function OptionGrid({ options, selected, onSelect }: { options: Option[]; select
                   </div>
                 )}
               </div>
-              <p className="text-xs text-[#8b7b6b] mt-0.5 leading-relaxed">{opt.description}</p>
+              <p className="text-xs text-[#7a6e60] mt-0.5 leading-relaxed">{opt.description}</p>
             </div>
           </div>
         </button>
@@ -216,14 +216,14 @@ export default function PublishingWizard({ onComplete, onSkip, initialAnswers }:
           <h1 className="font-serif text-3xl md:text-4xl text-[#2c1a00] leading-tight">
             Let's Publish Your Book
           </h1>
-          <p className="text-[#8b7b6b] mt-2 text-sm">
+          <p className="text-[#7a6e60] mt-2 text-sm">
             Answer {totalSteps} quick questions and we'll build your personalized publishing roadmap.
           </p>
         </div>
 
         {/* Progress bar */}
         <div className="mb-6">
-          <div className="flex items-center justify-between text-xs text-[#a89880] mb-2">
+          <div className="flex items-center justify-between text-xs text-[#8b7b6b] mb-2">
             <span>Step {step + 1} of {totalSteps}</span>
             <span>{Math.round(progress)}% complete</span>
           </div>
@@ -270,7 +270,7 @@ export default function PublishingWizard({ onComplete, onSkip, initialAnswers }:
                 </div>
                 <div>
                   <h2 className="font-serif text-xl text-[#2c1a00] leading-tight">{currentStep.title}</h2>
-                  <p className="text-xs text-[#8b7b6b] mt-0.5">{currentStep.subtitle}</p>
+                  <p className="text-xs text-[#7a6e60] mt-0.5">{currentStep.subtitle}</p>
                 </div>
               </div>
 
@@ -290,7 +290,7 @@ export default function PublishingWizard({ onComplete, onSkip, initialAnswers }:
                       className="border-[#d4c8b4] text-[#3a2a1a] placeholder:text-[#c0b09a]"
                       autoFocus
                     />
-                    <p className="text-xs text-[#a89880] mt-1">This is just a working title — you can change it anytime.</p>
+                    <p className="text-xs text-[#8b7b6b] mt-1">This is just a working title — you can change it anytime.</p>
                   </div>
                   <div>
                     <label className="block text-sm font-semibold text-[#5c3d2e] mb-1.5">Author Name</label>
@@ -300,7 +300,7 @@ export default function PublishingWizard({ onComplete, onSkip, initialAnswers }:
                       placeholder="e.g., Jane Smith, First Baptist Church…"
                       className="border-[#d4c8b4] text-[#3a2a1a] placeholder:text-[#c0b09a]"
                     />
-                    <p className="text-xs text-[#a89880] mt-1">Can be a person, organization, or ministry name.</p>
+                    <p className="text-xs text-[#8b7b6b] mt-1">Can be a person, organization, or ministry name.</p>
                   </div>
                 </div>
               )}
@@ -322,7 +322,7 @@ export default function PublishingWizard({ onComplete, onSkip, initialAnswers }:
                   {/* ISBN explanation for new publishers */}
                   <div className="rounded-xl bg-[#fdf5e4] border border-[#e8c87a]/40 p-4 text-sm text-[#5c3d2e]">
                     <p className="font-semibold mb-1">What is an ISBN?</p>
-                    <p className="text-xs text-[#8b7b6b] leading-relaxed">
+                    <p className="text-xs text-[#7a6e60] leading-relaxed">
                       An <strong>International Standard Book Number (ISBN)</strong> is a 13-digit code that uniquely identifies your book. 
                       Most bookstores, libraries, and online retailers (Amazon, Barnes & Noble, IngramSpark) require one. 
                       In the US, ISBNs are purchased from <strong>Bowker (myidentifiers.com)</strong>. A single ISBN costs $125; a block of 10 costs $295.
@@ -351,7 +351,7 @@ export default function PublishingWizard({ onComplete, onSkip, initialAnswers }:
                 </Button>
               ) : (
                 onSkip && (
-                  <button onClick={onSkip} className="text-xs text-[#a89880] hover:text-[#5c3d2e] transition-colors">
+                  <button onClick={onSkip} className="text-xs text-[#8b7b6b] hover:text-[#5c3d2e] transition-colors">
                     Skip for now
                   </button>
                 )
@@ -372,7 +372,7 @@ export default function PublishingWizard({ onComplete, onSkip, initialAnswers }:
         </div>
 
         {/* Trust note */}
-        <p className="text-center text-xs text-[#a89880] mt-4">
+        <p className="text-center text-xs text-[#8b7b6b] mt-4">
           Your answers are saved to your account and used only to personalize your publishing roadmap.
         </p>
       </div>

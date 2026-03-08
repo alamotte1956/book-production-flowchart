@@ -58,11 +58,11 @@ export default function SiteFooter() {
                 <p className="text-[10px] uppercase tracking-[0.15em] text-[#c9a96e]">Manuscript to Masterpiece</p>
               </div>
             </a>
-            <p className="text-sm text-[#a89878] leading-relaxed mb-4">
+            <p className="text-sm text-[#c4b8a0] leading-relaxed mb-4">
               The all-in-one self-publishing platform. Design, typeset, and produce print-ready books with professional tools — no software to download, works on any device.
             </p>
             <div className="space-y-1">
-              <p className="text-xs text-[#8b7b6b] font-medium uppercase tracking-wider">Export Formats</p>
+              <p className="text-xs text-[#b0a090] font-medium uppercase tracking-wider">Export Formats</p>
               <div className="flex flex-wrap gap-1.5">
                 {exportFormats.map((fmt) => (
                   <span key={fmt} className="text-[10px] px-2 py-0.5 rounded-full bg-[#3a2a14] text-[#c9a96e] border border-[#5c3d2e]/30">
@@ -81,9 +81,9 @@ export default function SiteFooter() {
                   <li key={link.href}>
                     <a
                       href={link.href}
-                      className="text-sm text-[#a89878] hover:text-[#f5efe0] transition-colors flex items-center gap-2 group"
+                      className="text-sm text-[#c4b8a0] hover:text-[#f5efe0] transition-colors flex items-center gap-2 group"
                     >
-                      <link.icon className="w-3.5 h-3.5 text-[#c9a96e]/50 group-hover:text-[#c9a96e] transition-colors" />
+                      <link.icon className="w-3.5 h-3.5 text-[#c9a96e]/75 group-hover:text-[#c9a96e] transition-colors" />
                       {link.label}
                     </a>
                   </li>
@@ -95,7 +95,7 @@ export default function SiteFooter() {
 
         <div className="border-t border-[#5c3d2e]/30 pt-6">
           <div className="flex flex-col sm:flex-row justify-between items-center gap-4">
-            <div className="flex flex-wrap justify-center gap-4 text-xs text-[#8b7b6b]">
+            <div className="flex flex-wrap justify-center gap-4 text-xs text-[#b0a090]">
               <a href="/pricing" className="hover:text-[#c9a96e] transition-colors">Pricing</a>
               <span className="text-[#5c3d2e]">|</span>
               <a href="/guide" className="hover:text-[#c9a96e] transition-colors">User Guide</a>
@@ -110,7 +110,7 @@ export default function SiteFooter() {
               <span className="text-[#5c3d2e]">|</span>
               <a href="/affiliates" className="hover:text-[#c9a96e] transition-colors">Affiliates</a>
             </div>
-            <p className="text-xs text-[#8b7b6b]">
+            <p className="text-xs text-[#b0a090]">
               &copy; {new Date().getFullYear()} Easy Book Publishers. All rights reserved.
             </p>
           </div>
