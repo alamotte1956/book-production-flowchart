@@ -115,6 +115,43 @@ async function startServer() {
   app.use(express.urlencoded({ limit: "100mb", extended: true }));
   app.use(cookieParser());
 
+  app.get("/api/auth/logout", async (req, res) => {
+    res.clearCookie("ebp_session", { path: "/" });
+    res.redirect("/login");
+  });
+
+  app.get("/api/auth/magic-login", async (req, res) => {
+    const token = req.query.token as string;
+    if (!token) {
+      return res.redirect("/login?error=missing_token");
+    }
+    try {
+      const { getUserByLoginToken, createSession } = await import("../db");
+      const user = await getUserByLoginToken(token);
+      if (!user) {
+        return res.redirect("/login?error=invalid_token");
+      }
+      if (user.loginTokenExpiresAt && new Date(user.loginTokenExpiresAt) < new Date()) {
+        return res.redirect("/login?error=expired_token");
+      }
+      const { nanoid } = await import("nanoid");
+      const sessionToken = nanoid(64);
+      await createSession(user.id, sessionToken);
+      res.cookie("ebp_session", sessionToken, {
+        maxAge: 30 * 24 * 60 * 60 * 1000,
+        httpOnly: true,
+        sameSite: "lax",
+        secure: process.env.NODE_ENV === "production",
+        path: "/",
+      });
+      console.log(`[Auth] Magic login successful for ${user.email}`);
+      res.redirect("/dashboard");
+    } catch (err) {
+      console.error("[Auth] Magic login error:", err);
+      res.redirect("/login?error=server_error");
+    }
+  });
+
   app.use((req, res, next) => {
     const ref = req.query.ref as string | undefined;
     if (ref && typeof ref === "string" && ref.length > 0 && ref.length <= 64) {

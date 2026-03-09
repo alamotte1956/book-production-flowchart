@@ -24,6 +24,7 @@ import PrivacyTerms from "./pages/PrivacyTerms";
 import ConfirmEmail from "./pages/ConfirmEmail";
 import AffiliateProgram from "./pages/AffiliateProgram";
 import AffiliateDashboard from "./pages/AffiliateDashboard";
+import Login from "./pages/Login";
 
 function Router() {
   return (
@@ -32,6 +33,7 @@ function Router() {
       <Route path={"/dashboard"} component={Home} />
       <Route path={"/pricing"} component={Pricing} />
       <Route path={"/privacy-terms"} component={PrivacyTerms} />
+      <Route path={"/login"} component={Login} />
       <Route path={"/confirm-email"} component={ConfirmEmail} />
       <Route path={"/affiliates"} component={AffiliateProgram} />
       <Route path={"/affiliate-dashboard"} component={AffiliateDashboard} />

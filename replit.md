@@ -30,14 +30,17 @@ A full-stack book production workflow management platform ("Manuscript to Master
 - Registration flow: `account.register` creates user with `openId = "email-{email}"`, generates confirmation token, sends real email via Resend
 - Email confirmation: `account.confirmEmail` validates token, sets `emailConfirmed = true`
 - Resend confirmation: `account.resendConfirmation` regenerates token and resends email (2-minute per-email cooldown enforced)
+- **Magic link login**: `/login` page sends sign-in link via `account.sendLoginLink` mutation → stores `loginToken`/`loginTokenExpiresAt` on user → emails link to `/api/auth/magic-login?token=...`
+- **Magic link verification**: Express route `/api/auth/magic-login` validates `loginToken`, creates a server-validated session (`sessionToken` stored in DB), sets `ebp_session` cookie (opaque token, httpOnly, 30-day expiry)
+- **Session validation**: `context.ts` reads `ebp_session` cookie and validates against `users.sessionToken` in DB (not forgeable)
+- **Logout**: `account.logout` tRPC mutation clears `sessionToken` in DB; Express route `/api/auth/logout` clears cookie and redirects to `/login`
 - Email service: Resend integration (`server/resendClient.ts`) — branded HTML emails with confirm button + fallback link
 - Checkout gate: `stripe.createCheckoutSession` requires `confirmedUserId` and verifies `emailConfirmed` before proceeding
 - `CheckoutGate` modal component (`client/src/components/CheckoutGate.tsx`) handles the registration/confirmation flow inline on the Pricing page
 - Confirmation page at `/confirm-email?token=...` for link-based verification
-- Users table has `emailConfirmed` (boolean) and `emailConfirmToken` (varchar) columns
+- Users table columns: `emailConfirmed`, `emailConfirmToken`, `loginToken`, `loginTokenExpiresAt`, `sessionToken`, `sessionTokenExpiresAt`
 - Replit Auth OIDC integration still exists in code but login is not enforced; all pages are accessible without authentication
-- tRPC context falls back to the guest user when no authenticated session is present (`server/_core/context.ts`)
-- Sessions stored in PostgreSQL `sessions` table
+- tRPC context checks: 1) Replit OIDC claims, 2) `ebp_session` cookie validated against DB, 3) falls back to guest user
 - App users stored in `users` table, keyed by `openId`
 
 ## Running the App

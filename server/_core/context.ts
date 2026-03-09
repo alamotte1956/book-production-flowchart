@@ -1,6 +1,6 @@
 import type { CreateExpressContextOptions } from "@trpc/server/adapters/express";
 import type { User } from "../../drizzle/schema";
-import { getUserByOpenId, upsertUser } from "../db";
+import { getUserByOpenId, getUserBySessionToken, upsertUser } from "../db";
 
 const GUEST_OPEN_ID = "guest-default-user";
 
@@ -41,6 +41,20 @@ export async function createContext(
     }
   } catch (error) {
     user = null;
+  }
+
+  if (!user) {
+    try {
+      const sessionCookie = (opts.req as any).cookies?.ebp_session;
+      if (sessionCookie && typeof sessionCookie === "string" && sessionCookie.length >= 32) {
+        const dbUser = await getUserBySessionToken(sessionCookie);
+        if (dbUser) {
+          user = dbUser;
+        }
+      }
+    } catch {
+      user = null;
+    }
   }
 
   if (!user) {

@@ -18,8 +18,8 @@ import { generateIdml } from "./idmlGenerator";
 import { invokeLLM } from "./_core/llm";
 import { lookupByIsbn } from "./isbnLookup";
 import { notifyOwner } from "./_core/notification";
-import { sendConfirmationEmail } from "./resendClient";
-import { createContactSubmission, saveWizardAnswers, getWizardAnswers, getRecentActivity, getDashboardStats, getUserById, updateUserStripeInfo, getUserByEmail, createEmailUser, confirmUserEmail, getUserByConfirmToken, getUserByCheckoutToken } from "./db";
+import { sendConfirmationEmail, sendLoginEmail } from "./resendClient";
+import { createContactSubmission, saveWizardAnswers, getWizardAnswers, getRecentActivity, getDashboardStats, getUserById, updateUserStripeInfo, getUserByEmail, createEmailUser, confirmUserEmail, getUserByConfirmToken, getUserByCheckoutToken, setLoginToken, clearSession } from "./db";
 import { TRPCError } from "@trpc/server";
 import { getUncachableStripeClient, getStripePublishableKey } from "./stripeClient";
 import { sql } from "drizzle-orm";
@@ -1166,6 +1166,45 @@ export const appRouter = router({
         }
 
         return { status: "resent" as const, ...(isDev ? { confirmUrl: `/confirm-email?token=${token}` } : {}) };
+      }),
+
+    sendLoginLink: publicProcedure
+      .input(z.object({ email: z.string().email() }))
+      .mutation(async ({ input }) => {
+        const user = await getUserByEmail(input.email);
+        if (!user) {
+          throw new TRPCError({ code: "NOT_FOUND", message: "No account found with that email. Please sign up first." });
+        }
+
+        checkEmailCooldown(input.email);
+
+        const token = nanoid(48);
+        await setLoginToken(user.id, token);
+
+        const isDev = process.env.NODE_ENV === "development";
+        if (isDev) {
+          console.log(`[Login Link][DEV] User ${input.email} → /api/auth/magic-login?token=${token}`);
+        }
+
+        try {
+          await sendLoginEmail(input.email, token, user.name ?? "");
+          markEmailSent(input.email);
+        } catch (emailErr) {
+          console.error("[Email] Failed to send login link:", emailErr);
+          if (!isDev) {
+            throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "Failed to send login email. Please try again." });
+          }
+        }
+
+        return { sent: true };
+      }),
+
+    logout: publicProcedure
+      .mutation(async ({ ctx }) => {
+        if (ctx.user && ctx.user.openId !== "guest-default-user") {
+          await clearSession(ctx.user.id);
+        }
+        return { success: true };
       }),
 
     checkEmail: publicProcedure

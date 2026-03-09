@@ -644,3 +644,53 @@ export async function updateUserStripeInfo(
   const [user] = await db.update(users).set(updateSet).where(eq(users.id, userId)).returning();
   return user ?? null;
 }
+
+export async function setLoginToken(userId: number, token: string) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  const tokenExpiry = new Date(Date.now() + 15 * 60 * 1000);
+  await db.update(users).set({
+    loginToken: token,
+    loginTokenExpiresAt: tokenExpiry,
+    updatedAt: new Date(),
+  }).where(eq(users.id, userId));
+}
+
+export async function getUserByLoginToken(token: string) {
+  const db = await getDb();
+  if (!db) return null;
+  const [user] = await db.select().from(users).where(eq(users.loginToken, token));
+  return user ?? null;
+}
+
+export async function createSession(userId: number, token: string) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  const expiry = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000);
+  await db.update(users).set({
+    sessionToken: token,
+    sessionTokenExpiresAt: expiry,
+    loginToken: null,
+    loginTokenExpiresAt: null,
+    updatedAt: new Date(),
+  }).where(eq(users.id, userId));
+}
+
+export async function getUserBySessionToken(token: string) {
+  const db = await getDb();
+  if (!db) return null;
+  const [user] = await db.select().from(users).where(eq(users.sessionToken, token));
+  if (!user) return null;
+  if (user.sessionTokenExpiresAt && new Date(user.sessionTokenExpiresAt) < new Date()) return null;
+  return user;
+}
+
+export async function clearSession(userId: number) {
+  const db = await getDb();
+  if (!db) return;
+  await db.update(users).set({
+    sessionToken: null,
+    sessionTokenExpiresAt: null,
+    updatedAt: new Date(),
+  }).where(eq(users.id, userId));
+}
