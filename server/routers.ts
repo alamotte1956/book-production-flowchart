@@ -1097,7 +1097,9 @@ export const appRouter = router({
 
         const existing = await getUserByEmail(input.email);
         if (existing?.emailConfirmed) {
-          return { status: "already_confirmed" as const, checkoutToken: existing.checkoutToken ?? "" };
+          const pollNonce = nanoid(32);
+          pollingNonces.set(pollNonce, { email: input.email.toLowerCase(), expiresAt: Date.now() + 30 * 60 * 1000 });
+          return { status: "already_confirmed" as const, pollNonce };
         }
 
         checkEmailCooldown(input.email);
@@ -1149,7 +1151,9 @@ export const appRouter = router({
           throw new TRPCError({ code: "NOT_FOUND", message: "No account found with that email" });
         }
         if (existing.emailConfirmed) {
-          return { status: "already_confirmed" as const, checkoutToken: existing.checkoutToken ?? "" };
+          const pollNonce = nanoid(32);
+          pollingNonces.set(pollNonce, { email: input.email.toLowerCase(), expiresAt: Date.now() + 30 * 60 * 1000 });
+          return { status: "already_confirmed" as const, pollNonce };
         }
 
         checkEmailCooldown(input.email);
@@ -1255,6 +1259,23 @@ export const appRouter = router({
       } catch {
         return { key: null };
       }
+    }),
+
+    getPriceIds: publicProcedure.query(async () => {
+      const stripe = await getUncachableStripeClient();
+      const prices = await stripe.prices.list({ limit: 50, active: true, expand: ['data.product'] });
+      const result: Record<string, Record<string, string>> = {};
+      for (const p of prices.data) {
+        const product = typeof p.product === 'string' ? null : p.product;
+        if (!product || !product.active) continue;
+        if (product.metadata?.app !== 'easy-book-publishers') continue;
+        const planName = product.metadata?.planName;
+        const billingCycle = p.metadata?.billingCycle;
+        if (!planName || !billingCycle) continue;
+        if (!result[planName]) result[planName] = {};
+        result[planName][billingCycle] = p.id;
+      }
+      return result;
     }),
 
     getSubscription: protectedProcedure.query(async ({ ctx }) => {

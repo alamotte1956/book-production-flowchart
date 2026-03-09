@@ -68,13 +68,13 @@ export default function CheckoutGate({ open, onClose, onConfirmed, planName }: C
         agreedToTerms: true,
       });
 
-      if (result.status === "already_confirmed" && result.checkoutToken) {
-        setStep("done");
+      const nonce = (result as any).pollNonce ?? null;
+      setPollNonce(nonce);
+      if (result.status === "already_confirmed" && nonce) {
         toast.success("Email already verified! Proceeding to checkout...");
-        setTimeout(() => onConfirmed(result.checkoutToken), 800);
+        startPolling(nonce);
+        setStep("waiting");
       } else {
-        const nonce = (result as any).pollNonce ?? null;
-        setPollNonce(nonce);
         setDevConfirmUrl((result as any).confirmUrl ?? null);
         setStep("waiting");
         setShowResend(false);
@@ -91,11 +91,12 @@ export default function CheckoutGate({ open, onClose, onConfirmed, planName }: C
     if (!email.trim()) return;
     try {
       const result = await resendMutation.mutateAsync({ email: email.trim() });
-      if (result.status === "already_confirmed" && result.checkoutToken) {
-        if (pollRef.current) clearInterval(pollRef.current);
-        setStep("done");
+      if (result.status === "already_confirmed" && (result as any).pollNonce) {
+        const nonce = (result as any).pollNonce;
+        setPollNonce(nonce);
         toast.success("Email already verified! Proceeding to checkout...");
-        setTimeout(() => onConfirmed(result.checkoutToken), 800);
+        startPolling(nonce);
+        setStep("waiting");
       } else {
         const nonce = (result as any).pollNonce ?? null;
         setPollNonce(nonce);

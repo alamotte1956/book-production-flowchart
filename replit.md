@@ -182,9 +182,9 @@ PostgreSQL via Replit's built-in database. Use `npx drizzle-kit push` to sync sc
   - Author Pro: monthly ($12.99), annual ($107.88/yr), lifetime ($132)
   - Publisher: monthly ($34.99), annual ($299.88/yr), lifetime ($349)
 - **User columns**: `plan` (enum: starter/author_pro/publisher), `stripeCustomerId`, `stripeSubscriptionId`
-- **tRPC routes**: `stripe.getSubscription`, `stripe.createCheckoutSession`, `stripe.createBillingPortal`, `stripe.getProducts`, `stripe.getPublishableKey`
+- **tRPC routes**: `stripe.getSubscription`, `stripe.createCheckoutSession`, `stripe.createBillingPortal`, `stripe.getProducts`, `stripe.getPublishableKey`, `stripe.getPriceIds`
 - **Webhook handlers**: `checkout.session.completed` (upgrades plan), `customer.subscription.updated`, `customer.subscription.deleted` (reverts to starter)
-- **Price IDs**: Hardcoded in `client/src/pages/Pricing.tsx` (PRICE_IDS constant) — update if Stripe products are recreated. NOTE: To apply new pricing ($132/$349), delete existing Stripe products first, re-run seed script, then update PRICE_IDS with new IDs
+- **Price IDs**: Dynamically fetched from Stripe via `stripe.getPriceIds` endpoint — automatically uses correct IDs for dev (test mode) and production (live mode). Products must have metadata `app=easy-book-publishers` and `planName`. Prices must have metadata `billingCycle` and `planName`.
 
 ## Feature Gating
 

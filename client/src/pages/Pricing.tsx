@@ -13,17 +13,9 @@ import CheckoutGate from "@/components/CheckoutGate";
 
 type BillingCycle = "monthly" | "annual" | "lifetime";
 
-const PRICE_IDS: Record<string, Record<BillingCycle, string>> = {
-  "Author Pro": {
-    monthly: "price_1T8YrzA6rewT2BRR3203CbI4",
-    annual: "price_1T8Ys0A6rewT2BRRpzIWjqWZ",
-    lifetime: "price_1T8Ys0A6rewT2BRRue9XxUEl",
-  },
-  "Publisher": {
-    monthly: "price_1T8Ys0A6rewT2BRRqxBSf5go",
-    annual: "price_1T8Ys0A6rewT2BRRMctmRIJw",
-    lifetime: "price_1T8Ys1A6rewT2BRRg8rdFtLC",
-  },
+const PLAN_NAME_MAP: Record<string, string> = {
+  "Author Pro": "author_pro",
+  "Publisher": "publisher",
 };
 
 const tiers = [
@@ -164,6 +156,13 @@ export default function Pricing() {
   const [checkoutUrl, setCheckoutUrl] = useState<string | null>(null);
   const { user } = useAuth();
   const checkoutMutation = trpc.stripe.createCheckoutSession.useMutation();
+  const priceIdsQuery = trpc.stripe.getPriceIds.useQuery();
+
+  const getPriceId = (tierName: string, cycle: BillingCycle): string | null => {
+    const planKey = PLAN_NAME_MAP[tierName];
+    if (!planKey || !priceIdsQuery.data) return null;
+    return (priceIdsQuery.data as any)?.[planKey]?.[cycle] ?? null;
+  };
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
@@ -179,8 +178,11 @@ export default function Pricing() {
       return;
     }
 
-    const priceId = PRICE_IDS[tierName]?.[billing];
-    if (!priceId) return;
+    const priceId = getPriceId(tierName, billing);
+    if (!priceId) {
+      toast.error("Pricing information is loading. Please try again in a moment.");
+      return;
+    }
 
     setPendingTier(tierName);
     setGateOpen(true);
@@ -188,13 +190,13 @@ export default function Pricing() {
 
   const handleConfirmedCheckout = async (checkoutToken: string) => {
     if (!pendingTier) return;
-    const priceId = PRICE_IDS[pendingTier]?.[billing];
+    const priceId = getPriceId(pendingTier, billing);
     if (!priceId) return;
 
     setGateOpen(false);
     setLoadingTier(pendingTier);
     try {
-      const planName = pendingTier === "Author Pro" ? "author_pro" as const : "publisher" as const;
+      const planName = (PLAN_NAME_MAP[pendingTier] ?? "author_pro") as "author_pro" | "publisher";
       const result = await checkoutMutation.mutateAsync({
         priceId,
         billingCycle: billing,
