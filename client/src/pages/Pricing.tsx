@@ -200,7 +200,8 @@ export default function Pricing() {
         planName,
         checkoutToken,
       });
-      window.location.href = result.url;
+      window.open(result.url, "_blank");
+      setLoadingTier(null);
     } catch (err) {
       console.error("Checkout error:", err);
       setLoadingTier(null);
