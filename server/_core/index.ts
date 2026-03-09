@@ -12,6 +12,7 @@ import { serveStatic, setupVite } from "./vite";
 import { WebhookHandlers } from "../webhookHandlers";
 import { getLocalStorageDir } from "../storage";
 
+
 function isPortAvailable(port: number): Promise<boolean> {
   return new Promise(resolve => {
     const server = net.createServer();
