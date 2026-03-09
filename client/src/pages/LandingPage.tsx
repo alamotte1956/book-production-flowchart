@@ -72,6 +72,12 @@ export default function LandingPage() {
             <button onClick={() => navigate("/affiliates")} className="text-[#d4c8b4] hover:text-[#f5d98a] transition-colors">Affiliates</button>
           </div>
           <div className="flex items-center gap-3">
+            <button onClick={() => navigate("/login")} className="text-[#d4c8b4] hover:text-[#f5d98a] transition-colors text-sm hidden md:block">
+              Sign In
+            </button>
+            <Button onClick={() => navigate("/pricing")} variant="outline" className="border-[#c9a96e]/40 text-[#f5d98a] hover:bg-[#c9a96e]/10 font-semibold hidden sm:flex" size="sm">
+              Sign Up
+            </Button>
             <Button onClick={() => navigate("/guided-journey")} className="bg-[#c9a96e] hover:bg-[#b8944f] text-[#1a1008] font-semibold hidden sm:flex" size="sm">
               Start the Wizard
             </Button>
@@ -92,7 +98,11 @@ export default function LandingPage() {
               <a href="#output" onClick={() => setMobileMenuOpen(false)} className="text-[#d4c8b4] hover:text-[#f5d98a] transition-colors py-2 text-sm">Output</a>
               <button onClick={() => { navigate("/pricing"); setMobileMenuOpen(false); }} className="text-left text-[#d4c8b4] hover:text-[#f5d98a] transition-colors py-2 text-sm">Pricing</button>
               <button onClick={() => { navigate("/affiliates"); setMobileMenuOpen(false); }} className="text-left text-[#d4c8b4] hover:text-[#f5d98a] transition-colors py-2 text-sm">Affiliates</button>
+              <button onClick={() => { navigate("/login"); setMobileMenuOpen(false); }} className="text-left text-[#d4c8b4] hover:text-[#f5d98a] transition-colors py-2 text-sm">Sign In</button>
               <div className="flex gap-3 pt-2 border-t border-[#c9a96e]/10">
+                <Button onClick={() => { navigate("/pricing"); setMobileMenuOpen(false); }} variant="outline" className="border-[#c9a96e]/40 text-[#f5d98a] hover:bg-[#c9a96e]/10 font-semibold flex-1" size="sm">
+                  Sign Up
+                </Button>
                 <Button onClick={() => { navigate("/guided-journey"); setMobileMenuOpen(false); }} className="bg-[#c9a96e] hover:bg-[#b8944f] text-[#1a1008] font-semibold flex-1" size="sm">
                   Start the Wizard
                 </Button>
