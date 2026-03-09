@@ -16,29 +16,42 @@ interface CheckoutGateProps {
 }
 
 export default function CheckoutGate({ open, onClose, onConfirmed, planName }: CheckoutGateProps) {
-  const [step, setStep] = useState<"register" | "confirm" | "done">("register");
+  const [step, setStep] = useState<"register" | "waiting" | "done">("register");
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [agreedTerms, setAgreedTerms] = useState(false);
-  const [confirmToken, setConfirmToken] = useState("");
-  const [confirmUrl, setConfirmUrl] = useState<string | null>(null);
-
   const [showResend, setShowResend] = useState(false);
+  const [devConfirmUrl, setDevConfirmUrl] = useState<string | null>(null);
+  const [pollNonce, setPollNonce] = useState<string | null>(null);
+  const pollRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const resendTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const registerMutation = trpc.account.register.useMutation();
-  const confirmMutation = trpc.account.confirmEmail.useMutation();
   const resendMutation = trpc.account.resendConfirmation.useMutation();
+  const checkStatusMutation = trpc.account.checkEmailStatus.useMutation();
 
   useEffect(() => {
-    if (step === "confirm") {
-      setShowResend(false);
-      resendTimerRef.current = setTimeout(() => setShowResend(true), 120000);
-    }
     return () => {
+      if (pollRef.current) clearInterval(pollRef.current);
       if (resendTimerRef.current) clearTimeout(resendTimerRef.current);
     };
-  }, [step]);
+  }, []);
+
+  const startPolling = (nonce: string) => {
+    if (pollRef.current) clearInterval(pollRef.current);
+    pollRef.current = setInterval(async () => {
+      try {
+        const result = await checkStatusMutation.mutateAsync({ pollNonce: nonce });
+        if (result.confirmed && result.checkoutToken) {
+          if (pollRef.current) clearInterval(pollRef.current);
+          setStep("done");
+          toast.success("Email confirmed! Proceeding to checkout...");
+          setTimeout(() => onConfirmed(result.checkoutToken!), 800);
+        }
+      } catch {
+      }
+    }, 3000);
+  };
 
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -60,28 +73,17 @@ export default function CheckoutGate({ open, onClose, onConfirmed, planName }: C
         toast.success("Email already verified! Proceeding to checkout...");
         setTimeout(() => onConfirmed(result.checkoutToken), 800);
       } else {
-        setConfirmUrl((result as any).confirmUrl ?? null);
-        setStep("confirm");
-        toast.success("Check your email for a confirmation link.");
+        const nonce = (result as any).pollNonce ?? null;
+        setPollNonce(nonce);
+        setDevConfirmUrl((result as any).confirmUrl ?? null);
+        setStep("waiting");
+        setShowResend(false);
+        resendTimerRef.current = setTimeout(() => setShowResend(true), 120000);
+        if (nonce) startPolling(nonce);
+        toast.success("Confirmation email sent! Check your inbox.");
       }
     } catch (err: any) {
       toast.error(err.message || "Registration failed. Please try again.");
-    }
-  };
-
-  const handleConfirm = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!confirmToken.trim()) return;
-
-    try {
-      const result = await confirmMutation.mutateAsync({ token: confirmToken.trim() });
-      if (result.success && result.checkoutToken) {
-        setStep("done");
-        toast.success("Email confirmed! Proceeding to checkout...");
-        setTimeout(() => onConfirmed(result.checkoutToken), 800);
-      }
-    } catch (err: any) {
-      toast.error(err.message || "Invalid or expired confirmation token. Please try again.");
     }
   };
 
@@ -90,30 +92,57 @@ export default function CheckoutGate({ open, onClose, onConfirmed, planName }: C
     try {
       const result = await resendMutation.mutateAsync({ email: email.trim() });
       if (result.status === "already_confirmed" && result.checkoutToken) {
+        if (pollRef.current) clearInterval(pollRef.current);
         setStep("done");
         toast.success("Email already verified! Proceeding to checkout...");
         setTimeout(() => onConfirmed(result.checkoutToken), 800);
       } else {
-        setConfirmUrl((result as any).confirmUrl ?? null);
+        const nonce = (result as any).pollNonce ?? null;
+        setPollNonce(nonce);
+        setDevConfirmUrl((result as any).confirmUrl ?? null);
         setShowResend(false);
         if (resendTimerRef.current) clearTimeout(resendTimerRef.current);
         resendTimerRef.current = setTimeout(() => setShowResend(true), 120000);
-        toast.success("Confirmation email resent. Please check your inbox.");
+        if (nonce) startPolling(nonce);
+        toast.success("Confirmation email resent. Check your inbox.");
       }
     } catch (err: any) {
       toast.error(err.message || "Failed to resend. Please try again.");
     }
   };
 
+  const handleDevConfirm = async () => {
+    if (!devConfirmUrl) return;
+    const tokenMatch = devConfirmUrl.match(/token=([^&]+)/);
+    if (!tokenMatch) return;
+    try {
+      const resp = await fetch(`/api/trpc/account.confirmEmail`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ json: { token: tokenMatch[1] } }),
+      });
+      const data = await resp.json();
+      if (data?.result?.data?.json?.success) {
+        if (pollRef.current) clearInterval(pollRef.current);
+        setStep("done");
+        toast.success("Email confirmed! Proceeding to checkout...");
+        setTimeout(() => onConfirmed(data.result.data.json.checkoutToken), 800);
+      }
+    } catch {
+      toast.error("Auto-confirm failed.");
+    }
+  };
+
   const handleClose = () => {
+    if (pollRef.current) clearInterval(pollRef.current);
+    if (resendTimerRef.current) clearTimeout(resendTimerRef.current);
     setStep("register");
     setName("");
     setEmail("");
     setAgreedTerms(false);
-    setConfirmToken("");
-    setConfirmUrl(null);
+    setDevConfirmUrl(null);
+    setPollNonce(null);
     setShowResend(false);
-    if (resendTimerRef.current) clearTimeout(resendTimerRef.current);
     onClose();
   };
 
@@ -124,12 +153,12 @@ export default function CheckoutGate({ open, onClose, onConfirmed, planName }: C
           <DialogTitle className="font-serif text-xl text-[#1a1008] flex items-center gap-2">
             <ShieldCheck className="w-5 h-5 text-[#c9a96e]" />
             {step === "register" && "Create Your Account"}
-            {step === "confirm" && "Confirm Your Email"}
+            {step === "waiting" && "Check Your Email"}
             {step === "done" && "Email Confirmed!"}
           </DialogTitle>
           <DialogDescription className="text-[#5c4a2a]">
             {step === "register" && `An email-confirmed account is required to purchase the ${planName} plan.`}
-            {step === "confirm" && "Enter the confirmation token to verify your email address."}
+            {step === "waiting" && "Click the confirmation link in the email we just sent you."}
             {step === "done" && "Your email is verified. Redirecting to secure checkout..."}
           </DialogDescription>
         </DialogHeader>
@@ -187,46 +216,34 @@ export default function CheckoutGate({ open, onClose, onConfirmed, planName }: C
           </form>
         )}
 
-        {step === "confirm" && (
-          <form onSubmit={handleConfirm} className="space-y-4 mt-2">
-            <div className="rounded-lg bg-[#c9a96e]/10 border border-[#c9a96e]/20 p-3">
+        {step === "waiting" && (
+          <div className="space-y-4 mt-2">
+            <div className="rounded-lg bg-[#c9a96e]/10 border border-[#c9a96e]/20 p-4 text-center">
+              <Mail className="w-10 h-10 text-[#c9a96e] mx-auto mb-3" />
               <p className="text-sm text-[#5c4a2a]">
-                A confirmation email has been sent to <strong>{email}</strong>.
-                Enter the token from the email to verify your address.
+                We sent a confirmation email to <strong className="text-[#1a1008]">{email}</strong>
               </p>
-              {confirmUrl && (
-                <a
-                  href={confirmUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-sm text-[#8b6914] underline mt-2 block"
-                >
-                  Auto-confirm (dev mode only)
-                </a>
-              )}
+              <p className="text-xs text-[#5c4a2a]/70 mt-1">
+                Click the link in the email. This page will update automatically.
+              </p>
             </div>
-            <div className="space-y-2">
-              <Label htmlFor="gate-token" className="text-[#3a2a14]">Confirmation Token</Label>
-              <Input
-                id="gate-token"
-                value={confirmToken}
-                onChange={(e) => setConfirmToken(e.target.value)}
-                placeholder="Paste your confirmation token"
-                required
-                className="bg-white border-[#c9a96e]/30 focus:border-[#c9a96e]"
-              />
+
+            <div className="flex items-center justify-center gap-2 text-sm text-[#5c4a2a]/70">
+              <Loader2 className="w-4 h-4 animate-spin text-[#c9a96e]" />
+              Waiting for confirmation...
             </div>
-            <Button
-              type="submit"
-              disabled={confirmMutation.isPending || !confirmToken.trim()}
-              className="w-full bg-[#c9a96e] hover:bg-[#b8944f] text-[#1a1008] font-semibold"
-            >
-              {confirmMutation.isPending ? (
-                <><Loader2 className="w-4 h-4 animate-spin mr-2" /> Verifying...</>
-              ) : (
-                <><CheckCircle2 className="w-4 h-4 mr-2" /> Confirm Email</>
-              )}
-            </Button>
+
+            {devConfirmUrl && (
+              <Button
+                type="button"
+                onClick={handleDevConfirm}
+                variant="outline"
+                className="w-full border-green-500/40 text-green-700 hover:bg-green-50"
+              >
+                <CheckCircle2 className="w-4 h-4 mr-2" /> Quick Confirm (Dev Mode)
+              </Button>
+            )}
+
             {showResend && (
               <Button
                 type="button"
@@ -242,7 +259,11 @@ export default function CheckoutGate({ open, onClose, onConfirmed, planName }: C
                 )}
               </Button>
             )}
-          </form>
+
+            <p className="text-xs text-center text-[#5c4a2a]/50">
+              Don't see it? Check your spam folder.
+            </p>
+          </div>
         )}
 
         {step === "done" && (

@@ -1070,6 +1070,7 @@ export const appRouter = router({
   account: (() => {
     const emailCooldowns = new Map<string, number>();
     const EMAIL_COOLDOWN_MS = 120_000;
+    const pollingNonces = new Map<string, { email: string; expiresAt: number }>();
 
     function checkEmailCooldown(email: string) {
       const lastSent = emailCooldowns.get(email.toLowerCase());
@@ -1124,7 +1125,9 @@ export const appRouter = router({
           }
         }
 
-        return { status: "confirmation_needed" as const, userId: user.id, ...(isDev ? { confirmUrl: `/confirm-email?token=${token}` } : {}) };
+        const pollNonce = nanoid(32);
+        pollingNonces.set(pollNonce, { email: input.email.toLowerCase(), expiresAt: Date.now() + 30 * 60 * 1000 });
+        return { status: "confirmation_needed" as const, userId: user.id, pollNonce, ...(isDev ? { confirmUrl: `/confirm-email?token=${token}` } : {}) };
       }),
 
     confirmEmail: publicProcedure
@@ -1173,7 +1176,27 @@ export const appRouter = router({
           }
         }
 
-        return { status: "resent" as const, ...(isDev ? { confirmUrl: `/confirm-email?token=${token}` } : {}) };
+        const pollNonce = nanoid(32);
+        pollingNonces.set(pollNonce, { email: input.email.toLowerCase(), expiresAt: Date.now() + 30 * 60 * 1000 });
+        return { status: "resent" as const, pollNonce, ...(isDev ? { confirmUrl: `/confirm-email?token=${token}` } : {}) };
+      }),
+
+    checkEmailStatus: publicProcedure
+      .input(z.object({ pollNonce: z.string() }))
+      .mutation(async ({ input }) => {
+        const nonceData = pollingNonces.get(input.pollNonce);
+        if (!nonceData || Date.now() > nonceData.expiresAt) {
+          return { confirmed: false, checkoutToken: null };
+        }
+        const user = await getUserByEmail(nonceData.email);
+        if (!user) {
+          return { confirmed: false, checkoutToken: null };
+        }
+        if (user.emailConfirmed && user.checkoutToken) {
+          pollingNonces.delete(input.pollNonce);
+          return { confirmed: true, checkoutToken: user.checkoutToken };
+        }
+        return { confirmed: false, checkoutToken: null };
       }),
 
     sendLoginLink: publicProcedure
