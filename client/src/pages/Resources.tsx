@@ -283,13 +283,6 @@ const categories: ResourceCategory[] = [
         tags: ["Print-on-Demand", "Distribution", "Bookstores"],
       },
       {
-        name: "Draft2Digital",
-        url: "https://www.draft2digital.com",
-        description: "Free ebook and print distribution aggregator. Distributes to Apple Books, Kobo, Barnes & Noble, and more. No upfront fees.",
-        free: true,
-        tags: ["Ebook", "Distribution", "Aggregator"],
-      },
-      {
         name: "BookBaby",
         url: "https://www.bookbaby.com",
         description: "Full-service self-publishing company offering editing, design, printing, and global distribution. Higher cost but more hand-holding.",

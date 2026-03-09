@@ -153,7 +153,6 @@ const competitors = [
   { name: "Vellum", price: "$250 one-time", scope: "Formatting only, Mac only, no IDML/ONIX" },
   { name: "Reedsy Studio", price: "$5–$8/mo", scope: "Basic formatting, limited templates" },
   { name: "BookBaby", price: "$1,090–$2,890/book", scope: "Full-service, per-book pricing" },
-  { name: "Draft2Digital", price: "10% royalty cut", scope: "Distribution only, no formatting tools" },
 ];
 
 export default function Pricing() {
