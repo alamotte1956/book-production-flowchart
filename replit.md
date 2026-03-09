@@ -26,11 +26,12 @@ A full-stack book production workflow management platform ("Manuscript to Master
 ## Auth Flow
 
 - **No login required for browsing** — a guest user (openId: "guest-default-user") is auto-created and used when no Replit Auth session exists
-- **Email-confirmed account required for checkout** — before Stripe checkout, users must register with name+email and confirm their email address
+- **Email-confirmed account required for checkout** — before Stripe checkout, users must register with name+email+password and confirm their email address
 - Registration flow: `account.register` creates user with `openId = "email-{email}"`, generates confirmation token, sends real email via Resend
-- Email confirmation: `account.confirmEmail` validates token, sets `emailConfirmed = true`
+- Email confirmation: `account.confirmEmail` validates token, sets `emailConfirmed = true`; after confirmation, password is saved via `account.setPassword`
 - Resend confirmation: `account.resendConfirmation` regenerates token and resends email (2-minute per-email cooldown enforced)
-- **Magic link login**: `/login` page sends sign-in link via `account.sendLoginLink` mutation → stores `loginToken`/`loginTokenExpiresAt` on user → emails link to `/api/auth/magic-login?token=...`
+- **Password login**: `/login` page supports email+password login via `account.loginWithPassword` mutation (bcryptjs hashing, 12 rounds). Falls back to magic link option.
+- **Magic link login**: `/login` page also offers sign-in link via `account.sendLoginLink` mutation → stores `loginToken`/`loginTokenExpiresAt` on user → emails link to `/api/auth/magic-login?token=...`
 - **Magic link verification**: Express route `/api/auth/magic-login` validates `loginToken`, creates a server-validated session (`sessionToken` stored in DB), sets `ebp_session` cookie (opaque token, httpOnly, 30-day expiry)
 - **Session validation**: `context.ts` reads `ebp_session` cookie and validates against `users.sessionToken` in DB (not forgeable)
 - **Logout**: `account.logout` tRPC mutation clears `sessionToken` in DB; Express route `/api/auth/logout` clears cookie and redirects to `/login`

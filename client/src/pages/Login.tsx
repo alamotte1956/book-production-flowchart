@@ -4,16 +4,20 @@ import { trpc } from "@/lib/trpc";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Mail, Loader2, CheckCircle2, ShieldCheck } from "lucide-react";
+import { Mail, Loader2, CheckCircle2, ShieldCheck, LogIn, Eye, EyeOff } from "lucide-react";
 import { toast } from "sonner";
 import SiteFooter from "@/components/SiteFooter";
 
 export default function Login() {
   const [, navigate] = useLocation();
-  const [step, setStep] = useState<"email" | "sent">("email");
+  const [step, setStep] = useState<"login" | "magic-sent">("login");
   const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
+  const [useMagicLink, setUseMagicLink] = useState(false);
 
-  const loginMutation = trpc.account.sendLoginLink.useMutation();
+  const loginMutation = trpc.account.loginWithPassword.useMutation();
+  const magicLinkMutation = trpc.account.sendLoginLink.useMutation();
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
@@ -31,13 +35,26 @@ export default function Login() {
     }
   }, []);
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handlePasswordLogin = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!email.trim() || !password.trim()) return;
+
+    try {
+      await loginMutation.mutateAsync({ email: email.trim(), password });
+      toast.success("Signed in successfully!");
+      navigate("/dashboard");
+    } catch (err: any) {
+      toast.error(err.message || "Invalid email or password.");
+    }
+  };
+
+  const handleMagicLink = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!email.trim()) return;
 
     try {
-      await loginMutation.mutateAsync({ email: email.trim() });
-      setStep("sent");
+      await magicLinkMutation.mutateAsync({ email: email.trim() });
+      setStep("magic-sent");
     } catch (err: any) {
       toast.error(err.message || "Failed to send login link. Please try again.");
     }
@@ -59,16 +76,16 @@ export default function Login() {
       </nav>
 
       <div className="max-w-md mx-auto px-6 py-24">
-        {step === "email" && (
+        {step === "login" && !useMagicLink && (
           <div className="bg-white/80 border border-[#c9a96e]/20 rounded-xl p-8 shadow-sm">
             <div className="text-center mb-6">
               <ShieldCheck className="w-10 h-10 text-[#c9a96e] mx-auto mb-3" />
               <h1 className="font-serif text-2xl text-[#1a1008]">Sign In</h1>
               <p className="text-[#5c4a2a] text-sm mt-1">
-                Enter your email and we'll send you a sign-in link.
+                Enter your email and password to sign in.
               </p>
             </div>
-            <form onSubmit={handleSubmit} className="space-y-4">
+            <form onSubmit={handlePasswordLogin} className="space-y-4">
               <div className="space-y-2">
                 <Label htmlFor="login-email" className="text-[#3a2a14]">Email Address</Label>
                 <Input
@@ -81,22 +98,107 @@ export default function Login() {
                   className="bg-white border-[#c9a96e]/30 focus:border-[#c9a96e]"
                 />
               </div>
+              <div className="space-y-2">
+                <Label htmlFor="login-password" className="text-[#3a2a14]">Password</Label>
+                <div className="relative">
+                  <Input
+                    id="login-password"
+                    type={showPassword ? "text" : "password"}
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    placeholder="Your password"
+                    required
+                    className="bg-white border-[#c9a96e]/30 focus:border-[#c9a96e] pr-10"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-[#7a6e60] hover:text-[#3a2a14]"
+                  >
+                    {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                  </button>
+                </div>
+              </div>
               <Button
                 type="submit"
-                disabled={loginMutation.isPending || !email.trim()}
+                disabled={loginMutation.isPending || !email.trim() || !password.trim()}
                 className="w-full bg-[#c9a96e] hover:bg-[#b8944f] text-[#1a1008] font-semibold"
               >
                 {loginMutation.isPending ? (
+                  <><Loader2 className="w-4 h-4 animate-spin mr-2" /> Signing in...</>
+                ) : (
+                  <><LogIn className="w-4 h-4 mr-2" /> Sign In</>
+                )}
+              </Button>
+            </form>
+
+            <div className="mt-4 pt-4 border-t border-[#c9a96e]/15 text-center">
+              <button
+                onClick={() => setUseMagicLink(true)}
+                className="text-sm text-[#8b6914] hover:text-[#c9a96e] underline"
+              >
+                Sign in with email link instead
+              </button>
+            </div>
+
+            <div className="mt-3 text-center">
+              <button
+                onClick={() => navigate("/pricing")}
+                className="text-sm text-[#5c4a2a]/70 hover:text-[#5c4a2a]"
+              >
+                Don't have an account? Sign up on the pricing page
+              </button>
+            </div>
+          </div>
+        )}
+
+        {step === "login" && useMagicLink && (
+          <div className="bg-white/80 border border-[#c9a96e]/20 rounded-xl p-8 shadow-sm">
+            <div className="text-center mb-6">
+              <Mail className="w-10 h-10 text-[#c9a96e] mx-auto mb-3" />
+              <h1 className="font-serif text-2xl text-[#1a1008]">Sign In via Email</h1>
+              <p className="text-[#5c4a2a] text-sm mt-1">
+                We'll send you a sign-in link — no password needed.
+              </p>
+            </div>
+            <form onSubmit={handleMagicLink} className="space-y-4">
+              <div className="space-y-2">
+                <Label htmlFor="magic-email" className="text-[#3a2a14]">Email Address</Label>
+                <Input
+                  id="magic-email"
+                  type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  placeholder="you@example.com"
+                  required
+                  className="bg-white border-[#c9a96e]/30 focus:border-[#c9a96e]"
+                />
+              </div>
+              <Button
+                type="submit"
+                disabled={magicLinkMutation.isPending || !email.trim()}
+                className="w-full bg-[#c9a96e] hover:bg-[#b8944f] text-[#1a1008] font-semibold"
+              >
+                {magicLinkMutation.isPending ? (
                   <><Loader2 className="w-4 h-4 animate-spin mr-2" /> Sending...</>
                 ) : (
                   <><Mail className="w-4 h-4 mr-2" /> Send Sign-In Link</>
                 )}
               </Button>
             </form>
+
+            <div className="mt-4 pt-4 border-t border-[#c9a96e]/15 text-center">
+              <button
+                onClick={() => setUseMagicLink(false)}
+                className="text-sm text-[#8b6914] hover:text-[#c9a96e] underline"
+              >
+                Sign in with password instead
+              </button>
+            </div>
           </div>
         )}
 
-        {step === "sent" && (
+        {step === "magic-sent" && (
           <div className="bg-white/80 border border-[#c9a96e]/20 rounded-xl p-8 shadow-sm text-center">
             <CheckCircle2 className="w-12 h-12 text-green-600 mx-auto mb-4" />
             <h1 className="font-serif text-2xl text-[#1a1008] mb-2">Check Your Email</h1>
@@ -108,7 +210,7 @@ export default function Login() {
             </p>
             <Button
               variant="outline"
-              onClick={() => setStep("email")}
+              onClick={() => { setStep("login"); setUseMagicLink(false); }}
               className="mt-6 border-[#c9a96e]/40 text-[#5c4a2a]"
             >
               Try a different email

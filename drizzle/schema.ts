@@ -16,6 +16,7 @@ export const users = pgTable("users", {
   name: text("name"),
   email: varchar("email", { length: 320 }),
   loginMethod: varchar("loginMethod", { length: 64 }),
+  passwordHash: varchar("passwordHash", { length: 255 }),
   role: roleEnum("role").default("user").notNull(),
   plan: planEnum("plan").default("starter").notNull(),
   isAdmin: boolean("isAdmin").default(false).notNull(),

@@ -19,7 +19,7 @@ import { invokeLLM } from "./_core/llm";
 import { lookupByIsbn } from "./isbnLookup";
 import { notifyOwner } from "./_core/notification";
 import { sendConfirmationEmail, sendLoginEmail, sendAffiliateWelcomeEmail, sendAffiliateNotificationToOwner } from "./resendClient";
-import { createContactSubmission, saveWizardAnswers, getWizardAnswers, getRecentActivity, getDashboardStats, getUserById, updateUserStripeInfo, getUserByEmail, createEmailUser, confirmUserEmail, getUserByConfirmToken, getUserByCheckoutToken, setLoginToken, clearSession } from "./db";
+import { createContactSubmission, saveWizardAnswers, getWizardAnswers, getRecentActivity, getDashboardStats, getUserById, updateUserStripeInfo, getUserByEmail, createEmailUser, confirmUserEmail, getUserByConfirmToken, getUserByCheckoutToken, setLoginToken, clearSession, createSession, setUserPassword } from "./db";
 import { TRPCError } from "@trpc/server";
 import { getUncachableStripeClient, getStripePublishableKey } from "./stripeClient";
 import { sql } from "drizzle-orm";
@@ -1071,6 +1071,33 @@ export const appRouter = router({
     const emailCooldowns = new Map<string, number>();
     const EMAIL_COOLDOWN_MS = 120_000;
     const pollingNonces = new Map<string, { email: string; expiresAt: number }>();
+    const loginAttempts = new Map<string, { count: number; blockedUntil: number }>();
+    const MAX_LOGIN_ATTEMPTS = 5;
+    const LOGIN_BLOCK_MS = 300_000;
+
+    function checkLoginThrottle(email: string) {
+      const key = email.toLowerCase();
+      const attempt = loginAttempts.get(key);
+      if (attempt && Date.now() < attempt.blockedUntil) {
+        const waitMins = Math.ceil((attempt.blockedUntil - Date.now()) / 60000);
+        throw new TRPCError({ code: "TOO_MANY_REQUESTS", message: `Too many login attempts. Please try again in ${waitMins} minute${waitMins > 1 ? 's' : ''}.` });
+      }
+    }
+
+    function recordLoginFailure(email: string) {
+      const key = email.toLowerCase();
+      const attempt = loginAttempts.get(key) ?? { count: 0, blockedUntil: 0 };
+      attempt.count += 1;
+      if (attempt.count >= MAX_LOGIN_ATTEMPTS) {
+        attempt.blockedUntil = Date.now() + LOGIN_BLOCK_MS;
+        attempt.count = 0;
+      }
+      loginAttempts.set(key, attempt);
+    }
+
+    function clearLoginFailures(email: string) {
+      loginAttempts.delete(email.toLowerCase());
+    }
 
     function checkEmailCooldown(email: string) {
       const lastSent = emailCooldowns.get(email.toLowerCase());
@@ -1232,6 +1259,57 @@ export const appRouter = router({
         }
 
         return { sent: true };
+      }),
+
+    loginWithPassword: publicProcedure
+      .input(z.object({
+        email: z.string().email(),
+        password: z.string().min(1),
+      }))
+      .mutation(async ({ ctx, input }) => {
+        checkLoginThrottle(input.email);
+        const bcrypt = await import("bcryptjs");
+        const user = await getUserByEmail(input.email);
+        if (!user || !user.passwordHash) {
+          recordLoginFailure(input.email);
+          throw new TRPCError({ code: "UNAUTHORIZED", message: "Invalid email or password." });
+        }
+        const valid = await bcrypt.compare(input.password, user.passwordHash);
+        if (!valid) {
+          recordLoginFailure(input.email);
+          throw new TRPCError({ code: "UNAUTHORIZED", message: "Invalid email or password." });
+        }
+        clearLoginFailures(input.email);
+        const sessionToken = nanoid(64);
+        await createSession(user.id, sessionToken);
+        ctx.res.cookie("ebp_session", sessionToken, {
+          maxAge: 30 * 24 * 60 * 60 * 1000,
+          httpOnly: true,
+          sameSite: "lax",
+          secure: process.env.NODE_ENV === "production",
+          path: "/",
+        });
+        return { success: true };
+      }),
+
+    setPassword: publicProcedure
+      .input(z.object({
+        email: z.string().email(),
+        password: z.string().min(8).max(128),
+        checkoutToken: z.string().min(1),
+      }))
+      .mutation(async ({ input }) => {
+        const user = await getUserByCheckoutToken(input.checkoutToken);
+        if (!user || user.email?.toLowerCase() !== input.email.toLowerCase()) {
+          throw new TRPCError({ code: "FORBIDDEN", message: "Invalid credentials. Cannot set password." });
+        }
+        if (!user.emailConfirmed) {
+          throw new TRPCError({ code: "FORBIDDEN", message: "Please confirm your email before setting a password." });
+        }
+        const bcrypt = await import("bcryptjs");
+        const hash = await bcrypt.hash(input.password, 12);
+        await setUserPassword(user.id, hash);
+        return { success: true };
       }),
 
     logout: publicProcedure

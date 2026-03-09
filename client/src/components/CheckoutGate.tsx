@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Mail, CheckCircle2, Loader2, ShieldCheck, RefreshCw } from "lucide-react";
+import { Mail, CheckCircle2, Loader2, ShieldCheck, RefreshCw, Eye, EyeOff } from "lucide-react";
 import { trpc } from "@/lib/trpc";
 import { toast } from "sonner";
 
@@ -19,6 +19,8 @@ export default function CheckoutGate({ open, onClose, onConfirmed, planName }: C
   const [step, setStep] = useState<"register" | "waiting" | "done">("register");
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
   const [agreedTerms, setAgreedTerms] = useState(false);
   const [showResend, setShowResend] = useState(false);
   const [devConfirmUrl, setDevConfirmUrl] = useState<string | null>(null);
@@ -29,6 +31,7 @@ export default function CheckoutGate({ open, onClose, onConfirmed, planName }: C
   const registerMutation = trpc.account.register.useMutation();
   const resendMutation = trpc.account.resendConfirmation.useMutation();
   const checkStatusMutation = trpc.account.checkEmailStatus.useMutation();
+  const setPasswordMutation = trpc.account.setPassword.useMutation();
 
   useEffect(() => {
     return () => {
@@ -37,6 +40,16 @@ export default function CheckoutGate({ open, onClose, onConfirmed, planName }: C
     };
   }, []);
 
+  const savePasswordIfSet = async (checkoutToken: string) => {
+    if (password.trim().length >= 8 && email.trim()) {
+      try {
+        await setPasswordMutation.mutateAsync({ email: email.trim(), password: password.trim(), checkoutToken });
+      } catch {
+        toast.error("Password could not be saved. You can set it later from the login page.");
+      }
+    }
+  };
+
   const startPolling = (nonce: string) => {
     if (pollRef.current) clearInterval(pollRef.current);
     pollRef.current = setInterval(async () => {
@@ -44,6 +57,7 @@ export default function CheckoutGate({ open, onClose, onConfirmed, planName }: C
         const result = await checkStatusMutation.mutateAsync({ pollNonce: nonce });
         if (result.confirmed && result.checkoutToken) {
           if (pollRef.current) clearInterval(pollRef.current);
+          await savePasswordIfSet(result.checkoutToken);
           setStep("done");
           toast.success("Email confirmed! Proceeding to checkout...");
           setTimeout(() => onConfirmed(result.checkoutToken!), 800);
@@ -125,9 +139,11 @@ export default function CheckoutGate({ open, onClose, onConfirmed, planName }: C
       const data = await resp.json();
       if (data?.result?.data?.json?.success) {
         if (pollRef.current) clearInterval(pollRef.current);
+        const ct = data.result.data.json.checkoutToken;
+        await savePasswordIfSet(ct);
         setStep("done");
         toast.success("Email confirmed! Proceeding to checkout...");
-        setTimeout(() => onConfirmed(data.result.data.json.checkoutToken), 800);
+        setTimeout(() => onConfirmed(ct), 800);
       }
     } catch {
       toast.error("Auto-confirm failed.");
@@ -140,6 +156,8 @@ export default function CheckoutGate({ open, onClose, onConfirmed, planName }: C
     setStep("register");
     setName("");
     setEmail("");
+    setPassword("");
+    setShowPassword(false);
     setAgreedTerms(false);
     setDevConfirmUrl(null);
     setPollNonce(null);
@@ -189,6 +207,30 @@ export default function CheckoutGate({ open, onClose, onConfirmed, planName }: C
                 className="bg-white border-[#c9a96e]/30 focus:border-[#c9a96e]"
               />
             </div>
+            <div className="space-y-2">
+              <Label htmlFor="gate-password" className="text-[#3a2a14]">
+                Password <span className="text-[#7a6e60] font-normal text-xs">(min 8 characters)</span>
+              </Label>
+              <div className="relative">
+                <Input
+                  id="gate-password"
+                  type={showPassword ? "text" : "password"}
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  placeholder="Create a password"
+                  required
+                  minLength={8}
+                  className="bg-white border-[#c9a96e]/30 focus:border-[#c9a96e] pr-10"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-[#7a6e60] hover:text-[#3a2a14]"
+                >
+                  {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                </button>
+              </div>
+            </div>
             <div className="flex items-start gap-2">
               <Checkbox
                 id="gate-terms"
@@ -205,7 +247,7 @@ export default function CheckoutGate({ open, onClose, onConfirmed, planName }: C
             </div>
             <Button
               type="submit"
-              disabled={registerMutation.isPending || !name.trim() || !email.trim() || !agreedTerms}
+              disabled={registerMutation.isPending || !name.trim() || !email.trim() || password.trim().length < 8 || !agreedTerms}
               className="w-full bg-[#c9a96e] hover:bg-[#b8944f] text-[#1a1008] font-semibold"
             >
               {registerMutation.isPending ? (
