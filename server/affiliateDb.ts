@@ -101,6 +101,59 @@ export async function getPayoutsByAffiliate(affiliateId: number) {
     .orderBy(desc(affiliatePayouts.createdAt));
 }
 
+export async function getAllAffiliates() {
+  const db = await getDb();
+  if (!db) return [];
+  return db.select().from(affiliates).orderBy(desc(affiliates.createdAt));
+}
+
+export async function markPayoutCompleted(affiliateId: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  const aff = await getAffiliateById(affiliateId);
+  if (!aff) throw new Error("Affiliate not found");
+  if (!aff.paypalEmail) throw new Error("Affiliate has no PayPal email");
+
+  const pendingConvs = await db.select()
+    .from(affiliateConversions)
+    .where(and(
+      eq(affiliateConversions.affiliateId, affiliateId),
+      sql`${affiliateConversions.status} IN ('pending', 'approved')`
+    ));
+
+  if (pendingConvs.length === 0) throw new Error("No pending conversions to pay");
+
+  const totalAmount = pendingConvs.reduce((sum, c) => sum + parseFloat(c.commissionAmount), 0);
+  if (totalAmount < 50) throw new Error(`Payout amount $${totalAmount.toFixed(2)} is below $50 minimum threshold`);
+
+  const convIds = pendingConvs.map(c => c.id);
+  const amountStr = totalAmount.toFixed(2);
+
+  const [payout] = await db.insert(affiliatePayouts).values({
+    affiliateId,
+    amount: amountStr,
+    paypalEmail: aff.paypalEmail,
+    conversionIds: convIds,
+    status: "completed",
+    processedAt: new Date(),
+  }).returning();
+
+  await db.update(affiliates).set({
+    pendingEarnings: sql`GREATEST(${affiliates.pendingEarnings}::numeric - ${amountStr}::numeric, 0)`,
+    updatedAt: new Date(),
+  }).where(eq(affiliates.id, affiliateId));
+
+  for (const cid of convIds) {
+    await db.update(affiliateConversions).set({
+      status: "paid",
+      paidAt: new Date(),
+    }).where(eq(affiliateConversions.id, cid));
+  }
+
+  return payout;
+}
+
 export async function getAffiliateStats(affiliateId: number) {
   const db = await getDb();
   if (!db) return null;

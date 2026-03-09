@@ -1410,6 +1410,65 @@ export const appRouter = router({
     }),
   }),
 
+  admin: (() => {
+    const adminProcedure = protectedProcedure.use(async ({ ctx, next }) => {
+      if (!ctx.user?.isAdmin) {
+        throw new TRPCError({ code: "FORBIDDEN", message: "Admin access required" });
+      }
+      return next();
+    });
+
+    return router({
+      getAffiliatePayouts: adminProcedure.query(async () => {
+        const { getAllAffiliates, getConversionsByAffiliate, getPayoutsByAffiliate } = await import("./affiliateDb");
+        const allAffiliates = await getAllAffiliates();
+        const results = await Promise.all(allAffiliates.map(async (aff) => {
+          const conversions = await getConversionsByAffiliate(aff.id, 1000);
+          const payouts = await getPayoutsByAffiliate(aff.id);
+          const pendingConversions = conversions.filter(c => c.status === "pending" || c.status === "approved");
+          return {
+            id: aff.id,
+            name: aff.name,
+            email: aff.email,
+            affiliateCode: aff.affiliateCode,
+            paypalEmail: aff.paypalEmail,
+            status: aff.status,
+            totalClicks: aff.totalClicks,
+            totalConversions: aff.totalConversions,
+            totalEarnings: aff.totalEarnings,
+            pendingEarnings: aff.pendingEarnings,
+            createdAt: aff.createdAt,
+            pendingConversions: pendingConversions.map(c => ({
+              id: c.id,
+              planName: c.planName,
+              saleAmount: c.saleAmount,
+              commissionAmount: c.commissionAmount,
+              createdAt: c.createdAt,
+            })),
+            recentPayouts: payouts.slice(0, 10).map(p => ({
+              id: p.id,
+              amount: p.amount,
+              status: p.status,
+              processedAt: p.processedAt,
+              createdAt: p.createdAt,
+            })),
+          };
+        }));
+        return results;
+      }),
+
+      recordPayout: adminProcedure
+        .input(z.object({
+          affiliateId: z.number(),
+        }))
+        .mutation(async ({ input }) => {
+          const { markPayoutCompleted } = await import("./affiliateDb");
+          const payout = await markPayoutCompleted(input.affiliateId);
+          return { success: true, payoutId: payout?.id, amount: payout?.amount };
+        }),
+    });
+  })(),
+
   affiliate: router({
     submitApplication: publicProcedure
       .input(z.object({

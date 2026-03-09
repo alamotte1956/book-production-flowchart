@@ -133,6 +133,15 @@ PostgreSQL via Replit's built-in database. Use `npx drizzle-kit push` to sync sc
 - **SEO Footer**: Global `SiteFooter` component with links to all 14 public pages, export format badges, and copyright. Added to every page (via DashboardLayout for sidebar pages, directly for standalone pages)
 - **Related Tools Cross-Linking**: `RelatedTools` component shows 6 contextual tool links on every tool page for internal SEO link equity
 
+## Admin Panel
+
+- **Admin Payouts Page**: `/admin/payouts` — admin-only page for managing affiliate payouts
+- **Access Control**: Admin endpoints use `adminProcedure` middleware that checks `ctx.user.isAdmin`
+- **Features**: Summary stats (total affiliates, pending payouts, all-time earnings), expandable affiliate cards with PayPal emails, pending conversions table, payout history, "Mark as Paid" button
+- **Payout Flow**: Server-authoritative — `markPayoutCompleted` computes amount from all pending/approved conversions, enforces $50 minimum, records payout, reduces pending balance, marks conversions as paid
+- **tRPC Routes**: `admin.getAffiliatePayouts`, `admin.recordPayout`
+- **Auto-admin**: `alamotte1956@gmail.com` is auto-promoted to admin on server startup via `ensureOwnerAdmin()`
+
 ## Affiliate Program
 
 - **Commission**: 20% on every sale, no cap on earnings

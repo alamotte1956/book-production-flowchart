@@ -25,6 +25,7 @@ import ConfirmEmail from "./pages/ConfirmEmail";
 import AffiliateProgram from "./pages/AffiliateProgram";
 import AffiliateDashboard from "./pages/AffiliateDashboard";
 import Login from "./pages/Login";
+import AdminPayouts from "./pages/AdminPayouts";
 
 function Router() {
   return (
@@ -34,6 +35,7 @@ function Router() {
       <Route path={"/pricing"} component={Pricing} />
       <Route path={"/privacy-terms"} component={PrivacyTerms} />
       <Route path={"/login"} component={Login} />
+      <Route path={"/admin/payouts"} component={AdminPayouts} />
       <Route path={"/confirm-email"} component={ConfirmEmail} />
       <Route path={"/affiliates"} component={AffiliateProgram} />
       <Route path={"/affiliate-dashboard"} component={AffiliateDashboard} />
