@@ -68,37 +68,27 @@ async function initStripe() {
   }
 }
 
-async function cleanupLegacyDemoData() {
+async function ensureOwnerAdmin() {
   if (!process.env.DATABASE_URL) return;
+  const OWNER_EMAIL = "alamotte1956@gmail.com";
   try {
     const { Pool } = await import("pg");
     const pool = new Pool({ connectionString: process.env.DATABASE_URL });
-    const { rows } = await pool.query(
-      "SELECT id FROM wizard_sessions WHERE answers::text LIKE '%Eye Care%'"
+    const { rowCount } = await pool.query(
+      `UPDATE users SET "isAdmin" = true, role = 'admin', plan = 'publisher' WHERE email = $1 AND ("isAdmin" = false OR plan != 'publisher')`,
+      [OWNER_EMAIL]
     );
-    for (const row of rows) {
-      await pool.query("DELETE FROM wizard_sessions WHERE id = $1", [row.id]);
-      console.log(`[Cleanup] Removed legacy wizard session id=${row.id}`);
-    }
-    const { rows: legacyProjects } = await pool.query(
-      "SELECT id FROM projects WHERE title LIKE '%Eye Care%'"
-    );
-    for (const row of legacyProjects) {
-      await pool.query("DELETE FROM step_statuses WHERE project_id = $1", [row.id]);
-      await pool.query("DELETE FROM phase_due_dates WHERE project_id = $1", [row.id]);
-      await pool.query("DELETE FROM production_jobs WHERE project_id = $1", [row.id]);
-      await pool.query("DELETE FROM uploaded_files WHERE project_id = $1", [row.id]);
-      await pool.query("DELETE FROM projects WHERE id = $1", [row.id]);
-      console.log(`[Cleanup] Removed legacy project id=${row.id}`);
+    if (rowCount && rowCount > 0) {
+      console.log(`[Admin] Promoted ${OWNER_EMAIL} to admin with publisher plan`);
     }
     await pool.end();
   } catch (err) {
-    console.warn("[Cleanup] Error:", err);
+    console.warn("[Admin] Error:", err);
   }
 }
 
 async function startServer() {
-  await cleanupLegacyDemoData();
+  await ensureOwnerAdmin();
   const app = express();
   const server = createServer(app);
 
