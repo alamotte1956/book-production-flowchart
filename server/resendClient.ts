@@ -19,7 +19,12 @@ export function getUncachableResendClient() {
 export async function sendConfirmationEmail(toEmail: string, token: string, userName: string) {
   const { client, brandFromEmail } = getUncachableResendClient();
 
-  const confirmUrl = `https://easybookpublishers.com/confirm-email?token=${token}`;
+  const baseUrl = process.env.REPLIT_DEV_DOMAIN
+    ? `https://${process.env.REPLIT_DEV_DOMAIN}`
+    : process.env.REPLIT_DEPLOYMENT === '1'
+      ? 'https://easybookpublishers.com'
+      : 'https://easybookpublishers.com';
+  const confirmUrl = `${baseUrl}/confirm-email?token=${token}`;
 
   const { data, error } = await client.emails.send({
     from: brandFromEmail,
