@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Check, X, ArrowRight, BookOpen, Zap, Crown, HelpCircle, Loader2 } from "lucide-react";
+import { Check, X, ArrowRight, BookOpen, Zap, Crown, HelpCircle, Loader2, Rocket } from "lucide-react";
 import { useLocation } from "wouter";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { trpc } from "@/lib/trpc";
@@ -16,6 +16,7 @@ type BillingCycle = "monthly" | "annual" | "lifetime";
 const PLAN_NAME_MAP: Record<string, string> = {
   "Author Pro": "author_pro",
   "Publisher": "publisher",
+  "KDP Ready": "kdp_ready",
 };
 
 const tiers = [
@@ -46,6 +47,35 @@ const tiers = [
       { name: "Amazon KDP-ready PDF export", included: false },
       { name: "InDesign IDML export", included: false },
       { name: "40+ book templates", included: false },
+      { name: "Production timeline", included: false },
+      { name: "Priority support", included: false },
+    ],
+  },
+  {
+    name: "KDP Ready",
+    monthly: "$6.99",
+    annual: "$4.99",
+    lifetime: "$49",
+    period: { monthly: "/month", annual: "/mo (billed annually)", lifetime: "one-time" },
+    description: "Already have a manuscript? Upload it, pick a template, and get KDP-ready files — fast.",
+    icon: Rocket,
+    cta: "Get KDP Ready",
+    ctaVariant: "default" as const,
+    highlight: false,
+    badge: "Self-Publishers",
+    features: [
+      { name: "1 book project", included: true },
+      { name: "AI typesetting (PDF + EPUB)", included: true },
+      { name: "Amazon KDP-ready PDF export", included: true },
+      { name: "40+ book templates", included: true },
+      { name: "Spine calculator", included: true },
+      { name: "Cover spec designer", included: true },
+      { name: "ISBN & ONIX 3.0 metadata", included: true },
+      { name: "30+ manuscript formats accepted", included: true },
+      { name: "Cross-platform (any browser)", included: true },
+      { name: "30-step production workflow", included: false },
+      { name: "Unlimited book projects", included: false },
+      { name: "InDesign IDML export", included: false },
       { name: "Production timeline", included: false },
       { name: "Priority support", included: false },
     ],
@@ -116,28 +146,28 @@ const tiers = [
   },
 ];
 
-const comparisonFeatures: Array<{ name: string; tooltip?: string; starter: string | boolean; author: string | boolean; publisher: string | boolean }> = [
-  { name: "Book Projects", starter: "1", author: "Unlimited", publisher: "Unlimited" },
-  { name: "Production Workflow", starter: "30 steps", author: "30 steps", publisher: "30 steps" },
-  { name: "Cross-Platform Access", tooltip: "Works on any device with a browser — Windows, Mac, Linux, Chromebook, iPad", starter: true, author: true, publisher: true },
-  { name: "Manuscript Import", tooltip: "Accept 30+ formats including DOCX, PDF, TXT, RTF, and more", starter: true, author: true, publisher: true },
-  { name: "Bible Design Studio", starter: true, author: true, publisher: true },
-  { name: "Spine Calculator", starter: true, author: true, publisher: true },
-  { name: "Cover Spec Designer", starter: true, author: true, publisher: true },
-  { name: "Print Spec Generator", starter: true, author: true, publisher: true },
-  { name: "ISBN & ONIX 3.0 Metadata", tooltip: "Full ISBN management and ONIX 3.0 XML export for retailers", starter: true, author: true, publisher: true },
-  { name: "Publishing Resources Hub", starter: true, author: true, publisher: true },
-  { name: "Guided Publishing Journey", starter: true, author: true, publisher: true },
-  { name: "AI Typesetting Engine", tooltip: "Automated book layout with professional styles — like Atticus + Vellum combined", starter: false, author: true, publisher: true },
-  { name: "PDF Export (Screen)", starter: false, author: true, publisher: true },
-  { name: "EPUB 3 Export", tooltip: "Standard EPUB 3 compatible with all major retailers", starter: false, author: true, publisher: true },
-  { name: "Amazon KDP-Ready PDF", tooltip: "Print-ready PDF with bleed, gutter, and trim marks per Amazon specs", starter: false, author: true, publisher: true },
-  { name: "InDesign IDML Export", tooltip: "Export to Adobe InDesign format for advanced customization — competitors don't offer this", starter: false, author: true, publisher: true },
-  { name: "40+ Book Templates", tooltip: "Professional templates with customizable styles and trim presets", starter: false, author: true, publisher: true },
-  { name: "Production Timeline", tooltip: "Gantt chart and deadline tracking for all 30 steps", starter: false, author: true, publisher: true },
-  { name: "Priority Support", starter: false, author: false, publisher: true },
-  { name: "Dedicated Account Manager", starter: false, author: false, publisher: true },
-  { name: "Custom Branding on Exports", starter: false, author: false, publisher: true },
+const comparisonFeatures: Array<{ name: string; tooltip?: string; starter: string | boolean; kdp: string | boolean; author: string | boolean; publisher: string | boolean }> = [
+  { name: "Book Projects", starter: "1", kdp: "1", author: "Unlimited", publisher: "Unlimited" },
+  { name: "Production Workflow", starter: "30 steps", kdp: false, author: "30 steps", publisher: "30 steps" },
+  { name: "Cross-Platform Access", tooltip: "Works on any device with a browser — Windows, Mac, Linux, Chromebook, iPad", starter: true, kdp: true, author: true, publisher: true },
+  { name: "Manuscript Import", tooltip: "Accept 30+ formats including DOCX, PDF, TXT, RTF, and more", starter: true, kdp: true, author: true, publisher: true },
+  { name: "Bible Design Studio", starter: true, kdp: false, author: true, publisher: true },
+  { name: "Spine Calculator", starter: true, kdp: true, author: true, publisher: true },
+  { name: "Cover Spec Designer", starter: true, kdp: true, author: true, publisher: true },
+  { name: "Print Spec Generator", starter: true, kdp: false, author: true, publisher: true },
+  { name: "ISBN & ONIX 3.0 Metadata", tooltip: "Full ISBN management and ONIX 3.0 XML export for retailers", starter: true, kdp: true, author: true, publisher: true },
+  { name: "Publishing Resources Hub", starter: true, kdp: false, author: true, publisher: true },
+  { name: "Guided Publishing Journey", starter: true, kdp: true, author: true, publisher: true },
+  { name: "AI Typesetting Engine", tooltip: "Automated book layout with professional styles — like Atticus + Vellum combined", starter: false, kdp: true, author: true, publisher: true },
+  { name: "PDF Export (Screen)", starter: false, kdp: true, author: true, publisher: true },
+  { name: "EPUB 3 Export", tooltip: "Standard EPUB 3 compatible with all major retailers", starter: false, kdp: true, author: true, publisher: true },
+  { name: "Amazon KDP-Ready PDF", tooltip: "Print-ready PDF with bleed, gutter, and trim marks per Amazon specs", starter: false, kdp: true, author: true, publisher: true },
+  { name: "InDesign IDML Export", tooltip: "Export to Adobe InDesign format for advanced customization — competitors don't offer this", starter: false, kdp: false, author: true, publisher: true },
+  { name: "40+ Book Templates", tooltip: "Professional templates with customizable styles and trim presets", starter: false, kdp: true, author: true, publisher: true },
+  { name: "Production Timeline", tooltip: "Gantt chart and deadline tracking for all 30 steps", starter: false, kdp: false, author: true, publisher: true },
+  { name: "Priority Support", starter: false, kdp: false, author: false, publisher: true },
+  { name: "Dedicated Account Manager", starter: false, kdp: false, author: false, publisher: true },
+  { name: "Custom Branding on Exports", starter: false, kdp: false, author: false, publisher: true },
 ];
 
 const competitors = [
@@ -196,7 +226,7 @@ export default function Pricing() {
     setGateOpen(false);
     setLoadingTier(pendingTier);
     try {
-      const planName = (PLAN_NAME_MAP[pendingTier] ?? "author_pro") as "author_pro" | "publisher";
+      const planName = (PLAN_NAME_MAP[pendingTier] ?? "author_pro") as "kdp_ready" | "author_pro" | "publisher";
       const result = await checkoutMutation.mutateAsync({
         priceId,
         billingCycle: billing,
@@ -264,7 +294,7 @@ export default function Pricing() {
           </div>
         </div>
 
-        <div className="grid md:grid-cols-3 gap-8 mb-24">
+        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6 mb-24">
           {tiers.map((tier) => {
             const Icon = tier.icon;
             const price = tier[billing];
@@ -373,6 +403,7 @@ export default function Pricing() {
                   <tr className="border-b-2 border-[#c9a96e]/20">
                     <th className="text-left py-4 px-4 font-serif text-lg text-[#1a1008]">Feature</th>
                     <th className="text-center py-4 px-4 font-serif text-lg text-[#1a1008]">Starter</th>
+                    <th className="text-center py-4 px-4 font-serif text-lg text-[#1a1008]">KDP Ready</th>
                     <th className="text-center py-4 px-4 font-serif text-lg text-[#1a1008] bg-[#c9a96e]/5">Author Pro</th>
                     <th className="text-center py-4 px-4 font-serif text-lg text-[#1a1008]">Publisher</th>
                   </tr>
@@ -395,7 +426,7 @@ export default function Pricing() {
                           )}
                         </span>
                       </td>
-                      {(["starter", "author", "publisher"] as const).map((plan) => (
+                      {(["starter", "kdp", "author", "publisher"] as const).map((plan) => (
                         <td
                           key={plan}
                           className={`py-3 px-4 text-center text-sm ${plan === "author" ? "bg-[#c9a96e]/5" : ""}`}

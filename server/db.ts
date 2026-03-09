@@ -633,7 +633,7 @@ export async function getUserById(userId: number) {
 
 export async function updateUserStripeInfo(
   userId: number,
-  info: { stripeCustomerId?: string; stripeSubscriptionId?: string | null; plan?: "starter" | "author_pro" | "publisher" }
+  info: { stripeCustomerId?: string; stripeSubscriptionId?: string | null; plan?: "starter" | "kdp_ready" | "author_pro" | "publisher" }
 ) {
   const db = await getDb();
   if (!db) return null;

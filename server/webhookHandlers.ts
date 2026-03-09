@@ -28,7 +28,7 @@ export class WebhookHandlers {
       case 'checkout.session.completed': {
         const session = event.data.object;
         const userId = parseInt(session.metadata?.userId, 10);
-        const planName = session.metadata?.planName as 'author_pro' | 'publisher' | undefined;
+        const planName = session.metadata?.planName as 'kdp_ready' | 'author_pro' | 'publisher' | undefined;
         if (!userId || !planName) return;
 
         const update: Parameters<typeof updateUserStripeInfo>[1] = {
@@ -76,7 +76,7 @@ export class WebhookHandlers {
         if (!userId) return;
 
         if (subscription.status === 'active') {
-          const planName = subscription.metadata?.planName as 'author_pro' | 'publisher' | undefined;
+          const planName = subscription.metadata?.planName as 'kdp_ready' | 'author_pro' | 'publisher' | undefined;
           if (planName) {
             await updateUserStripeInfo(userId, {
               plan: planName,

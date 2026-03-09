@@ -8,7 +8,7 @@ export const errorTypeEnum = pgEnum("error_type", ["format_unsupported", "parse_
 /**
  * Core user table backing auth flow.
  */
-export const planEnum = pgEnum("plan", ["starter", "author_pro", "publisher"]);
+export const planEnum = pgEnum("plan", ["starter", "kdp_ready", "author_pro", "publisher"]);
 
 export const users = pgTable("users", {
   id: serial("id").primaryKey(),

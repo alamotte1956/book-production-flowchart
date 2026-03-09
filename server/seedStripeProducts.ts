@@ -18,6 +18,42 @@ async function seedProducts() {
     return;
   }
 
+  const kdpReady = await stripe.products.create({
+    name: 'KDP Ready',
+    description: 'Upload your manuscript, pick a template, and get KDP-ready PDF and EPUB files. Perfect for self-publishers.',
+    metadata: {
+      app: 'easy-book-publishers',
+      planName: 'kdp_ready',
+    },
+  });
+  console.log(`Created product: ${kdpReady.name} (${kdpReady.id})`);
+
+  const kdpReadyMonthly = await stripe.prices.create({
+    product: kdpReady.id,
+    unit_amount: 699,
+    currency: 'usd',
+    recurring: { interval: 'month' },
+    metadata: { billingCycle: 'monthly', planName: 'kdp_ready' },
+  });
+  console.log(`  Monthly: ${kdpReadyMonthly.id} — $6.99/mo`);
+
+  const kdpReadyAnnual = await stripe.prices.create({
+    product: kdpReady.id,
+    unit_amount: 5988,
+    currency: 'usd',
+    recurring: { interval: 'year' },
+    metadata: { billingCycle: 'annual', planName: 'kdp_ready' },
+  });
+  console.log(`  Annual: ${kdpReadyAnnual.id} — $59.88/yr ($4.99/mo)`);
+
+  const kdpReadyLifetime = await stripe.prices.create({
+    product: kdpReady.id,
+    unit_amount: 4900,
+    currency: 'usd',
+    metadata: { billingCycle: 'lifetime', planName: 'kdp_ready' },
+  });
+  console.log(`  Lifetime: ${kdpReadyLifetime.id} — $49.00`);
+
   const authorPro = await stripe.products.create({
     name: 'Author Pro',
     description: 'Full publishing toolkit with AI-powered typesetting, KDP export, unlimited projects.',

@@ -5,10 +5,11 @@ import { Input } from "@/components/ui/input";
 import {
   BookOpen, Zap, FileText, Users, Clock, Tag, Printer,
   ChevronRight, Check, BookMarked, Feather,
-  GraduationCap, Heart, Baby, Globe, Sparkles,
+  GraduationCap, Heart, Baby, Globe, Sparkles, Briefcase, Rocket,
 } from "lucide-react";
 
 export type WizardAnswers = {
+  pathway: string;
   bookType: string;
   bookTitle: string;
   authorName: string;
@@ -83,7 +84,20 @@ const TIMELINE_OPTIONS: Option[] = [
   { id: "6-plus-months", label: "6+ Months", description: "This is a long-term project — I'm planning well in advance", icon: BookOpen, color: "text-purple-600 bg-purple-50 border-purple-200" },
 ];
 
-const STEPS = [
+const PATHWAY_OPTIONS: Option[] = [
+  { id: "professional", label: "Publishing Professional", description: "I need the full production workflow — editorial, design, typesetting, proofing, distribution, and project management tools", icon: Briefcase, color: "text-purple-600 bg-purple-50 border-purple-200" },
+  { id: "kdp-self-publish", label: "Self-Publish on Amazon KDP", description: "I have a finished manuscript and just need it formatted into a KDP-ready PDF and EPUB so I can publish on Amazon", icon: Rocket, color: "text-emerald-600 bg-emerald-50 border-emerald-200" },
+];
+
+type StepDef = {
+  id: string;
+  title: string;
+  subtitle: string;
+  icon: React.ElementType;
+};
+
+const ALL_STEPS: StepDef[] = [
+  { id: "pathway", title: "How can we help you?", subtitle: "Choose the path that best describes what you need. We'll tailor everything to fit.", icon: Sparkles },
   { id: "book-type", title: "What do you want to publish?", subtitle: "Choose the type of book you're creating. This helps us tailor every step of your journey.", icon: BookOpen },
   { id: "book-details", title: "Tell us about your book", subtitle: "A working title and your name — you can always change these later.", icon: Feather },
   { id: "experience", title: "What's your publishing experience?", subtitle: "This helps us calibrate how much guidance to give you at each step.", icon: GraduationCap },
@@ -93,6 +107,15 @@ const STEPS = [
   { id: "audience", title: "Who is your target audience?", subtitle: "Your audience shapes everything from trim size to marketing strategy.", icon: Users },
   { id: "timeline", title: "What's your publishing timeline?", subtitle: "We'll build your production schedule around your target launch date.", icon: Clock },
 ];
+
+function getStepsForPathway(pathway: string): StepDef[] {
+  if (pathway === "kdp-self-publish") {
+    return ALL_STEPS.filter(s =>
+      ["pathway", "book-type", "book-details", "format", "isbn", "timeline"].includes(s.id)
+    );
+  }
+  return ALL_STEPS;
+}
 
 function OptionGrid({ options, selected, onSelect }: { options: Option[]; selected: string; onSelect: (id: string) => void }) {
   return (
@@ -132,6 +155,7 @@ function OptionGrid({ options, selected, onSelect }: { options: Option[]; select
 export default function PublishingWizard({ onComplete, initialAnswers }: Props) {
   const [step, setStep] = useState(0);
   const [answers, setAnswers] = useState<WizardAnswers>({
+    pathway: initialAnswers?.pathway ?? "",
     bookType: initialAnswers?.bookType ?? "",
     bookTitle: initialAnswers?.bookTitle ?? "",
     authorName: initialAnswers?.authorName ?? "",
@@ -143,26 +167,44 @@ export default function PublishingWizard({ onComplete, initialAnswers }: Props) 
     timeline: initialAnswers?.timeline ?? "",
   });
 
-  const totalSteps = STEPS.length;
-  const currentStep = STEPS[step];
+  const steps = getStepsForPathway(answers.pathway);
+  const totalSteps = steps.length;
+  const currentStep = steps[step];
   const progress = ((step + 1) / totalSteps) * 100;
 
-  function canAdvance() {
-    switch (step) {
-      case 0: return !!answers.bookType;
-      case 1: return !!answers.bookTitle.trim() && !!answers.authorName.trim();
-      case 2: return !!answers.experience;
-      case 3: return !!answers.manuscriptStatus;
-      case 4: return !!answers.format;
-      case 5: return !!answers.hasIsbn;
-      case 6: return !!answers.audience;
-      case 7: return !!answers.timeline;
+  function canAdvanceForStep(stepId: string) {
+    switch (stepId) {
+      case "pathway": return !!answers.pathway;
+      case "book-type": return !!answers.bookType;
+      case "book-details": return !!answers.bookTitle.trim() && !!answers.authorName.trim();
+      case "experience": return !!answers.experience;
+      case "manuscript": return !!answers.manuscriptStatus;
+      case "format": return !!answers.format;
+      case "isbn": return !!answers.hasIsbn;
+      case "audience": return !!answers.audience;
+      case "timeline": return !!answers.timeline;
       default: return false;
     }
   }
 
+  function canAdvance() {
+    return currentStep ? canAdvanceForStep(currentStep.id) : false;
+  }
+
   function goNext() {
     if (!canAdvance()) return;
+    if (currentStep.id === "pathway") {
+      if (answers.pathway === "kdp-self-publish") {
+        setAnswers(a => ({
+          ...a,
+          experience: "first-time",
+          manuscriptStatus: "ready",
+          audience: "general",
+        }));
+      }
+      setStep(1);
+      return;
+    }
     if (step === totalSteps - 1) {
       onComplete(answers);
       return;
@@ -187,7 +229,7 @@ export default function PublishingWizard({ onComplete, initialAnswers }: Props) 
             Let's Publish Your Book
           </h1>
           <p className="text-[#7a6e60] mt-2 text-sm">
-            Answer {totalSteps} quick questions and we'll build your personalized publishing roadmap.
+            Answer a few quick questions and we'll build your personalized publishing roadmap.
           </p>
         </div>
 
@@ -205,7 +247,7 @@ export default function PublishingWizard({ onComplete, initialAnswers }: Props) 
             />
           </div>
           <div className="flex items-center justify-center gap-1.5 mt-3">
-            {STEPS.map((s, i) => (
+            {steps.map((s, i) => (
               <div
                 key={s.id}
                 className={`rounded-full transition-all duration-300 ${
@@ -238,11 +280,15 @@ export default function PublishingWizard({ onComplete, initialAnswers }: Props) 
                 </div>
               </div>
 
-              {step === 0 && (
+              {currentStep.id === "pathway" && (
+                <OptionGrid options={PATHWAY_OPTIONS} selected={answers.pathway} onSelect={v => setAnswers(a => ({ ...a, pathway: v }))} />
+              )}
+
+              {currentStep.id === "book-type" && (
                 <OptionGrid options={BOOK_TYPES} selected={answers.bookType} onSelect={v => setAnswers(a => ({ ...a, bookType: v }))} />
               )}
 
-              {step === 1 && (
+              {currentStep.id === "book-details" && (
                 <div className="space-y-5">
                   <div>
                     <label className="block text-sm font-semibold text-[#5c3d2e] mb-1.5">Working Title</label>
@@ -268,19 +314,19 @@ export default function PublishingWizard({ onComplete, initialAnswers }: Props) 
                 </div>
               )}
 
-              {step === 2 && (
+              {currentStep.id === "experience" && (
                 <OptionGrid options={EXPERIENCE_OPTIONS} selected={answers.experience} onSelect={v => setAnswers(a => ({ ...a, experience: v }))} />
               )}
 
-              {step === 3 && (
+              {currentStep.id === "manuscript" && (
                 <OptionGrid options={MANUSCRIPT_OPTIONS} selected={answers.manuscriptStatus} onSelect={v => setAnswers(a => ({ ...a, manuscriptStatus: v }))} />
               )}
 
-              {step === 4 && (
+              {currentStep.id === "format" && (
                 <OptionGrid options={FORMAT_OPTIONS} selected={answers.format} onSelect={v => setAnswers(a => ({ ...a, format: v }))} />
               )}
 
-              {step === 5 && (
+              {currentStep.id === "isbn" && (
                 <div className="space-y-4">
                   <div className="rounded-xl bg-[#fdf5e4] border border-[#e8c87a]/40 p-4 text-sm text-[#5c3d2e]">
                     <p className="font-semibold mb-1">What is an ISBN?</p>
@@ -294,11 +340,11 @@ export default function PublishingWizard({ onComplete, initialAnswers }: Props) 
                 </div>
               )}
 
-              {step === 6 && (
+              {currentStep.id === "audience" && (
                 <OptionGrid options={AUDIENCE_OPTIONS} selected={answers.audience} onSelect={v => setAnswers(a => ({ ...a, audience: v }))} />
               )}
 
-              {step === 7 && (
+              {currentStep.id === "timeline" && (
                 <OptionGrid options={TIMELINE_OPTIONS} selected={answers.timeline} onSelect={v => setAnswers(a => ({ ...a, timeline: v }))} />
               )}
             </motion.div>

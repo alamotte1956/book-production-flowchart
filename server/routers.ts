@@ -74,12 +74,12 @@ export const appRouter = router({
       .mutation(async ({ ctx, input }) => {
         const user = await getUserById(ctx.user.id);
         const plan = user?.plan ?? "starter";
-        if (plan === "starter" && !user?.isAdmin) {
+        if ((plan === "starter" || plan === "kdp_ready") && !user?.isAdmin) {
           const existing = await getProjectsByUser(ctx.user.id);
           if (existing.length >= 1) {
             throw new TRPCError({
               code: "FORBIDDEN",
-              message: "Starter plan is limited to 1 book project. Upgrade to Author Pro for unlimited projects.",
+              message: `Your ${plan === "kdp_ready" ? "KDP Ready" : "Starter"} plan is limited to 1 book project. Upgrade to Author Pro for unlimited projects.`,
             });
           }
         }
@@ -114,12 +114,12 @@ export const appRouter = router({
         }
         const user = await getUserById(ctx.user.id);
         const plan = user?.plan ?? "starter";
-        if (plan === "starter" && !user?.isAdmin) {
+        if ((plan === "starter" || plan === "kdp_ready") && !user?.isAdmin) {
           const existing = await getProjectsByUser(ctx.user.id);
           if (existing.length >= 1) {
             throw new TRPCError({
               code: "FORBIDDEN",
-              message: "Starter plan is limited to 1 book project. Upgrade to Author Pro for unlimited projects.",
+              message: `Your ${plan === "kdp_ready" ? "KDP Ready" : "Starter"} plan is limited to 1 book project. Upgrade to Author Pro for unlimited projects.`,
             });
           }
         }
@@ -1371,7 +1371,7 @@ export const appRouter = router({
       .input(z.object({
         priceId: z.string(),
         billingCycle: z.enum(["monthly", "annual", "lifetime"]),
-        planName: z.enum(["author_pro", "publisher"]),
+        planName: z.enum(["kdp_ready", "author_pro", "publisher"]),
         checkoutToken: z.string().min(1),
       }))
       .mutation(async ({ ctx, input }) => {
@@ -1425,7 +1425,7 @@ export const appRouter = router({
         const protocol = ctx.req.protocol || "https";
         const baseUrl = `${protocol}://${host}`;
 
-        const validatedPlanName = product.metadata.planName as "author_pro" | "publisher";
+        const validatedPlanName = product.metadata.planName as "kdp_ready" | "author_pro" | "publisher";
 
         let validatedAffiliateCode: string | null = null;
         const rawRef = (ctx.req as any).cookies?.ebp_ref;

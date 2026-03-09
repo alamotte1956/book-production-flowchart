@@ -2,7 +2,7 @@
 
 ## Project Overview
 
-A full-stack book production workflow management platform ("Manuscript to Masterpiece") that helps authors track all phases of book production from concept to publication.
+A full-stack book production workflow management platform ("Manuscript to Masterpiece") that helps authors track all phases of book production from concept to publication. Two distinct pathways: **Publishing Professional** (full 9-phase workflow) and **Self-Publish on Amazon KDP** (streamlined upload-format-publish flow).
 
 ## Tech Stack
 
@@ -87,7 +87,10 @@ PostgreSQL via Replit's built-in database. Use `npx drizzle-kit push` to sync sc
 
 - **9-Phase/30-Step Workflow Tracker**: Full book production pipeline from concept to publication
 - **Inline Editing**: Title, author, and genre editable inline in project tracker header
-- **Publishing Wizard**: 7-step onboarding wizard at `/guided-journey` with personalized roadmap
+- **Publishing Wizard**: Onboarding wizard at `/guided-journey` with two pathways:
+  - **Publishing Professional**: Full 9-step wizard → comprehensive roadmap with all 9 production phases
+  - **Self-Publish on KDP**: Streamlined 6-step wizard → focused roadmap (template → upload → format → cover → publish)
+  - Pathway choice is the first question; subsequent steps adapt based on selection
 - **Auto-Produce**: AI typesetting pipeline producing real production files:
   - **Interior PDF**: Puppeteer/Chromium rendered, press-ready with proper typography
   - **KDP Print-Ready PDF**: Amazon-compliant with 0.125" bleed, gutter margins scaled by page count
@@ -180,20 +183,22 @@ PostgreSQL via Replit's built-in database. Use `npx drizzle-kit push` to sync sc
 - **Schema**: `stripe.*` tables auto-synced (products, prices, customers, subscriptions, etc.) — NEVER INSERT directly
 - **Webhook**: `/api/stripe/webhook` route registered BEFORE `express.json()` with raw body parsing
 - **Products**: Created via `server/seedStripeProducts.ts` (run `npx tsx server/seedStripeProducts.ts`)
+  - KDP Ready: monthly ($6.99), annual ($59.88/yr), lifetime ($49) — for self-publishers who just need KDP formatting
   - Author Pro: monthly ($12.99), annual ($107.88/yr), lifetime ($132)
   - Publisher: monthly ($34.99), annual ($299.88/yr), lifetime ($349)
-- **User columns**: `plan` (enum: starter/author_pro/publisher), `stripeCustomerId`, `stripeSubscriptionId`
+- **User columns**: `plan` (enum: starter/kdp_ready/author_pro/publisher), `stripeCustomerId`, `stripeSubscriptionId`
 - **tRPC routes**: `stripe.getSubscription`, `stripe.createCheckoutSession`, `stripe.createBillingPortal`, `stripe.getProducts`, `stripe.getPublishableKey`, `stripe.getPriceIds`
 - **Webhook handlers**: `checkout.session.completed` (upgrades plan), `customer.subscription.updated`, `customer.subscription.deleted` (reverts to starter)
 - **Price IDs**: Dynamically fetched from Stripe via `stripe.getPriceIds` endpoint — automatically uses correct IDs for dev (test mode) and production (live mode). Products must have metadata `app=easy-book-publishers` and `planName`. Prices must have metadata `billingCycle` and `planName`.
 
 ## Feature Gating
 
-- **Hook**: `client/src/hooks/usePlan.ts` — `usePlan()` returns `{ plan, canAccess(feature), isStarter, isPro, isPublisher, projectLimit }`
+- **Hook**: `client/src/hooks/usePlan.ts` — `usePlan()` returns `{ plan, canAccess(feature), isStarter, isKdpReady, isPro, isPublisher, projectLimit }`
 - **Gate Component**: `client/src/components/UpgradeGate.tsx` — full-page or inline upgrade prompt
-- **Gated Features** (require Author Pro+): `ai_typesetting`, `kdp_export`, `timeline`, `templates`, `unlimited_projects`
+- **Gated Features** (require KDP Ready+): `ai_typesetting`, `kdp_export`, `templates`
+- **Gated Features** (require Author Pro+): `timeline`, `unlimited_projects`
 - **Publisher-only**: `priority_support`
-- **Starter limits**: 1 book project (enforced on backend in `server/routers.ts` project.create and project.duplicate)
+- **Starter limits**: 1 book project; **KDP Ready limits**: 1 book project (enforced on backend)
 - **Gated pages**: AutoProduce, Timeline, Templates use wrapper Gate components that render UpgradeGate for Starter users
 - **Dashboard Tool Hub**: Tools with `gatedFeature` show lock icon + "PRO" badge + "Upgrade >" for users without access; clicking redirects to /pricing. Uses `canAccess(feature)` from usePlan for proper plan-level checks.
 - **Sidebar**: Lock icons on gated items for Starter users, plan label under user name, "Upgrade Plan" CTA in footer

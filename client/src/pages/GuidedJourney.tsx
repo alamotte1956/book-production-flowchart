@@ -23,7 +23,81 @@ type RoadmapStep = {
   phase: string;
 };
 
+function generateKdpRoadmap(answers: WizardAnswers): RoadmapStep[] {
+  const steps: RoadmapStep[] = [];
+  const needsPrint = answers.format === "print" || answers.format === "both";
+  const needsEbook = answers.format === "ebook" || answers.format === "both";
+
+  steps.push({
+    title: "Pick a Book Template",
+    description: "Browse our template library and choose a layout that fits your book. Templates set your trim size, margins, fonts, and chapter styling automatically.",
+    icon: Globe,
+    toolPath: "/templates",
+    toolLabel: "Browse Templates",
+    phase: "Step 1",
+  });
+
+  steps.push({
+    title: "Upload & Format Your Manuscript",
+    description: needsEbook && needsPrint
+      ? "Upload your finished manuscript to Auto-Produce. It will generate a KDP-ready interior PDF and an EPUB — formatted, paginated, and ready to publish."
+      : needsEbook
+      ? "Upload your finished manuscript to Auto-Produce. It will generate a professionally formatted EPUB ready for Kindle publishing."
+      : "Upload your finished manuscript to Auto-Produce. It will generate a KDP-ready interior PDF — formatted, paginated, and print-ready.",
+    icon: Zap,
+    toolPath: "/auto-produce",
+    toolLabel: "Start Auto-Produce",
+    phase: "Step 2",
+  });
+
+  if (needsPrint) {
+    steps.push({
+      title: "Calculate Your Spine Width",
+      description: "Enter your page count and paper type to get the exact spine width Amazon KDP requires for your cover file.",
+      icon: Ruler,
+      toolPath: "/spine-calculator",
+      toolLabel: "Open Spine Calculator",
+      phase: "Step 3",
+    });
+
+    steps.push({
+      title: "Generate Your Cover Specs",
+      description: "Create a full-wrap cover template with the correct dimensions, bleed, barcode zone, and safe areas for KDP printing.",
+      icon: Layers,
+      toolPath: "/cover-designer",
+      toolLabel: "Open Cover Designer",
+      phase: "Step 4",
+    });
+  }
+
+  if (answers.hasIsbn === "need-isbn" || answers.hasIsbn === "what-is-isbn") {
+    steps.push({
+      title: answers.hasIsbn === "what-is-isbn" ? "Get an ISBN (or Use Amazon's Free One)" : "Set Up Your ISBN",
+      description: answers.hasIsbn === "what-is-isbn"
+        ? "Amazon KDP gives you a free ISBN, but buying your own gives you more control. We'll help you decide and set up your metadata."
+        : "Enter your ISBN and set up your book metadata — title, author, categories, and keywords for Amazon's search.",
+      icon: BookMarked,
+      toolPath: "/isbn-manager",
+      toolLabel: "Open ISBN Manager",
+      phase: needsPrint ? "Step 5" : "Step 3",
+    });
+  }
+
+  steps.push({
+    title: "Review & Publish on KDP",
+    description: "Download your formatted files and upload them to Amazon KDP. Set your price, categories, and description — then hit publish.",
+    icon: Sparkles,
+    phase: "Final Step",
+  });
+
+  return steps;
+}
+
 function generateRoadmap(answers: WizardAnswers): RoadmapStep[] {
+  if (answers.pathway === "kdp-self-publish") {
+    return generateKdpRoadmap(answers);
+  }
+
   const steps: RoadmapStep[] = [];
   const isBible = answers.bookType === "Bible / Scripture";
   const isChildrens = answers.bookType === "Children's Book";
@@ -219,7 +293,9 @@ function Roadmap({ answers }: { answers: WizardAnswers }) {
           <div className="text-center mb-6">
             <div className="inline-flex items-center gap-2 bg-[#fdf5e4] border border-[#e8c87a]/40 rounded-full px-4 py-1.5 mb-4">
               <Sparkles size={14} className="text-[#c9a96e]" />
-              <span className="text-xs font-semibold text-[#8b6914]">Your Publishing Roadmap</span>
+              <span className="text-xs font-semibold text-[#8b6914]">
+                {answers.pathway === "kdp-self-publish" ? "Your KDP Publishing Roadmap" : "Your Publishing Roadmap"}
+              </span>
             </div>
             <h1 className="font-serif text-2xl md:text-3xl text-[#2c1a00] leading-tight">
               {answers.bookTitle}
