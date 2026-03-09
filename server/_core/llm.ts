@@ -227,6 +227,7 @@ const resolveApiUrl = () => {
 
 const assertApiKey = () => {
   const key = getApiKey();
+  console.log(`[assertApiKey] key length=${key.length}, from getApiKey(), raw OPENAI=${!!process.env.OPENAI_API_KEY}, raw FORGE=${!!process.env.BUILT_IN_FORGE_API_KEY}`);
   if (!key) {
     throw new Error("OPENAI_API_KEY is not configured");
   }
