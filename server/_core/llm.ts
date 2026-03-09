@@ -277,6 +277,8 @@ const normalizeResponseFormat = ({
 };
 
 export async function invokeLLM(params: InvokeParams): Promise<InvokeResult> {
+  const _k = process.env.BUILT_IN_FORGE_API_KEY || process.env.OPENAI_API_KEY || "";
+  console.log(`[invokeLLM CALLED] key=${_k.length} chars, OPENAI_API_KEY=${!!process.env.OPENAI_API_KEY}, file=${__filename}`);
   assertApiKey();
 
   const useOpenAI = isUsingOpenAI();
