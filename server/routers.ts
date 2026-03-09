@@ -764,11 +764,19 @@ export const appRouter = router({
         (async () => {
           try {
             await updateProductionJob(newJob.id, { status: "processing" });
-            const { storageGet } = await import("./storage");
+            const { storageGet, getLocalStorageDir } = await import("./storage");
             const { url: manuscriptUrl } = await storageGet(originalJob.manuscriptFileKey!);
-            const fetchRes = await fetch(manuscriptUrl);
-            if (!fetchRes.ok) throw new Error(`Storage fetch failed: ${fetchRes.status}`);
-            const buffer = Buffer.from(await fetchRes.arrayBuffer());
+            let buffer: Buffer;
+            if (manuscriptUrl.startsWith("/")) {
+              const fs = await import("fs");
+              const path = await import("path");
+              const localPath = path.join(getLocalStorageDir(), originalJob.manuscriptFileKey!);
+              buffer = fs.readFileSync(localPath);
+            } else {
+              const fetchRes = await fetch(manuscriptUrl);
+              if (!fetchRes.ok) throw new Error(`Storage fetch failed: ${fetchRes.status}`);
+              buffer = Buffer.from(await fetchRes.arrayBuffer());
+            }
             const ext = (originalJob.manuscriptFileName ?? "").split(".").pop()?.toLowerCase() ?? "";
             const mimeMap: Record<string, string> = {
               pdf: "application/pdf",
