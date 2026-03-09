@@ -116,6 +116,13 @@ async function startServer() {
   app.use(express.urlencoded({ limit: "100mb", extended: true }));
   app.use(cookieParser());
 
+  app.get("/api/llm-check", async (_req, res) => {
+    const hasForge = !!process.env.BUILT_IN_FORGE_API_KEY;
+    const hasOpenAI = !!process.env.OPENAI_API_KEY;
+    const keyLen = (process.env.BUILT_IN_FORGE_API_KEY || process.env.OPENAI_API_KEY || "").length;
+    res.json({ hasForge, hasOpenAI, keyLen, provider: hasForge ? "forge" : hasOpenAI ? "openai" : "none" });
+  });
+
   app.get("/api/auth/logout", async (req, res) => {
     res.clearCookie("ebp_session", { path: "/" });
     res.redirect("/login");
