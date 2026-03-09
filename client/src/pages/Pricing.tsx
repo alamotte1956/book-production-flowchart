@@ -161,6 +161,7 @@ export default function Pricing() {
   const [loadingTier, setLoadingTier] = useState<string | null>(null);
   const [gateOpen, setGateOpen] = useState(false);
   const [pendingTier, setPendingTier] = useState<string | null>(null);
+  const [checkoutUrl, setCheckoutUrl] = useState<string | null>(null);
   const { user } = useAuth();
   const checkoutMutation = trpc.stripe.createCheckoutSession.useMutation();
 
@@ -200,10 +201,11 @@ export default function Pricing() {
         planName,
         checkoutToken,
       });
-      window.open(result.url, "_blank");
+      setCheckoutUrl(result.url);
       setLoadingTier(null);
-    } catch (err) {
+    } catch (err: any) {
       console.error("Checkout error:", err);
+      toast.error(err.message || "Checkout failed. Please try again.");
       setLoadingTier(null);
     }
   };
@@ -454,6 +456,31 @@ export default function Pricing() {
         onConfirmed={handleConfirmedCheckout}
         planName={pendingTier || ""}
       />
+
+      {checkoutUrl && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/50 backdrop-blur-sm">
+          <div className="bg-[#f3efe6] rounded-xl shadow-2xl p-8 max-w-md mx-4 text-center space-y-4 border border-[#c9a96e]/30">
+            <h3 className="text-xl font-serif text-[#1a1008] font-bold">Ready for Checkout</h3>
+            <p className="text-[#5c4a2a] text-sm">
+              Click the button below to complete your purchase on Stripe's secure checkout page.
+            </p>
+            <a
+              href={checkoutUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center justify-center gap-2 w-full px-6 py-3 bg-[#c9a96e] hover:bg-[#b8944f] text-[#1a1008] font-semibold rounded-lg transition-colors"
+            >
+              Go to Secure Checkout →
+            </a>
+            <button
+              onClick={() => setCheckoutUrl(null)}
+              className="text-sm text-[#5c4a2a]/70 hover:text-[#5c4a2a] underline"
+            >
+              Cancel
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
