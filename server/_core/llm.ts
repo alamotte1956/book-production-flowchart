@@ -1,5 +1,3 @@
-import { ENV } from "./env";
-
 export type Role = "system" | "user" | "assistant" | "tool" | "function";
 
 export type TextContent = {
@@ -209,18 +207,27 @@ const normalizeToolChoice = (
   return toolChoice;
 };
 
+const getApiKey = () => {
+  return process.env.BUILT_IN_FORGE_API_KEY || process.env.OPENAI_API_KEY || "";
+};
+
+const isUsingOpenAI = () => {
+  return !process.env.BUILT_IN_FORGE_API_KEY && !!process.env.OPENAI_API_KEY;
+};
+
 const resolveApiUrl = () => {
-  if (ENV.forgeApiUrl && ENV.forgeApiUrl.trim().length > 0) {
-    return `${ENV.forgeApiUrl.replace(/\/$/, "")}/v1/chat/completions`;
+  if (process.env.BUILT_IN_FORGE_API_URL && process.env.BUILT_IN_FORGE_API_URL.trim().length > 0) {
+    return `${process.env.BUILT_IN_FORGE_API_URL.replace(/\/$/, "")}/v1/chat/completions`;
   }
-  if (ENV.openaiApiKey) {
+  if (process.env.OPENAI_API_KEY) {
     return "https://api.openai.com/v1/chat/completions";
   }
   return "https://forge.manus.im/v1/chat/completions";
 };
 
 const assertApiKey = () => {
-  if (!ENV.forgeApiKey) {
+  const key = getApiKey();
+  if (!key) {
     throw new Error("OPENAI_API_KEY is not configured");
   }
 };
@@ -273,7 +280,7 @@ const normalizeResponseFormat = ({
 export async function invokeLLM(params: InvokeParams): Promise<InvokeResult> {
   assertApiKey();
 
-  const useOpenAI = !process.env.BUILT_IN_FORGE_API_KEY && !!process.env.OPENAI_API_KEY;
+  const useOpenAI = isUsingOpenAI();
 
   const {
     messages,
@@ -325,7 +332,7 @@ export async function invokeLLM(params: InvokeParams): Promise<InvokeResult> {
     method: "POST",
     headers: {
       "content-type": "application/json",
-      authorization: `Bearer ${ENV.forgeApiKey}`,
+      authorization: `Bearer ${getApiKey()}`,
     },
     body: JSON.stringify(payload),
   });
