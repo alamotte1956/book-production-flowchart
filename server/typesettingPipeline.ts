@@ -5,7 +5,71 @@
  * 3. Renders to PDF via Puppeteer and EPUB via epub-gen-memory
  */
 import puppeteer from "puppeteer-core";
-import { invokeLLM } from "./_core/llm";
+import { invokeLLM as _originalInvokeLLM } from "./_core/llm";
+import type { InvokeParams, InvokeResult } from "./_core/llm";
+
+async function invokeLLM(params: InvokeParams): Promise<InvokeResult> {
+  const apiKey = process.env.BUILT_IN_FORGE_API_KEY || process.env.OPENAI_API_KEY || "";
+  const useOpenAI = !process.env.BUILT_IN_FORGE_API_KEY && !!process.env.OPENAI_API_KEY;
+
+  if (!apiKey) {
+    throw new Error("OPENAI_API_KEY is not configured");
+  }
+
+  const apiUrl = process.env.BUILT_IN_FORGE_API_URL?.trim()
+    ? `${process.env.BUILT_IN_FORGE_API_URL.replace(/\/$/, "")}/v1/chat/completions`
+    : useOpenAI
+      ? "https://api.openai.com/v1/chat/completions"
+      : "https://forge.manus.im/v1/chat/completions";
+
+  console.log(`[Pipeline invokeLLM] useOpenAI=${useOpenAI}, keyLen=${apiKey.length}, url=${apiUrl}`);
+
+  const messages = params.messages.map((m: any) => {
+    if (typeof m.content === "string") return m;
+    if (Array.isArray(m.content)) {
+      return {
+        ...m,
+        content: m.content.map((c: any) => {
+          if (c.type === "text") return c;
+          if (c.type === "image_url") return c;
+          if (c.type === "file_url") return { type: "text", text: `[File: ${c.file_url?.url}]` };
+          return c;
+        }),
+      };
+    }
+    return m;
+  });
+
+  const payload: Record<string, unknown> = {
+    model: useOpenAI ? "gpt-4o" : "gemini-2.5-flash",
+    messages,
+    max_tokens: useOpenAI ? 16384 : 32768,
+  };
+
+  if (!useOpenAI) {
+    payload.thinking = { budget_tokens: 128 };
+  }
+
+  if (params.response_format) {
+    payload.response_format = params.response_format;
+  }
+
+  const response = await fetch(apiUrl, {
+    method: "POST",
+    headers: {
+      "content-type": "application/json",
+      authorization: `Bearer ${apiKey}`,
+    },
+    body: JSON.stringify(payload),
+  });
+
+  if (!response.ok) {
+    const errorText = await response.text();
+    throw new Error(`LLM invoke failed: ${response.status} ${response.statusText} – ${errorText}`);
+  }
+
+  return (await response.json()) as InvokeResult;
+}
 import { getTrimSize, getTypesettingStyle, type TrimSize, type TypesettingStyle } from "./typesettingStyles";
 
 export type Chapter = {
