@@ -273,6 +273,8 @@ const normalizeResponseFormat = ({
 export async function invokeLLM(params: InvokeParams): Promise<InvokeResult> {
   assertApiKey();
 
+  const useOpenAI = !process.env.BUILT_IN_FORGE_API_KEY && !!process.env.OPENAI_API_KEY;
+
   const {
     messages,
     tools,
@@ -285,7 +287,7 @@ export async function invokeLLM(params: InvokeParams): Promise<InvokeResult> {
   } = params;
 
   const payload: Record<string, unknown> = {
-    model: "gemini-2.5-flash",
+    model: useOpenAI ? "gpt-4o" : "gemini-2.5-flash",
     messages: messages.map(normalizeMessage),
   };
 
@@ -301,9 +303,11 @@ export async function invokeLLM(params: InvokeParams): Promise<InvokeResult> {
     payload.tool_choice = normalizedToolChoice;
   }
 
-  payload.max_tokens = 32768
-  payload.thinking = {
-    "budget_tokens": 128
+  payload.max_tokens = 32768;
+  if (!useOpenAI) {
+    payload.thinking = {
+      "budget_tokens": 128
+    };
   }
 
   const normalizedResponseFormat = normalizeResponseFormat({
