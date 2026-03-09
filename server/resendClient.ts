@@ -113,3 +113,93 @@ export async function sendLoginEmail(toEmail: string, token: string, userName: s
   console.log(`[Resend] Login email sent to ${toEmail}, id=${data?.id}`);
   return data;
 }
+
+export async function sendAffiliateWelcomeEmail(toEmail: string, name: string, affiliateCode: string) {
+  const { client, brandFromEmail } = getUncachableResendClient();
+
+  const dashboardUrl = `https://easybookpublishers.com/affiliate-dashboard`;
+
+  const { data, error } = await client.emails.send({
+    from: brandFromEmail,
+    to: toEmail,
+    subject: 'Welcome to the Easy Book Publishers Affiliate Program!',
+    html: `
+      <div style="font-family: 'Georgia', serif; max-width: 560px; margin: 0 auto; padding: 32px 24px; background-color: #f3efe6; border-radius: 12px;">
+        <div style="text-align: center; margin-bottom: 24px;">
+          <h1 style="color: #1a1008; font-size: 24px; margin: 0;">Easy Book Publishers</h1>
+          <p style="color: #c9a96e; font-size: 14px; margin: 4px 0 0;">Affiliate Program</p>
+        </div>
+        <p style="color: #3a2a14; font-size: 16px; line-height: 1.6;">
+          Hi ${name},
+        </p>
+        <p style="color: #3a2a14; font-size: 16px; line-height: 1.6;">
+          Welcome to our affiliate program! Your application has been approved and you're ready to start earning 20% commission on every sale.
+        </p>
+        <div style="background: #fff; border: 1px solid #c9a96e33; border-radius: 8px; padding: 16px; margin: 24px 0; text-align: center;">
+          <p style="color: #7a6e60; font-size: 13px; margin: 0 0 4px;">Your Affiliate Code</p>
+          <p style="color: #1a1008; font-size: 20px; font-weight: 700; margin: 0; letter-spacing: 0.5px;">${affiliateCode}</p>
+        </div>
+        <p style="color: #3a2a14; font-size: 16px; line-height: 1.6;">
+          Use this code to log in to your affiliate dashboard and access your referral links, marketing assets, and earnings reports.
+        </p>
+        <div style="text-align: center; margin: 32px 0;">
+          <a href="${dashboardUrl}" style="display: inline-block; background-color: #c9a96e; color: #1a1008; font-weight: 600; font-size: 16px; padding: 14px 32px; border-radius: 8px; text-decoration: none;">
+            Go to Affiliate Dashboard
+          </a>
+        </div>
+        <hr style="border: none; border-top: 1px solid #c9a96e33; margin: 24px 0;" />
+        <p style="color: #a89a8a; font-size: 12px; text-align: center;">
+          Easy Book Publishers — Manuscript to Masterpiece
+        </p>
+      </div>
+    `,
+  });
+
+  if (error) {
+    console.error('[Resend] Failed to send affiliate welcome email:', error);
+    throw new Error(`Failed to send affiliate welcome email: ${error.message}`);
+  }
+
+  console.log(`[Resend] Affiliate welcome email sent to ${toEmail}, id=${data?.id}`);
+  return data;
+}
+
+export async function sendAffiliateNotificationToOwner(affiliateName: string, affiliateEmail: string, affiliateCode: string) {
+  const { client, brandFromEmail } = getUncachableResendClient();
+
+  const ownerEmail = 'alamotte1956@gmail.com';
+
+  const { data, error } = await client.emails.send({
+    from: brandFromEmail,
+    to: ownerEmail,
+    subject: `New Affiliate Signup: ${affiliateName}`,
+    html: `
+      <div style="font-family: 'Georgia', serif; max-width: 560px; margin: 0 auto; padding: 32px 24px; background-color: #f3efe6; border-radius: 12px;">
+        <div style="text-align: center; margin-bottom: 24px;">
+          <h1 style="color: #1a1008; font-size: 24px; margin: 0;">New Affiliate Signup</h1>
+        </div>
+        <p style="color: #3a2a14; font-size: 16px; line-height: 1.6;">
+          A new affiliate has signed up for the Easy Book Publishers program:
+        </p>
+        <div style="background: #fff; border: 1px solid #c9a96e33; border-radius: 8px; padding: 16px; margin: 24px 0;">
+          <p style="color: #3a2a14; font-size: 15px; margin: 4px 0;"><strong>Name:</strong> ${affiliateName}</p>
+          <p style="color: #3a2a14; font-size: 15px; margin: 4px 0;"><strong>Email:</strong> ${affiliateEmail}</p>
+          <p style="color: #3a2a14; font-size: 15px; margin: 4px 0;"><strong>Code:</strong> ${affiliateCode}</p>
+        </div>
+        <p style="color: #7a6e60; font-size: 13px; line-height: 1.5;">
+          This affiliate was auto-approved and can start referring immediately.
+        </p>
+        <hr style="border: none; border-top: 1px solid #c9a96e33; margin: 24px 0;" />
+        <p style="color: #a89a8a; font-size: 12px; text-align: center;">
+          Easy Book Publishers — Manuscript to Masterpiece
+        </p>
+      </div>
+    `,
+  });
+
+  if (error) {
+    console.error('[Resend] Failed to send affiliate notification to owner:', error);
+  } else {
+    console.log(`[Resend] Affiliate notification sent to owner, id=${data?.id}`);
+  }
+}

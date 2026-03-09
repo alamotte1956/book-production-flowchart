@@ -18,7 +18,7 @@ import { generateIdml } from "./idmlGenerator";
 import { invokeLLM } from "./_core/llm";
 import { lookupByIsbn } from "./isbnLookup";
 import { notifyOwner } from "./_core/notification";
-import { sendConfirmationEmail, sendLoginEmail } from "./resendClient";
+import { sendConfirmationEmail, sendLoginEmail, sendAffiliateWelcomeEmail, sendAffiliateNotificationToOwner } from "./resendClient";
 import { createContactSubmission, saveWizardAnswers, getWizardAnswers, getRecentActivity, getDashboardStats, getUserById, updateUserStripeInfo, getUserByEmail, createEmailUser, confirmUserEmail, getUserByConfirmToken, getUserByCheckoutToken, setLoginToken, clearSession } from "./db";
 import { TRPCError } from "@trpc/server";
 import { getUncachableStripeClient, getStripePublishableKey } from "./stripeClient";
@@ -1436,6 +1436,18 @@ export const appRouter = router({
           promotionMethod: input.promotionMethod ?? null,
           status: "approved",
         });
+
+        try {
+          await sendAffiliateWelcomeEmail(input.email, input.name, affiliate.affiliateCode);
+        } catch (emailErr) {
+          console.error("[Affiliate] Failed to send welcome email:", emailErr);
+        }
+
+        try {
+          await sendAffiliateNotificationToOwner(input.name, input.email, affiliate.affiliateCode);
+        } catch (emailErr) {
+          console.error("[Affiliate] Failed to send owner notification:", emailErr);
+        }
 
         return { success: true, affiliateCode: affiliate.affiliateCode, affiliateId: affiliate.id };
       }),
