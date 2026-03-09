@@ -226,9 +226,7 @@ const resolveApiUrl = () => {
 };
 
 const assertApiKey = () => {
-  const key = getApiKey();
-  console.log(`[assertApiKey] key length=${key.length}, from getApiKey(), raw OPENAI=${!!process.env.OPENAI_API_KEY}, raw FORGE=${!!process.env.BUILT_IN_FORGE_API_KEY}`);
-  if (!key) {
+  if (!getApiKey()) {
     throw new Error("OPENAI_API_KEY is not configured");
   }
 };
@@ -311,7 +309,7 @@ export async function invokeLLM(params: InvokeParams): Promise<InvokeResult> {
     payload.tool_choice = normalizedToolChoice;
   }
 
-  payload.max_tokens = 32768;
+  payload.max_tokens = useOpenAI ? 16384 : 32768;
   if (!useOpenAI) {
     payload.thinking = {
       "budget_tokens": 128
