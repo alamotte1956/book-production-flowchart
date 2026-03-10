@@ -1,4 +1,4 @@
-import { BookOpen, Layers, Ruler, Library, Search, FileText, LayoutGrid, HelpCircle, CreditCard, Compass, Shield, Users } from "lucide-react";
+import { BookOpen, Layers, Ruler, Library, Search, FileText, LayoutGrid, HelpCircle, CreditCard, Compass, Shield, Users, BookMarked } from "lucide-react";
 
 const footerSections = [
   {
@@ -25,6 +25,7 @@ const footerSections = [
     links: [
       { label: "Publishing Resources", href: "/resources", icon: Library },
       { label: "User Guide", href: "/guide", icon: HelpCircle },
+      { label: "Publishing Glossary", href: "/glossary", icon: BookMarked },
       { label: "Publishing Wizard", href: "/guided-journey", icon: Compass },
       { label: "Pricing & Plans", href: "/pricing", icon: CreditCard },
       { label: "Privacy & Terms", href: "/privacy-terms", icon: Shield },
@@ -103,6 +104,8 @@ export default function SiteFooter() {
               <a href="/resources" className="hover:text-[#c9a96e] transition-colors">Resources</a>
               <span className="text-[#5c3d2e]">|</span>
               <a href="/guided-journey" className="hover:text-[#c9a96e] transition-colors">Publishing Wizard</a>
+              <span className="text-[#5c3d2e]">|</span>
+              <a href="/glossary" className="hover:text-[#c9a96e] transition-colors">Glossary</a>
               <span className="text-[#5c3d2e]">|</span>
               <a href="/templates" className="hover:text-[#c9a96e] transition-colors">Templates</a>
               <span className="text-[#5c3d2e]">|</span>

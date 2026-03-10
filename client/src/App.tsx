@@ -27,6 +27,7 @@ import AffiliateDashboard from "./pages/AffiliateDashboard";
 import Login from "./pages/Login";
 import ResetPassword from "./pages/ResetPassword";
 import AdminPayouts from "./pages/AdminPayouts";
+import Glossary from "./pages/Glossary";
 
 function Router() {
   return (
@@ -57,6 +58,7 @@ function Router() {
       <Route path={"/isbn-lookup"} component={ISBNLookup} />
       <Route path={"/guided-journey"} component={GuidedJourney} />
       <Route path={"/print-specs"} component={PrintSpecs} />
+      <Route path={"/glossary"} component={Glossary} />
       <Route path={"/404"} component={NotFound} />
       <Route component={NotFound} />
     </Switch>
