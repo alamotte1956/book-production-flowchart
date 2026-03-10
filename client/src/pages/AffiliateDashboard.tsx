@@ -1,9 +1,8 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useLocation } from "wouter";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Input } from "@/components/ui/input";
 import {
   DollarSign, MousePointerClick, TrendingUp, Wallet, Copy, CheckCircle2,
   BarChart3, ExternalLink, ArrowRight, Share2, Mail, FileText, Loader2,
@@ -12,19 +11,13 @@ import { trpc } from "@/lib/trpc";
 import { toast } from "sonner";
 import SiteFooter from "@/components/SiteFooter";
 
-const AFFILIATE_CODE_KEY = "ebp_affiliate_code";
-
 export default function AffiliateDashboard() {
   const [, navigate] = useLocation();
-  const [affiliateCode, setAffiliateCode] = useState("");
-  const [inputCode, setInputCode] = useState("");
   const [copied, setCopied] = useState(false);
   const [activeTab, setActiveTab] = useState<"overview" | "marketing" | "conversions" | "payouts">("overview");
 
-  useEffect(() => {
-    const saved = localStorage.getItem(AFFILIATE_CODE_KEY);
-    if (saved) setAffiliateCode(saved);
-  }, []);
+  const myAffiliateQuery = trpc.affiliate.getMyAffiliate.useQuery();
+  const affiliateCode = myAffiliateQuery.data?.affiliateCode || "";
 
   const dashboardQuery = trpc.affiliate.getDashboard.useQuery(
     { affiliateCode },
@@ -36,14 +29,6 @@ export default function AffiliateDashboard() {
     { enabled: !!affiliateCode && activeTab === "marketing" }
   );
 
-  const handleLogin = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (inputCode.trim()) {
-      setAffiliateCode(inputCode.trim());
-      localStorage.setItem(AFFILIATE_CODE_KEY, inputCode.trim());
-    }
-  };
-
   const handleCopy = (text: string) => {
     navigator.clipboard.writeText(text);
     setCopied(true);
@@ -51,12 +36,15 @@ export default function AffiliateDashboard() {
     setTimeout(() => setCopied(false), 2000);
   };
 
-  const handleLogout = () => {
-    setAffiliateCode("");
-    localStorage.removeItem(AFFILIATE_CODE_KEY);
-  };
+  if (myAffiliateQuery.isLoading) {
+    return (
+      <div className="min-h-screen bg-[#f3efe6] flex items-center justify-center">
+        <Loader2 className="w-8 h-8 animate-spin text-[#c9a96e]" />
+      </div>
+    );
+  }
 
-  if (!affiliateCode) {
+  if (!myAffiliateQuery.data) {
     return (
       <div className="min-h-screen bg-[#f3efe6]">
         <nav className="sticky top-0 z-50 bg-[#1a1008]/90 backdrop-blur-sm border-b border-[#c9a96e]/15">
@@ -71,19 +59,16 @@ export default function AffiliateDashboard() {
           <div className="text-center mb-8">
             <BarChart3 className="w-12 h-12 text-[#c9a96e] mx-auto mb-4" />
             <h1 className="font-serif text-3xl text-[#1a1008] mb-2">Affiliate Dashboard</h1>
-            <p className="text-[#5c4a2a]/90">Enter your affiliate code to access your dashboard</p>
+            <p className="text-[#5c4a2a]/90">You don't have an affiliate account yet.</p>
           </div>
           <Card className="bg-white border-[#c9a96e]/15">
-            <CardContent className="p-6">
-              <form onSubmit={handleLogin} className="space-y-4">
-                <Input value={inputCode} onChange={(e) => setInputCode(e.target.value)} placeholder="Your affiliate code" required className="bg-[#f3efe6] border-[#c9a96e]/30" />
-                <Button type="submit" className="w-full bg-[#c9a96e] hover:bg-[#b8944f] text-[#1a1008] font-semibold">
-                  Access Dashboard <ArrowRight className="w-4 h-4 ml-2" />
-                </Button>
-              </form>
-              <p className="text-xs text-[#5c4a2a]/70 text-center mt-4">
-                Don't have an affiliate code? <a href="/affiliates" className="text-[#8b6914] underline">Apply here</a>
+            <CardContent className="p-6 text-center">
+              <p className="text-sm text-[#5c4a2a]/80 mb-4">
+                Apply for our affiliate program to earn 20% commission on every sale you refer.
               </p>
+              <Button onClick={() => navigate("/affiliates")} className="w-full bg-[#c9a96e] hover:bg-[#b8944f] text-[#1a1008] font-semibold">
+                Apply Now <ArrowRight className="w-4 h-4 ml-2" />
+              </Button>
             </CardContent>
           </Card>
         </div>
@@ -112,9 +97,9 @@ export default function AffiliateDashboard() {
           </div>
         </nav>
         <div className="max-w-md mx-auto px-6 py-24 text-center">
-          <h1 className="font-serif text-2xl text-[#1a1008] mb-4">Affiliate Not Found</h1>
-          <p className="text-[#5c4a2a]/90 mb-6">The affiliate code you entered was not found.</p>
-          <Button onClick={handleLogout} className="bg-[#c9a96e] hover:bg-[#b8944f] text-[#1a1008]">Try Another Code</Button>
+          <h1 className="font-serif text-2xl text-[#1a1008] mb-4">Dashboard Error</h1>
+          <p className="text-[#5c4a2a]/90 mb-6">Unable to load your affiliate dashboard. Please try again later.</p>
+          <Button onClick={() => navigate("/dashboard")} className="bg-[#c9a96e] hover:bg-[#b8944f] text-[#1a1008]">Back to Dashboard</Button>
         </div>
         <SiteFooter />
       </div>
@@ -140,8 +125,8 @@ export default function AffiliateDashboard() {
           </button>
           <div className="flex items-center gap-3">
             <Badge className="bg-[#c9a96e]/10 text-[#8b6914] border-[#c9a96e]/30">{affiliate.status}</Badge>
-            <Button onClick={handleLogout} variant="outline" size="sm" className="border-[#c9a96e]/30 text-[#f5d98a] hover:bg-[#c9a96e]/10">
-              Sign Out
+            <Button onClick={() => navigate("/dashboard")} variant="outline" size="sm" className="border-[#c9a96e]/30 text-[#f5d98a] hover:bg-[#c9a96e]/10">
+              Back to Dashboard
             </Button>
           </div>
         </div>

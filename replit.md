@@ -173,8 +173,8 @@ PostgreSQL via Replit's built-in database. Use `npx drizzle-kit push` to sync sc
 - `contact_submissions` — Contact form entries
 - `wizard_sessions` — Publishing wizard answers (userId, answers jsonb, completedAt)
 - `orders` — Purchase/order history per user (userId, stripeSessionId, planName, billingCycle, amount, currency, status, customerEmail). Strictly user-scoped via `protectedProcedure` + `getOrdersByUser(ctx.user.id)`.
-- `affiliates` — Affiliate accounts (affiliateCode unique, commissionRate, status, totalClicks/Conversions/Earnings)
-- `affiliate_clicks` — Click tracking (affiliateId, ipHash, userAgent, referrerUrl, landingPage)
+- `affiliates` — Affiliate accounts (affiliateCode unique, userId linked, commissionRate, status, totalClicks/Conversions/Earnings). All affiliate routes (`getDashboard`, `getMarketingAssets`, `submitApplication`, `getMyAffiliate`) use `protectedProcedure` with `userId` ownership verification.
+- `affiliate_clicks` — Click tracking (affiliateId, ipHash, userAgent, referrerUrl, landingPage). `trackClick` is public (for tracking referral links).
 - `affiliate_conversions` — Conversion records (affiliateId, stripeSessionId, planName, saleAmount, commissionAmount, status)
 - `affiliate_payouts` — Payout history (affiliateId, amount, paypalEmail, status)
 

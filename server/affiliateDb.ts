@@ -35,6 +35,13 @@ export async function getAffiliateById(id: number): Promise<Affiliate | null> {
   return aff ?? null;
 }
 
+export async function getAffiliateByUserId(userId: number): Promise<Affiliate | null> {
+  const db = await getDb();
+  if (!db) return null;
+  const [aff] = await db.select().from(affiliates).where(eq(affiliates.userId, userId));
+  return aff ?? null;
+}
+
 export async function recordClick(data: Omit<InsertAffiliateClick, "id" | "createdAt">) {
   const db = await getDb();
   if (!db) return;

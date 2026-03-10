@@ -1657,7 +1657,15 @@ export const appRouter = router({
   })(),
 
   affiliate: router({
-    submitApplication: publicProcedure
+    getMyAffiliate: protectedProcedure
+      .query(async ({ ctx }) => {
+        const { getAffiliateByUserId } = await import("./affiliateDb");
+        const affiliate = await getAffiliateByUserId(ctx.user.id);
+        if (!affiliate) return null;
+        return { affiliateCode: affiliate.affiliateCode, name: affiliate.name, status: affiliate.status };
+      }),
+
+    submitApplication: protectedProcedure
       .input(z.object({
         name: z.string().min(1).max(255),
         email: z.string().email().max(320),
@@ -1665,7 +1673,7 @@ export const appRouter = router({
         paypalEmail: z.string().email().max(320).optional(),
         promotionMethod: z.string().max(2000).optional(),
       }))
-      .mutation(async ({ input }) => {
+      .mutation(async ({ ctx, input }) => {
         const { createAffiliate, getAffiliateByEmail } = await import("./affiliateDb");
         const existing = await getAffiliateByEmail(input.email);
         if (existing) {
@@ -1674,6 +1682,7 @@ export const appRouter = router({
 
         const code = input.name.toLowerCase().replace(/[^a-z0-9]/g, "").slice(0, 12) + "-" + nanoid(8);
         const affiliate = await createAffiliate({
+          userId: ctx.user.id,
           affiliateCode: code,
           name: input.name,
           email: input.email,
@@ -1698,12 +1707,16 @@ export const appRouter = router({
         return { success: true, affiliateCode: affiliate.affiliateCode, affiliateId: affiliate.id };
       }),
 
-    getDashboard: publicProcedure
+    getDashboard: protectedProcedure
       .input(z.object({ affiliateCode: z.string() }))
-      .query(async ({ input }) => {
+      .query(async ({ ctx, input }) => {
         const { getAffiliateByCode, getAffiliateStats, getConversionsByAffiliate, getPayoutsByAffiliate, getDailyEarnings } = await import("./affiliateDb");
         const affiliate = await getAffiliateByCode(input.affiliateCode);
         if (!affiliate) throw new TRPCError({ code: "NOT_FOUND", message: "Affiliate not found" });
+
+        if (affiliate.userId !== ctx.user.id) {
+          throw new TRPCError({ code: "FORBIDDEN", message: "You do not have access to this affiliate dashboard" });
+        }
 
         const stats = await getAffiliateStats(affiliate.id);
         const conversions = await getConversionsByAffiliate(affiliate.id, 20);
@@ -1739,9 +1752,16 @@ export const appRouter = router({
         return { success: true };
       }),
 
-    getMarketingAssets: publicProcedure
+    getMarketingAssets: protectedProcedure
       .input(z.object({ affiliateCode: z.string() }))
-      .query(async ({ input }) => {
+      .query(async ({ ctx, input }) => {
+        const { getAffiliateByCode } = await import("./affiliateDb");
+        const affiliate = await getAffiliateByCode(input.affiliateCode);
+        if (!affiliate) throw new TRPCError({ code: "NOT_FOUND", message: "Affiliate not found" });
+        if (affiliate.userId !== ctx.user.id) {
+          throw new TRPCError({ code: "FORBIDDEN", message: "You do not have access to these marketing assets" });
+        }
+
         const baseUrl = "https://easybookpublishers.replit.app";
         const refLink = `${baseUrl}/?ref=${input.affiliateCode}`;
 
