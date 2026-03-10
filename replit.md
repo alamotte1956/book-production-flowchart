@@ -92,7 +92,9 @@ PostgreSQL via Replit's built-in database. Use `npx drizzle-kit push` to sync sc
   - **Publishing Professional**: Full 9-step wizard → comprehensive roadmap with all 9 production phases
   - **Self-Publish on KDP**: Streamlined 6-step wizard → focused roadmap (template → upload → format → cover → publish)
   - Pathway choice is the first question; subsequent steps adapt based on selection
-- **Auto-Produce**: AI typesetting pipeline producing real production files:
+- **Auto-Produce**: AI typesetting pipeline producing real production files (zero content loss guaranteed):
+  - **Chapter Detection**: LLM identifies chapter boundaries (line numbers only, never reproduces text); original manuscript text is sliced directly to build chapters. Word count validation (95% threshold) catches any gaps; falls back to regex if LLM fails.
+  - **Large manuscripts** (>80K chars): Uses `splitChaptersByRegex()` (no LLM, full content preserved). If no chapter headings found, splits into 2500-line sections.
   - **Interior PDF**: Puppeteer/Chromium rendered, press-ready with proper typography
   - **KDP Print-Ready PDF**: Amazon-compliant with 0.125" bleed, gutter margins scaled by page count
   - **EPUB**: Standards-compliant ebook via epub-gen-memory with TOC, copyright page, metadata

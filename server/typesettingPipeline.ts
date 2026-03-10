@@ -40,10 +40,11 @@ async function invokeLLM(params: InvokeParams): Promise<InvokeResult> {
     return m;
   });
 
+  const defaultMaxTokens = useOpenAI ? 16384 : 32768;
   const payload: Record<string, unknown> = {
     model: useOpenAI ? "gpt-4o" : "gemini-2.5-flash",
     messages,
-    max_tokens: useOpenAI ? 16384 : 32768,
+    max_tokens: params.max_tokens ?? defaultMaxTokens,
   };
 
   if (!useOpenAI) {
@@ -236,6 +237,70 @@ function splitChaptersByRegex(rawText: string, title: string, author: string): P
   return { title, author, frontmatter, chapters, backmatter };
 }
 
+function buildBookFromBoundaries(
+  rawText: string,
+  title: string,
+  author: string,
+  boundaries: Array<{ lineNumber: number; title: string }>,
+  frontmatterEndLine?: number,
+  backmatterStartLine?: number
+): ParsedBook {
+  const lines = rawText.split(/\r?\n/);
+
+  let frontmatter = "";
+  const fmEnd = frontmatterEndLine ?? (boundaries.length > 0 ? boundaries[0].lineNumber : 0);
+  if (fmEnd > 0) {
+    frontmatter = lines.slice(0, fmEnd).join("\n").trim();
+  }
+
+  let backmatter = "";
+  if (backmatterStartLine != null && backmatterStartLine < lines.length) {
+    backmatter = lines.slice(backmatterStartLine).join("\n").trim();
+  }
+
+  const bodyEndLine = backmatterStartLine ?? lines.length;
+
+  const chapters: ParsedBook["chapters"] = [];
+  for (let c = 0; c < boundaries.length; c++) {
+    const headingLine = boundaries[c].lineNumber;
+    const bodyStartLine = headingLine + 1;
+    const endLine = c + 1 < boundaries.length ? boundaries[c + 1].lineNumber : bodyEndLine;
+    const body = lines.slice(bodyStartLine, endLine).join("\n").trim();
+    chapters.push({
+      number: chapters.length + 1,
+      title: boundaries[c].title || `Chapter ${chapters.length + 1}`,
+      body,
+    });
+  }
+
+  if (chapters.length === 0) {
+    const bodyStart = fmEnd;
+    const bodyText = lines.slice(bodyStart, bodyEndLine).join("\n").trim();
+    if (bodyText.length > 0) {
+      chapters.push({ number: 1, title: "Chapter 1", body: bodyText });
+    }
+  }
+
+  return { title, author, frontmatter, chapters, backmatter };
+}
+
+function validateParsedContent(rawText: string, book: ParsedBook): boolean {
+  const inputWords = rawText.split(/\s+/).filter(Boolean).length;
+  let outputWords = 0;
+  if (book.frontmatter) outputWords += book.frontmatter.split(/\s+/).filter(Boolean).length;
+  if (book.backmatter) outputWords += book.backmatter.split(/\s+/).filter(Boolean).length;
+  for (const ch of book.chapters) {
+    outputWords += ch.body.split(/\s+/).filter(Boolean).length;
+    if (ch.title) outputWords += ch.title.split(/\s+/).filter(Boolean).length;
+  }
+  const ratio = inputWords > 0 ? outputWords / inputWords : 1;
+  if (ratio < 0.95) {
+    console.warn(`[Stage: chapter-detection] Content validation FAILED: input ${inputWords} words, output ${outputWords} words (ratio ${(ratio * 100).toFixed(1)}%)`);
+    return false;
+  }
+  return true;
+}
+
 export async function detectChapters(
   rawText: string,
   title: string,
@@ -251,37 +316,46 @@ export async function detectChapters(
       return result;
     }
 
+    const numberedLines = rawText.split(/\r?\n/).map((line, i) => `[L${i}] ${line}`).join("\n");
+
     let response: Awaited<ReturnType<typeof invokeLLM>>;
     try {
       response = await invokeLLM({
         messages: [
           {
             role: "system",
-            content: `You are a professional book typesetter. Your job is to parse a raw manuscript and extract its structure.
-Identify chapters by looking for patterns like "Chapter 1", "CHAPTER ONE", "Part I", numbered sections, or clear thematic breaks.
-Return a JSON object with this exact structure:
+            content: `You are a professional book typesetter. Your job is to identify the STRUCTURE of a manuscript — NOT to reproduce its text.
+
+Each line in the manuscript is prefixed with a line number like [L0], [L1], [L2], etc.
+
+Identify chapter boundaries, front matter, and back matter by their line numbers.
+Look for patterns like "Chapter 1", "CHAPTER ONE", "Part I", numbered sections, or clear thematic breaks.
+
+Return a JSON object with ONLY this structure:
 {
-  "title": "Book title (use provided title if not found in text)",
-  "author": "Author name (use provided author if not found in text)",
-  "frontmatter": "Any preface, foreword, introduction text (plain text, may be empty string)",
   "chapters": [
-    {
-      "number": 1,
-      "title": "Chapter title or 'Chapter 1' if untitled",
-      "body": "Full chapter text as plain text paragraphs separated by double newlines"
-    }
+    { "lineNumber": 0, "title": "Chapter title or 'Chapter 1' if untitled" },
+    { "lineNumber": 42, "title": "Chapter 2" }
   ],
-  "backmatter": "Any epilogue, afterword, acknowledgements (plain text, may be empty string)"
+  "frontmatterEndLine": 0,
+  "backmatterStartLine": null
 }
-Preserve all paragraph breaks. Do not summarize or shorten any text. Return ONLY valid JSON.`,
+
+Rules:
+- "chapters" lists each chapter's HEADING line number and title
+- "lineNumber" is the line number where the chapter heading appears (e.g., 0 for [L0])
+- "frontmatterEndLine" is the line number where front matter ends (same as first chapter's lineNumber if no front matter; can be 0)
+- "backmatterStartLine" is the line number where back matter begins (epilogue, afterword, acknowledgements, appendix, etc.), or null if none
+- Do NOT include any chapter body text — only line numbers and titles
+- Return ONLY valid JSON`,
           },
           {
             role: "user",
-            content: `Title: ${title}\nAuthor: ${author}\n\nManuscript:\n\n${rawText}`,
+            content: `Title: ${title}\nAuthor: ${author}\n\nManuscript:\n\n${numberedLines}`,
           },
         ],
         response_format: { type: "json_object" },
-        max_tokens: 32768,
+        max_tokens: 4096,
       });
     } catch (llmErr: unknown) {
       const msg = llmErr instanceof Error ? llmErr.message : String(llmErr);
@@ -291,24 +365,54 @@ Preserve all paragraph breaks. Do not summarize or shorten any text. Return ONLY
 
     const content = response.choices[0]?.message?.content;
     if (typeof content !== "string" || content.trim() === "") {
-      throw new Error("LLM returned empty or non-string content for chapter detection");
+      console.warn("[Stage: chapter-detection] LLM returned empty content; falling back to regex");
+      return splitChaptersByRegex(rawText, title, author);
     }
 
-    let parsed: ParsedBook;
+    let boundaryData: {
+      chapters?: Array<{ lineNumber: number; title: string }>;
+      frontmatterEndLine?: number;
+      backmatterStartLine?: number | null;
+    };
     try {
-      parsed = JSON.parse(content) as ParsedBook;
+      boundaryData = JSON.parse(content);
     } catch (parseErr: unknown) {
       const msg = parseErr instanceof Error ? parseErr.message : String(parseErr);
       console.warn(`[Stage: chapter-detection] JSON parse failed (${msg}); falling back to regex-based splitting`);
       return splitChaptersByRegex(rawText, title, author);
     }
 
-    if (!parsed.chapters || parsed.chapters.length === 0) {
-      console.warn(`[Stage: chapter-detection] LLM returned 0 chapters; falling back to regex-based splitting`);
+    if (!boundaryData.chapters || boundaryData.chapters.length === 0) {
+      console.warn(`[Stage: chapter-detection] LLM returned 0 chapter boundaries; falling back to regex-based splitting`);
       return splitChaptersByRegex(rawText, title, author);
     }
 
-    return parsed;
+    const totalLines = rawText.split(/\r?\n/).length;
+    const validBoundaries = boundaryData.chapters
+      .filter(b => typeof b.lineNumber === "number" && b.lineNumber >= 0 && b.lineNumber < totalLines)
+      .sort((a, b) => a.lineNumber - b.lineNumber);
+
+    if (validBoundaries.length === 0) {
+      console.warn("[Stage: chapter-detection] No valid line numbers in LLM response; falling back to regex");
+      return splitChaptersByRegex(rawText, title, author);
+    }
+
+    const book = buildBookFromBoundaries(
+      rawText,
+      title,
+      author,
+      validBoundaries,
+      boundaryData.frontmatterEndLine ?? undefined,
+      boundaryData.backmatterStartLine ?? undefined
+    );
+
+    if (!validateParsedContent(rawText, book)) {
+      console.warn("[Stage: chapter-detection] Word count validation failed; falling back to regex-based splitting");
+      return splitChaptersByRegex(rawText, title, author);
+    }
+
+    console.log(`[Stage: chapter-detection] LLM boundary detection found ${book.chapters.length} chapters, content validated`);
+    return book;
   });
 }
 
