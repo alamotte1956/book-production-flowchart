@@ -13,10 +13,10 @@ import SiteFooter from "@/components/SiteFooter";
 const HERO_URL = "https://d2xsxph8kpxj0f.cloudfront.net/310519663211654017/kGjPju6hKCvCsjZhgUHyqj/hero-banner-cxQRR1jXLBmcXxFPJoqxWN.webp";
 
 const features = [
-  { icon: Upload, title: "Upload Your Manuscript", desc: "Drop in your DOCX, PDF, or any of 30+ formats. Our parser extracts your text, detects chapters, and preserves your structure automatically." },
-  { icon: Sparkles, title: "AI-Powered Typesetting", desc: "Professional book layout generated in minutes — drop caps, running headers, smart typography, orphan/widow control, and chapter openers." },
-  { icon: Printer, title: "Print-Ready Output", desc: "Download real Interior PDF, KDP Print-Ready PDF with bleed, EPUB 3, and InDesign IDML files — all from a single upload." },
-  { icon: Globe, title: "Publish Anywhere", desc: "Export files ready for Amazon KDP, IngramSpark, Barnes & Noble Press, Apple Books, or your own printer. We handle the specs." },
+  { icon: Upload, title: "Upload Your Manuscript", desc: "New author? Just drop in your DOCX, PDF, or any of 30+ formats. Our parser extracts your text, detects chapters, and preserves your structure automatically." },
+  { icon: Sparkles, title: "AI-Powered Typesetting", desc: "Your new book gets a professional layout in minutes — drop caps, running headers, smart typography, orphan/widow control, and chapter openers." },
+  { icon: Printer, title: "Print-Ready Output", desc: "Download real Interior PDF, KDP Print-Ready PDF with bleed, EPUB 3, and InDesign IDML files — everything a new author needs from a single upload." },
+  { icon: Globe, title: "Publish Your New Book Anywhere", desc: "Export files ready for Amazon KDP, IngramSpark, Barnes & Noble Press, Apple Books, or your own printer. We handle the specs." },
 ];
 
 const outputFormats = [
@@ -28,12 +28,12 @@ const outputFormats = [
 ];
 
 const testimonials = [
-  { quote: "I had no idea what I was doing when I started. Easy Book Publishers walked me through every step. My book looks like it came from a major publishing house.", author: "Maria S.", role: "First-Time Author", stars: 5 },
+  { quote: "As a new author, I had no idea what I was doing. Easy Book Publishers walked me through every step. My new book looks like it came from a major publishing house.", author: "Maria S.", role: "New Author, First Book", stars: 5 },
   { quote: "This platform saved me thousands in typesetting costs. The AI output is indistinguishable from work I've paid designers $3,000 for.", author: "James R.", role: "Self-Published Author, 4 books", stars: 5 },
   { quote: "The Bible Design Studio is unlike anything else on the market. Finally, a tool built for scripture publishers that understands verse structure.", author: "David L.", role: "Independent Publisher", stars: 5 },
-  { quote: "From manuscript to print-ready PDF in under 10 minutes. I've published 3 books here and I'm never going back to the old way.", author: "Sarah K.", role: "Writing Coach & Author", stars: 5 },
-  { quote: "The AI writing assistant wrote a foreword and glossary that I barely had to edit. It saved me weeks of work and they sounded completely professional.", author: "Michael T.", role: "Non-Fiction Author", stars: 5 },
-  { quote: "I compared this to Atticus and Vellum. Easier to use, better output, and a fraction of the price. It's not even close.", author: "Priya N.", role: "Self-Publisher, 7 titles", stars: 5 },
+  { quote: "I was a brand new author with a finished manuscript and no clue what came next. This platform made publishing my new book incredibly simple.", author: "Sarah K.", role: "New Author & Writing Coach", stars: 5 },
+  { quote: "The AI writing assistant wrote a foreword and glossary that I barely had to edit. Perfect for new authors who don't know where to start with front matter.", author: "Michael T.", role: "New Non-Fiction Author", stars: 5 },
+  { quote: "I compared this to Atticus and Vellum. Easier to use, better output, and a fraction of the price. Every new author should start here.", author: "Priya N.", role: "Self-Publisher, 7 titles", stars: 5 },
 ];
 
 const stats = [
@@ -44,19 +44,19 @@ const stats = [
 ];
 
 const whyAuthorsChooseUs = [
-  { icon: Clock, title: "Minutes, Not Months", desc: "Upload your manuscript and get print-ready files the same day. No waiting for designers or typesetters." },
-  { icon: DollarSign, title: "Save Thousands", desc: "Professional typesetting typically costs $1,500-$5,000. Get the same quality from just $9.99/mo." },
+  { icon: Clock, title: "Publish Your New Book in Minutes", desc: "Go from manuscript to print-ready files the same day. No waiting for designers or typesetters." },
+  { icon: DollarSign, title: "New Authors Save Thousands", desc: "Professional typesetting typically costs $1,500-$5,000. Get the same quality from just $9.99/mo." },
   { icon: Shield, title: "You Keep 100%", desc: "Zero commission on your book sales. Zero royalty share. Your earnings are yours, always." },
-  { icon: BookOpen, title: "Every Format, One Upload", desc: "Get print PDF, KDP-ready PDF, EPUB, and InDesign IDML from a single manuscript upload." },
-  { icon: PenTool, title: "AI Writing Assistant", desc: "Generate your foreword, introduction, copyright page, back-cover blurb, and glossary with one click." },
-  { icon: Layers, title: "30-Step Production Tracker", desc: "Follow a professional publishing workflow from concept to published book. Never miss a step." },
+  { icon: BookOpen, title: "Every Format, One Upload", desc: "Get print PDF, KDP-ready PDF, EPUB, and InDesign IDML — all from a single manuscript upload." },
+  { icon: PenTool, title: "AI Writing Assistant", desc: "Generate your foreword, introduction, copyright page, back-cover blurb, and glossary with one click. Perfect for new authors." },
+  { icon: Layers, title: "30-Step Guided Workflow", desc: "New to publishing? Follow a professional workflow from concept to published book. Never miss a step." },
 ];
 
 const newAuthorFeatures = [
-  { title: "No Publishing Experience Required", desc: "Our Publishing Wizard asks about your book and builds a personalized roadmap. Every step is explained in plain language." },
-  { title: "Professional Results, Every Time", desc: "World-class typesetting with smart typography, drop caps, proper margins, and industry-standard formatting — automatically applied." },
-  { title: "AI Writes Your Front & Back Matter", desc: "Generate a polished foreword, introduction, copyright page, author bio, glossary, and back-cover blurb. Edit and publish." },
-  { title: "One Platform, Everything You Need", desc: "Manuscript formatting, cover specs, spine calculator, ISBN management, and export to every major retailer — all in one place." },
+  { title: "Built for New Authors", desc: "Never published before? Our Publishing Wizard asks about your book and builds a personalized roadmap. Every step is explained in plain language — no experience needed." },
+  { title: "Professional Results, Automatically", desc: "World-class typesetting with smart typography, drop caps, proper margins, and industry-standard formatting — automatically applied to your new book." },
+  { title: "AI Writes Your Front & Back Matter", desc: "Generate a polished foreword, introduction, copyright page, author bio, glossary, and back-cover blurb. New authors save weeks of work." },
+  { title: "One Platform, Everything You Need", desc: "Manuscript formatting, cover specs, spine calculator, ISBN management, and export to every major retailer — everything a new author needs in one place." },
 ];
 
 const comparisonPoints = [
@@ -143,20 +143,20 @@ export default function LandingPage() {
         <div className="relative max-w-7xl mx-auto px-6 pt-2 md:pt-3 pb-24 md:pb-32 text-center">
           <div className="inline-flex items-center gap-2 bg-[#c9a96e]/10 border border-[#c9a96e]/25 rounded-full px-4 py-1.5 mb-6">
             <Zap className="w-3.5 h-3.5 text-[#f5d98a]" />
-            <span className="text-xs text-[#f5d98a] font-medium tracking-wide">Your One-Stop Publishing Partner</span>
+            <span className="text-xs text-[#f5d98a] font-medium tracking-wide">The #1 Publishing Platform for New Authors</span>
           </div>
           <h1 className="font-serif text-5xl md:text-7xl lg:text-8xl text-[#f5d98a] mb-4 leading-tight tracking-tight">
             Easy Book Publishers
           </h1>
           <p className="font-serif text-2xl md:text-4xl lg:text-5xl text-[#ede7d8] mb-6 leading-tight">
-            From Manuscript to <span className="text-[#f5d98a]">Masterpiece</span>
+            New Author? New Book? <span className="text-[#f5d98a]">Start Here.</span>
           </p>
           <p className="text-lg md:text-xl text-[#d4c8b4] max-w-2xl mx-auto mb-4">
             The professional publishing platform built for new authors.
-            Upload your manuscript, get print-ready books in minutes.
+            Upload your manuscript, publish your new book in minutes.
           </p>
           <p className="text-sm text-[#d4c8b4]/70 max-w-lg mx-auto mb-10">
-            No design skills needed. No software to install. No experience required.
+            No design skills needed. No software to install. Built for new authors with zero publishing experience.
           </p>
           <div className="flex flex-wrap justify-center gap-4 mb-6">
             <Button onClick={() => navigate("/guided-journey")} size="lg" className="bg-gradient-to-r from-[#d4b480] to-[#c9a96e] hover:from-[#e0c490] hover:to-[#d4b480] text-[#1a1008] font-bold text-base px-8 py-6 rounded-xl shadow-xl shadow-[#c9a96e]/20">
@@ -181,16 +181,16 @@ export default function LandingPage() {
           <div className="flex items-center gap-2"><Shield className="w-4 h-4 text-[#c9a96e]" /> 30-Day Money-Back Guarantee</div>
           <div className="flex items-center gap-2"><DollarSign className="w-4 h-4 text-[#c9a96e]" /> Zero Commission on Sales</div>
           <div className="flex items-center gap-2"><Award className="w-4 h-4 text-[#c9a96e]" /> Professional Typesetting Quality</div>
-          <div className="flex items-center gap-2"><HeartHandshake className="w-4 h-4 text-[#c9a96e]" /> Built for First-Time Authors</div>
+          <div className="flex items-center gap-2"><HeartHandshake className="w-4 h-4 text-[#c9a96e]" /> Built for New Authors</div>
         </div>
       </section>
 
       {/* ── Why Authors Choose Us ── */}
       <section className="max-w-7xl mx-auto px-6 py-20">
         <div className="text-center mb-14">
-          <Badge className="bg-[#c9a96e]/10 text-[#8b6914] border-[#c9a96e]/30 mb-3">Why Easy Book Publishers</Badge>
-          <h2 className="font-serif text-3xl md:text-4xl text-[#1a1008] mb-3">Everything You Need to Publish Like a Pro</h2>
-          <p className="text-[#5c4a2a]/85 max-w-2xl mx-auto">Other platforms give you a formatting tool. We give you a complete publishing partner — from your first word to your first sale.</p>
+          <Badge className="bg-[#c9a96e]/10 text-[#8b6914] border-[#c9a96e]/30 mb-3">Why New Authors Choose Us</Badge>
+          <h2 className="font-serif text-3xl md:text-4xl text-[#1a1008] mb-3">Everything a New Author Needs to Publish Like a Pro</h2>
+          <p className="text-[#5c4a2a]/85 max-w-2xl mx-auto">Other platforms give you a formatting tool. We give new authors a complete publishing partner — from your first word to your first sale.</p>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {whyAuthorsChooseUs.map((item) => (
@@ -212,8 +212,8 @@ export default function LandingPage() {
         <div className="max-w-7xl mx-auto px-6">
           <div className="text-center mb-14">
             <Badge className="bg-[#c9a96e]/10 text-[#8b6914] border-[#c9a96e]/30 mb-3">How It Works</Badge>
-            <h2 className="font-serif text-3xl md:text-4xl text-[#1a1008] mb-3">Four Steps to a Finished Book</h2>
-            <p className="text-[#5c4a2a]/85 max-w-xl mx-auto">From raw manuscript to professional, print-ready output in minutes — not months.</p>
+            <h2 className="font-serif text-3xl md:text-4xl text-[#1a1008] mb-3">Four Steps to Your New Book</h2>
+            <p className="text-[#5c4a2a]/85 max-w-xl mx-auto">New authors go from raw manuscript to professional, print-ready new book in minutes — not months.</p>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
             {features.map((f, i) => (
@@ -244,9 +244,9 @@ export default function LandingPage() {
       <section id="output" className="bg-[#1a1008] py-20">
         <div className="max-w-7xl mx-auto px-6">
           <div className="text-center mb-14">
-            <Badge className="bg-[#c9a96e]/15 text-[#f5d98a] border-[#c9a96e]/30 mb-3">Real Output Files</Badge>
-            <h2 className="font-serif text-3xl md:text-4xl text-[#ede7d8] mb-3">Production-Ready Exports</h2>
-            <p className="text-[#d4c8b4]/80 max-w-xl mx-auto">Not mockups. Not previews. Real, downloadable production files ready for print and distribution worldwide.</p>
+            <Badge className="bg-[#c9a96e]/15 text-[#f5d98a] border-[#c9a96e]/30 mb-3">Your New Book Files</Badge>
+            <h2 className="font-serif text-3xl md:text-4xl text-[#ede7d8] mb-3">Production-Ready Exports for Your New Book</h2>
+            <p className="text-[#d4c8b4]/80 max-w-xl mx-auto">Not mockups. Real, downloadable production files ready for print and distribution worldwide — professional quality from day one.</p>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
             {outputFormats.map((fmt) => (
@@ -269,12 +269,12 @@ export default function LandingPage() {
       <section id="new-authors" className="max-w-7xl mx-auto px-6 py-20">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
           <div>
-            <Badge className="bg-[#c9a96e]/10 text-[#8b6914] border-[#c9a96e]/30 mb-4">Built for You</Badge>
+            <Badge className="bg-[#c9a96e]/10 text-[#8b6914] border-[#c9a96e]/30 mb-4">For New Authors</Badge>
             <h2 className="font-serif text-3xl md:text-4xl text-[#1a1008] mb-4">
-              First Book? You're in the Right Place.
+              New Author? Your New Book Starts Here.
             </h2>
             <p className="text-[#5c4a2a]/85 leading-relaxed mb-8 text-lg">
-              We built Easy Book Publishers specifically for new authors who want professional results without the steep learning curve. Every feature is designed so you can focus on what matters most — your story.
+              We built Easy Book Publishers specifically for new authors publishing their first book. Every feature is designed so new authors can focus on what matters most — your story — while we handle the professional production.
             </p>
             <div className="space-y-6">
               {newAuthorFeatures.map((f, i) => (
@@ -325,9 +325,9 @@ export default function LandingPage() {
       <section className="bg-gradient-to-b from-[#f0e8d8] to-[#f3efe6] py-20">
         <div className="max-w-4xl mx-auto px-6">
           <div className="text-center mb-12">
-            <Badge className="bg-[#c9a96e]/10 text-[#8b6914] border-[#c9a96e]/30 mb-3">The Smart Choice</Badge>
-            <h2 className="font-serif text-3xl md:text-4xl text-[#1a1008] mb-3">How We Compare</h2>
-            <p className="text-[#5c4a2a]/85 max-w-xl mx-auto">See why authors are switching from Atticus ($147) and Vellum ($250) to Easy Book Publishers.</p>
+            <Badge className="bg-[#c9a96e]/10 text-[#8b6914] border-[#c9a96e]/30 mb-3">The Smart Choice for New Authors</Badge>
+            <h2 className="font-serif text-3xl md:text-4xl text-[#1a1008] mb-3">Why New Authors Choose Us Over the Competition</h2>
+            <p className="text-[#5c4a2a]/85 max-w-xl mx-auto">See why new authors are choosing Easy Book Publishers over Atticus ($147) and Vellum ($250) for their new book.</p>
           </div>
           <Card className="bg-white border-[#c9a96e]/15 overflow-hidden">
             <div className="overflow-x-auto">
@@ -363,9 +363,9 @@ export default function LandingPage() {
       <section className="bg-[#1a1008] py-20">
         <div className="max-w-5xl mx-auto px-6">
           <div className="text-center mb-14">
-            <Badge className="bg-[#c9a96e]/15 text-[#f5d98a] border-[#c9a96e]/30 mb-3">Complete Toolkit</Badge>
-            <h2 className="font-serif text-3xl md:text-4xl text-[#ede7d8] mb-3">Everything in One Place</h2>
-            <p className="text-[#d4c8b4]/80 max-w-2xl mx-auto">Stop juggling multiple tools and subscriptions. Easy Book Publishers is the only platform you need from manuscript to published book.</p>
+            <Badge className="bg-[#c9a96e]/15 text-[#f5d98a] border-[#c9a96e]/30 mb-3">Complete New Author Toolkit</Badge>
+            <h2 className="font-serif text-3xl md:text-4xl text-[#ede7d8] mb-3">Everything a New Author Needs in One Place</h2>
+            <p className="text-[#d4c8b4]/80 max-w-2xl mx-auto">Stop juggling multiple tools. Easy Book Publishers gives new authors the only platform they need — from manuscript to published new book.</p>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {[
@@ -397,9 +397,9 @@ export default function LandingPage() {
       <section className="py-20">
         <div className="max-w-7xl mx-auto px-6">
           <div className="text-center mb-14">
-            <Badge className="bg-[#c9a96e]/10 text-[#8b6914] border-[#c9a96e]/30 mb-3">Author Stories</Badge>
-            <h2 className="font-serif text-3xl md:text-4xl text-[#1a1008] mb-3">Trusted by Authors Who Come Back</h2>
-            <p className="text-[#5c4a2a]/85 max-w-xl mx-auto">From first-time writers to prolific publishers, hear why authors make Easy Book Publishers their go-to platform.</p>
+            <Badge className="bg-[#c9a96e]/10 text-[#8b6914] border-[#c9a96e]/30 mb-3">New Author Stories</Badge>
+            <h2 className="font-serif text-3xl md:text-4xl text-[#1a1008] mb-3">New Authors Love Easy Book Publishers</h2>
+            <p className="text-[#5c4a2a]/85 max-w-xl mx-auto">From brand-new authors publishing their first book to experienced writers launching their latest title — hear why they choose us.</p>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {testimonials.map((t, i) => (
@@ -425,12 +425,12 @@ export default function LandingPage() {
       {/* ── Final CTA ── */}
       <section className="bg-gradient-to-r from-[#1a1008] to-[#2a1a10] py-20">
         <div className="max-w-3xl mx-auto px-6 text-center">
-          <h2 className="font-serif text-3xl md:text-4xl text-[#f5d98a] mb-4">Ready to Publish Your Book?</h2>
+          <h2 className="font-serif text-3xl md:text-4xl text-[#f5d98a] mb-4">Ready to Publish Your New Book?</h2>
           <p className="text-lg text-[#d4c8b4]/90 mb-3 max-w-xl mx-auto">
-            Join authors who use Easy Book Publishers to create professional, print-ready books — and keep coming back for every new title.
+            Join thousands of new authors who use Easy Book Publishers to turn their manuscript into a professional, print-ready new book.
           </p>
           <p className="text-sm text-[#d4c8b4]/60 mb-10 max-w-md mx-auto">
-            Plans from $9.99/mo. 30-day money-back guarantee. Your book, your earnings — we take zero commission.
+            Plans from $9.99/mo. 30-day money-back guarantee. Built for new authors — your book, your earnings, zero commission.
           </p>
           <div className="flex flex-col sm:flex-row justify-center gap-4">
             <Button onClick={() => navigate("/guided-journey")} size="lg" className="bg-gradient-to-r from-[#d4b480] to-[#c9a96e] hover:from-[#e0c490] hover:to-[#d4b480] text-[#1a1008] font-bold text-base px-10 py-6 rounded-xl shadow-xl shadow-[#c9a96e]/25">

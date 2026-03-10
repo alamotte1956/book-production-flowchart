@@ -25,7 +25,7 @@ const tiers = [
     monthly: "$14.99",
     annual: "$9.99",
     period: { monthly: "/month", annual: "/mo (billed annually)" },
-    description: "Manuscript done? Upload, pick a template, get KDP-ready files. Replaces Atticus at a fraction of the cost.",
+    description: "New author with a finished manuscript? Upload, pick a template, get KDP-ready files for your new book. Replaces Atticus at a fraction of the cost.",
     icon: Rocket,
     cta: "Get KDP Ready",
     ctaVariant: "default" as const,
@@ -58,7 +58,7 @@ const tiers = [
     monthly: "$29.99",
     annual: "$19.99",
     period: { monthly: "/month", annual: "/mo (billed annually)" },
-    description: "Everything in Atticus + Vellum combined — for less than either one alone. The complete author toolkit.",
+    description: "The complete new author toolkit. Everything in Atticus + Vellum combined — for less than either one alone. Publish your new book like a pro.",
     icon: Zap,
     cta: "Get Author Pro",
     ctaVariant: "default" as const,
@@ -94,7 +94,7 @@ const tiers = [
     monthly: "$59.99",
     annual: "$39.99",
     period: { monthly: "/month", annual: "/mo (billed annually)" },
-    description: "For publishing houses, imprints, and prolific authors managing multiple titles at scale.",
+    description: "For publishers, imprints, and prolific new authors scaling to multiple titles. Priority support and custom branding for your new books.",
     icon: Crown,
     cta: "Get Publisher",
     ctaVariant: "outline" as const,
@@ -248,12 +248,12 @@ export default function Pricing() {
 
       <div className="max-w-6xl mx-auto px-6 py-20">
         <div className="text-center mb-12">
-          <Badge className="bg-[#c9a96e]/10 text-[#8b6914] border-[#c9a96e]/30 mb-4">Pricing</Badge>
+          <Badge className="bg-[#c9a96e]/10 text-[#8b6914] border-[#c9a96e]/30 mb-4">New Author Pricing</Badge>
           <h1 className="font-serif text-4xl md:text-5xl text-[#1a1008] mb-4">
-            Professional publishing tools, priced for authors
+            Professional publishing tools, priced for new authors
           </h1>
           <p className="text-lg text-[#5c4a2a]/90 max-w-2xl mx-auto mb-8">
-            Replaces Atticus ($147) + Vellum ($250) + Reedsy + IngramSpark — at a fraction of the cost. Marketing tools, royalty calculators, distribution guides, and more. No commissions, no per-book fees, works on any device.
+            New authors save thousands vs. Atticus ($147) + Vellum ($250) + Reedsy + IngramSpark. Publish your new book with marketing tools, royalty calculators, distribution guides, and more. No commissions, no per-book fees, works on any device.
           </p>
 
           <div className="inline-flex items-center bg-[#1a1008]/5 rounded-full p-1 gap-1">
@@ -353,9 +353,9 @@ export default function Pricing() {
         </div>
 
         <div className="mb-20 bg-white rounded-2xl border border-[#c9a96e]/15 p-8">
-          <h2 className="font-serif text-3xl text-[#1a1008] text-center mb-3">Why Authors Switch to Us</h2>
+          <h2 className="font-serif text-3xl text-[#1a1008] text-center mb-3">Why New Authors Choose Us</h2>
           <p className="text-center text-[#5c4a2a]/80 mb-8 max-w-xl mx-auto">
-            Other platforms charge 2x–10x more for a fraction of what you get. We built something better.
+            Other platforms charge 2x–10x more for a fraction of what new authors get. We built something better for your new book.
           </p>
           <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-2">
             {competitors.map((c) => (
@@ -453,13 +453,14 @@ export default function Pricing() {
           <h2 className="font-serif text-3xl text-[#1a1008] text-center mb-10">Frequently Asked Questions</h2>
           <div className="grid md:grid-cols-2 gap-6 max-w-4xl mx-auto">
             {[
-              { q: "How does this compare to Atticus or Vellum?", a: "Atticus costs $147 one-time for writing + formatting. Vellum costs $249.99 and only works on Mac. Our Author Pro ($19.99/mo annual) does everything both tools do — plus IDML export, ISBN management, cover specs, marketing toolkit, royalty calculator, distribution guide, production timeline, and a full 30-step workflow. All in your browser, on any device." },
-              { q: "Why is this so much cheaper?", a: "We're a cloud platform — no desktop software to maintain per OS. That means lower costs for us and lower prices for you. We also believe publishing tools shouldn't cost more than the books you're creating." },
-              { q: "Do you take a percentage of my book sales?", a: "Never. Draft2Digital takes 10% of every sale — forever. Lulu takes 20% of profits. We charge a flat fee. Your book earnings are 100% yours, whether you sell 10 copies or 10,000." },
-              { q: "What if I just want to publish one book on KDP?", a: "The KDP Ready plan ($9.99/mo) is built exactly for that. Upload your manuscript, pick a template, and download KDP-ready files. No per-sale commissions, no complexity. Cancel anytime." },
-              { q: "Can I export files for Amazon KDP?", a: "Yes. KDP Ready, Author Pro, and Publisher plans all generate KDP-compliant PDFs with proper bleed, margins, and trim sizes that pass Amazon's automated file review." },
+              { q: "I'm a new author — is this right for me?", a: "Absolutely. Easy Book Publishers was built specifically for new authors. Our guided wizard walks you through every step, and our AI handles the professional typesetting. No publishing experience needed — just upload your manuscript and we'll produce your new book." },
+              { q: "How does this compare to Atticus or Vellum?", a: "Atticus costs $147 one-time for writing + formatting. Vellum costs $249.99 and only works on Mac. Our Author Pro ($19.99/mo annual) does everything both tools do — plus IDML export, ISBN management, cover specs, marketing toolkit, royalty calculator, distribution guide, production timeline, and a 30-step workflow. New authors get more tools at a fraction of the price." },
+              { q: "Why is this so much cheaper?", a: "We're a cloud platform — no desktop software to maintain per OS. That means lower costs for us and lower prices for new authors. We believe publishing tools shouldn't cost more than the books you're creating." },
+              { q: "Do you take a percentage of my book sales?", a: "Never. Draft2Digital takes 10% of every sale — forever. Lulu takes 20% of profits. We charge a flat fee. New authors keep 100% of their book earnings, whether you sell 10 copies or 10,000." },
+              { q: "What if I just want to publish one new book on KDP?", a: "The KDP Ready plan ($9.99/mo) is built exactly for new authors publishing their first book on Amazon. Upload your manuscript, pick a template, and download KDP-ready files. Cancel anytime." },
+              { q: "Can I export files for Amazon KDP?", a: "Yes. All plans generate KDP-compliant PDFs with proper bleed, margins, and trim sizes that pass Amazon's automated file review. New authors get professional-quality output from day one." },
               { q: "What about InDesign IDML export?", a: "Author Pro and Publisher plans include IDML export — something no other self-publishing platform offers. Hand off production-ready files to any InDesign professional without reformatting." },
-              { q: "Is there a money-back guarantee?", a: "Yes. All paid plans come with a 30-day money-back guarantee. If it's not right for you, you get a full refund — no questions asked." },
+              { q: "Is there a money-back guarantee?", a: "Yes. All plans come with a 30-day money-back guarantee. New authors can try everything risk-free — if it's not right for you, you get a full refund, no questions asked." },
             ].map(({ q, a }) => (
               <div key={q} className="bg-white rounded-xl border border-[#c9a96e]/15 p-6">
                 <h3 className="font-serif font-bold text-[#1a1008] mb-2">{q}</h3>
@@ -470,9 +471,9 @@ export default function Pricing() {
         </div>
 
         <div className="text-center py-16 px-6 bg-gradient-to-r from-[#1a1008] to-[#2a1a10] rounded-2xl">
-          <h2 className="font-serif text-3xl text-[#f5d98a] mb-4">Ready to publish your book?</h2>
+          <h2 className="font-serif text-3xl text-[#f5d98a] mb-4">New author? Publish your new book today.</h2>
           <p className="text-[#d4c8b4] mb-8 max-w-xl mx-auto">
-            Join authors and publishers using Easy Book Publishers to bring their books to life — from first idea to finished volume.
+            Join thousands of new authors using Easy Book Publishers to bring their new book to life — from manuscript to masterpiece.
           </p>
           <Button onClick={() => navigate("/dashboard")} size="lg" className="bg-gradient-to-r from-[#d4b480] to-[#c9a96e] hover:from-[#e0c490] hover:to-[#d4b480] text-[#1a1008] font-bold text-base px-10 py-6 rounded-xl shadow-xl shadow-[#c9a96e]/25">
             Go to Dashboard

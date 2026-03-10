@@ -63,7 +63,7 @@ export default function SiteFooter() {
               </div>
             </a>
             <p className="text-sm text-[#c4b8a0] leading-relaxed mb-4">
-              The all-in-one self-publishing platform. Design, typeset, and produce print-ready books with professional tools — no software to download, works on any device.
+              The all-in-one publishing platform built for new authors. Publish your new book with professional AI typesetting, KDP-ready exports, and a guided 30-step workflow — no experience needed, works on any device.
             </p>
             <div className="space-y-1">
               <p className="text-xs text-[#b0a090] font-medium uppercase tracking-wider">Export Formats</p>
