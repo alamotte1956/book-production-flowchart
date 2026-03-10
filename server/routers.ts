@@ -19,7 +19,7 @@ import { invokeLLM } from "./_core/llm";
 import { lookupByIsbn } from "./isbnLookup";
 import { notifyOwner } from "./_core/notification";
 import { sendConfirmationEmail, sendLoginEmail, sendPasswordResetEmail, sendAffiliateWelcomeEmail, sendAffiliateNotificationToOwner } from "./resendClient";
-import { createContactSubmission, saveWizardAnswers, getWizardAnswers, getRecentActivity, getDashboardStats, getUserById, updateUserStripeInfo, getUserByEmail, createEmailUser, confirmUserEmail, getUserByConfirmToken, getUserByCheckoutToken, setLoginToken, getUserByLoginToken, setPasswordResetToken, getUserByPasswordResetToken, clearPasswordResetToken, clearSession, createSession, setUserPassword } from "./db";
+import { createContactSubmission, saveWizardAnswers, getWizardAnswers, getRecentActivity, getDashboardStats, getUserById, updateUserStripeInfo, getUserByEmail, createEmailUser, confirmUserEmail, getUserByConfirmToken, getUserByCheckoutToken, setLoginToken, getUserByLoginToken, setPasswordResetToken, getUserByPasswordResetToken, clearPasswordResetToken, clearSession, createSession, setUserPassword, getOrdersByUser } from "./db";
 import { TRPCError } from "@trpc/server";
 import { getUncachableStripeClient, getStripePublishableKey } from "./stripeClient";
 import { sql } from "drizzle-orm";
@@ -253,7 +253,7 @@ export const appRouter = router({
         if (!project || project.userId !== ctx.user.id) {
           throw new Error("Project not found");
         }
-        await deleteUploadedFile(input.fileId);
+        await deleteUploadedFile(input.fileId, input.projectId);
         return { success: true };
       }),
   }),
@@ -1418,6 +1418,10 @@ export const appRouter = router({
         stripeCustomerId: user.stripeCustomerId,
         stripeSubscriptionId: user.stripeSubscriptionId,
       };
+    }),
+
+    getOrders: protectedProcedure.query(async ({ ctx }) => {
+      return getOrdersByUser(ctx.user.id);
     }),
 
     createCheckoutSession: publicProcedure

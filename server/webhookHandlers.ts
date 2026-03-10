@@ -1,5 +1,5 @@
 import { getStripeSync } from './stripeClient';
-import { updateUserStripeInfo } from './db';
+import { updateUserStripeInfo, createOrder } from './db';
 import { getAffiliateByCode, createConversion } from './affiliateDb';
 
 export class WebhookHandlers {
@@ -42,6 +42,24 @@ export class WebhookHandlers {
 
         await updateUserStripeInfo(userId, update);
         console.log(`[Stripe] User ${userId} upgraded to ${planName}`);
+
+        try {
+          const saleAmount = session.amount_total ? (session.amount_total / 100).toFixed(2) : "0.00";
+          await createOrder({
+            userId,
+            stripeSessionId: session.id,
+            stripeCustomerId: typeof session.customer === 'string' ? session.customer : null,
+            planName,
+            billingCycle: session.metadata?.billingCycle || null,
+            amount: saleAmount,
+            currency: session.currency || "usd",
+            status: "completed",
+            customerEmail: session.customer_email || session.customer_details?.email || null,
+          });
+          console.log(`[Orders] Order recorded for user ${userId}: ${planName} ($${saleAmount})`);
+        } catch (orderErr) {
+          console.error('[Orders] Error recording order:', orderErr);
+        }
 
         const affiliateCode = session.metadata?.affiliateCode;
         if (affiliateCode) {

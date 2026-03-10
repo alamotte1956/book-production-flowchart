@@ -183,6 +183,25 @@ export const wizardSessions = pgTable("wizard_sessions", {
 export type WizardSession = typeof wizardSessions.$inferSelect;
 export type InsertWizardSession = typeof wizardSessions.$inferInsert;
 
+export const orderStatusEnum = pgEnum("order_status", ["completed", "refunded", "disputed"]);
+
+export const orders = pgTable("orders", {
+  id: serial("id").primaryKey(),
+  userId: integer("userId").notNull(),
+  stripeSessionId: varchar("stripeSessionId", { length: 255 }).unique(),
+  stripeCustomerId: varchar("stripeCustomerId", { length: 255 }),
+  planName: varchar("planName", { length: 64 }).notNull(),
+  billingCycle: varchar("billingCycle", { length: 32 }),
+  amount: numeric("amount", { precision: 10, scale: 2 }).notNull(),
+  currency: varchar("currency", { length: 10 }).default("usd").notNull(),
+  status: orderStatusEnum("status").default("completed").notNull(),
+  customerEmail: varchar("customerEmail", { length: 320 }),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+});
+
+export type Order = typeof orders.$inferSelect;
+export type InsertOrder = typeof orders.$inferInsert;
+
 export const affiliateStatusEnum = pgEnum("affiliate_status", ["pending", "approved", "suspended"]);
 export const conversionStatusEnum = pgEnum("conversion_status", ["pending", "approved", "paid"]);
 export const payoutStatusEnum = pgEnum("payout_status", ["pending", "processing", "completed", "failed"]);

@@ -10,6 +10,7 @@ import {
   productionJobs, InsertProductionJob, ProductionJob,
   contactSubmissions, InsertContactSubmission, ContactSubmission,
   wizardSessions, InsertWizardSession, WizardSession,
+  orders, InsertOrder, Order,
 } from "../drizzle/schema";
 
 
@@ -201,10 +202,13 @@ export async function createUploadedFile(data: Omit<InsertUploadedFile, "id" | "
   return file;
 }
 
-export async function deleteUploadedFile(fileId: number): Promise<void> {
+export async function deleteUploadedFile(fileId: number, projectId: number): Promise<void> {
   const db = await getDb();
   if (!db) throw new Error("Database not available");
-  await db.delete(uploadedFiles).where(eq(uploadedFiles.id, fileId));
+  const result = await db.delete(uploadedFiles).where(and(eq(uploadedFiles.id, fileId), eq(uploadedFiles.projectId, projectId))).returning();
+  if (result.length === 0) {
+    throw new Error("File not found or does not belong to this project");
+  }
 }
 
 // ─── Step date helpers ────────────────────────────────────────
@@ -730,4 +734,17 @@ export async function clearSession(userId: number) {
     sessionTokenExpiresAt: null,
     updatedAt: new Date(),
   }).where(eq(users.id, userId));
+}
+
+export async function createOrder(order: InsertOrder): Promise<Order> {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  const [created] = await db.insert(orders).values(order).returning();
+  return created;
+}
+
+export async function getOrdersByUser(userId: number): Promise<Order[]> {
+  const db = await getDb();
+  if (!db) return [];
+  return db.select().from(orders).where(eq(orders.userId, userId)).orderBy(desc(orders.createdAt));
 }
