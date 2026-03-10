@@ -644,14 +644,17 @@ function generateTocNavHtml(chapters: Array<{ title?: string; content: string }>
 export async function renderToEpub(book: ParsedBook, style: TypesettingStyle, meta?: EpubMetadata): Promise<Buffer> {
   return runStage("epub-generation", async () => {
     const epubMeta = meta || {};
-    let EpubModule: { default: (...args: unknown[]) => Promise<Uint8Array> };
+    let Epub: (...args: unknown[]) => Promise<Uint8Array>;
     try {
-      EpubModule = await import("epub-gen-memory") as typeof EpubModule;
+      const EpubModule = await import("epub-gen-memory");
+      Epub = EpubModule.EPub || EpubModule.default?.EPub || EpubModule.default;
+      if (typeof Epub !== "function") {
+        throw new Error(`EPub export is ${typeof Epub}, not a function. Keys: ${Object.keys(EpubModule).join(", ")}`);
+      }
     } catch (importErr: unknown) {
       const msg = importErr instanceof Error ? importErr.message : String(importErr);
       throw new Error(`Failed to import epub-gen-memory: ${msg}`);
     }
-    const Epub = EpubModule.default;
 
     const content: Array<{ title?: string; content: string }> = [];
 
