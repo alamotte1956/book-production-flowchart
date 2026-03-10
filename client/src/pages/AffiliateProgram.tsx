@@ -40,7 +40,7 @@ const competitorComparison = [
 
 const faqs = [
   { q: "Who can become an affiliate?", a: "Anyone with an audience interested in self-publishing, book design, or writing tools. This includes bloggers, YouTubers, podcasters, writing coaches, book designers, and publishing consultants." },
-  { q: "How much can I earn?", a: "You earn 20% on every sale. Author Pro lifetime plans earn you $26.40 per sale, Publisher lifetime plans earn $69.80 per sale. Monthly and annual subscriptions earn recurring commissions." },
+  { q: "How much can I earn?", a: "You earn 20% on every sale. Author Pro lifetime plans earn you $19.40 per sale, Publisher lifetime plans earn $49.80 per sale. Monthly and annual subscriptions earn recurring commissions." },
   { q: "When do I get paid?", a: "Payouts are processed monthly via PayPal once your balance reaches the $50 minimum threshold. Commissions are approved after a 30-day hold period to account for refunds." },
   { q: "How long does the cookie last?", a: "Our tracking cookie lasts 90 days. If someone clicks your link and purchases within 90 days, you get credit for the sale — even if they visit the site multiple times." },
   { q: "What marketing materials do you provide?", a: "We provide ready-to-use banner ads, text links, social media copy, and email templates. All available in your affiliate dashboard once approved." },
@@ -162,17 +162,17 @@ export default function AffiliateProgram() {
             <Card className="bg-white border-[#c9a96e]/15">
               <CardContent className="p-6 text-center">
                 <Zap className="w-8 h-8 text-[#c9a96e] mx-auto mb-3" />
-                <div className="font-serif text-3xl text-[#1a1008] font-bold">$26.40</div>
+                <div className="font-serif text-3xl text-[#1a1008] font-bold">$19.40</div>
                 <div className="text-sm text-[#5c4a2a]/90 mt-1">per Author Pro lifetime sale</div>
-                <div className="text-xs text-[#8b6914] mt-2">Plan price: $132</div>
+                <div className="text-xs text-[#8b6914] mt-2">Plan price: $97</div>
               </CardContent>
             </Card>
             <Card className="bg-white border-[#c9a96e]/15 ring-2 ring-[#c9a96e]/30">
               <CardContent className="p-6 text-center">
                 <TrendingUp className="w-8 h-8 text-[#c9a96e] mx-auto mb-3" />
-                <div className="font-serif text-3xl text-[#1a1008] font-bold">$69.80</div>
+                <div className="font-serif text-3xl text-[#1a1008] font-bold">$49.80</div>
                 <div className="text-sm text-[#5c4a2a]/90 mt-1">per Publisher lifetime sale</div>
-                <div className="text-xs text-[#8b6914] mt-2">Plan price: $349</div>
+                <div className="text-xs text-[#8b6914] mt-2">Plan price: $249</div>
               </CardContent>
             </Card>
             <Card className="bg-white border-[#c9a96e]/15">

@@ -324,7 +324,7 @@ export const ROUTE_META: Array<{ path: string; meta: RouteMeta }> = [
     meta: {
       title: "Pricing — Easy Book Publishers",
       description:
-        "Simple, transparent pricing for self-publishing. Starter (free), Author Pro ($132), and Publisher ($349) plans with AI typesetting, EPUB/PDF export, IDML, and team features.",
+        "Simple, transparent pricing for self-publishing. Starter (free), KDP Ready ($29), Author Pro ($97), and Publisher ($249) plans with AI typesetting, EPUB/PDF export, IDML, and team features.",
       keywords:
         "pricing, self-publishing plans, book publishing pricing, online publishing, publishing platform",
       canonical: `${BASE}/pricing`,
@@ -336,7 +336,7 @@ export const ROUTE_META: Array<{ path: string; meta: RouteMeta }> = [
         "@context": "https://schema.org",
         "@type": "WebPage",
         name: "Pricing — Easy Book Publishers",
-        description: "Transparent pricing for self-publishing — Starter (free), Author Pro ($132), and Publisher ($349).",
+        description: "Transparent pricing for self-publishing — Starter (free), KDP Ready ($29), Author Pro ($97), and Publisher ($249).",
         url: `${BASE}/pricing`,
         provider: ORG_SCHEMA,
       },
@@ -435,8 +435,9 @@ export const ROUTE_META: Array<{ path: string; meta: RouteMeta }> = [
             operatingSystem: "Web",
             offers: [
               { "@type": "Offer", name: "Starter", price: "0", priceCurrency: "USD", description: "Free forever — 1 book project, basic tools" },
-              { "@type": "Offer", name: "Author Pro", price: "132", priceCurrency: "USD", description: "Full publishing toolkit with AI typesetting, IDML, and KDP export" },
-              { "@type": "Offer", name: "Publisher", price: "349", priceCurrency: "USD", description: "For publishing houses and prolific authors with custom branding" },
+              { "@type": "Offer", name: "KDP Ready", price: "29", priceCurrency: "USD", description: "Upload your manuscript, get KDP-ready PDF and EPUB — fast" },
+              { "@type": "Offer", name: "Author Pro", price: "97", priceCurrency: "USD", description: "Full publishing toolkit with AI typesetting, IDML, and KDP export" },
+              { "@type": "Offer", name: "Publisher", price: "249", priceCurrency: "USD", description: "For publishing houses and prolific authors with custom branding" },
             ],
             featureList: [
               "AI-powered book typesetting",
@@ -470,7 +471,7 @@ export const ROUTE_META: Array<{ path: string; meta: RouteMeta }> = [
                 name: "Is Easy Book Publishers free to use?",
                 acceptedAnswer: {
                   "@type": "Answer",
-                  text: "Yes, the Starter plan is free forever and includes 1 book project with access to the Bible Design Studio, Spine Calculator, Cover Designer, ISBN Manager, Print Specs, and Resources Hub. Paid plans (Author Pro at $132 and Publisher at $349) unlock AI typesetting, 40+ templates, IDML export, and unlimited projects.",
+                  text: "Yes, the Starter plan is free forever and includes 1 book project with access to the Bible Design Studio, Spine Calculator, Cover Designer, ISBN Manager, Print Specs, and Resources Hub. Paid plans (KDP Ready at $29, Author Pro at $97, and Publisher at $249) unlock AI typesetting, 40+ templates, IDML export, and unlimited projects.",
                 },
               },
               {
@@ -553,8 +554,8 @@ export const ROUTE_META: Array<{ path: string; meta: RouteMeta }> = [
   {
     path: "/affiliates",
     meta: {
-      title: "Affiliate Program — Earn 25% Commission | Easy Book Publishers",
-      description: "Join the Easy Book Publishers affiliate program. Earn 25% on every sale with a 90-day cookie, real-time dashboard, and monthly PayPal payouts.",
+      title: "Affiliate Program — Earn 20% Commission | Easy Book Publishers",
+      description: "Join the Easy Book Publishers affiliate program. Earn 20% on every sale with a 90-day cookie, real-time dashboard, and monthly PayPal payouts.",
       keywords: "affiliate program, book publishing affiliate, earn commissions, referral program, self-publishing affiliate",
       canonical: `${BASE}/affiliates`,
       ogImage: OG_IMAGE,
@@ -565,7 +566,7 @@ export const ROUTE_META: Array<{ path: string; meta: RouteMeta }> = [
         "@context": "https://schema.org",
         "@type": "WebPage",
         name: "Affiliate Program — Easy Book Publishers",
-        description: "Earn 25% commission on every referral sale. 90-day tracking cookie, monthly PayPal payouts, real-time dashboard.",
+        description: "Earn 20% commission on every referral sale. 90-day tracking cookie, monthly PayPal payouts, real-time dashboard.",
         url: `${BASE}/affiliates`,
         provider: ORG_SCHEMA,
       },

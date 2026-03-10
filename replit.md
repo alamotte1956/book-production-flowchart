@@ -130,7 +130,7 @@ PostgreSQL via Replit's built-in database. Use `npx drizzle-kit push` to sync sc
 - **Guided Journey Dashboard**: New users see "Start Your Publishing Journey" CTA, wizard-completers see roadmap summary with retake option
 - **Project Duplication**: Duplicate button in Project Tracker creates project copy with "(Copy)" suffix
 - **Notification Center**: Bell icon in sidebar with unread count, popover dropdown, localStorage-based read tracking
-- **Pricing Page**: Three tiers (Starter free, Author Pro $132 lifetime, Publisher $349 lifetime) with billing toggle, competitor comparison, and FAQ
+- **Pricing Page**: Four tiers (Starter free, KDP Ready $29 lifetime, Author Pro $97 lifetime, Publisher $249 lifetime) with billing toggle, competitive comparison vs Atticus/Vellum/D2D/BookBaby, and FAQ
 - **Getting Started Checklist**: New projects show 6-step onboarding checklist, auto-hides after 3 completed steps
 - **Resources Search & Filter**: Search bar with text highlighting, category filter pills (Writing, Editorial, Design, etc.)
 - **Contact Form**: Public contact form on landing page (backend wired to contact_submissions table)
@@ -183,9 +183,9 @@ PostgreSQL via Replit's built-in database. Use `npx drizzle-kit push` to sync sc
 - **Schema**: `stripe.*` tables auto-synced (products, prices, customers, subscriptions, etc.) — NEVER INSERT directly
 - **Webhook**: `/api/stripe/webhook` route registered BEFORE `express.json()` with raw body parsing
 - **Products**: Created via `server/seedStripeProducts.ts` (run `npx tsx server/seedStripeProducts.ts`)
-  - KDP Ready: monthly ($6.99), annual ($59.88/yr), lifetime ($49) — for self-publishers who just need KDP formatting
-  - Author Pro: monthly ($12.99), annual ($107.88/yr), lifetime ($132)
-  - Publisher: monthly ($34.99), annual ($299.88/yr), lifetime ($349)
+  - KDP Ready: monthly ($4.99), annual ($35.88/yr), lifetime ($29) — for self-publishers who just need KDP formatting
+  - Author Pro: monthly ($9.99), annual ($83.88/yr), lifetime ($97)
+  - Publisher: monthly ($24.99), annual ($203.88/yr), lifetime ($249)
 - **User columns**: `plan` (enum: starter/kdp_ready/author_pro/publisher), `stripeCustomerId`, `stripeSubscriptionId`
 - **tRPC routes**: `stripe.getSubscription`, `stripe.createCheckoutSession`, `stripe.createBillingPortal`, `stripe.getProducts`, `stripe.getPublishableKey`, `stripe.getPriceIds`
 - **Webhook handlers**: `checkout.session.completed` (upgrades plan), `customer.subscription.updated`, `customer.subscription.deleted` (reverts to starter)
