@@ -424,6 +424,10 @@ function SpecSummary({ config }: { config: BibleConfig }) {
 // ─── AI Writing Assistant ─────────────────────────────────────────────────────
 
 const COPY_TYPES = [
+  { value: "foreword", label: "Foreword", desc: "~500 words" },
+  { value: "introduction", label: "Introduction", desc: "~600 words" },
+  { value: "copyright-page", label: "Copyright Page", desc: "~150 words" },
+  { value: "glossary", label: "Glossary", desc: "~400 words" },
   { value: "back-cover-blurb", label: "Back-Cover Blurb", desc: "~150 words" },
   { value: "author-bio", label: "Author Biography", desc: "~100 words" },
   { value: "catalog-description", label: "Catalog Description", desc: "~200 words" },

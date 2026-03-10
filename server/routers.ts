@@ -850,13 +850,13 @@ export const appRouter = router({
   ai: router({
     generateCopy: protectedProcedure
       .input(z.object({
-        type: z.enum(["back-cover-blurb", "author-bio", "catalog-description", "press-release", "marketing-email", "bisac-description", "toc-description", "study-note-summary", "devotional-intro"]),
+        type: z.enum(["back-cover-blurb", "author-bio", "catalog-description", "press-release", "marketing-email", "bisac-description", "toc-description", "study-note-summary", "devotional-intro", "foreword", "introduction", "copyright-page", "glossary"]),
         bookTitle: z.string().min(1).max(255),
         author: z.string().max(255).optional(),
         genre: z.string().max(128).optional(),
         synopsis: z.string().max(2000).optional(),
         tone: z.enum(["literary", "commercial", "academic", "inspirational", "devotional"]).optional(),
-        wordCount: z.number().min(50).max(800).optional(),
+        wordCount: z.number().min(50).max(1500).optional(),
       }))
       .mutation(async ({ input }) => {
         const typeLabels: Record<string, string> = {
@@ -869,14 +869,37 @@ export const appRouter = router({
           "toc-description": "table of contents description",
           "study-note-summary": "study note summary",
           "devotional-intro": "devotional introduction",
+          "foreword": "foreword",
+          "introduction": "introduction",
+          "copyright-page": "copyright page",
+          "glossary": "glossary of key terms",
         };
-        const targetWords = input.wordCount ?? (input.type === "back-cover-blurb" ? 150 : input.type === "author-bio" ? 100 : input.type === "bisac-description" ? 100 : input.type === "study-note-summary" ? 200 : input.type === "devotional-intro" ? 250 : 200);
+        const defaultWordCounts: Record<string, number> = {
+          "back-cover-blurb": 150,
+          "author-bio": 100,
+          "bisac-description": 100,
+          "study-note-summary": 200,
+          "devotional-intro": 250,
+          "foreword": 500,
+          "introduction": 600,
+          "copyright-page": 150,
+          "glossary": 400,
+        };
+        const targetWords = input.wordCount ?? (defaultWordCounts[input.type] || 200);
         const toneGuide = input.tone ? `Tone: ${input.tone}.` : "";
         const synopsisLine = input.synopsis ? `\nSynopsis / Key details: ${input.synopsis}` : "";
 
+        const typeSpecificInstructions: Record<string, string> = {
+          "foreword": "Write a foreword as if written by a respected colleague, mentor, or industry figure endorsing the book. Include a personal anecdote about how you know the author or their work, why this book matters, and what the reader will gain. Use first person. End with the endorser's perspective on why the reader should continue. Do NOT include a signature line or name — just the body text.",
+          "introduction": "Write a book introduction from the author's perspective. Cover the motivation for writing the book, what the reader will learn or experience, how the book is organized, and who the intended audience is. Make it personal and engaging — this is the author speaking directly to the reader before the main content begins.",
+          "copyright-page": `Write a professional copyright page for a published book. Include: copyright notice (© ${new Date().getFullYear()} [Author]), all-rights-reserved statement, a disclaimer if appropriate for the genre, publisher line (Easy Book Publishers), country of publication (United States), and a note about reproduction restrictions. Format each element on its own line. Do NOT invent an ISBN — leave a placeholder line reading "ISBN: [To be assigned]".`,
+          "glossary": "Write a glossary of key terms relevant to this book's subject matter. Include 15–25 terms that a reader would encounter in the text. Format each entry as: the term in bold followed by a clear, concise definition (1–2 sentences). Arrange terms alphabetically. Choose terms that genuinely help the reader understand the book's content.",
+        };
+
         const systemPrompt = `You are a professional publishing copywriter specializing in book marketing and editorial copy. Write compelling, polished text for publishers and authors. Output only the requested copy — no preamble, no labels, no meta-commentary.`;
 
-        const userPrompt = `Write a ${typeLabels[input.type]} for the following book:\n\nTitle: ${input.bookTitle}\nAuthor: ${input.author ?? "(not specified)"}\nGenre: ${input.genre ?? "(not specified)"}${synopsisLine}\n\n${toneGuide}\nTarget length: approximately ${targetWords} words.`;
+        const extraInstruction = typeSpecificInstructions[input.type] ? `\n\nSpecific instructions: ${typeSpecificInstructions[input.type]}` : "";
+        const userPrompt = `Write a ${typeLabels[input.type]} for the following book:\n\nTitle: ${input.bookTitle}\nAuthor: ${input.author ?? "(not specified)"}\nGenre: ${input.genre ?? "(not specified)"}${synopsisLine}\n\n${toneGuide}\nTarget length: approximately ${targetWords} words.${extraInstruction}`;
 
         let response;
         try {

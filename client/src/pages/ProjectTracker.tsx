@@ -1020,6 +1020,10 @@ function PhaseSection({
 // ─── AI Writing Assistant ────────────────────────────────────────
 
 const TRACKER_COPY_TYPES = [
+  { value: "foreword", label: "Foreword", desc: "~500 words" },
+  { value: "introduction", label: "Introduction", desc: "~600 words" },
+  { value: "copyright-page", label: "Copyright Page", desc: "~150 words" },
+  { value: "glossary", label: "Glossary", desc: "~400 words" },
   { value: "back-cover-blurb", label: "Back-Cover Blurb", desc: "~150 words" },
   { value: "author-bio", label: "Author Biography", desc: "~100 words" },
   { value: "press-release", label: "Press Release", desc: "~300 words" },
