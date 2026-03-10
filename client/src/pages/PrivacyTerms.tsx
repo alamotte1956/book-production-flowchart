@@ -3,7 +3,7 @@ import { Shield, FileText, Lock, Eye, Database, CreditCard, Mail, Globe, Scale, 
 import { Button } from "@/components/ui/button";
 import SiteFooter from "@/components/SiteFooter";
 
-const lastUpdated = "March 8, 2026";
+const lastUpdated = "March 10, 2026";
 
 export default function PrivacyTerms() {
   const [, navigate] = useLocation();
@@ -141,23 +141,51 @@ export default function PrivacyTerms() {
             </div>
             <div className="bg-white rounded-xl border border-[#c9a96e]/15 p-6 md:p-8 space-y-6">
               <div>
+                <h3 className="font-serif text-lg text-[#1a1008] font-semibold mb-2">Key Definitions</h3>
+                <p className="text-[#5c4a2a] leading-relaxed text-sm mb-3">
+                  Here are plain-language explanations of important terms used throughout this page:
+                </p>
+                <ul className="space-y-2 text-[#5c4a2a] text-sm list-disc list-inside">
+                  <li><strong>"The Service"</strong> — The Easy Book Publishers website, tools, and all features we provide to help you produce your book.</li>
+                  <li><strong>"Account"</strong> — Your personal login on Easy Book Publishers, created with your email address and password.</li>
+                  <li><strong>"Content" / "Your Content"</strong> — Anything you upload or create using our platform, including your manuscripts, cover designs, and exported book files. You own all of it.</li>
+                  <li><strong>"Subscription"</strong> — A paid plan (monthly or annual) that renews automatically and gives you access to premium features until you cancel.</li>
+                  <li><strong>"Lifetime Plan"</strong> — A one-time purchase that gives you permanent access to a plan's features with no recurring charges.</li>
+                  <li><strong>"Stripe"</strong> — The independent payment company that securely handles all credit card transactions on our behalf. We never see or store your card number.</li>
+                  <li><strong>"TLS Encryption"</strong> — A security technology that scrambles data sent between your browser and our servers so no one else can read it.</li>
+                  <li><strong>"PCI-DSS Level 1"</strong> — The highest level of payment security certification. Stripe holds this certification, meaning your payment info meets the strictest safety standards.</li>
+                  <li><strong>"Cookies"</strong> — Small files stored in your browser that remember your login session. We only use essential cookies to keep you signed in.</li>
+                  <li><strong>"Typesetting"</strong> — The process of formatting your manuscript into a professionally designed, print-ready layout with proper fonts, margins, headers, and page numbers.</li>
+                  <li><strong>"PDF"</strong> — A standard file format used for viewing and printing documents. We generate print-ready PDFs suitable for services like Amazon KDP.</li>
+                  <li><strong>"EPUB"</strong> — A widely used e-book format that works on most e-readers (Kindle, Kobo, Apple Books, etc.).</li>
+                  <li><strong>"IDML"</strong> — An Adobe InDesign file format. Useful if you or a designer want to make further layout changes in professional design software.</li>
+                  <li><strong>"KDP"</strong> — Kindle Direct Publishing, Amazon's self-publishing platform where you can list your book for sale.</li>
+                  <li><strong>"Trim Size"</strong> — The final dimensions of your printed book (for example, 6" x 9"). This determines page layout and margins.</li>
+                  <li><strong>"ISBN"</strong> — International Standard Book Number, a unique identifier assigned to published books. It is not required to use our service.</li>
+                  <li><strong>"Binding Arbitration"</strong> — A way to settle disagreements outside of court, where a neutral third party reviews the issue and makes a decision that both sides agree to follow.</li>
+                  <li><strong>"Intellectual Property"</strong> — Legal ownership rights over creative work. Your book content belongs to you; our platform design and code belong to us.</li>
+                  <li><strong>"As Is"</strong> — Means we provide the service in its current state and do not make guarantees that every feature will work perfectly at all times.</li>
+                </ul>
+              </div>
+
+              <div className="border-t border-[#c9a96e]/10 pt-6">
                 <h3 className="font-serif text-lg text-[#1a1008] font-semibold mb-2">1. Acceptance of Terms</h3>
                 <p className="text-[#5c4a2a] leading-relaxed text-sm">
-                  By accessing or using Easy Book Publishers ("the Service"), you agree to be bound by these Terms of Service and our Privacy Policy. If you do not agree to these terms, you may not use the Service.
+                  By using Easy Book Publishers, you agree to follow these rules. If you do not agree, please do not use the Service.
                 </p>
               </div>
 
               <div>
                 <h3 className="font-serif text-lg text-[#1a1008] font-semibold mb-2">2. Account Registration</h3>
                 <p className="text-[#5c4a2a] leading-relaxed text-sm">
-                  To purchase a paid plan, you must create an account with a valid email address and confirm your email. You are responsible for maintaining the security of your account and for all activities that occur under your account. You must provide accurate and complete information during registration.
+                  To purchase a paid plan, you need to create an account with a valid email address and confirm it. You are responsible for keeping your password safe and for anything that happens on your account. Please use real, accurate information when signing up.
                 </p>
               </div>
 
               <div>
-                <h3 className="font-serif text-lg text-[#1a1008] font-semibold mb-2">3. Service Description</h3>
+                <h3 className="font-serif text-lg text-[#1a1008] font-semibold mb-2">3. What We Provide</h3>
                 <p className="text-[#5c4a2a] leading-relaxed text-sm">
-                  Easy Book Publishers provides web-based book production tools including manuscript upload, typesetting, cover design, and export to multiple formats (PDF, EPUB, IDML). The Service offers free (Starter) and paid (Author Pro, Publisher) tiers with varying feature access.
+                  Easy Book Publishers gives you online tools to upload your manuscript, format it with professional typesetting, and export it as a print-ready PDF, e-book (EPUB), or design file (IDML). We offer a free Starter plan and paid plans (KDP Ready, Author Pro, and Publisher) with additional features at each level.
                 </p>
               </div>
 
@@ -167,71 +195,71 @@ export default function PrivacyTerms() {
                   <h3 className="font-serif text-lg text-[#1a1008] font-semibold">4. Payments & Subscriptions</h3>
                 </div>
                 <ul className="space-y-1 text-[#5c4a2a] text-sm list-disc list-inside">
-                  <li>All payments are processed securely through Stripe</li>
-                  <li>Subscription plans (monthly and annual) renew automatically until cancelled</li>
-                  <li>Lifetime plans are one-time purchases with no recurring charges</li>
-                  <li>You may cancel your subscription at any time through the billing portal</li>
-                  <li>Refunds are handled on a case-by-case basis within 14 days of purchase</li>
-                  <li>Prices are listed in USD and may be updated with reasonable notice</li>
+                  <li>All payments are handled securely by Stripe. We never see or store your credit card number.</li>
+                  <li>Monthly and annual plans renew automatically. You will be charged at the start of each billing period until you cancel.</li>
+                  <li>Lifetime plans are a single, one-time payment. You will never be charged again for that plan.</li>
+                  <li>You can cancel your subscription at any time through the billing portal. You keep access until the end of your current billing period.</li>
+                  <li>If you are unhappy with your purchase, you may request a refund within 14 days. We review each request individually.</li>
+                  <li>All prices are shown in U.S. dollars (USD). We will give you advance notice before changing prices.</li>
                 </ul>
               </div>
 
               <div>
-                <h3 className="font-serif text-lg text-[#1a1008] font-semibold mb-2">5. Intellectual Property</h3>
+                <h3 className="font-serif text-lg text-[#1a1008] font-semibold mb-2">5. Your Content Belongs to You</h3>
                 <p className="text-[#5c4a2a] leading-relaxed text-sm">
-                  You retain full ownership of all content you create or upload to the Service, including manuscripts, cover designs, and exported files. Easy Book Publishers does not claim any intellectual property rights over your content. Our platform, including its design, code, and documentation, is the property of Easy Book Publishers and is protected by copyright.
+                  You keep full ownership of everything you create or upload, including your manuscripts, cover designs, and exported files. We will never claim your work as ours. The Easy Book Publishers platform itself (its design, features, and code) is our property and is protected by copyright.
                 </p>
               </div>
 
               <div>
-                <h3 className="font-serif text-lg text-[#1a1008] font-semibold mb-2">6. Acceptable Use</h3>
+                <h3 className="font-serif text-lg text-[#1a1008] font-semibold mb-2">6. Rules for Using the Service</h3>
                 <p className="text-[#5c4a2a] leading-relaxed text-sm">
-                  You agree not to use the Service to:
+                  Please do not use Easy Book Publishers to:
                 </p>
                 <ul className="mt-2 space-y-1 text-[#5c4a2a] text-sm list-disc list-inside">
-                  <li>Upload or distribute content that infringes on the rights of others</li>
-                  <li>Attempt to access, tamper with, or use non-public areas of the Service</li>
-                  <li>Use the Service for any unlawful purpose or in violation of any applicable laws</li>
-                  <li>Interfere with or disrupt the Service or its infrastructure</li>
-                  <li>Resell or redistribute the Service without authorization</li>
+                  <li>Upload content that you do not have the right to use (for example, someone else's copyrighted work without permission)</li>
+                  <li>Try to break into, hack, or tamper with parts of the platform you should not have access to</li>
+                  <li>Do anything illegal or that violates any laws</li>
+                  <li>Disrupt or interfere with the platform for other users</li>
+                  <li>Resell or redistribute our service to others without our permission</li>
                 </ul>
               </div>
 
               <div>
                 <div className="flex items-center gap-2 mb-2">
                   <AlertTriangle className="w-4 h-4 text-[#8b6914]" />
-                  <h3 className="font-serif text-lg text-[#1a1008] font-semibold">7. Limitation of Liability</h3>
+                  <h3 className="font-serif text-lg text-[#1a1008] font-semibold">7. Limits on Our Responsibility</h3>
                 </div>
                 <p className="text-[#5c4a2a] leading-relaxed text-sm">
-                  The Service is provided "as is" without warranties of any kind. Easy Book Publishers shall not be liable for any indirect, incidental, special, or consequential damages arising from your use of the Service. Our total liability shall not exceed the amount you paid for the Service in the 12 months preceding the claim.
+                  We do our best to provide a reliable service, but we cannot guarantee everything will work perfectly at all times. If something goes wrong, we are not responsible for indirect losses (such as lost profits or missed deadlines) resulting from using the Service. The most we would ever owe you is the amount you paid us in the 12 months before the issue occurred.
                 </p>
               </div>
 
               <div>
                 <h3 className="font-serif text-lg text-[#1a1008] font-semibold mb-2">8. Service Availability</h3>
                 <p className="text-[#5c4a2a] leading-relaxed text-sm">
-                  We strive to maintain high availability but do not guarantee uninterrupted access. The Service may be temporarily unavailable due to maintenance, updates, or circumstances beyond our control. We will make reasonable efforts to notify users of planned downtime.
+                  We aim to keep the platform running smoothly, but there may be times it is temporarily unavailable for maintenance, updates, or unexpected issues. We will do our best to let you know in advance about any planned downtime.
                 </p>
               </div>
 
               <div>
-                <h3 className="font-serif text-lg text-[#1a1008] font-semibold mb-2">9. Termination</h3>
+                <h3 className="font-serif text-lg text-[#1a1008] font-semibold mb-2">9. Closing Your Account</h3>
                 <p className="text-[#5c4a2a] leading-relaxed text-sm">
-                  We reserve the right to suspend or terminate your access to the Service if you violate these Terms. You may close your account at any time. Upon termination, your right to use the Service ceases immediately, though we will provide reasonable time to export your data.
+                  You can close your account at any time. If you break these rules, we may suspend or close your account. If your account is closed for any reason, you will have a reasonable amount of time to download your files before they are removed.
                 </p>
               </div>
 
               <div>
-                <h3 className="font-serif text-lg text-[#1a1008] font-semibold mb-2">10. Changes to Terms</h3>
+                <h3 className="font-serif text-lg text-[#1a1008] font-semibold mb-2">10. Changes to These Terms</h3>
                 <p className="text-[#5c4a2a] leading-relaxed text-sm">
-                  We may update these Terms from time to time. Material changes will be communicated through the platform or via email. Your continued use of the Service after changes take effect constitutes acceptance of the updated Terms.
+                  We may update these Terms from time to time. If we make important changes, we will let you know by email or through the platform. If you continue using the Service after the changes, it means you accept the updated Terms.
                 </p>
               </div>
 
               <div>
-                <h3 className="font-serif text-lg text-[#1a1008] font-semibold mb-2">11. Governing Law</h3>
+                <h3 className="font-serif text-lg text-[#1a1008] font-semibold mb-2">11. Legal Jurisdiction</h3>
                 <p className="text-[#5c4a2a] leading-relaxed text-sm">
-                  These Terms shall be governed by and construed in accordance with the laws of the United States. Any disputes arising from these Terms or the Service shall be resolved through binding arbitration.
+                  These Terms follow United States law. If we ever have a disagreement that we cannot resolve directly, it will be settled through binding arbitration, which means a neutral third party will review the issue and make a final decision instead of going to court.
                 </p>
               </div>
             </div>
