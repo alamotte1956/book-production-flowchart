@@ -378,15 +378,43 @@ export default function Home() {
           </div>
 
           {projectList.length === 0 ? (
-            <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} className="text-center py-24 bg-gradient-to-br from-white/90 to-[#f3efe6]/90 backdrop-blur-sm rounded-2xl border border-[#c9a96e]/20 shadow-sm">
-              <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-[#f5ede0] to-[#e8dfd0] flex items-center justify-center mx-auto mb-6 shadow-sm">
-                <BookOpen size={32} className="text-[#c9a96e]" />
+            <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} className="bg-gradient-to-br from-white/90 to-[#f3efe6]/90 backdrop-blur-sm rounded-2xl border border-[#c9a96e]/20 shadow-sm overflow-hidden">
+              <div className="text-center pt-16 pb-10 px-6">
+                <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-[#f5ede0] to-[#e8dfd0] flex items-center justify-center mx-auto mb-6 shadow-sm">
+                  <BookOpen size={32} className="text-[#c9a96e]" />
+                </div>
+                <p className="font-serif text-2xl text-[#3a2a1a] mb-2">Welcome to Your Publishing Studio</p>
+                <p className="text-sm text-[#7a6e60] max-w-md mx-auto leading-relaxed mb-8">You're one step away from creating a professional, print-ready book. Start your first project and our {totalSteps}-step workflow will guide you through every stage.</p>
+                <Button className="bg-gradient-to-r from-[#c9a96e] to-[#b8944f] hover:from-[#d4b480] hover:to-[#c9a96e] text-[#2a1a0a] font-semibold shadow-md shadow-[#c9a96e]/15 px-8 py-3 text-base" onClick={() => setOpen(true)}>
+                  <Plus size={18} className="mr-2" /> Create Your First Book
+                </Button>
               </div>
-              <p className="font-serif text-2xl text-[#3a2a1a]">No projects yet</p>
-              <p className="text-sm text-[#7a6e60] mt-2 max-w-sm mx-auto leading-relaxed">Create your first book project to start tracking production across all {totalSteps} steps.</p>
-              <Button className="mt-8 bg-gradient-to-r from-[#c9a96e] to-[#b8944f] hover:from-[#d4b480] hover:to-[#c9a96e] text-[#2a1a0a] font-semibold shadow-md shadow-[#c9a96e]/15 px-6 py-3" onClick={() => setOpen(true)}>
-                <Plus size={18} className="mr-2" /> Create Your First Project
-              </Button>
+              <div className="bg-[#1a1008]/[0.03] border-t border-[#c9a96e]/10 px-6 py-8">
+                <p className="text-xs uppercase tracking-wider text-[#c9a96e] font-semibold text-center mb-5">Here's what happens next</p>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 max-w-2xl mx-auto">
+                  <div className="text-center px-4">
+                    <div className="w-8 h-8 rounded-full bg-[#c9a96e]/15 flex items-center justify-center mx-auto mb-2 border border-[#c9a96e]/20">
+                      <span className="text-xs font-bold text-[#c9a96e]">1</span>
+                    </div>
+                    <p className="text-sm font-serif font-semibold text-[#3a2a1a] mb-1">Name Your Book</p>
+                    <p className="text-xs text-[#7a6e60] leading-relaxed">Enter your title and author name to create a project</p>
+                  </div>
+                  <div className="text-center px-4">
+                    <div className="w-8 h-8 rounded-full bg-[#c9a96e]/15 flex items-center justify-center mx-auto mb-2 border border-[#c9a96e]/20">
+                      <span className="text-xs font-bold text-[#c9a96e]">2</span>
+                    </div>
+                    <p className="text-sm font-serif font-semibold text-[#3a2a1a] mb-1">Upload & Format</p>
+                    <p className="text-xs text-[#7a6e60] leading-relaxed">Upload your manuscript and our AI typesets it instantly</p>
+                  </div>
+                  <div className="text-center px-4">
+                    <div className="w-8 h-8 rounded-full bg-[#c9a96e]/15 flex items-center justify-center mx-auto mb-2 border border-[#c9a96e]/20">
+                      <span className="text-xs font-bold text-[#c9a96e]">3</span>
+                    </div>
+                    <p className="text-sm font-serif font-semibold text-[#3a2a1a] mb-1">Download & Publish</p>
+                    <p className="text-xs text-[#7a6e60] leading-relaxed">Get print-ready PDF, EPUB, and more — publish anywhere</p>
+                  </div>
+                </div>
+              </div>
             </motion.div>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
