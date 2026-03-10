@@ -92,21 +92,27 @@ async function startServer() {
   const app = express();
   const server = createServer(app);
 
-  let serverReady = false;
-  app.use((req, res, next) => {
-    if (!serverReady && req.path === "/" && req.method === "GET") {
-      return res.status(200).send("<!DOCTYPE html><html><body>Loading...</body></html>");
-    }
-    next();
-  });
-
   const preferredPort = parseInt(process.env.PORT || "5000");
   const port = await findAvailablePort(preferredPort);
   if (port !== preferredPort) {
     console.log(`Port ${preferredPort} is busy, using port ${port} instead`);
   }
-  server.listen(port, () => {
-    console.log(`Server running on http://localhost:${port}/`);
+
+  let serverReady = false;
+  app.use((req, res, next) => {
+    if (!serverReady) {
+      return res.status(200).set("Content-Type", "text/html").send(
+        '<!DOCTYPE html><html><head><meta charset="UTF-8"><meta http-equiv="refresh" content="3"><title>Loading...</title></head><body style="display:flex;align-items:center;justify-content:center;height:100vh;font-family:Georgia,serif;background:#f3efe6;color:#1a1008"><p>Starting up, please wait...</p></body></html>'
+      );
+    }
+    next();
+  });
+
+  await new Promise<void>((resolve) => {
+    server.listen(port, () => {
+      console.log(`Server running on http://localhost:${port}/`);
+      resolve();
+    });
   });
 
   await ensureOwnerAdmin();
