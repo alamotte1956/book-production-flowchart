@@ -132,7 +132,16 @@ export default function Login() {
               </Button>
             </form>
 
-            <div className="mt-4 pt-4 border-t border-[#c9a96e]/15 text-center">
+            <div className="mt-4 text-center">
+              <button
+                onClick={() => navigate("/reset-password")}
+                className="text-sm text-[#8b6914] hover:text-[#c9a96e] underline"
+              >
+                Forgot password?
+              </button>
+            </div>
+
+            <div className="mt-3 pt-3 border-t border-[#c9a96e]/15 text-center">
               <button
                 onClick={() => setUseMagicLink(true)}
                 className="text-sm text-[#8b6914] hover:text-[#c9a96e] underline"

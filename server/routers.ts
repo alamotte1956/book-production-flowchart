@@ -18,8 +18,8 @@ import { generateIdml } from "./idmlGenerator";
 import { invokeLLM } from "./_core/llm";
 import { lookupByIsbn } from "./isbnLookup";
 import { notifyOwner } from "./_core/notification";
-import { sendConfirmationEmail, sendLoginEmail, sendAffiliateWelcomeEmail, sendAffiliateNotificationToOwner } from "./resendClient";
-import { createContactSubmission, saveWizardAnswers, getWizardAnswers, getRecentActivity, getDashboardStats, getUserById, updateUserStripeInfo, getUserByEmail, createEmailUser, confirmUserEmail, getUserByConfirmToken, getUserByCheckoutToken, setLoginToken, clearSession, createSession, setUserPassword } from "./db";
+import { sendConfirmationEmail, sendLoginEmail, sendPasswordResetEmail, sendAffiliateWelcomeEmail, sendAffiliateNotificationToOwner } from "./resendClient";
+import { createContactSubmission, saveWizardAnswers, getWizardAnswers, getRecentActivity, getDashboardStats, getUserById, updateUserStripeInfo, getUserByEmail, createEmailUser, confirmUserEmail, getUserByConfirmToken, getUserByCheckoutToken, setLoginToken, getUserByLoginToken, setPasswordResetToken, getUserByPasswordResetToken, clearPasswordResetToken, clearSession, createSession, setUserPassword } from "./db";
 import { TRPCError } from "@trpc/server";
 import { getUncachableStripeClient, getStripePublishableKey } from "./stripeClient";
 import { sql } from "drizzle-orm";
@@ -1309,6 +1309,59 @@ export const appRouter = router({
         const bcrypt = await import("bcryptjs");
         const hash = await bcrypt.hash(input.password, 12);
         await setUserPassword(user.id, hash);
+        return { success: true };
+      }),
+
+    requestPasswordReset: publicProcedure
+      .input(z.object({ email: z.string().email() }))
+      .mutation(async ({ input }) => {
+        checkEmailCooldown(input.email);
+        markEmailSent(input.email);
+
+        const user = await getUserByEmail(input.email);
+        if (!user) {
+          return { sent: true };
+        }
+
+        const token = nanoid(48);
+        await setPasswordResetToken(user.id, token);
+
+        const isDev = process.env.NODE_ENV === "development";
+        if (isDev) {
+          console.log(`[Password Reset][DEV] User ${input.email} → /reset-password?token=${token}`);
+        }
+
+        try {
+          await sendPasswordResetEmail(input.email, token, user.name ?? "");
+        } catch (emailErr) {
+          console.error("[Email] Failed to send password reset:", emailErr);
+          if (!isDev) {
+            throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "Failed to send password reset email. Please try again." });
+          }
+        }
+
+        return { sent: true };
+      }),
+
+    resetPassword: publicProcedure
+      .input(z.object({
+        token: z.string().min(1),
+        password: z.string().min(8).max(128),
+      }))
+      .mutation(async ({ input }) => {
+        const user = await getUserByPasswordResetToken(input.token);
+        if (!user) {
+          throw new TRPCError({ code: "NOT_FOUND", message: "Invalid or expired reset link. Please request a new one." });
+        }
+        if (user.passwordResetTokenExpiresAt && new Date(user.passwordResetTokenExpiresAt) < new Date()) {
+          throw new TRPCError({ code: "BAD_REQUEST", message: "This reset link has expired. Please request a new one." });
+        }
+
+        const bcrypt = await import("bcryptjs");
+        const hash = await bcrypt.hash(input.password, 12);
+        await setUserPassword(user.id, hash);
+        await clearPasswordResetToken(user.id);
+
         return { success: true };
       }),
 

@@ -26,6 +26,8 @@ export const users = pgTable("users", {
   termsAcceptedAt: timestamp("termsAcceptedAt"),
   loginToken: varchar("loginToken", { length: 128 }),
   loginTokenExpiresAt: timestamp("loginTokenExpiresAt"),
+  passwordResetToken: varchar("passwordResetToken", { length: 128 }),
+  passwordResetTokenExpiresAt: timestamp("passwordResetTokenExpiresAt"),
   sessionToken: varchar("sessionToken", { length: 128 }),
   sessionTokenExpiresAt: timestamp("sessionTokenExpiresAt"),
   checkoutToken: varchar("checkoutToken", { length: 128 }),

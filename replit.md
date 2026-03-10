@@ -31,6 +31,7 @@ A full-stack book production workflow management platform ("Manuscript to Master
 - Email confirmation: `account.confirmEmail` validates token, sets `emailConfirmed = true`; after confirmation, password is saved via `account.setPassword`
 - Resend confirmation: `account.resendConfirmation` regenerates token and resends email (2-minute per-email cooldown enforced)
 - **Password login**: `/login` page supports email+password login via `account.loginWithPassword` mutation (bcryptjs hashing, 12 rounds). Falls back to magic link option.
+- **Forgot password**: `/reset-password` page. Flow: enter email → `account.requestPasswordReset` generates dedicated `passwordResetToken` (15-min expiry), sends branded email via Resend → user clicks link → `/reset-password?token=...` → new password form → `account.resetPassword` verifies token, hashes password, clears token. Separate token columns from magic-login to prevent cross-purpose token use.
 - **Magic link login**: `/login` page also offers sign-in link via `account.sendLoginLink` mutation → stores `loginToken`/`loginTokenExpiresAt` on user → emails link to `/api/auth/magic-login?token=...`
 - **Magic link verification**: Express route `/api/auth/magic-login` validates `loginToken`, creates a server-validated session (`sessionToken` stored in DB), sets `ebp_session` cookie (opaque token, httpOnly, 30-day expiry)
 - **Session validation**: `context.ts` reads `ebp_session` cookie and validates against `users.sessionToken` in DB (not forgeable)
@@ -39,7 +40,7 @@ A full-stack book production workflow management platform ("Manuscript to Master
 - Checkout gate: `stripe.createCheckoutSession` requires `confirmedUserId` and verifies `emailConfirmed` before proceeding
 - `CheckoutGate` modal component (`client/src/components/CheckoutGate.tsx`) handles the registration/confirmation flow inline on the Pricing page
 - Confirmation page at `/confirm-email?token=...` for link-based verification
-- Users table columns: `emailConfirmed`, `emailConfirmToken`, `loginToken`, `loginTokenExpiresAt`, `sessionToken`, `sessionTokenExpiresAt`
+- Users table columns: `emailConfirmed`, `emailConfirmToken`, `loginToken`, `loginTokenExpiresAt`, `passwordResetToken`, `passwordResetTokenExpiresAt`, `sessionToken`, `sessionTokenExpiresAt`
 - Replit Auth OIDC integration still exists in code but login is not enforced; all pages are accessible without authentication
 - tRPC context checks: 1) Replit OIDC claims, 2) `ebp_session` cookie validated against DB, 3) falls back to guest user
 - App users stored in `users` table, keyed by `openId`

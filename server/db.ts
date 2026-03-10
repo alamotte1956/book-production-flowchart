@@ -685,6 +685,34 @@ export async function getUserBySessionToken(token: string) {
   return user;
 }
 
+export async function setPasswordResetToken(userId: number, token: string) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  const tokenExpiry = new Date(Date.now() + 15 * 60 * 1000);
+  await db.update(users).set({
+    passwordResetToken: token,
+    passwordResetTokenExpiresAt: tokenExpiry,
+    updatedAt: new Date(),
+  }).where(eq(users.id, userId));
+}
+
+export async function getUserByPasswordResetToken(token: string) {
+  const db = await getDb();
+  if (!db) return null;
+  const [user] = await db.select().from(users).where(eq(users.passwordResetToken, token));
+  return user ?? null;
+}
+
+export async function clearPasswordResetToken(userId: number) {
+  const db = await getDb();
+  if (!db) return;
+  await db.update(users).set({
+    passwordResetToken: null,
+    passwordResetTokenExpiresAt: null,
+    updatedAt: new Date(),
+  }).where(eq(users.id, userId));
+}
+
 export async function setUserPassword(userId: number, passwordHash: string) {
   const db = await getDb();
   if (!db) throw new Error("Database not available");
