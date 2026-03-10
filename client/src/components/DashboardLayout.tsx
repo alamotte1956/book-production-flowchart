@@ -329,7 +329,7 @@ function DashboardLayoutContent({
                   {user?.name || "User"}
                 </p>
                 <p className="text-[11px] text-walnut/50 mt-0.5">
-                  {plan === "publisher" ? "Publisher" : plan === "author_pro" ? "Author Pro" : "Starter Plan"}
+                  {plan === "publisher" ? "Publisher" : plan === "author_pro" ? "Author Pro" : plan === "kdp_ready" ? "KDP Ready" : "No Plan"}
                 </p>
               </div>
             </div>

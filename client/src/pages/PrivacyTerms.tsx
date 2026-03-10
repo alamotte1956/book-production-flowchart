@@ -150,7 +150,6 @@ export default function PrivacyTerms() {
                   <li><strong>"Account"</strong> — Your personal login on Easy Book Publishers, created with your email address and password.</li>
                   <li><strong>"Content" / "Your Content"</strong> — Anything you upload or create using our platform, including your manuscripts, cover designs, and exported book files. You own all of it.</li>
                   <li><strong>"Subscription"</strong> — A paid plan (monthly or annual) that renews automatically and gives you access to premium features until you cancel.</li>
-                  <li><strong>"Lifetime Plan"</strong> — A one-time purchase that gives you permanent access to a plan's features with no recurring charges.</li>
                   <li><strong>"Stripe"</strong> — The independent payment company that securely handles all credit card transactions on our behalf. We never see or store your card number.</li>
                   <li><strong>"TLS Encryption"</strong> — A security technology that scrambles data sent between your browser and our servers so no one else can read it.</li>
                   <li><strong>"PCI-DSS Level 1"</strong> — The highest level of payment security certification. Stripe holds this certification, meaning your payment info meets the strictest safety standards.</li>
@@ -185,7 +184,7 @@ export default function PrivacyTerms() {
               <div>
                 <h3 className="font-serif text-lg text-[#1a1008] font-semibold mb-2">3. What We Provide</h3>
                 <p className="text-[#5c4a2a] leading-relaxed text-sm">
-                  Easy Book Publishers gives you online tools to upload your manuscript, format it with professional typesetting, and export it as a print-ready PDF, e-book (EPUB), or design file (IDML). We offer a free Starter plan and paid plans (KDP Ready, Author Pro, and Publisher) with additional features at each level.
+                  Easy Book Publishers gives you online tools to upload your manuscript, format it with professional typesetting, and export it as a print-ready PDF, e-book (EPUB), or design file (IDML). We offer three paid plans (KDP Ready, Author Pro, and Publisher) with additional features at each level.
                 </p>
               </div>
 
@@ -197,7 +196,6 @@ export default function PrivacyTerms() {
                 <ul className="space-y-1 text-[#5c4a2a] text-sm list-disc list-inside">
                   <li>All payments are handled securely by Stripe. We never see or store your credit card number.</li>
                   <li>Monthly and annual plans renew automatically. You will be charged at the start of each billing period until you cancel.</li>
-                  <li>Lifetime plans are a single, one-time payment. You will never be charged again for that plan.</li>
                   <li>You can cancel your subscription at any time through the billing portal. You keep access until the end of your current billing period.</li>
                   <li>If you are unhappy with your purchase, you may request a refund within 14 days. We review each request individually.</li>
                   <li>All prices are shown in U.S. dollars (USD). We will give you advance notice before changing prices.</li>

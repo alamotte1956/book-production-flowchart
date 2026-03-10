@@ -71,16 +71,21 @@ async function initStripe() {
 
 async function ensureOwnerAdmin() {
   if (!process.env.DATABASE_URL) return;
-  const OWNER_EMAIL = "alamotte1956@gmail.com";
+  const PRIVILEGED_ACCOUNTS = [
+    { email: "alamotte1956@gmail.com", isAdmin: true },
+    { email: "les@leslamotte.com", isAdmin: false },
+  ];
   try {
     const { Pool } = await import("pg");
     const pool = new Pool({ connectionString: process.env.DATABASE_URL });
-    const { rowCount } = await pool.query(
-      `UPDATE users SET "isAdmin" = true, role = 'admin', plan = 'publisher' WHERE email = $1 AND ("isAdmin" = false OR plan != 'publisher')`,
-      [OWNER_EMAIL]
-    );
-    if (rowCount && rowCount > 0) {
-      console.log(`[Admin] Promoted ${OWNER_EMAIL} to admin with publisher plan`);
+    for (const account of PRIVILEGED_ACCOUNTS) {
+      const { rowCount } = await pool.query(
+        `UPDATE users SET "isAdmin" = CASE WHEN $2 THEN true ELSE "isAdmin" END, role = CASE WHEN $2 THEN 'admin' ELSE role END, plan = 'publisher' WHERE LOWER(email) = LOWER($1) AND (plan != 'publisher'${account.isAdmin ? ' OR "isAdmin" = false' : ''})`,
+        [account.email, account.isAdmin]
+      );
+      if (rowCount && rowCount > 0) {
+        console.log(`[Admin] Promoted ${account.email} to ${account.isAdmin ? 'admin with ' : ''}publisher plan`);
+      }
     }
     await pool.end();
   } catch (err) {

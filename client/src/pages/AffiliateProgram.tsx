@@ -20,7 +20,7 @@ const highlights = [
   { icon: Clock, title: "90-Day Cookie", description: "Your referrals are tracked for 90 days, so you earn even if they don't buy right away" },
   { icon: CalendarDays, title: "Monthly Payouts", description: "Get paid every month via PayPal once you hit the $50 minimum threshold" },
   { icon: BarChart3, title: "Real-Time Dashboard", description: "Track clicks, conversions, and earnings with a live affiliate dashboard" },
-  { icon: Gift, title: "Lifetime Commissions", description: "Earn commission on every plan purchase — monthly, annual, and lifetime plans" },
+  { icon: Gift, title: "Recurring Commissions", description: "Earn commission on every plan purchase — monthly and annual subscriptions" },
   { icon: Shield, title: "Trusted Platform", description: "Join a growing community of publishers and content creators who trust our tools" },
 ];
 
@@ -40,13 +40,13 @@ const competitorComparison = [
 
 const faqs = [
   { q: "Who can become an affiliate?", a: "Anyone with an audience interested in self-publishing, book design, or writing tools. This includes bloggers, YouTubers, podcasters, writing coaches, book designers, and publishing consultants." },
-  { q: "How much can I earn?", a: "You earn 20% on every sale. Author Pro lifetime plans earn you $19.40 per sale, Publisher lifetime plans earn $49.80 per sale. Monthly and annual subscriptions earn recurring commissions." },
+  { q: "How much can I earn?", a: "You earn 20% on every sale. For annual Author Pro plans, that's $47.98/year per referral. For annual Publisher plans, $95.98/year per referral. Monthly subscriptions earn recurring commissions too." },
   { q: "When do I get paid?", a: "Payouts are processed monthly via PayPal once your balance reaches the $50 minimum threshold. Commissions are approved after a 30-day hold period to account for refunds." },
   { q: "How long does the cookie last?", a: "Our tracking cookie lasts 90 days. If someone clicks your link and purchases within 90 days, you get credit for the sale — even if they visit the site multiple times." },
   { q: "What marketing materials do you provide?", a: "We provide ready-to-use banner ads, text links, social media copy, and email templates. All available in your affiliate dashboard once approved." },
   { q: "Can I promote on social media?", a: "Absolutely. You can share your referral link on any platform — blog posts, YouTube descriptions, Twitter/X, Instagram, TikTok, Facebook groups, email newsletters, and more." },
   { q: "Are there any restrictions?", a: "You cannot use paid ads that bid on our brand name, send unsolicited spam, or misrepresent the product. Standard affiliate program terms apply." },
-  { q: "Do I need to be a customer to be an affiliate?", a: "No, but we recommend trying the free Starter plan so you can speak authentically about the platform. Your audience trusts genuine recommendations." },
+  { q: "Do I need to be a customer to be an affiliate?", a: "No, but we recommend trying the platform so you can speak authentically about it. Your audience trusts genuine recommendations." },
 ];
 
 export default function AffiliateProgram() {
@@ -162,31 +162,31 @@ export default function AffiliateProgram() {
             <Card className="bg-white border-[#c9a96e]/15">
               <CardContent className="p-6 text-center">
                 <Zap className="w-8 h-8 text-[#c9a96e] mx-auto mb-3" />
-                <div className="font-serif text-3xl text-[#1a1008] font-bold">$19.40</div>
-                <div className="text-sm text-[#5c4a2a]/90 mt-1">per Author Pro lifetime sale</div>
-                <div className="text-xs text-[#8b6914] mt-2">Plan price: $97</div>
+                <div className="font-serif text-3xl text-[#1a1008] font-bold">$3.00</div>
+                <div className="text-sm text-[#5c4a2a]/90 mt-1">per KDP Ready monthly</div>
+                <div className="text-xs text-[#8b6914] mt-2">Plan: $14.99/mo</div>
               </CardContent>
             </Card>
             <Card className="bg-white border-[#c9a96e]/15 ring-2 ring-[#c9a96e]/30">
               <CardContent className="p-6 text-center">
                 <TrendingUp className="w-8 h-8 text-[#c9a96e] mx-auto mb-3" />
-                <div className="font-serif text-3xl text-[#1a1008] font-bold">$49.80</div>
-                <div className="text-sm text-[#5c4a2a]/90 mt-1">per Publisher lifetime sale</div>
-                <div className="text-xs text-[#8b6914] mt-2">Plan price: $249</div>
+                <div className="font-serif text-3xl text-[#1a1008] font-bold">$6.00</div>
+                <div className="text-sm text-[#5c4a2a]/90 mt-1">per Author Pro monthly</div>
+                <div className="text-xs text-[#8b6914] mt-2">Plan: $29.99/mo</div>
               </CardContent>
             </Card>
             <Card className="bg-white border-[#c9a96e]/15">
               <CardContent className="p-6 text-center">
                 <Wallet className="w-8 h-8 text-[#c9a96e] mx-auto mb-3" />
-                <div className="font-serif text-3xl text-[#1a1008] font-bold">$2.60+</div>
-                <div className="text-sm text-[#5c4a2a]/90 mt-1">per monthly subscription</div>
-                <div className="text-xs text-[#8b6914] mt-2">Recurring every month</div>
+                <div className="font-serif text-3xl text-[#1a1008] font-bold">$12.00</div>
+                <div className="text-sm text-[#5c4a2a]/90 mt-1">per Publisher monthly</div>
+                <div className="text-xs text-[#8b6914] mt-2">Plan: $59.99/mo</div>
               </CardContent>
             </Card>
           </div>
           <div className="mt-6 bg-[#c9a96e]/10 border border-[#c9a96e]/20 rounded-xl p-4 text-center">
             <p className="text-sm text-[#5c4a2a]">
-              <strong>Example:</strong> Refer just 10 Publisher lifetime customers per month = <strong>$698/month</strong> in passive income
+              <strong>Example:</strong> Refer 20 Author Pro subscribers = <strong>$120/month</strong> in recurring passive income
             </p>
           </div>
         </div>

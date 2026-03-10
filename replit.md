@@ -143,7 +143,7 @@ PostgreSQL via Replit's built-in database. Use `npx drizzle-kit push` to sync sc
 - **Guided Journey Dashboard**: New users see "Start Your Publishing Journey" CTA, wizard-completers see roadmap summary with retake option
 - **Project Duplication**: Duplicate button in Project Tracker creates project copy with "(Copy)" suffix
 - **Notification Center**: Bell icon in sidebar with unread count, popover dropdown, localStorage-based read tracking
-- **Pricing Page**: Four tiers (Starter free, KDP Ready $99 lifetime, Author Pro $199 lifetime, Publisher $499 lifetime) with billing toggle, competitive comparison vs Atticus/Vellum/D2D/BookBaby/Reedsy, and FAQ
+- **Pricing Page**: Three tiers (KDP Ready, Author Pro, Publisher) with monthly/annual billing toggle, competitive comparison vs Atticus/Vellum/D2D/BookBaby/Reedsy, and FAQ
 - **Getting Started Checklist**: New projects show 6-step onboarding checklist, auto-hides after 3 completed steps
 - **Resources Search & Filter**: Search bar with text highlighting, category filter pills (Writing, Editorial, Design, etc.)
 - **Contact Form**: Public contact form on landing page (backend wired to contact_submissions table)
@@ -197,9 +197,10 @@ PostgreSQL via Replit's built-in database. Use `npx drizzle-kit push` to sync sc
 - **Schema**: `stripe.*` tables auto-synced (products, prices, customers, subscriptions, etc.) — NEVER INSERT directly
 - **Webhook**: `/api/stripe/webhook` route registered BEFORE `express.json()` with raw body parsing
 - **Products**: Created via `server/seedStripeProducts.ts` (run `npx tsx server/seedStripeProducts.ts`)
-  - KDP Ready: monthly ($14.99), annual ($9.99/mo billed annually), lifetime ($99) — for self-publishers who just need KDP formatting
-  - Author Pro: monthly ($29.99), annual ($19.99/mo billed annually), lifetime ($199)
-  - Publisher: monthly ($59.99), annual ($39.99/mo billed annually), lifetime ($499)
+  - KDP Ready: monthly ($14.99), annual ($9.99/mo billed annually)
+  - Author Pro: monthly ($29.99), annual ($19.99/mo billed annually)
+  - Publisher: monthly ($59.99), annual ($39.99/mo billed annually)
+  - No free/starter plan, no lifetime plan
 - **User columns**: `plan` (enum: starter/kdp_ready/author_pro/publisher), `stripeCustomerId`, `stripeSubscriptionId`
 - **tRPC routes**: `stripe.getSubscription`, `stripe.createCheckoutSession`, `stripe.createBillingPortal`, `stripe.getProducts`, `stripe.getPublishableKey`, `stripe.getPriceIds`
 - **Webhook handlers**: `checkout.session.completed` (upgrades plan), `customer.subscription.updated`, `customer.subscription.deleted` (reverts to starter)
@@ -212,11 +213,10 @@ PostgreSQL via Replit's built-in database. Use `npx drizzle-kit push` to sync sc
 - **Gated Features** (require KDP Ready+): `ai_typesetting`, `kdp_export`, `templates`
 - **Gated Features** (require Author Pro+): `timeline`, `unlimited_projects`
 - **Publisher-only**: `priority_support`
-- **Starter limits**: 1 book project; **KDP Ready limits**: 1 book project (enforced on backend)
-- **Gated pages**: AutoProduce, Timeline, Templates use wrapper Gate components that render UpgradeGate for Starter users
+- **KDP Ready limits**: 1 book project (enforced on backend)
+- **Gated pages**: AutoProduce, Timeline, Templates use wrapper Gate components that render UpgradeGate for unpaid users
 - **Dashboard Tool Hub**: Tools with `gatedFeature` show lock icon + "PRO" badge + "Upgrade >" for users without access; clicking redirects to /pricing. Uses `canAccess(feature)` from usePlan for proper plan-level checks.
-- **Sidebar**: Lock icons on gated items for Starter users, plan label under user name, "Upgrade Plan" CTA in footer
-- **Dashboard**: "Unlock Pro Publishing Tools" teaser banner for Starter users, "Upgrade for More Projects" button when project limit reached
+- **Sidebar**: Lock icons on gated items for unpaid users, plan label under user name, "Upgrade Plan" CTA in footer
 - **Checkout Feedback**: Home.tsx and Pricing.tsx read `?checkout=success&plan=X` / `?checkout=cancelled` query params and show sonner toasts, then clean up URL
 - **Privacy Policy & Terms of Service**: Combined page at `/privacy-terms` covering data collection, security, payments, IP rights, acceptable use, and liability
 - **Email-Confirmed Checkout Gate**: `CheckoutGate` modal on Pricing page requires account creation with name/email + email confirmation + terms agreement before Stripe checkout

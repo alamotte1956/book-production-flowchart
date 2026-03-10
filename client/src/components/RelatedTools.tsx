@@ -12,7 +12,7 @@ const ALL_TOOLS = [
   { key: "timeline", label: "Production Timeline", desc: "Gantt chart and deadline tracking for your project", href: "/timeline/0", icon: Layers },
   { key: "resources", label: "Publishing Resources", desc: "Guides, checklists, and references for self-publishing", href: "/resources", icon: HelpCircle },
   { key: "guide", label: "User Guide", desc: "Step-by-step guide to using every tool on the platform", href: "/guide", icon: HelpCircle },
-  { key: "pricing", label: "Pricing & Plans", desc: "Compare plans — Starter (free), Author Pro, Publisher", href: "/pricing", icon: CreditCard },
+  { key: "pricing", label: "Pricing & Plans", desc: "Compare plans — KDP Ready, Author Pro, Publisher", href: "/pricing", icon: CreditCard },
   { key: "guided-journey", label: "Publishing Wizard", desc: "Answer 8 questions to get a personalized publishing roadmap", href: "/guided-journey", icon: Compass },
 ];
 

@@ -45,7 +45,7 @@ const stats = [
 
 const whyAuthorsChooseUs = [
   { icon: Clock, title: "Minutes, Not Months", desc: "Upload your manuscript and get print-ready files the same day. No waiting for designers or typesetters." },
-  { icon: DollarSign, title: "Save Thousands", desc: "Professional typesetting typically costs $1,500-$5,000. Get the same quality starting at $29 one-time." },
+  { icon: DollarSign, title: "Save Thousands", desc: "Professional typesetting typically costs $1,500-$5,000. Get the same quality from just $9.99/mo." },
   { icon: Shield, title: "You Keep 100%", desc: "Zero commission on your book sales. Zero royalty share. Your earnings are yours, always." },
   { icon: BookOpen, title: "Every Format, One Upload", desc: "Get print PDF, KDP-ready PDF, EPUB, and InDesign IDML from a single manuscript upload." },
   { icon: PenTool, title: "AI Writing Assistant", desc: "Generate your foreword, introduction, copyright page, back-cover blurb, and glossary with one click." },
@@ -60,7 +60,7 @@ const newAuthorFeatures = [
 ];
 
 const comparisonPoints = [
-  { feature: "Price", us: "From $29 one-time", others: "$147-$250+ one-time" },
+  { feature: "Price", us: "From $9.99/mo", others: "$147-$250+ one-time" },
   { feature: "Works on", us: "Any device, any browser", others: "Mac only (Vellum) or desktop app" },
   { feature: "AI Writing Assistant", us: "Foreword, intro, glossary, blurbs, bios", others: "Not included" },
   { feature: "InDesign IDML Export", us: "Included", others: "Not available" },
@@ -160,10 +160,10 @@ export default function LandingPage() {
           </p>
           <div className="flex flex-wrap justify-center gap-4 mb-6">
             <Button onClick={() => navigate("/guided-journey")} size="lg" className="bg-gradient-to-r from-[#d4b480] to-[#c9a96e] hover:from-[#e0c490] hover:to-[#d4b480] text-[#1a1008] font-bold text-base px-8 py-6 rounded-xl shadow-xl shadow-[#c9a96e]/20">
-              Start Your Book Free <ArrowRight className="w-5 h-5 ml-2" />
+              Start Your Book <ArrowRight className="w-5 h-5 ml-2" />
             </Button>
           </div>
-          <p className="text-xs text-[#d4c8b4]/60 mb-12">Free to start. No credit card. Ready in under 2 minutes.</p>
+          <p className="text-xs text-[#d4c8b4]/60 mb-12">30-day money-back guarantee. Ready in under 2 minutes.</p>
           <div className="flex flex-wrap justify-center gap-8 md:gap-12">
             {stats.map((s) => (
               <div key={s.label} className="text-center">
@@ -315,7 +315,7 @@ export default function LandingPage() {
               <Button onClick={() => navigate("/guided-journey")} size="lg" className="bg-gradient-to-r from-[#d4b480] to-[#c9a96e] hover:from-[#e0c490] hover:to-[#d4b480] text-[#1a1008] font-bold px-8 py-5 rounded-xl shadow-lg shadow-[#c9a96e]/20 w-full">
                 Start Your Publishing Journey <ArrowRight className="w-5 h-5 ml-2" />
               </Button>
-              <p className="text-xs text-[#d4c8b4]/50 mt-3">Free to start. Takes about 2 minutes.</p>
+              <p className="text-xs text-[#d4c8b4]/50 mt-3">Get started in about 2 minutes.</p>
             </div>
           </div>
         </div>
@@ -430,11 +430,11 @@ export default function LandingPage() {
             Join authors who use Easy Book Publishers to create professional, print-ready books — and keep coming back for every new title.
           </p>
           <p className="text-sm text-[#d4c8b4]/60 mb-10 max-w-md mx-auto">
-            Free to start. 30-day money-back guarantee on all paid plans. Your book, your earnings — we take zero commission.
+            Plans from $9.99/mo. 30-day money-back guarantee. Your book, your earnings — we take zero commission.
           </p>
           <div className="flex flex-col sm:flex-row justify-center gap-4">
             <Button onClick={() => navigate("/guided-journey")} size="lg" className="bg-gradient-to-r from-[#d4b480] to-[#c9a96e] hover:from-[#e0c490] hover:to-[#d4b480] text-[#1a1008] font-bold text-base px-10 py-6 rounded-xl shadow-xl shadow-[#c9a96e]/25">
-              Start Your Book Free <ArrowRight className="w-5 h-5 ml-2" />
+              Start Your Book <ArrowRight className="w-5 h-5 ml-2" />
             </Button>
             <Button onClick={() => navigate("/pricing")} variant="outline" size="lg" className="border-[#c9a96e]/40 text-[#f5d98a] hover:bg-[#c9a96e]/10 font-semibold px-8 py-6 rounded-xl">
               View Pricing
