@@ -878,14 +878,38 @@ export const appRouter = router({
 
         const userPrompt = `Write a ${typeLabels[input.type]} for the following book:\n\nTitle: ${input.bookTitle}\nAuthor: ${input.author ?? "(not specified)"}\nGenre: ${input.genre ?? "(not specified)"}${synopsisLine}\n\n${toneGuide}\nTarget length: approximately ${targetWords} words.`;
 
-        const response = await invokeLLM({
-          messages: [
-            { role: "system", content: systemPrompt },
-            { role: "user", content: userPrompt },
-          ],
-        });
+        let response;
+        try {
+          response = await invokeLLM({
+            messages: [
+              { role: "system", content: systemPrompt },
+              { role: "user", content: userPrompt },
+            ],
+          });
+        } catch (llmErr: unknown) {
+          const msg = llmErr instanceof Error ? llmErr.message : String(llmErr);
+          console.error(`[AI generateCopy] LLM error for type="${input.type}", title="${input.bookTitle}": ${msg}`);
+          throw new TRPCError({
+            code: "INTERNAL_SERVER_ERROR",
+            message: "The AI service is temporarily unavailable. Please try again in a moment.",
+          });
+        }
 
-        const content = response.choices?.[0]?.message?.content ?? "";
+        const rawContent = response.choices?.[0]?.message?.content;
+        const content = typeof rawContent === "string"
+          ? rawContent
+          : Array.isArray(rawContent)
+            ? rawContent.filter((p: any) => p.type === "text").map((p: any) => p.text).join("\n")
+            : "";
+
+        if (!content.trim()) {
+          console.warn(`[AI generateCopy] Empty response for type="${input.type}", title="${input.bookTitle}"`);
+          throw new TRPCError({
+            code: "INTERNAL_SERVER_ERROR",
+            message: "The AI returned an empty response. Please try again.",
+          });
+        }
+
         return { content, type: input.type };
       }),
   }),
