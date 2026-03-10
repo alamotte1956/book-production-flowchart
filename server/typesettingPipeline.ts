@@ -320,14 +320,36 @@ function escapeHtml(text: string): string {
     .replace(/"/g, "&quot;");
 }
 
-function textToHtmlParagraphs(text: string, dropCap: boolean, isFirst: boolean): string {
-  const paragraphs = text.split(/\n{2,}/).filter(p => p.trim().length > 0);
-  return paragraphs.map((p, i) => {
-    const escaped = escapeHtml(p.trim().replace(/\n/g, " "));
-    if (dropCap && isFirst && i === 0) {
+function smartTypography(text: string): string {
+  let s = text;
+  s = s.replace(/---/g, "\u2014");
+  s = s.replace(/--/g, "\u2013");
+  s = s.replace(/\.\.\./g, "\u2026");
+  s = s.replace(/(^|[\s([\u201C])"/g, "$1\u201C");
+  s = s.replace(/"/g, "\u201D");
+  s = s.replace(/(^|[\s([\u2018])'/g, "$1\u2018");
+  s = s.replace(/'/g, "\u2019");
+  return s;
+}
+
+function textToHtmlParagraphs(text: string, dropCap: boolean, isFirstChapter: boolean): string {
+  const blocks = text.split(/\n{2,}/).filter(p => p.trim().length > 0);
+  const SCENE_BREAK_RE = /^(\*\s*\*\s*\*|#\s*#\s*#|~\s*~\s*~|-\s*-\s*-|—\s*—\s*—|\* \* \*|§)$/;
+
+  return blocks.map((p, i) => {
+    const trimmed = p.trim().replace(/\n/g, " ");
+    if (SCENE_BREAK_RE.test(trimmed)) {
+      return `<div class="scene-break" role="separator"><span class="scene-break-ornament">\u2042</span></div>`;
+    }
+    const escaped = smartTypography(escapeHtml(trimmed));
+    const isFirstPara = i === 0;
+    if (dropCap && isFirstChapter && isFirstPara && escaped.length > 1) {
       const firstChar = escaped[0] ?? "";
       const rest = escaped.slice(1);
-      return `<p class="drop-cap"><span class="drop-cap-letter">${firstChar}</span>${rest}</p>`;
+      return `<p class="first-para drop-cap"><span class="drop-cap-letter">${firstChar}</span>${rest}</p>`;
+    }
+    if (isFirstPara) {
+      return `<p class="first-para">${escaped}</p>`;
     }
     return `<p>${escaped}</p>`;
   }).join("\n");
@@ -375,23 +397,33 @@ export function generateBookHtml(
 
   const isScripture = style.doubleColumn && style.verseNumbers;
 
+  const textAreaHeight = pageHeightIn - mTopIn - mBottomIn;
+  const chapterDropIn = Math.min(textAreaHeight * 0.3, 2.5);
+  const headingBaseFontPt = style.chapterHeadingSize;
+  const chapterNumFontPt = Math.round(headingBaseFontPt * 0.65);
+  const titleFontPt = headingBaseFontPt;
+  const dropCapFontPt = Math.round(headingBaseFontPt * 3);
+  const dropCapLines = 3;
+
   const chapters = book.chapters.map((ch, idx) => {
     const isFirst = idx === 0;
     const bodyHtml = isScripture
       ? textToHtmlParagraphsScripture(ch.body)
       : textToHtmlParagraphs(ch.body, style.dropCap, isFirst);
     const breakClass = style.chapterBreakStyle === "page-break" ? "page-break" : "large-space";
-    // Scripture uses book/chapter heading style (e.g. "Genesis 1") instead of "Chapter N"
     const chapterLabel = isScripture
       ? (ch.title && ch.title !== `Chapter ${ch.number}` ? escapeHtml(ch.title) : `Chapter ${ch.number}`)
       : `Chapter ${ch.number}`;
-    const chapterSubtitle = isScripture ? "" :
-      (ch.title && ch.title !== `Chapter ${ch.number}` ? `<h1 class="chapter-title">${escapeHtml(ch.title)}</h1>` : "");
+    const hasCustomTitle = !isScripture && ch.title && ch.title !== `Chapter ${ch.number}` && ch.title !== `Section ${ch.number}`;
+    const chapterSubtitle = hasCustomTitle
+      ? `<h2 class="chapter-title">${smartTypography(escapeHtml(ch.title))}</h2>` : "";
+    const ornament = isScripture ? "" : `<div class="chapter-ornament">\u2767</div>`;
     return `
     <section class="chapter ${breakClass}" id="chapter-${ch.number}">
       <div class="chapter-heading">
         <div class="chapter-number">${chapterLabel}</div>
         ${chapterSubtitle}
+        ${ornament}
       </div>
       <div class="chapter-body">
         ${bodyHtml}
@@ -399,23 +431,40 @@ export function generateBookHtml(
     </section>`;
   }).join("\n");
 
+  const year = new Date().getFullYear();
+
+  const halfTitleHtml = `
+  <div class="half-title-page">
+    <div class="half-title-text">${smartTypography(escapeHtml(book.title))}</div>
+  </div>`;
+
+  const copyrightHtml = `
+  <div class="copyright-page">
+    <p class="copyright-title">${smartTypography(escapeHtml(book.title))}</p>
+    <p class="copyright-line">&copy; ${year} ${smartTypography(escapeHtml(book.author))}. All rights reserved.</p>
+    <p class="copyright-line">No part of this publication may be reproduced, distributed, or transmitted in any form without the prior written permission of the author, except for brief quotations in reviews.</p>
+    <p class="copyright-line">Published by Easy Book Publishers</p>
+    <p class="copyright-line">Typeset with Easy Book Publishers &mdash; easybookpublishers.com</p>
+  </div>`;
+
   const frontmatterHtml = book.frontmatter?.trim()
     ? `<section class="frontmatter page-break">
-        <div class="chapter-body">${textToHtmlParagraphs(book.frontmatter, false, false)}</div>
+        <div class="chapter-body fm-body">${textToHtmlParagraphs(book.frontmatter, false, false)}</div>
       </section>`
     : "";
 
   const backmatterHtml = book.backmatter?.trim()
     ? `<section class="backmatter page-break">
-        <div class="chapter-heading"><h1 class="chapter-title">Acknowledgements</h1></div>
-        <div class="chapter-body">${textToHtmlParagraphs(book.backmatter, false, false)}</div>
+        <div class="chapter-heading bm-heading">
+          <div class="chapter-ornament">\u2767</div>
+          <h2 class="chapter-title">Acknowledgements</h2>
+        </div>
+        <div class="chapter-body bm-body">${textToHtmlParagraphs(book.backmatter, false, false)}</div>
       </section>`
     : "";
 
-  const bleedMarks = "";
-
   const trimMetaTag = bleedOverrides
-    ? `\n  <!-- KDP Print-Ready: trim ${trim.widthIn}×${trim.heightIn}in, bleed ${KDP_BLEED_IN}in outside/top/bottom -->`
+    ? `\n  <!-- KDP Print-Ready: trim ${trim.widthIn}\u00D7${trim.heightIn}in, bleed ${KDP_BLEED_IN}in outside/top/bottom -->`
     : "";
 
   return `<!DOCTYPE html>
@@ -424,6 +473,7 @@ export function generateBookHtml(
   <meta charset="UTF-8" />
   <title>${escapeHtml(book.title)}</title>${trimMetaTag}
   <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="${style.googleFontsUrl}" rel="stylesheet" />
   <style>
     @page {
@@ -431,7 +481,7 @@ export function generateBookHtml(
       margin-top: ${mTopIn}in;
       margin-bottom: ${mBottomIn}in;
       margin-left: ${mInsideIn}in;
-      margin-right: ${mOutsideIn}in;${bleedMarks}
+      margin-right: ${mOutsideIn}in;
     }
     @page :left {
       margin-left: ${mOutsideIn}in;
@@ -441,7 +491,9 @@ export function generateBookHtml(
       margin-left: ${mInsideIn}in;
       margin-right: ${mOutsideIn}in;
     }
-    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
     html, body {
       width: ${pageWidthIn}in;
       font-family: ${style.fontFamily};
@@ -449,88 +501,208 @@ export function generateBookHtml(
       line-height: ${style.lineHeight};
       color: ${style.bodyColor};
       background: #ffffff;
+      -webkit-font-smoothing: antialiased;
+      text-rendering: optimizeLegibility;
+      font-feature-settings: "kern" 1, "liga" 1, "calt" 1, "onum" 1;
+      font-kerning: normal;
     }
+
+    /* ── Half-Title Page ── */
+    .half-title-page {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: ${textAreaHeight}in;
+      text-align: center;
+      page-break-after: always;
+    }
+    .half-title-text {
+      font-family: ${style.chapterHeadingFont};
+      font-size: ${headingBaseFontPt * 1.2}pt;
+      color: ${style.headingColor};
+      letter-spacing: 0.04em;
+      font-weight: 400;
+    }
+
+    /* ── Title Page ── */
     .title-page {
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      min-height: ${pageHeightIn - mTopIn - mBottomIn}in;
+      min-height: ${textAreaHeight}in;
       text-align: center;
       page-break-after: always;
     }
+    .title-page-rule {
+      width: 2in;
+      height: 0;
+      border: none;
+      border-top: 0.75pt solid ${style.headingColor};
+      margin: 0.35in auto;
+      opacity: 0.6;
+    }
     .title-page h1 {
       font-family: ${style.chapterHeadingFont};
-      font-size: ${style.chapterHeadingSize * 1.6}pt;
+      font-size: ${headingBaseFontPt * 1.8}pt;
       color: ${style.headingColor};
-      margin-bottom: 0.5in;
       font-weight: 600;
+      letter-spacing: 0.03em;
+      line-height: 1.2;
+      margin-bottom: 0;
+    }
+    .title-page .subtitle {
+      font-family: ${style.chapterHeadingFont};
+      font-size: ${headingBaseFontPt * 0.75}pt;
+      color: ${style.headingColor};
+      font-weight: 400;
+      font-style: italic;
+      letter-spacing: 0.02em;
+      margin-top: 0.15in;
     }
     .title-page .author {
+      font-family: ${style.fontFamily};
       font-size: ${style.fontSize + 2}pt;
       color: ${style.bodyColor};
-      font-style: italic;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      font-weight: 400;
     }
+    .title-page .publisher-mark {
+      font-family: ${style.fontFamily};
+      font-size: ${style.fontSize - 1}pt;
+      color: ${style.bodyColor};
+      opacity: 0.5;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      margin-top: 1in;
+    }
+
+    /* ── Copyright Page ── */
+    .copyright-page {
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
+      min-height: ${textAreaHeight}in;
+      padding-bottom: 0.5in;
+      page-break-after: always;
+    }
+    .copyright-title {
+      font-family: ${style.chapterHeadingFont};
+      font-size: ${style.fontSize}pt;
+      font-weight: 600;
+      font-style: italic;
+      color: ${style.headingColor};
+      margin-bottom: 0.2in;
+    }
+    .copyright-line {
+      font-size: ${Math.max(style.fontSize - 2, 7.5)}pt;
+      line-height: 1.6;
+      color: ${style.bodyColor};
+      margin-bottom: 0.08in;
+    }
+
+    /* ── Chapter Layout ── */
     .page-break { page-break-before: always; }
-    .large-space { margin-top: 2in; }
-    .chapter { padding-bottom: 0.5in; }
+    .large-space { margin-top: ${chapterDropIn}in; }
+    .chapter { padding-bottom: 0.3in; }
+
     .chapter-heading {
       text-align: center;
-      margin-bottom: 0.4in;
-      padding-top: 0.5in;
+      margin-bottom: 0.5in;
+      padding-top: ${chapterDropIn}in;
     }
     .chapter-number {
       font-family: ${style.chapterHeadingFont};
-      font-size: ${style.fontSize + 1}pt;
+      font-size: ${chapterNumFontPt}pt;
       text-transform: uppercase;
-      letter-spacing: 0.15em;
+      letter-spacing: 0.2em;
       color: ${style.headingColor};
-      margin-bottom: 0.1in;
+      font-weight: 400;
+      margin-bottom: 0.15in;
     }
     .chapter-title {
       font-family: ${style.chapterHeadingFont};
-      font-size: ${style.chapterHeadingSize}pt;
+      font-size: ${titleFontPt}pt;
       font-weight: 600;
       color: ${style.headingColor};
-      line-height: 1.25;
+      line-height: 1.3;
+      margin-top: 0.08in;
+      margin-bottom: 0;
     }
+    .chapter-ornament {
+      font-size: ${Math.round(style.fontSize * 1.1)}pt;
+      color: ${style.headingColor};
+      opacity: 0.4;
+      margin-top: 0.15in;
+      letter-spacing: 0.3em;
+    }
+
+    /* ── Body Text ── */
     .chapter-body p {
       text-indent: 1.5em;
       margin-bottom: 0;
       text-align: justify;
       hyphens: auto;
-      orphans: 2;
-      widows: 2;
+      -webkit-hyphens: auto;
+      orphans: 3;
+      widows: 3;
+      word-spacing: -0.02em;
     }
-    .chapter-body p:first-child {
+    .chapter-body p.first-para {
       text-indent: 0;
     }
+
+    /* ── Scene Break ── */
+    .scene-break {
+      text-align: center;
+      margin: 0.4in 0;
+      line-height: 1;
+    }
+    .scene-break-ornament {
+      font-size: ${style.fontSize + 2}pt;
+      color: ${style.headingColor};
+      opacity: 0.45;
+      letter-spacing: 0.5em;
+    }
+
+    /* ── Drop Cap ── */
     .drop-cap { text-indent: 0 !important; }
     .drop-cap-letter {
       float: left;
       font-family: ${style.chapterHeadingFont};
-      font-size: ${style.chapterHeadingSize * 2.2}pt;
-      line-height: 0.75;
-      padding-right: 0.05in;
-      padding-top: 0.05in;
+      font-size: ${dropCapFontPt}pt;
+      line-height: ${1.0 / dropCapLines * dropCapLines * 0.82};
+      padding-right: 0.06in;
+      margin-top: 0.04in;
       color: ${style.headingColor};
       font-weight: 600;
     }
+
+    /* ── Front/Back Matter ── */
     .frontmatter, .backmatter { padding-bottom: 0.5in; }
+    .fm-body p, .bm-body p {
+      text-indent: 0;
+      margin-bottom: 0.12in;
+    }
+    .bm-heading {
+      padding-top: ${chapterDropIn}in;
+    }
 
     /* ── Scripture / Reference double-column layout ── */
     ${isScripture ? `
     .chapter-body {
       column-count: 2;
       column-gap: 0.25in;
-      column-rule: 0.5pt solid #c8b89a;
+      column-rule: 0.4pt solid ${style.headingColor}33;
     }
     .chapter-heading {
       column-span: all;
       text-align: center;
-      border-bottom: 1pt solid #2c1a00;
+      border-bottom: 0.5pt solid ${style.headingColor}44;
       padding-bottom: 0.1in;
       margin-bottom: 0.2in;
+      padding-top: 0.3in;
     }
     .chapter-number {
       font-size: ${style.chapterHeadingSize}pt;
@@ -539,33 +711,41 @@ export function generateBookHtml(
       text-transform: uppercase;
       color: ${style.headingColor};
     }
+    .chapter-ornament { display: none; }
     .chapter-body p {
       text-indent: 0;
-      margin-bottom: 0.05in;
+      margin-bottom: 0.04in;
       text-align: justify;
       hyphens: auto;
+      -webkit-hyphens: auto;
       orphans: 2;
       widows: 2;
     }
     sup.vn {
-      font-size: 0.6em;
+      font-size: 0.58em;
       font-weight: 700;
       color: ${style.headingColor};
       vertical-align: super;
       line-height: 0;
-      margin-right: 0.05em;
+      margin-right: 0.04em;
+      margin-left: 0.02em;
       font-style: normal;
     }
     ` : ""}
   </style>
 </head>
 <body>
+  ${halfTitleHtml}
+
   <!-- Title Page -->
   <div class="title-page">
-    <h1>${escapeHtml(book.title)}</h1>
-    <div class="author">${escapeHtml(book.author)}</div>
+    <h1>${smartTypography(escapeHtml(book.title))}</h1>
+    <hr class="title-page-rule" />
+    <div class="author">${smartTypography(escapeHtml(book.author))}</div>
+    <div class="publisher-mark">Easy Book Publishers</div>
   </div>
 
+  ${copyrightHtml}
   ${frontmatterHtml}
   ${chapters}
   ${backmatterHtml}
@@ -745,11 +925,19 @@ export async function renderToEpub(book: ParsedBook, style: TypesettingStyle, me
     }
 
     for (const ch of book.chapters) {
+      const SCENE_BREAK_RE = /^(\*\s*\*\s*\*|#\s*#\s*#|~\s*~\s*~|-\s*-\s*-|—\s*—\s*—|\* \* \*|§)$/;
+      const chapterHtml = ch.body.split(/\n{2,}/).map((p, pi) => {
+        const trimmed = p.trim().replace(/\n/g, " ");
+        if (SCENE_BREAK_RE.test(trimmed)) {
+          return `<p style="text-align:center;margin:1.5em 0;font-size:1.2em;letter-spacing:0.5em;opacity:0.4;">\u2042</p>`;
+        }
+        const escaped = smartTypography(escapeHtml(trimmed));
+        if (pi === 0) return `<p style="margin:0;text-align:justify;">${escaped}</p>`;
+        return `<p style="text-indent:1.5em;margin:0;text-align:justify;">${escaped}</p>`;
+      }).join("");
       content.push({
         title: ch.title || `Chapter ${ch.number}`,
-        content: `<div>${ch.body.split(/\n{2,}/).map(p =>
-          `<p style="text-indent:1.5em;margin:0;text-align:justify;">${escapeHtml(p.trim().replace(/\n/g, " "))}</p>`
-        ).join("")}</div>`,
+        content: `<div>${chapterHtml}</div>`,
       });
     }
 
@@ -774,12 +962,32 @@ export async function renderToEpub(book: ParsedBook, style: TypesettingStyle, me
       lang: "en",
       date: publishDate,
       css: `
-        body { font-family: ${style.fontFamily}; font-size: 1em; line-height: ${style.lineHeight}; color: ${style.bodyColor}; }
-        h1 { font-family: ${style.chapterHeadingFont}; font-size: 1.5em; color: ${style.headingColor}; text-align: center; margin: 1em 0; }
-        p { text-indent: 1.5em; margin: 0; text-align: justify; }
+        body {
+          font-family: ${style.fontFamily};
+          font-size: 1em;
+          line-height: ${style.lineHeight};
+          color: ${style.bodyColor};
+          text-rendering: optimizeLegibility;
+          -webkit-font-smoothing: antialiased;
+          orphans: 3;
+          widows: 3;
+        }
+        h1, h2 {
+          font-family: ${style.chapterHeadingFont};
+          color: ${style.headingColor};
+          text-align: center;
+          page-break-after: avoid;
+          margin-top: 2em;
+          margin-bottom: 0.3em;
+          line-height: 1.3;
+        }
+        h1 { font-size: 1.4em; font-weight: 600; letter-spacing: 0.02em; }
+        h2 { font-size: 1.1em; font-weight: 400; font-style: italic; margin-top: 0.2em; }
+        p { text-indent: 1.5em; margin: 0; text-align: justify; hyphens: auto; -webkit-hyphens: auto; }
+        p:first-of-type { text-indent: 0; }
         nav#toc ol { list-style-type: none; padding-left: 0; }
-        nav#toc li { margin-bottom: 0.5em; }
-        nav#toc a { text-decoration: none; color: inherit; }
+        nav#toc li { margin-bottom: 0.6em; }
+        nav#toc a { text-decoration: none; color: inherit; font-family: ${style.chapterHeadingFont}; }
       `,
     };
 
