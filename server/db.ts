@@ -11,6 +11,7 @@ import {
   contactSubmissions, InsertContactSubmission, ContactSubmission,
   wizardSessions, InsertWizardSession, WizardSession,
   orders, InsertOrder, Order,
+  reviewComments, InsertReviewComment, ReviewComment,
 } from "../drizzle/schema";
 
 
@@ -364,6 +365,31 @@ export async function updateProductionJob(
   return updated;
 }
 
+// ─── Review Comments ──────────────────────────────────────────────────────────
+
+export async function createReviewComment(
+  data: Omit<InsertReviewComment, "id" | "createdAt">
+): Promise<ReviewComment> {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  const [comment] = await db.insert(reviewComments).values(data).returning();
+  return comment;
+}
+
+export async function getReviewCommentsByJob(jobId: number): Promise<ReviewComment[]> {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  return db.select().from(reviewComments).where(eq(reviewComments.jobId, jobId)).orderBy(reviewComments.createdAt);
+}
+
+export async function countApprovedJobsByProject(projectId: number): Promise<number> {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  const [result] = await db.select({ count: sql<number>`count(*)::int` }).from(productionJobs)
+    .where(and(eq(productionJobs.projectId, projectId), eq(productionJobs.status, "approved")));
+  return result?.count ?? 0;
+}
+
 // ─── Contact Submissions ──────────────────────────────────────────────────────
 
 export async function createContactSubmission(
@@ -541,7 +567,7 @@ export async function getRecentActivity(userId: number): Promise<ActivityItem[]>
   }
 
   for (const j of recentJobs) {
-    const statusLabel = j.status === "complete" ? "completed" : j.status === "error" ? "failed" : j.status === "processing" ? "started" : "queued";
+    const statusLabel = j.status === "approved" ? "approved" : j.status === "complete" ? "completed" : j.status === "pending_review" ? "ready for review" : j.status === "error" ? "failed" : j.status === "processing" ? "started" : "queued";
     items.push({
       type: "production_job",
       projectId: j.projectId,

@@ -2,7 +2,7 @@ import { boolean, index, integer, jsonb, numeric, pgEnum, pgTable, text, timesta
 
 export const roleEnum = pgEnum("role", ["user", "admin"]);
 export const stepStatusEnum = pgEnum("step_status", ["pending", "complete", "skipped"]);
-export const jobStatusEnum = pgEnum("job_status", ["queued", "processing", "complete", "error"]);
+export const jobStatusEnum = pgEnum("job_status", ["queued", "processing", "complete", "error", "pending_review", "approved"]);
 export const errorTypeEnum = pgEnum("error_type", ["format_unsupported", "parse_empty", "pipeline_error", "unknown"]);
 
 /**
@@ -149,12 +149,26 @@ export const productionJobs = pgTable("production_jobs", {
   errorType: errorTypeEnum("errorType").default("unknown"),
   failedStage: varchar("failedStage", { length: 64 }),
   retryCount: integer("retryCount").default(0).notNull(),
+  reviewNotes: text("reviewNotes"),
+  approvedAt: timestamp("approvedAt"),
   createdAt: timestamp("createdAt").defaultNow().notNull(),
   updatedAt: timestamp("updatedAt").defaultNow().notNull(),
 });
 
 export type ProductionJob = typeof productionJobs.$inferSelect;
 export type InsertProductionJob = typeof productionJobs.$inferInsert;
+
+export const reviewComments = pgTable("review_comments", {
+  id: serial("id").primaryKey(),
+  jobId: integer("jobId").notNull(),
+  userId: integer("userId").notNull(),
+  role: varchar("role", { length: 32 }).default("author").notNull(),
+  message: text("message").notNull(),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+});
+
+export type ReviewComment = typeof reviewComments.$inferSelect;
+export type InsertReviewComment = typeof reviewComments.$inferInsert;
 
 /**
  * Contact form submissions sent from the public footer form.

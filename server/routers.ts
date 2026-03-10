@@ -9,6 +9,7 @@ import {
   getDueDatesByProject, upsertPhaseDueDate, deletePhaseDueDate,
   updateProjectDeadline, updateProjectGenre, updateProjectBibleSpecs, updateProjectMeta,
   createProductionJob, getProductionJobsByProject, getProductionJobById, updateProductionJob,
+  createReviewComment, getReviewCommentsByJob, countApprovedJobsByProject,
 } from "./db";
 import { parseManuscript } from "./manuscriptParser";
 import { produceBook } from "./typesettingPipeline";
@@ -688,7 +689,7 @@ export const appRouter = router({
               chapterCount,
             });
 
-            const updates: Record<string, unknown> = { status: "complete" };
+            const updates: Record<string, unknown> = { status: "pending_review" };
 
             // Upload PDF if requested
             if (outputFormat === "both" || outputFormat === "pdf") {
@@ -825,7 +826,7 @@ export const appRouter = router({
               { trimSizeId: originalJob.trimSizeId, styleId: originalJob.styleId, title: project.title, author: project.author ?? "Unknown Author", includeBleed: true }
             );
             await updateProductionJob(newJob.id, { wordCount, chapterCount });
-            const updates: Record<string, unknown> = { status: "complete" };
+            const updates: Record<string, unknown> = { status: "pending_review" };
             const pdfKey = `output/${originalJob.projectId}/${newJob.id}-interior.pdf`;
             const { url: pdfUrl } = await storagePut(pdfKey, pdfBuffer, "application/pdf");
             updates.pdfUrl = pdfUrl; updates.pdfKey = pdfKey;
@@ -870,6 +871,52 @@ export const appRouter = router({
         })();
 
         return { jobId: newJob.id, status: "queued" };
+      }),
+
+    approve: protectedProcedure
+      .input(z.object({ jobId: z.number() }))
+      .mutation(async ({ ctx, input }) => {
+        const job = await getProductionJobById(input.jobId);
+        if (!job) throw new Error("Job not found");
+        const project = await getProjectById(job.projectId);
+        if (!project || project.userId !== ctx.user.id) throw new Error("Not authorized");
+        if (job.status !== "pending_review") throw new Error("Only jobs in review can be approved");
+        await updateProductionJob(input.jobId, { status: "approved", approvedAt: new Date() } as any);
+        return { success: true };
+      }),
+
+    requestRevision: protectedProcedure
+      .input(z.object({ jobId: z.number(), message: z.string().min(1).max(5000) }))
+      .mutation(async ({ ctx, input }) => {
+        const job = await getProductionJobById(input.jobId);
+        if (!job) throw new Error("Job not found");
+        const project = await getProjectById(job.projectId);
+        if (!project || project.userId !== ctx.user.id) throw new Error("Not authorized");
+        if (job.status !== "pending_review") throw new Error("Only jobs in review can have revisions requested");
+        await createReviewComment({ jobId: input.jobId, userId: ctx.user.id, role: "author", message: input.message });
+        await updateProductionJob(input.jobId, { reviewNotes: input.message } as any);
+        return { success: true };
+      }),
+
+    addComment: protectedProcedure
+      .input(z.object({ jobId: z.number(), message: z.string().min(1).max(5000) }))
+      .mutation(async ({ ctx, input }) => {
+        const job = await getProductionJobById(input.jobId);
+        if (!job) throw new Error("Job not found");
+        const project = await getProjectById(job.projectId);
+        if (!project || project.userId !== ctx.user.id) throw new Error("Not authorized");
+        const comment = await createReviewComment({ jobId: input.jobId, userId: ctx.user.id, role: "author", message: input.message });
+        return comment;
+      }),
+
+    getComments: protectedProcedure
+      .input(z.object({ jobId: z.number() }))
+      .query(async ({ ctx, input }) => {
+        const job = await getProductionJobById(input.jobId);
+        if (!job) throw new Error("Job not found");
+        const project = await getProjectById(job.projectId);
+        if (!project || project.userId !== ctx.user.id) throw new Error("Not authorized");
+        return getReviewCommentsByJob(input.jobId);
       }),
   }),
 
@@ -1092,7 +1139,7 @@ export const appRouter = router({
 
         const completedStepCount = steps.filter(s => s.status === "complete").length;
         const totalStepCount = steps.length;
-        const hasCompletedJob = jobs.some(j => j.status === "complete");
+        const hasCompletedJob = jobs.some(j => j.status === "complete" || j.status === "pending_review" || j.status === "approved");
         const failedJob = jobs.find(j => j.status === "error");
         const hasManuscript = jobs.length > 0;
 

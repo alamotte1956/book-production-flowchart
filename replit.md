@@ -101,6 +101,7 @@ PostgreSQL via Replit's built-in database. Use `npx drizzle-kit push` to sync sc
   - **IDML (InDesign)**: Real Adobe InDesign Interchange format with paragraph/character styles, master spreads, and proper layout
   - **Input modes**: File upload (30+ formats) or direct text paste/type
   - Auto-selects scripture style for Bible projects
+  - **Review & Approval workflow**: Jobs complete to `pending_review` status. Author can preview PDF inline, add comments, and either approve (→ `approved`, counts toward plan) or request changes. Only approved jobs count as plan usage. DB: `review_comments` table, `reviewNotes`/`approvedAt` columns on `production_jobs`.
 - **Manuscript Parsing**: Supports DOCX, DOC, ODT, PDF, EPUB, XLSX, CSV, RTF, HTML, Markdown, JSON, YAML, TXT, and more via `server/manuscriptParser.ts`
 - **Real PDF Spec Sheets**: All tool pages generate downloadable PDFs via server-side Puppeteer rendering (`POST /api/render-pdf`)
 - **Bible Design Studio**: Full Bible edition configurator with real PDF spec sheet export

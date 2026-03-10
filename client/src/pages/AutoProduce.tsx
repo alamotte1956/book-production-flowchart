@@ -148,6 +148,8 @@ function statusLabel(status: string) {
     case "queued": return "Queued";
     case "processing": return "Processing";
     case "complete": return "Complete";
+    case "pending_review": return "Ready for Review";
+    case "approved": return "Approved";
     case "error": return "Failed";
     default: return status;
   }
@@ -156,6 +158,8 @@ function statusLabel(status: string) {
 function statusColor(status: string): "default" | "secondary" | "destructive" | "outline" {
   switch (status) {
     case "complete": return "default";
+    case "approved": return "default";
+    case "pending_review": return "secondary";
     case "error": return "destructive";
     case "processing": return "secondary";
     default: return "outline";
@@ -167,6 +171,8 @@ function progressPercent(status: string) {
     case "queued": return 10;
     case "processing": return 60;
     case "complete": return 100;
+    case "pending_review": return 100;
+    case "approved": return 100;
     case "error": return 100;
     default: return 0;
   }
@@ -328,6 +334,8 @@ function JobCard({ jobId, projectId }: { jobId: number; projectId: number }) {
   const [enabled, setEnabled] = useState(true);
   const [showTechDetails, setShowTechDetails] = useState(false);
   const [retryJobId, setRetryJobId] = useState<number | null>(null);
+  const [reviewComment, setReviewComment] = useState("");
+  const [showPdfPreview, setShowPdfPreview] = useState(false);
   const utils = trpc.useUtils();
 
   const { data: job } = trpc.autoProduce.status.useQuery(
@@ -337,6 +345,38 @@ function JobCard({ jobId, projectId }: { jobId: number; projectId: number }) {
       enabled,
     }
   );
+
+  const { data: comments, refetch: refetchComments } = trpc.autoProduce.getComments.useQuery(
+    { jobId },
+    { enabled: false }
+  );
+
+  const approveMutation = trpc.autoProduce.approve.useMutation({
+    onSuccess: () => {
+      utils.autoProduce.status.invalidate({ jobId });
+      utils.autoProduce.status.refetch({ jobId });
+      toast.success("Output approved and finalized! This job now counts toward your plan.");
+    },
+    onError: (err) => toast.error(`Approval failed: ${err.message}`),
+  });
+
+  const addCommentMutation = trpc.autoProduce.addComment.useMutation({
+    onSuccess: () => {
+      setReviewComment("");
+      refetchComments();
+      toast.success("Comment added.");
+    },
+    onError: (err) => toast.error(`Comment failed: ${err.message}`),
+  });
+
+  const requestRevisionMutation = trpc.autoProduce.requestRevision.useMutation({
+    onSuccess: () => {
+      setReviewComment("");
+      refetchComments();
+      toast.success("Revision notes saved. You can re-run the job with adjustments or contact support.");
+    },
+    onError: (err) => toast.error(`Request failed: ${err.message}`),
+  });
 
   const retryMutation = trpc.autoProduce.retry.useMutation({
     onSuccess: (data) => {
@@ -351,7 +391,13 @@ function JobCard({ jobId, projectId }: { jobId: number; projectId: number }) {
   });
 
   useEffect(() => {
-    if (job?.status === "complete" || job?.status === "error") {
+    if (job?.status === "pending_review") {
+      refetchComments();
+    }
+  }, [job?.status]);
+
+  useEffect(() => {
+    if (job?.status === "complete" || job?.status === "error" || job?.status === "pending_review" || job?.status === "approved") {
       setEnabled(false);
     }
   }, [job?.status]);
@@ -366,9 +412,11 @@ function JobCard({ jobId, projectId }: { jobId: number; projectId: number }) {
     <Card className={`border shadow-sm transition-all duration-300 ${
       isActive
         ? "border-[#c9a96e]/50 bg-gradient-to-br from-white to-[#fdf9f3] shadow-md ring-1 ring-[#c9a96e]/20"
-        : job.status === "complete"
-          ? "border-green-200/60 bg-gradient-to-br from-white to-green-50/30 shadow-sm"
-          : "border-red-200/60 bg-white shadow-sm"
+        : job.status === "pending_review"
+          ? "border-amber-200/60 bg-gradient-to-br from-white to-amber-50/30 shadow-md ring-1 ring-amber-200/30"
+          : job.status === "approved" || job.status === "complete"
+            ? "border-green-200/60 bg-gradient-to-br from-white to-green-50/30 shadow-sm"
+            : "border-red-200/60 bg-white shadow-sm"
     }`}>
       <CardHeader className="pb-3">
         <div className="flex items-center justify-between">
@@ -376,13 +424,17 @@ function JobCard({ jobId, projectId }: { jobId: number; projectId: number }) {
             <div className={`w-9 h-9 rounded-full flex items-center justify-center flex-shrink-0 ${
               isActive
                 ? "bg-[#c9a96e]/15 ring-2 ring-[#c9a96e]/30"
-                : job.status === "complete"
-                  ? "bg-green-100 ring-2 ring-green-200"
-                  : "bg-red-100 ring-2 ring-red-200"
+                : job.status === "pending_review"
+                  ? "bg-amber-100 ring-2 ring-amber-200"
+                  : job.status === "approved" || job.status === "complete"
+                    ? "bg-green-100 ring-2 ring-green-200"
+                    : "bg-red-100 ring-2 ring-red-200"
             }`}>
               {isActive ? (
                 <Loader2 className="w-4.5 h-4.5 text-[#8b5e3c] animate-spin" />
-              ) : job.status === "complete" ? (
+              ) : job.status === "pending_review" ? (
+                <Eye className="w-4.5 h-4.5 text-amber-600" />
+              ) : job.status === "approved" || job.status === "complete" ? (
                 <CheckCircle2 className="w-4.5 h-4.5 text-green-600" />
               ) : (
                 <AlertCircle className="w-4.5 h-4.5 text-red-500" />
@@ -401,7 +453,8 @@ function JobCard({ jobId, projectId }: { jobId: number; projectId: number }) {
             isActive ? "animate-pulse" : ""
           }`}>
             {isActive && <span className="relative flex h-2 w-2"><span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-current opacity-75" /><span className="relative inline-flex rounded-full h-2 w-2 bg-current" /></span>}
-            {job.status === "complete" && <CheckCircle2 className="w-3 h-3" />}
+            {job.status === "pending_review" && <Eye className="w-3 h-3" />}
+            {(job.status === "complete" || job.status === "approved") && <CheckCircle2 className="w-3 h-3" />}
             {job.status === "error" && <AlertCircle className="w-3 h-3" />}
             {statusLabel(job.status)}
           </Badge>
@@ -448,11 +501,21 @@ function JobCard({ jobId, projectId }: { jobId: number; projectId: number }) {
           </div>
         )}
 
-        {job.status === "complete" && (
+        {job.status === "pending_review" && (
+          <div className="flex justify-between text-xs text-amber-700 mb-1">
+            <span className="flex items-center gap-1.5">
+              <Eye className="w-3 h-3" />
+              Production complete — review your output before finalizing
+            </span>
+            <span className="font-medium">100%</span>
+          </div>
+        )}
+
+        {(job.status === "complete" || job.status === "approved") && (
           <div className="flex justify-between text-xs text-green-700 mb-1">
             <span className="flex items-center gap-1.5">
               <CheckCircle2 className="w-3 h-3" />
-              Production complete
+              {job.status === "approved" ? "Output approved and finalized" : "Production complete"}
             </span>
             <span className="font-medium">100%</span>
           </div>
@@ -684,7 +747,7 @@ function JobCard({ jobId, projectId }: { jobId: number; projectId: number }) {
           </div>
         )}
 
-        {job.status === "complete" && (() => {
+        {(job.status === "pending_review" || job.status === "approved" || job.status === "complete") && (() => {
           const kdpTrim = isKdpCompatible(job.trimSizeId);
           const hasKdpPdf = !!job.kdpPdfUrl;
           const hasBleed = hasKdpPdf;
@@ -850,21 +913,116 @@ function JobCard({ jobId, projectId }: { jobId: number; projectId: number }) {
                 )}
               </div>
 
-              <WhatsNext
-                compact
-                className="mt-1"
-                prompts={[
-                  {
-                    id: "after_produce_cover",
-                    title: "Design Your Book Cover",
-                    description: "Your interior is ready! Next, generate a full-wrap cover spec sheet with exact dimensions for your printer.",
-                    actionLabel: "Open Cover Designer",
-                    actionRoute: "/cover-designer",
-                    icon: "cover_designer",
-                    priority: "high",
-                  } satisfies NextPrompt,
-                ]}
-              />
+              {job.status === "pending_review" && (
+                <div className="rounded-lg border border-amber-200 bg-gradient-to-br from-amber-50/50 to-white p-4">
+                  <div className="flex items-center gap-2 mb-3">
+                    <Eye className="w-4 h-4 text-amber-700" />
+                    <span className="text-sm font-semibold text-amber-900">Review Your Output</span>
+                  </div>
+                  <p className="text-xs text-amber-800 mb-4">
+                    Preview your typeset files below. When you're satisfied, approve the output to finalize it. Your plan usage is only counted once you approve.
+                  </p>
+
+                  {(job.pdfUrl || job.kdpPdfUrl) && (
+                    <div className="mb-4">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        className="border-amber-300 text-amber-800 hover:bg-amber-100 gap-2 w-full justify-center"
+                        onClick={() => setShowPdfPreview(!showPdfPreview)}
+                      >
+                        <Eye className="w-3.5 h-3.5" />
+                        {showPdfPreview ? "Hide PDF Preview" : "Preview Interior PDF"}
+                      </Button>
+                      {showPdfPreview && (
+                        <div className="mt-3 rounded-lg border border-[#e8dfd0] overflow-hidden bg-white">
+                          <iframe
+                            src={job.kdpPdfUrl || job.pdfUrl || ""}
+                            className="w-full border-0"
+                            style={{ height: "600px" }}
+                            title="PDF Preview"
+                          />
+                        </div>
+                      )}
+                    </div>
+                  )}
+
+                  {comments && comments.length > 0 && (
+                    <div className="mb-4 space-y-2">
+                      <p className="text-xs font-semibold text-amber-800 uppercase tracking-wider">Comments</p>
+                      {comments.map((c: { id: number; message: string; createdAt: string }) => (
+                        <div key={c.id} className="rounded-md bg-white border border-amber-200 p-3">
+                          <p className="text-xs text-[#3d2b1f] whitespace-pre-wrap">{c.message}</p>
+                          <p className="text-[10px] text-[#a09080] mt-1">
+                            {new Date(c.createdAt).toLocaleString()}
+                          </p>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+
+                  <div className="mb-3">
+                    <textarea
+                      value={reviewComment}
+                      onChange={(e) => setReviewComment(e.target.value)}
+                      placeholder="Add notes about changes needed, or leave feedback before approving..."
+                      className="w-full rounded-md border border-amber-200 bg-white px-3 py-2 text-sm text-[#3d2b1f] placeholder:text-[#b09880] focus:outline-none focus:ring-2 focus:ring-amber-300 focus:border-transparent resize-none"
+                      rows={3}
+                    />
+                  </div>
+
+                  <div className="flex flex-col sm:flex-row gap-2">
+                    <Button
+                      className="flex-1 bg-green-600 hover:bg-green-700 text-white gap-2"
+                      onClick={() => approveMutation.mutate({ jobId: job.id })}
+                      disabled={approveMutation.isPending}
+                    >
+                      {approveMutation.isPending ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <CheckCircle2 className="w-3.5 h-3.5" />}
+                      Approve & Finalize
+                    </Button>
+                    {reviewComment.trim() && (
+                      <>
+                        <Button
+                          variant="outline"
+                          className="flex-1 border-amber-300 text-amber-800 hover:bg-amber-50 gap-2"
+                          onClick={() => addCommentMutation.mutate({ jobId: job.id, message: reviewComment.trim() })}
+                          disabled={addCommentMutation.isPending}
+                        >
+                          {addCommentMutation.isPending ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <FileText className="w-3.5 h-3.5" />}
+                          Save Comment
+                        </Button>
+                        <Button
+                          variant="outline"
+                          className="flex-1 border-red-300 text-red-700 hover:bg-red-50 gap-2"
+                          onClick={() => requestRevisionMutation.mutate({ jobId: job.id, message: reviewComment.trim() })}
+                          disabled={requestRevisionMutation.isPending}
+                        >
+                          {requestRevisionMutation.isPending ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <AlertCircle className="w-3.5 h-3.5" />}
+                          Request Changes
+                        </Button>
+                      </>
+                    )}
+                  </div>
+                </div>
+              )}
+
+              {(job.status === "approved" || job.status === "complete") && (
+                <WhatsNext
+                  compact
+                  className="mt-1"
+                  prompts={[
+                    {
+                      id: "after_produce_cover",
+                      title: "Design Your Book Cover",
+                      description: "Your interior is ready! Next, generate a full-wrap cover spec sheet with exact dimensions for your printer.",
+                      actionLabel: "Open Cover Designer",
+                      actionRoute: "/cover-designer",
+                      icon: "cover_designer",
+                      priority: "high",
+                    } satisfies NextPrompt,
+                  ]}
+                />
+              )}
             </div>
           );
         })()}
@@ -873,10 +1031,10 @@ function JobCard({ jobId, projectId }: { jobId: number; projectId: number }) {
           <p className="text-xs text-[#b09880]">
             Started {new Date(job.createdAt).toLocaleString()}
           </p>
-          {job.status === "complete" && (
+          {(job.status === "complete" || job.status === "pending_review" || job.status === "approved") && (
             <p className="text-xs text-green-600 flex items-center gap-1">
               <Clock className="w-3 h-3" />
-              Completed {new Date(job.updatedAt).toLocaleString()}
+              {job.status === "approved" ? "Approved" : "Completed"} {new Date(job.updatedAt).toLocaleString()}
             </p>
           )}
         </div>
