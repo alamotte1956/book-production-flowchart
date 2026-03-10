@@ -163,7 +163,7 @@ export default function LandingPage() {
               Start Your Book <ArrowRight className="w-5 h-5 ml-2" />
             </Button>
           </div>
-          <p className="text-xs text-[#d4c8b4]/60 mb-12">30-day money-back guarantee. Ready in under 2 minutes.</p>
+          <p className="text-xs text-[#d4c8b4]/60 mb-12">30-day money-back guarantee. Ready in under 15 minutes.</p>
           <div className="flex flex-wrap justify-center gap-8 md:gap-12">
             {stats.map((s) => (
               <div key={s.label} className="text-center">
