@@ -153,7 +153,18 @@ export function serveStatic(app: Express) {
     );
   }
 
-  app.use(express.static(distPath));
+  app.use("/assets", express.static(path.resolve(distPath, "assets"), {
+    maxAge: "1y",
+    immutable: true,
+  }));
+  app.use(express.static(distPath, {
+    maxAge: 0,
+    setHeaders: (res, filePath) => {
+      if (filePath.endsWith(".html")) {
+        res.setHeader("Cache-Control", "no-cache, must-revalidate");
+      }
+    },
+  }));
 
   // fall through to index.html if the file doesn't exist, injecting route meta
   app.use("*", (req, res) => {

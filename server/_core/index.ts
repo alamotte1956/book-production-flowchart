@@ -1,4 +1,5 @@
 import "dotenv/config";
+import compression from "compression";
 import express from "express";
 import cookieParser from "cookie-parser";
 import { createServer } from "http";
@@ -95,6 +96,7 @@ async function ensureOwnerAdmin() {
 
 async function startServer() {
   const app = express();
+  app.use(compression());
   const server = createServer(app);
 
   const preferredPort = parseInt(process.env.PORT || "5000");

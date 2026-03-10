@@ -23,6 +23,13 @@ A full-stack book production workflow management platform ("Manuscript to Master
 - Database schema in `drizzle/schema.ts` (PostgreSQL)
 - Auth integration in `server/replit_integrations/auth/`
 
+## Performance Optimizations
+
+- **Code splitting**: All page routes use `React.lazy()` with `Suspense` for on-demand loading
+- **Vendor chunking**: Vite `manualChunks` splits React, Radix UI, Framer Motion, Recharts, and Lucide icons into separate cached bundles
+- **Gzip compression**: `compression` middleware enabled server-wide
+- **Cache headers**: Hashed `/assets/*` files cached for 1 year (immutable); `index.html` set to `no-cache, must-revalidate`
+
 ## Auth Flow
 
 - **No login required for browsing** — a guest user (openId: "guest-default-user") is auto-created and used when no Replit Auth session exists
