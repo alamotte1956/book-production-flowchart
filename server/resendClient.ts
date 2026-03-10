@@ -19,9 +19,9 @@ export function getUncachableResendClient() {
 export async function sendConfirmationEmail(toEmail: string, token: string, userName: string) {
   const { client, brandFromEmail } = getUncachableResendClient();
 
-  const baseUrl = process.env.REPLIT_DEV_DOMAIN
-    ? `https://${process.env.REPLIT_DEV_DOMAIN}`
-    : 'https://book-production-flowchart.replit.app';
+  const baseUrl = process.env.REPLIT_DEPLOYMENT === '1'
+    ? 'https://book-production-flowchart.replit.app'
+    : `https://${process.env.REPLIT_DEV_DOMAIN || 'book-production-flowchart.replit.app'}`;
   const confirmUrl = `${baseUrl}/confirm-email?token=${token}`;
 
   const { data, error } = await client.emails.send({
@@ -71,9 +71,9 @@ export async function sendConfirmationEmail(toEmail: string, token: string, user
 export async function sendPasswordResetEmail(toEmail: string, token: string, userName: string) {
   const { client, brandFromEmail } = getUncachableResendClient();
 
-  const baseUrl = process.env.REPLIT_DEV_DOMAIN
-    ? `https://${process.env.REPLIT_DEV_DOMAIN}`
-    : 'https://book-production-flowchart.replit.app';
+  const baseUrl = process.env.REPLIT_DEPLOYMENT === '1'
+    ? 'https://book-production-flowchart.replit.app'
+    : `https://${process.env.REPLIT_DEV_DOMAIN || 'book-production-flowchart.replit.app'}`;
   const resetUrl = `${baseUrl}/reset-password?token=${token}`;
 
   const { data, error } = await client.emails.send({
@@ -123,9 +123,9 @@ export async function sendPasswordResetEmail(toEmail: string, token: string, use
 export async function sendLoginEmail(toEmail: string, token: string, userName: string) {
   const { client, brandFromEmail } = getUncachableResendClient();
 
-  const baseUrl = process.env.REPLIT_DEV_DOMAIN
-    ? `https://${process.env.REPLIT_DEV_DOMAIN}`
-    : 'https://book-production-flowchart.replit.app';
+  const baseUrl = process.env.REPLIT_DEPLOYMENT === '1'
+    ? 'https://book-production-flowchart.replit.app'
+    : `https://${process.env.REPLIT_DEV_DOMAIN || 'book-production-flowchart.replit.app'}`;
   const loginUrl = `${baseUrl}/api/auth/magic-login?token=${token}`;
 
   const { data, error } = await client.emails.send({
