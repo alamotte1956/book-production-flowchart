@@ -49,6 +49,33 @@ export type TypesettingStyle = {
   group?: "General" | "Bible / Scripture";
 };
 
+export type FontFamily = {
+  id: string;
+  label: string;
+  category: "serif" | "sans-serif" | "display";
+  cssStack: string;
+  googleFontsUrl: string;
+};
+
+export const FONT_FAMILIES: FontFamily[] = [
+  { id: "eb-garamond", label: "EB Garamond", category: "serif", cssStack: "'EB Garamond', Garamond, Georgia, serif", googleFontsUrl: "https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,600;0,700;1,400;1,600&display=swap" },
+  { id: "lora", label: "Lora", category: "serif", cssStack: "'Lora', Georgia, serif", googleFontsUrl: "https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,600;0,700;1,400;1,600&display=swap" },
+  { id: "merriweather", label: "Merriweather", category: "serif", cssStack: "'Merriweather', Georgia, serif", googleFontsUrl: "https://fonts.googleapis.com/css2?family=Merriweather:ital,wght@0,400;0,700;1,400;1,700&display=swap" },
+  { id: "source-serif-4", label: "Source Serif 4", category: "serif", cssStack: "'Source Serif 4', Georgia, serif", googleFontsUrl: "https://fonts.googleapis.com/css2?family=Source+Serif+4:ital,wght@0,400;0,600;0,700;1,400;1,600&display=swap" },
+  { id: "gentium-book-plus", label: "Gentium Book Plus", category: "serif", cssStack: "'Gentium Book Plus', Georgia, serif", googleFontsUrl: "https://fonts.googleapis.com/css2?family=Gentium+Book+Plus:ital,wght@0,400;0,700;1,400;1,700&display=swap" },
+  { id: "libre-baskerville", label: "Libre Baskerville", category: "serif", cssStack: "'Libre Baskerville', Baskerville, Georgia, serif", googleFontsUrl: "https://fonts.googleapis.com/css2?family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&display=swap" },
+  { id: "crimson-pro", label: "Crimson Pro", category: "serif", cssStack: "'Crimson Pro', Georgia, serif", googleFontsUrl: "https://fonts.googleapis.com/css2?family=Crimson+Pro:ital,wght@0,400;0,600;0,700;1,400;1,600&display=swap" },
+  { id: "playfair-display", label: "Playfair Display", category: "display", cssStack: "'Playfair Display', Georgia, serif", googleFontsUrl: "https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;0,800;1,400;1,600&display=swap" },
+  { id: "cormorant-garamond", label: "Cormorant Garamond", category: "serif", cssStack: "'Cormorant Garamond', Garamond, Georgia, serif", googleFontsUrl: "https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400;1,600&display=swap" },
+  { id: "nunito", label: "Nunito", category: "sans-serif", cssStack: "'Nunito', 'Segoe UI', Tahoma, sans-serif", googleFontsUrl: "https://fonts.googleapis.com/css2?family=Nunito:ital,wght@0,400;0,600;0,700;1,400;1,600&display=swap" },
+  { id: "raleway", label: "Raleway", category: "sans-serif", cssStack: "'Raleway', 'Segoe UI', Tahoma, sans-serif", googleFontsUrl: "https://fonts.googleapis.com/css2?family=Raleway:ital,wght@0,400;0,600;0,700;1,400;1,600&display=swap" },
+  { id: "open-sans", label: "Open Sans", category: "sans-serif", cssStack: "'Open Sans', 'Segoe UI', Tahoma, sans-serif", googleFontsUrl: "https://fonts.googleapis.com/css2?family=Open+Sans:ital,wght@0,400;0,600;0,700;1,400;1,600&display=swap" },
+  { id: "pt-serif", label: "PT Serif", category: "serif", cssStack: "'PT Serif', Georgia, serif", googleFontsUrl: "https://fonts.googleapis.com/css2?family=PT+Serif:ital,wght@0,400;0,700;1,400;1,700&display=swap" },
+  { id: "bitter", label: "Bitter", category: "serif", cssStack: "'Bitter', Georgia, serif", googleFontsUrl: "https://fonts.googleapis.com/css2?family=Bitter:ital,wght@0,400;0,600;0,700;1,400;1,600&display=swap" },
+  { id: "dm-serif-display", label: "DM Serif Display", category: "display", cssStack: "'DM Serif Display', Georgia, serif", googleFontsUrl: "https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&display=swap" },
+  { id: "josefin-slab", label: "Josefin Slab", category: "serif", cssStack: "'Josefin Slab', Georgia, serif", googleFontsUrl: "https://fonts.googleapis.com/css2?family=Josefin+Slab:ital,wght@0,400;0,600;0,700;1,400;1,600&display=swap" },
+];
+
 export type PaperType = {
   id: string;
   label: string;

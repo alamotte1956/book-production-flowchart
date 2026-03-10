@@ -70,7 +70,7 @@ async function invokeLLM(params: InvokeParams): Promise<InvokeResult> {
 
   return (await response.json()) as InvokeResult;
 }
-import { getTrimSize, getTypesettingStyle, type TrimSize, type TypesettingStyle } from "./typesettingStyles";
+import { getTrimSize, getTypesettingStyle, FONT_FAMILIES, type TrimSize, type TypesettingStyle } from "./typesettingStyles";
 
 export type Chapter = {
   number: number;
@@ -96,6 +96,8 @@ export type ProduceOptions = {
   isbn?: string;
   publisher?: string;
   description?: string;
+  fontOverrideBody?: string;
+  fontOverrideHeading?: string;
 };
 
 export type ProduceResult = {
@@ -474,7 +476,7 @@ export function generateBookHtml(
   <title>${escapeHtml(book.title)}</title>${trimMetaTag}
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="${style.googleFontsUrl}" rel="stylesheet" />
+  ${style.googleFontsUrl.split("|||").map(u => `<link href="${u}" rel="stylesheet" />`).join("\n  ")}
   <style>
     @page {
       size: ${pageWidthIn}in ${pageHeightIn}in;
@@ -1069,6 +1071,29 @@ export async function produceBook(
   } catch (err: unknown) {
     const msg = err instanceof Error ? err.message : String(err);
     throw new Error(`[Stage: config-resolution] Invalid typesetting style ID "${options.styleId}": ${msg}`);
+  }
+
+  if (options.fontOverrideBody || options.fontOverrideHeading) {
+    style = { ...style };
+    const googleUrls: string[] = [style.googleFontsUrl];
+
+    if (options.fontOverrideBody) {
+      const bodyFont = FONT_FAMILIES.find(f => f.id === options.fontOverrideBody);
+      if (bodyFont) {
+        style.fontFamily = bodyFont.cssStack;
+        googleUrls.push(bodyFont.googleFontsUrl);
+      }
+    }
+    if (options.fontOverrideHeading) {
+      const headingFont = FONT_FAMILIES.find(f => f.id === options.fontOverrideHeading);
+      if (headingFont) {
+        style.chapterHeadingFont = headingFont.cssStack;
+        googleUrls.push(headingFont.googleFontsUrl);
+      }
+    }
+
+    const uniqueUrls = [...new Set(googleUrls)];
+    style.googleFontsUrl = uniqueUrls.join("|||");
   }
 
   // Step 1: Parse chapters with AI

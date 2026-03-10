@@ -12,7 +12,7 @@ import {
 } from "./db";
 import { parseManuscript } from "./manuscriptParser";
 import { produceBook } from "./typesettingPipeline";
-import { TYPESETTING_STYLES, TRIM_SIZES, getTrimSize, getTypesettingStyle } from "./typesettingStyles";
+import { TYPESETTING_STYLES, TRIM_SIZES, FONT_FAMILIES, getTrimSize, getTypesettingStyle } from "./typesettingStyles";
 import { storagePut } from "./storage";
 import { generateIdml } from "./idmlGenerator";
 import { invokeLLM } from "./_core/llm";
@@ -309,10 +309,32 @@ export const appRouter = router({
       .input(z.object({
         styleId: z.string(),
         trimSizeId: z.string(),
+        fontOverrideBody: z.string().optional(),
+        fontOverrideHeading: z.string().optional(),
       }))
       .query(({ input }) => {
         const trim = getTrimSize(input.trimSizeId);
-        const style = getTypesettingStyle(input.styleId);
+        let style = getTypesettingStyle(input.styleId);
+
+        if (input.fontOverrideBody || input.fontOverrideHeading) {
+          style = { ...style };
+          const googleUrls: string[] = [style.googleFontsUrl];
+          if (input.fontOverrideBody) {
+            const bodyFont = FONT_FAMILIES.find(f => f.id === input.fontOverrideBody);
+            if (bodyFont) {
+              style.fontFamily = bodyFont.cssStack;
+              googleUrls.push(bodyFont.googleFontsUrl);
+            }
+          }
+          if (input.fontOverrideHeading) {
+            const headingFont = FONT_FAMILIES.find(f => f.id === input.fontOverrideHeading);
+            if (headingFont) {
+              style.chapterHeadingFont = headingFont.cssStack;
+              googleUrls.push(headingFont.googleFontsUrl);
+            }
+          }
+          style.googleFontsUrl = [...new Set(googleUrls)].join("|||");
+        }
 
         // Sample content for the preview page
         // All scripture-* styles use Genesis sample content
@@ -410,7 +432,7 @@ export const appRouter = router({
   <title>Style Preview — ${style.label}</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="${style.googleFontsUrl}" rel="stylesheet">
+  ${style.googleFontsUrl.split("|||").map(u => `<link href="${u}" rel="stylesheet">`).join("\n  ")}
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
     html, body { background: #e8e0d8; display: flex; justify-content: center; align-items: flex-start; padding: 24px; min-height: 100vh; }
@@ -562,6 +584,7 @@ export const appRouter = router({
     options: publicProcedure.query(() => ({
       trimSizes: TRIM_SIZES,
       styles: TYPESETTING_STYLES,
+      fonts: FONT_FAMILIES,
     })),
 
     // List all production jobs for a project
@@ -597,6 +620,8 @@ export const appRouter = router({
         fileName: z.string(),
         mimeType: z.string(),
         fileBase64: z.string(),
+        fontOverrideBody: z.string().optional(),
+        fontOverrideHeading: z.string().optional(),
       }))
       .mutation(async ({ ctx, input }) => {
         const user = await getUserById(ctx.user.id);
@@ -653,6 +678,8 @@ export const appRouter = router({
                 title: project.title,
                 author: project.author ?? "Unknown Author",
                 includeBleed: true,
+                fontOverrideBody: input.fontOverrideBody,
+                fontOverrideHeading: input.fontOverrideHeading,
               }
             );
 

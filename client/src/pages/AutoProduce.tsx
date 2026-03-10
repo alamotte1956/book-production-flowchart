@@ -179,11 +179,13 @@ interface StylePreviewModalProps {
   onClose: () => void;
   styleId: string;
   trimSizeId: string;
+  fontOverrideBody?: string;
+  fontOverrideHeading?: string;
 }
 
-function StylePreviewModal({ open, onClose, styleId, trimSizeId }: StylePreviewModalProps) {
+function StylePreviewModal({ open, onClose, styleId, trimSizeId, fontOverrideBody, fontOverrideHeading }: StylePreviewModalProps) {
   const { data, isLoading, error } = trpc.autoProduce.preview.useQuery(
-    { styleId, trimSizeId },
+    { styleId, trimSizeId, fontOverrideBody: fontOverrideBody || undefined, fontOverrideHeading: fontOverrideHeading || undefined },
     { enabled: open && !!styleId && !!trimSizeId }
   );
 
@@ -926,6 +928,8 @@ function AutoProduceInner() {
   const [styleAutoSelected, setStyleAutoSelected] = useState(false);
   const [trimAutoSelected, setTrimAutoSelected] = useState(false);
   const [templateName, setTemplateName] = useState<string | null>(null);
+  const [fontOverrideBody, setFontOverrideBody] = useState("");
+  const [fontOverrideHeading, setFontOverrideHeading] = useState("");
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   // Generate / revoke object URL for image previews
@@ -1023,6 +1027,8 @@ function AutoProduceInner() {
       setSelectedFile(null);
       setTrimSizeId("");
       setStyleId("");
+      setFontOverrideBody("");
+      setFontOverrideHeading("");
       refetchJobs();
       toast.success("Production job started! The AI is now typesetting your manuscript.");
     },
@@ -1086,6 +1092,8 @@ function AutoProduceInner() {
         fileName,
         mimeType,
         fileBase64,
+        fontOverrideBody: fontOverrideBody && fontOverrideBody !== "__default" ? fontOverrideBody : undefined,
+        fontOverrideHeading: fontOverrideHeading && fontOverrideHeading !== "__default" ? fontOverrideHeading : undefined,
       });
     } finally {
       setIsSubmitting(false);
@@ -1237,6 +1245,52 @@ function AutoProduceInner() {
                     Auto-selected based on your project genre (Bible / Scripture). You can change it above.
                   </p>
                 )}
+              </div>
+              <div className="space-y-1.5">
+                <label className="text-sm font-medium text-[#5c3d2e] flex items-center gap-1.5">
+                  <Type className="w-3.5 h-3.5" /> Body Font
+                  <span className="text-xs font-normal text-[#8b7a6a]">(optional)</span>
+                </label>
+                <Select value={fontOverrideBody} onValueChange={setFontOverrideBody}>
+                  <SelectTrigger className="border-[#d4b896]/60 bg-[#fdf9f3] text-[#3d2b1f]">
+                    <SelectValue placeholder="Use style default" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="__default">Use style default</SelectItem>
+                    {options?.fonts
+                      ?.filter(f => f.category === "serif" || f.category === "sans-serif")
+                      .map(f => (
+                        <SelectItem key={f.id} value={f.id}>
+                          <span className="flex items-center gap-2">
+                            {f.label}
+                            <span className="text-xs text-[#8b7a6a]">{f.category}</span>
+                          </span>
+                        </SelectItem>
+                      ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="space-y-1.5">
+                <label className="text-sm font-medium text-[#5c3d2e] flex items-center gap-1.5">
+                  <Type className="w-3.5 h-3.5" /> Heading & Chapter Font
+                  <span className="text-xs font-normal text-[#8b7a6a]">(optional)</span>
+                </label>
+                <Select value={fontOverrideHeading} onValueChange={setFontOverrideHeading}>
+                  <SelectTrigger className="border-[#d4b896]/60 bg-[#fdf9f3] text-[#3d2b1f]">
+                    <SelectValue placeholder="Use style default" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="__default">Use style default</SelectItem>
+                    {options?.fonts?.map(f => (
+                      <SelectItem key={f.id} value={f.id}>
+                        <span className="flex items-center gap-2">
+                          {f.label}
+                          <span className="text-xs text-[#8b7a6a]">{f.category}</span>
+                        </span>
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
               </div>
               <div className="space-y-1.5">
                 <label className="text-sm font-medium text-[#5c3d2e]">Output Format</label>
@@ -1536,6 +1590,8 @@ function AutoProduceInner() {
         onClose={() => setPreviewOpen(false)}
         styleId={styleId}
         trimSizeId={trimSizeId}
+        fontOverrideBody={fontOverrideBody && fontOverrideBody !== "__default" ? fontOverrideBody : undefined}
+        fontOverrideHeading={fontOverrideHeading && fontOverrideHeading !== "__default" ? fontOverrideHeading : undefined}
       />
 
       {/* Related Tools footer backlinks */}

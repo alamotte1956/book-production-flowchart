@@ -109,6 +109,7 @@ PostgreSQL via Replit's built-in database. Use `npx drizzle-kit push` to sync sc
 - **What's Next Banners**: Contextual next-step suggestions on all tool pages after task completion
 - **AI Writing Assistant**: Generate back-cover blurbs, author bios, press releases, marketing copy in Project Tracker
 - **Typeface Pairings**: 8 professional font pairings in Bible Studio with one-click apply and live preview
+- **Custom Font Selection**: Users can override body and heading/chapter fonts independently from the typesetting style. 16 curated Google Fonts (serif, sans-serif, display) defined in `FONT_FAMILIES` in `shared/bibleSpecs.ts`. Font overrides available in Auto-Produce page and EBP Production Wizard. Overrides are applied in `produceBook()` by cloning the style and replacing `fontFamily`/`chapterHeadingFont`; multiple Google Font URLs joined with `|||` separator and split into multiple `<link>` tags in HTML output.
 - **Format Conversion Suggestions**: Smart error guidance when Auto-Produce fails due to unsupported formats
 - **Publisher Partners**: Harvest House, Tyndale, Zondervan, BronzeBow in Resources Hub
 - **Book Genres**: Christian Living, Devotional, Children's Christian, Prayer, Pastoral, Biography, Academic/Theological, Music/Audio

@@ -34,7 +34,7 @@ import type { EBPTemplate } from "../../../shared/ebpTemplates";
 // ─── Shared bibleSpecs imports ────────────────────────────────────────────────
 // We import the arrays directly from the shared module so the wizard always
 // shows the same options as the rest of the app.
-import { TYPESETTING_STYLES, TRIM_SIZES } from "../../../shared/bibleSpecs";
+import { TYPESETTING_STYLES, TRIM_SIZES, FONT_FAMILIES } from "../../../shared/bibleSpecs";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -120,6 +120,8 @@ export default function EBPProductionWizard({
   // Step 3: Typesetting config (pre-filled from template)
   const [styleId, setStyleId] = useState(template.styleId);
   const [trimSizeId, setTrimSizeId] = useState(template.trimSizeId);
+  const [fontOverrideBody, setFontOverrideBody] = useState("");
+  const [fontOverrideHeading, setFontOverrideHeading] = useState("");
 
   // Step 4: Manuscript
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -198,6 +200,8 @@ export default function EBPProductionWizard({
         fileName: selectedFile.name,
         mimeType: selectedFile.type || "application/octet-stream",
         fileBase64,
+        fontOverrideBody: fontOverrideBody && fontOverrideBody !== "__default" ? fontOverrideBody : undefined,
+        fontOverrideHeading: fontOverrideHeading && fontOverrideHeading !== "__default" ? fontOverrideHeading : undefined,
       });
 
       setJobId(result.jobId);
@@ -379,6 +383,36 @@ export default function EBPProductionWizard({
                         {t.label}
                         {t.id === template.trimSizeId ? " ★" : ""}
                       </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div>
+                <Label className="text-sm font-medium text-[#3b2a1a]">Body Font <span className="text-xs font-normal text-[#8b7a6a]">(optional)</span></Label>
+                <Select value={fontOverrideBody} onValueChange={setFontOverrideBody}>
+                  <SelectTrigger className="mt-1 border-[#c9a96e]/30 focus:ring-[#c9a96e]/50">
+                    <SelectValue placeholder="Use style default" />
+                  </SelectTrigger>
+                  <SelectContent className="max-h-60">
+                    <SelectItem value="__default">Use style default</SelectItem>
+                    {FONT_FAMILIES.filter(f => f.category === "serif" || f.category === "sans-serif").map(f => (
+                      <SelectItem key={f.id} value={f.id}>{f.label} <span className="text-xs text-[#8b7a6a]">({f.category})</span></SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div>
+                <Label className="text-sm font-medium text-[#3b2a1a]">Heading & Chapter Font <span className="text-xs font-normal text-[#8b7a6a]">(optional)</span></Label>
+                <Select value={fontOverrideHeading} onValueChange={setFontOverrideHeading}>
+                  <SelectTrigger className="mt-1 border-[#c9a96e]/30 focus:ring-[#c9a96e]/50">
+                    <SelectValue placeholder="Use style default" />
+                  </SelectTrigger>
+                  <SelectContent className="max-h-60">
+                    <SelectItem value="__default">Use style default</SelectItem>
+                    {FONT_FAMILIES.map(f => (
+                      <SelectItem key={f.id} value={f.id}>{f.label} <span className="text-xs text-[#8b7a6a]">({f.category})</span></SelectItem>
                     ))}
                   </SelectContent>
                 </Select>
