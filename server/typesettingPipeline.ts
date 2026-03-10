@@ -167,17 +167,87 @@ async function runStage<T>(stageName: string, fn: () => Promise<T>): Promise<T> 
 
 // ─── Step 1: LLM Chapter Detection ──────────────────────────────────────────
 
+const CHAPTER_HEADING_RE = /^(?:\s*(?:chapter|ch\.?)\s+(?:\d+|[ivxlcdm]+|one|two|three|four|five|six|seven|eight|nine|ten|eleven|twelve|thirteen|fourteen|fifteen|sixteen|seventeen|eighteen|nineteen|twenty|thirty|forty|fifty|sixty|seventy|eighty|ninety|hundred)(?:\s*[:.–—-]\s*.*)?|part\s+(?:\d+|[ivxlcdm]+)(?:\s*[:.–—-]\s*.*)?|\d+\s*[:.–—]\s*.+)$/im;
+
+function splitChaptersByRegex(rawText: string, title: string, author: string): ParsedBook {
+  const lines = rawText.split(/\r?\n/);
+  const chapterStarts: { index: number; heading: string }[] = [];
+
+  for (let i = 0; i < lines.length; i++) {
+    const trimmed = lines[i].trim();
+    if (trimmed.length > 0 && trimmed.length < 200 && CHAPTER_HEADING_RE.test(trimmed)) {
+      chapterStarts.push({ index: i, heading: trimmed });
+    }
+  }
+
+  if (chapterStarts.length === 0) {
+    const LINES_PER_CHUNK = 2500;
+    const chapters: ParsedBook["chapters"] = [];
+    for (let start = 0; start < lines.length; start += LINES_PER_CHUNK) {
+      const chunkLines = lines.slice(start, start + LINES_PER_CHUNK);
+      chapters.push({
+        number: chapters.length + 1,
+        title: `Section ${chapters.length + 1}`,
+        body: chunkLines.join("\n"),
+      });
+    }
+    return { title, author, chapters };
+  }
+
+  let frontmatter = "";
+  if (chapterStarts[0].index > 0) {
+    frontmatter = lines.slice(0, chapterStarts[0].index).join("\n").trim();
+  }
+
+  const chapters: ParsedBook["chapters"] = [];
+  for (let c = 0; c < chapterStarts.length; c++) {
+    const startLine = chapterStarts[c].index + 1;
+    const endLine = c + 1 < chapterStarts.length ? chapterStarts[c + 1].index : lines.length;
+    const body = lines.slice(startLine, endLine).join("\n").trim();
+    const heading = chapterStarts[c].heading;
+
+    let chapterTitle = heading;
+    const titleMatch = heading.match(/^(?:chapter|ch\.?)\s+(?:\d+|[ivxlcdm]+|\w+)\s*[:.–—-]\s*(.+)$/i);
+    if (titleMatch) chapterTitle = titleMatch[1].trim();
+
+    chapters.push({
+      number: c + 1,
+      title: chapterTitle,
+      body,
+    });
+  }
+
+  let backmatter = "";
+  const lastChapter = chapters[chapters.length - 1];
+  if (lastChapter) {
+    const backPatterns = /^(?:epilogue|afterword|acknowledgements?|appendix|about the author|bibliography|notes|index)\b/im;
+    const bodyLines = lastChapter.body.split(/\r?\n/);
+    for (let i = 0; i < bodyLines.length; i++) {
+      if (backPatterns.test(bodyLines[i].trim())) {
+        backmatter = bodyLines.slice(i).join("\n").trim();
+        lastChapter.body = bodyLines.slice(0, i).join("\n").trim();
+        break;
+      }
+    }
+  }
+
+  return { title, author, frontmatter, chapters, backmatter };
+}
+
 export async function detectChapters(
   rawText: string,
   title: string,
   author: string
 ): Promise<ParsedBook> {
   return runStage("chapter-detection", async () => {
-    // Truncate very long manuscripts to avoid token limits — process in chunks if needed
-    const MAX_CHARS = 80000;
-    const truncated = rawText.length > MAX_CHARS
-      ? rawText.slice(0, MAX_CHARS) + "\n\n[... manuscript continues ...]"
-      : rawText;
+    const LLM_CHAR_LIMIT = 80000;
+
+    if (rawText.length > LLM_CHAR_LIMIT) {
+      console.log(`[Stage: chapter-detection] Manuscript is ${rawText.length} chars (>${LLM_CHAR_LIMIT}), using regex-based chapter splitting for full content`);
+      const result = splitChaptersByRegex(rawText, title, author);
+      console.log(`[Stage: chapter-detection] Regex split found ${result.chapters.length} chapters from ${rawText.length} chars`);
+      return result;
+    }
 
     let response: Awaited<ReturnType<typeof invokeLLM>>;
     try {
@@ -205,7 +275,7 @@ Preserve all paragraph breaks. Do not summarize or shorten any text. Return ONLY
           },
           {
             role: "user",
-            content: `Title: ${title}\nAuthor: ${author}\n\nManuscript:\n\n${truncated}`,
+            content: `Title: ${title}\nAuthor: ${author}\n\nManuscript:\n\n${rawText}`,
           },
         ],
         response_format: { type: "json_object" },
@@ -213,7 +283,8 @@ Preserve all paragraph breaks. Do not summarize or shorten any text. Return ONLY
       });
     } catch (llmErr: unknown) {
       const msg = llmErr instanceof Error ? llmErr.message : String(llmErr);
-      throw new Error(`LLM call failed during chapter detection: ${msg}`);
+      console.warn(`[Stage: chapter-detection] LLM failed (${msg}); falling back to regex-based splitting`);
+      return splitChaptersByRegex(rawText, title, author);
     }
 
     const content = response.choices[0]?.message?.content;
@@ -226,22 +297,13 @@ Preserve all paragraph breaks. Do not summarize or shorten any text. Return ONLY
       parsed = JSON.parse(content) as ParsedBook;
     } catch (parseErr: unknown) {
       const msg = parseErr instanceof Error ? parseErr.message : String(parseErr);
-      console.warn(`[Stage: chapter-detection] JSON parse failed (${msg}); falling back to single-chapter mode. Raw LLM response length: ${content.length}`);
-      // Fallback: treat entire text as a single chapter
-      return {
-        title,
-        author,
-        chapters: [{ number: 1, title: "Full Text", body: rawText }],
-      };
+      console.warn(`[Stage: chapter-detection] JSON parse failed (${msg}); falling back to regex-based splitting`);
+      return splitChaptersByRegex(rawText, title, author);
     }
 
     if (!parsed.chapters || parsed.chapters.length === 0) {
-      console.warn(`[Stage: chapter-detection] LLM returned 0 chapters; falling back to single-chapter mode. Title: "${title}", Author: "${author}"`);
-      return {
-        title,
-        author,
-        chapters: [{ number: 1, title: "Full Text", body: rawText }],
-      };
+      console.warn(`[Stage: chapter-detection] LLM returned 0 chapters; falling back to regex-based splitting`);
+      return splitChaptersByRegex(rawText, title, author);
     }
 
     return parsed;
@@ -553,7 +615,7 @@ export async function renderToPdf(html: string, trim: TrimSize, bleedOverrides?:
       const page = await browser.newPage();
 
       try {
-        await page.setContent(html, { waitUntil: "networkidle0", timeout: 60000 });
+        await page.setContent(html, { waitUntil: "networkidle0", timeout: 300000 });
       } catch (contentErr: unknown) {
         const msg = contentErr instanceof Error ? contentErr.message : String(contentErr);
         throw new Error(`Page content load timed out or failed: ${msg}`);
