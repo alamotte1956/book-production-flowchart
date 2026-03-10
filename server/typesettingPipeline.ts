@@ -727,10 +727,8 @@ export async function renderToEpub(book: ParsedBook, style: TypesettingStyle, me
 
     let epubBuffer: Uint8Array;
     try {
-      epubBuffer = await Epub(
-        epubOptions,
-        content
-      );
+      const epub = new (Epub as new (options: Record<string, unknown>, content: Array<{ title?: string; content: string }>) => { genEpub: () => Promise<Uint8Array> })(epubOptions, content);
+      epubBuffer = await epub.genEpub();
     } catch (epubErr: unknown) {
       const msg = epubErr instanceof Error ? epubErr.message : String(epubErr);
       throw new Error(`epub-gen-memory failed (title: "${book.title}", chapters: ${book.chapters.length}): ${msg}`);
