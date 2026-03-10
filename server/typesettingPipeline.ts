@@ -899,6 +899,23 @@ export async function renderToEpub(book: ParsedBook, style: TypesettingStyle, me
     }
 
     const content: Array<{ title?: string; content: string }> = [];
+    const SCENE_BREAK_RE = /^(\*\s*\*\s*\*|#\s*#\s*#|~\s*~\s*~|-\s*-\s*-|\u2014\s*\u2014\s*\u2014|\* \* \*|\u00A7)$/;
+    const year = new Date().getFullYear();
+
+    content.push({
+      title: smartTypography(book.title),
+      content: `<div style="text-align:center;margin-top:40%;"><p style="font-size:1.3em;letter-spacing:0.04em;font-weight:400;margin:0;">${smartTypography(escapeHtml(book.title))}</p></div>`,
+    });
+
+    content.push({
+      title: "Title Page",
+      content: `<div style="text-align:center;margin-top:30%;">
+        <p style="font-size:1.8em;font-weight:600;letter-spacing:0.03em;line-height:1.2;margin:0 0 0.3em 0;">${smartTypography(escapeHtml(book.title))}</p>
+        <hr style="width:40%;border:none;border-top:0.5pt solid currentColor;margin:0.8em auto;opacity:0.4;" />
+        <p style="font-size:1.1em;letter-spacing:0.08em;text-transform:uppercase;font-weight:400;margin:0;">${smartTypography(escapeHtml(book.author))}</p>
+        <p style="font-size:0.75em;letter-spacing:0.06em;text-transform:uppercase;opacity:0.5;margin-top:3em;">Easy Book Publishers</p>
+      </div>`,
+    });
 
     content.push({
       title: "Copyright",
@@ -919,34 +936,57 @@ export async function renderToEpub(book: ParsedBook, style: TypesettingStyle, me
       content.push({
         title: "Introduction",
         content: `<div>${book.frontmatter.split(/\n{2,}/).map(p =>
-          `<p style="text-indent:1.5em;margin:0;">${escapeHtml(p.trim())}</p>`
+          `<p style="margin:0 0 0.5em 0;text-align:justify;">${smartTypography(escapeHtml(p.trim()))}</p>`
         ).join("")}</div>`,
       });
     }
 
-    for (const ch of book.chapters) {
-      const SCENE_BREAK_RE = /^(\*\s*\*\s*\*|#\s*#\s*#|~\s*~\s*~|-\s*-\s*-|—\s*—\s*—|\* \* \*|§)$/;
-      const chapterHtml = ch.body.split(/\n{2,}/).map((p, pi) => {
+    for (let ci = 0; ci < book.chapters.length; ci++) {
+      const ch = book.chapters[ci];
+      const chTitle = ch.title || `Chapter ${ch.number}`;
+      const hasCustomTitle = ch.title && ch.title !== `Chapter ${ch.number}` && ch.title !== `Section ${ch.number}`;
+
+      let chapterHeaderHtml = `<div style="text-align:center;margin-top:15%;margin-bottom:1.5em;">`;
+      chapterHeaderHtml += `<p style="font-size:0.75em;text-transform:uppercase;letter-spacing:0.2em;font-weight:400;margin:0 0 0.15em 0;">Chapter ${ch.number}</p>`;
+      if (hasCustomTitle) {
+        chapterHeaderHtml += `<p style="font-size:1.3em;font-weight:600;line-height:1.3;margin:0.1em 0 0 0;">${smartTypography(escapeHtml(ch.title))}</p>`;
+      }
+      chapterHeaderHtml += `<p style="font-size:0.9em;opacity:0.35;margin-top:0.4em;letter-spacing:0.3em;">\u2767</p>`;
+      chapterHeaderHtml += `</div>`;
+
+      const chapterBodyHtml = ch.body.split(/\n{2,}/).map((p, pi) => {
         const trimmed = p.trim().replace(/\n/g, " ");
         if (SCENE_BREAK_RE.test(trimmed)) {
-          return `<p style="text-align:center;margin:1.5em 0;font-size:1.2em;letter-spacing:0.5em;opacity:0.4;">\u2042</p>`;
+          return `<p style="text-align:center;margin:1.5em 0;font-size:1.1em;letter-spacing:0.5em;opacity:0.35;">\u2042</p>`;
         }
         const escaped = smartTypography(escapeHtml(trimmed));
+        if (pi === 0 && ci === 0 && style.dropCap && escaped.length > 1) {
+          const firstChar = escaped[0] ?? "";
+          const rest = escaped.slice(1);
+          return `<p style="margin:0;text-align:justify;"><span style="float:left;font-size:3.2em;line-height:0.85;padding-right:0.06em;font-weight:600;">${firstChar}</span>${rest}</p>`;
+        }
         if (pi === 0) return `<p style="margin:0;text-align:justify;">${escaped}</p>`;
         return `<p style="text-indent:1.5em;margin:0;text-align:justify;">${escaped}</p>`;
       }).join("");
+
       content.push({
-        title: ch.title || `Chapter ${ch.number}`,
-        content: `<div>${chapterHtml}</div>`,
+        title: chTitle,
+        content: `<div>${chapterHeaderHtml}${chapterBodyHtml}</div>`,
       });
     }
 
     if (book.backmatter?.trim()) {
       content.push({
         title: "Acknowledgements",
-        content: `<div>${book.backmatter.split(/\n{2,}/).map(p =>
-          `<p style="text-indent:1.5em;margin:0;">${escapeHtml(p.trim())}</p>`
-        ).join("")}</div>`,
+        content: `<div>
+          <div style="text-align:center;margin-top:15%;margin-bottom:1.5em;">
+            <p style="font-size:0.9em;opacity:0.35;margin-bottom:0.4em;letter-spacing:0.3em;">\u2767</p>
+            <p style="font-size:1.3em;font-weight:600;margin:0;">Acknowledgements</p>
+          </div>
+          ${book.backmatter.split(/\n{2,}/).map(p =>
+            `<p style="margin:0 0 0.5em 0;text-align:justify;">${smartTypography(escapeHtml(p.trim()))}</p>`
+          ).join("")}
+        </div>`,
       });
     }
 

@@ -697,6 +697,8 @@ export const appRouter = router({
               trimSize: prodTrimSize,
               style: prodStyle,
               chapters: idmlChapters,
+              frontmatter: parsedBook.frontmatter,
+              backmatter: parsedBook.backmatter,
             });
             const idmlKey = `output/${input.projectId}/${job.id}-layout.idml`;
             const { url: idmlUrl } = await storagePut(idmlKey, idmlBuffer, "application/vnd.adobe.indesign-idml-package");
@@ -809,7 +811,7 @@ export const appRouter = router({
             const { url: epubUrl } = await storagePut(epubKey, epubBuffer, "application/epub+zip");
             updates.epubUrl = epubUrl; updates.epubKey = epubKey;
             const idmlChapters = parsedBook.chapters.map(ch => ({ title: ch.title, paragraphs: ch.body.split(/\n{2,}/).filter(p => p.trim().length > 0) }));
-            const idmlBuffer = await generateIdml({ title: project.title, author: project.author ?? "Unknown Author", trimSize: prodTrimSize, style: prodStyle, chapters: idmlChapters });
+            const idmlBuffer = await generateIdml({ title: project.title, author: project.author ?? "Unknown Author", trimSize: prodTrimSize, style: prodStyle, chapters: idmlChapters, frontmatter: parsedBook.frontmatter, backmatter: parsedBook.backmatter });
             const idmlKey = `output/${originalJob.projectId}/${newJob.id}-layout.idml`;
             const { url: idmlUrl } = await storagePut(idmlKey, idmlBuffer, "application/vnd.adobe.indesign-idml-package");
             updates.idmlUrl = idmlUrl; updates.idmlKey = idmlKey;

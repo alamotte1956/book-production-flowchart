@@ -32,6 +32,8 @@ export interface IdmlOptions {
   trimSize: TrimSize;
   style: TypesettingStyle;
   chapters: Chapter[];
+  frontmatter?: string;
+  backmatter?: string;
   /** Include red-letter markup for words of Christ (Bible only) */
   redLetter?: boolean;
 }
@@ -45,6 +47,18 @@ function escapeXml(s: string): string {
     .replace(/>/g, "&gt;")
     .replace(/"/g, "&quot;")
     .replace(/'/g, "&apos;");
+}
+
+function smartTypographyXml(text: string): string {
+  let s = text;
+  s = s.replace(/---/g, "\u2014");
+  s = s.replace(/--/g, "\u2013");
+  s = s.replace(/\.\.\./g, "\u2026");
+  s = s.replace(/(^|[\s([\u201C])"/g, "$1\u201C");
+  s = s.replace(/"/g, "\u201D");
+  s = s.replace(/(^|[\s([\u2018])'/g, "$1\u2018");
+  s = s.replace(/'/g, "\u2019");
+  return s;
 }
 
 function inchesToPoints(inches: number): number {
@@ -153,16 +167,49 @@ function buildStyles(opts: IdmlOptions): string {
       AppliedFont="${escapeXml(fontFamily)}" FontStyle="Regular"
       PointSize="${fontSize}" Leading="${leading}"
       SpaceBefore="0" SpaceAfter="0"
-      Justification="FullyJustified" HyphenateLastWord="false"/>
+      Justification="FullyJustified" HyphenateLastWord="false"
+      KeepFirstLines="3" KeepLastLines="3"/>
     <ParagraphStyle Self="ParagraphStyle/ChapterTitle" Name="Chapter Title"
       AppliedFont="${escapeXml(fontFamily)}" FontStyle="Bold"
       PointSize="${chapterSize}" Leading="${chapterLeading}"
       SpaceBefore="${marginTop}" SpaceAfter="${Math.round(leading * 0.5)}"
       Justification="CenterAlign"/>
+    <ParagraphStyle Self="ParagraphStyle/HalfTitle" Name="Half Title"
+      AppliedFont="${escapeXml(fontFamily)}" FontStyle="Regular"
+      PointSize="${Math.round(chapterSize * 1.2)}" Leading="${Math.round(chapterSize * 1.2 * 1.3 * 10) / 10}"
+      SpaceBefore="0" SpaceAfter="0"
+      Justification="CenterAlign" KeepWithNext="1"/>
+    <ParagraphStyle Self="ParagraphStyle/TitlePage" Name="Title Page"
+      AppliedFont="${escapeXml(fontFamily)}" FontStyle="Bold"
+      PointSize="${Math.round(chapterSize * 1.8)}" Leading="${Math.round(chapterSize * 1.8 * 1.2 * 10) / 10}"
+      SpaceBefore="0" SpaceAfter="${Math.round(leading * 0.5)}"
+      Justification="CenterAlign"/>
+    <ParagraphStyle Self="ParagraphStyle/TitleAuthor" Name="Title Author"
+      AppliedFont="${escapeXml(fontFamily)}" FontStyle="Regular"
+      PointSize="${fontSize + 2}" Leading="${Math.round((fontSize + 2) * 1.4 * 10) / 10}"
+      SpaceBefore="0" SpaceAfter="0"
+      Justification="CenterAlign"/>
+    <ParagraphStyle Self="ParagraphStyle/Copyright" Name="Copyright"
+      AppliedFont="${escapeXml(fontFamily)}" FontStyle="Regular"
+      PointSize="${Math.max(fontSize - 2, 7.5)}" Leading="${Math.round(Math.max(fontSize - 2, 7.5) * 1.6 * 10) / 10}"
+      SpaceBefore="0" SpaceAfter="${Math.round(leading * 0.15)}"
+      Justification="LeftAlign"/>
+    <ParagraphStyle Self="ParagraphStyle/ChapterSubtitle" Name="Chapter Subtitle"
+      AppliedFont="${escapeXml(fontFamily)}" FontStyle="Italic"
+      PointSize="${chapterSize}" Leading="${chapterLeading}"
+      SpaceBefore="0" SpaceAfter="${Math.round(leading * 0.3)}"
+      Justification="CenterAlign"/>
+    <ParagraphStyle Self="ParagraphStyle/SceneBreak" Name="Scene Break"
+      AppliedFont="${escapeXml(fontFamily)}" FontStyle="Regular"
+      PointSize="${fontSize}" Leading="${leading}"
+      SpaceBefore="${Math.round(leading * 0.8)}" SpaceAfter="${Math.round(leading * 0.8)}"
+      Justification="CenterAlign"/>
     <ParagraphStyle Self="ParagraphStyle/BodyFirst" Name="Body First"
       BasedOn="ParagraphStyle/Body" FirstLineIndent="0"/>
     <ParagraphStyle Self="ParagraphStyle/BodyIndented" Name="Body Indented"
       BasedOn="ParagraphStyle/Body" FirstLineIndent="${indent}"/>
+    <ParagraphStyle Self="ParagraphStyle/DropCap" Name="Drop Cap"
+      BasedOn="ParagraphStyle/BodyFirst" DropCapCharacters="1" DropCapLines="3"/>
     <ParagraphStyle Self="ParagraphStyle/RunningHeader" Name="Running Header"
       AppliedFont="${escapeXml(fontFamily)}" FontStyle="Italic"
       PointSize="${Math.round(fontSize * 0.85 * 10) / 10}"
@@ -289,6 +336,7 @@ function buildStory(opts: IdmlOptions): string {
   const fontFamily = getFontFamily(style);
   const fontSize = style.fontSize;
   const leading = Math.round(fontSize * style.lineHeight * 10) / 10;
+  const SCENE_BREAK_RE = /^(\*\s*\*\s*\*|#\s*#\s*#|~\s*~\s*~|-\s*-\s*-|\u2014\s*\u2014\s*\u2014|\* \* \*|\u00A7)$/;
 
   let content = `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <idPkg:Story xmlns:idPkg="http://ns.adobe.com/AdobeInDesign/idml/1.0/packaging"
@@ -297,27 +345,109 @@ function buildStory(opts: IdmlOptions): string {
     StoryTitle="${escapeXml(opts.title)}" AppliedNamedGrid="n">
 `;
 
-  for (const chapter of chapters) {
-    // Chapter title paragraph
+  const year = new Date().getFullYear();
+
+  content += `    <ParagraphStyleRange AppliedParagraphStyle="ParagraphStyle/HalfTitle">
+      <CharacterStyleRange AppliedCharacterStyle="CharacterStyle/$ID/[No character style]">
+        <Content>${escapeXml(smartTypographyXml(opts.title))}</Content>
+      </CharacterStyleRange>
+      <Br/>
+    </ParagraphStyleRange>
+    <ParagraphStyleRange AppliedParagraphStyle="ParagraphStyle/Body">
+      <CharacterStyleRange AppliedCharacterStyle="CharacterStyle/$ID/[No character style]">
+        <SpecialCharacter SpecialCharacterType="FrameBreak"/>
+      </CharacterStyleRange>
+    </ParagraphStyleRange>\n`;
+
+  content += `    <ParagraphStyleRange AppliedParagraphStyle="ParagraphStyle/TitlePage">
+      <CharacterStyleRange AppliedCharacterStyle="CharacterStyle/$ID/[No character style]"
+        AppliedFont="${escapeXml(fontFamily)}" FontStyle="Bold">
+        <Content>${escapeXml(smartTypographyXml(opts.title))}</Content>
+      </CharacterStyleRange>
+      <Br/>
+    </ParagraphStyleRange>
+    <ParagraphStyleRange AppliedParagraphStyle="ParagraphStyle/TitleAuthor">
+      <CharacterStyleRange AppliedCharacterStyle="CharacterStyle/$ID/[No character style]">
+        <Content>${escapeXml(smartTypographyXml(opts.author))}</Content>
+      </CharacterStyleRange>
+      <Br/>
+    </ParagraphStyleRange>
+    <ParagraphStyleRange AppliedParagraphStyle="ParagraphStyle/Body">
+      <CharacterStyleRange AppliedCharacterStyle="CharacterStyle/$ID/[No character style]">
+        <SpecialCharacter SpecialCharacterType="FrameBreak"/>
+      </CharacterStyleRange>
+    </ParagraphStyleRange>\n`;
+
+  const copyrightLines = [
+    smartTypographyXml(opts.title),
+    `\u00A9 ${year} ${smartTypographyXml(opts.author)}. All rights reserved.`,
+    `No part of this publication may be reproduced, distributed, or transmitted in any form without the prior written permission of the author, except for brief quotations in reviews.`,
+    `Published by Easy Book Publishers`,
+    `Typeset with Easy Book Publishers \u2014 easybookpublishers.com`,
+  ];
+  for (const line of copyrightLines) {
+    content += `    <ParagraphStyleRange AppliedParagraphStyle="ParagraphStyle/Copyright">
+      <CharacterStyleRange AppliedCharacterStyle="CharacterStyle/$ID/[No character style]">
+        <Content>${escapeXml(line)}</Content>
+      </CharacterStyleRange>
+      <Br/>
+    </ParagraphStyleRange>\n`;
+  }
+  content += `    <ParagraphStyleRange AppliedParagraphStyle="ParagraphStyle/Body">
+      <CharacterStyleRange AppliedCharacterStyle="CharacterStyle/$ID/[No character style]">
+        <SpecialCharacter SpecialCharacterType="FrameBreak"/>
+      </CharacterStyleRange>
+    </ParagraphStyleRange>\n`;
+
+  if (opts.frontmatter?.trim()) {
+    const fmParagraphs = opts.frontmatter.split(/\n{2,}/).filter(p => p.trim().length > 0);
+    for (const fmPara of fmParagraphs) {
+      content += `    <ParagraphStyleRange AppliedParagraphStyle="ParagraphStyle/BodyFirst">
+      <CharacterStyleRange AppliedCharacterStyle="CharacterStyle/$ID/[No character style]"
+        AppliedFont="${escapeXml(fontFamily)}" FontStyle="Regular" PointSize="${fontSize}" Leading="${leading}">
+        <Content>${escapeXml(smartTypographyXml(fmPara.trim()))}</Content>
+      </CharacterStyleRange>
+      <Br/>
+    </ParagraphStyleRange>\n`;
+    }
+    content += `    <ParagraphStyleRange AppliedParagraphStyle="ParagraphStyle/Body">
+      <CharacterStyleRange AppliedCharacterStyle="CharacterStyle/$ID/[No character style]">
+        <SpecialCharacter SpecialCharacterType="FrameBreak"/>
+      </CharacterStyleRange>
+    </ParagraphStyleRange>\n`;
+  }
+
+  for (let ci = 0; ci < chapters.length; ci++) {
+    const chapter = chapters[ci];
+
     content += `    <ParagraphStyleRange AppliedParagraphStyle="ParagraphStyle/ChapterTitle">
       <CharacterStyleRange AppliedCharacterStyle="CharacterStyle/$ID/[No character style]"
         AppliedFont="${escapeXml(fontFamily)}" FontStyle="Bold">
-        <Content>${escapeXml(chapter.title)}</Content>
+        <Content>${escapeXml(smartTypographyXml(chapter.title))}</Content>
       </CharacterStyleRange>
       <Br/>
     </ParagraphStyleRange>\n`;
 
-    // Body paragraphs
     for (let i = 0; i < chapter.paragraphs.length; i++) {
-      const para = chapter.paragraphs[i];
-      const styleRef = i === 0 ? "ParagraphStyle/BodyFirst" : "ParagraphStyle/BodyIndented";
+      const rawPara = chapter.paragraphs[i];
+      const para = smartTypographyXml(rawPara);
+
+      if (SCENE_BREAK_RE.test(rawPara.trim())) {
+        content += `    <ParagraphStyleRange AppliedParagraphStyle="ParagraphStyle/SceneBreak">
+      <CharacterStyleRange AppliedCharacterStyle="CharacterStyle/$ID/[No character style]">
+        <Content>\u2042</Content>
+      </CharacterStyleRange>
+      <Br/>
+    </ParagraphStyleRange>\n`;
+        continue;
+      }
 
       if (style.verseNumbers) {
-        // Parse verse numbers: "^1 In the beginning..."
-        const verseMatch = para.match(/^\^(\d+)\s*([\s\S]*)/);
+        const verseMatch = rawPara.match(/^\^(\d+)\s*([\s\S]*)/);
         if (verseMatch) {
           const verseNum = verseMatch[1];
-          const verseText = verseMatch[2];
+          const verseText = smartTypographyXml(verseMatch[2]);
+          const styleRef = i === 0 ? "ParagraphStyle/BodyFirst" : "ParagraphStyle/BodyIndented";
           content += `    <ParagraphStyleRange AppliedParagraphStyle="${styleRef}">
       <CharacterStyleRange AppliedCharacterStyle="CharacterStyle/VerseNum">
         <Content>${escapeXml(verseNum)}</Content>
@@ -332,10 +462,44 @@ function buildStory(opts: IdmlOptions): string {
         }
       }
 
+      let styleRef: string;
+      if (i === 0 && ci === 0 && style.dropCap) {
+        styleRef = "ParagraphStyle/DropCap";
+      } else if (i === 0) {
+        styleRef = "ParagraphStyle/BodyFirst";
+      } else {
+        styleRef = "ParagraphStyle/BodyIndented";
+      }
+
       content += `    <ParagraphStyleRange AppliedParagraphStyle="${styleRef}">
       <CharacterStyleRange AppliedCharacterStyle="CharacterStyle/$ID/[No character style]"
         AppliedFont="${escapeXml(fontFamily)}" FontStyle="Regular" PointSize="${fontSize}" Leading="${leading}">
         <Content>${escapeXml(para)}</Content>
+      </CharacterStyleRange>
+      <Br/>
+    </ParagraphStyleRange>\n`;
+    }
+  }
+
+  if (opts.backmatter?.trim()) {
+    content += `    <ParagraphStyleRange AppliedParagraphStyle="ParagraphStyle/Body">
+      <CharacterStyleRange AppliedCharacterStyle="CharacterStyle/$ID/[No character style]">
+        <SpecialCharacter SpecialCharacterType="FrameBreak"/>
+      </CharacterStyleRange>
+    </ParagraphStyleRange>\n`;
+    content += `    <ParagraphStyleRange AppliedParagraphStyle="ParagraphStyle/ChapterTitle">
+      <CharacterStyleRange AppliedCharacterStyle="CharacterStyle/$ID/[No character style]"
+        AppliedFont="${escapeXml(fontFamily)}" FontStyle="Bold">
+        <Content>Acknowledgements</Content>
+      </CharacterStyleRange>
+      <Br/>
+    </ParagraphStyleRange>\n`;
+    const bmParagraphs = opts.backmatter.split(/\n{2,}/).filter(p => p.trim().length > 0);
+    for (const bmPara of bmParagraphs) {
+      content += `    <ParagraphStyleRange AppliedParagraphStyle="ParagraphStyle/BodyFirst">
+      <CharacterStyleRange AppliedCharacterStyle="CharacterStyle/$ID/[No character style]"
+        AppliedFont="${escapeXml(fontFamily)}" FontStyle="Regular" PointSize="${fontSize}" Leading="${leading}">
+        <Content>${escapeXml(smartTypographyXml(bmPara.trim()))}</Content>
       </CharacterStyleRange>
       <Br/>
     </ParagraphStyleRange>\n`;
