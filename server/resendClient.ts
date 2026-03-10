@@ -21,9 +21,7 @@ export async function sendConfirmationEmail(toEmail: string, token: string, user
 
   const baseUrl = process.env.REPLIT_DEV_DOMAIN
     ? `https://${process.env.REPLIT_DEV_DOMAIN}`
-    : process.env.REPLIT_DEPLOYMENT === '1'
-      ? 'https://easybookpublishers.com'
-      : 'https://easybookpublishers.com';
+    : 'https://book-production-flowchart.replit.app';
   const confirmUrl = `${baseUrl}/confirm-email?token=${token}`;
 
   const { data, error } = await client.emails.send({
@@ -75,7 +73,7 @@ export async function sendPasswordResetEmail(toEmail: string, token: string, use
 
   const baseUrl = process.env.REPLIT_DEV_DOMAIN
     ? `https://${process.env.REPLIT_DEV_DOMAIN}`
-    : 'https://easybookpublishers.com';
+    : 'https://book-production-flowchart.replit.app';
   const resetUrl = `${baseUrl}/reset-password?token=${token}`;
 
   const { data, error } = await client.emails.send({
@@ -125,7 +123,10 @@ export async function sendPasswordResetEmail(toEmail: string, token: string, use
 export async function sendLoginEmail(toEmail: string, token: string, userName: string) {
   const { client, brandFromEmail } = getUncachableResendClient();
 
-  const loginUrl = `https://easybookpublishers.com/api/auth/magic-login?token=${token}`;
+  const baseUrl = process.env.REPLIT_DEV_DOMAIN
+    ? `https://${process.env.REPLIT_DEV_DOMAIN}`
+    : 'https://book-production-flowchart.replit.app';
+  const loginUrl = `${baseUrl}/api/auth/magic-login?token=${token}`;
 
   const { data, error } = await client.emails.send({
     from: brandFromEmail,
@@ -174,7 +175,7 @@ export async function sendLoginEmail(toEmail: string, token: string, userName: s
 export async function sendAffiliateWelcomeEmail(toEmail: string, name: string, affiliateCode: string) {
   const { client, brandFromEmail } = getUncachableResendClient();
 
-  const dashboardUrl = `https://easybookpublishers.com/affiliate-dashboard`;
+  const dashboardUrl = 'https://book-production-flowchart.replit.app/affiliate-dashboard';
 
   const { data, error } = await client.emails.send({
     from: brandFromEmail,
