@@ -1141,32 +1141,50 @@ export const appRouter = router({
           });
         }
 
-        // 2. Notify the project owner via the Manus notification service
-        const notificationContent = [
-          `From: ${input.name} <${input.email}>`,
-          `Subject: ${input.subject}`,
-          ``,
-          input.message,
-          ``,
-          `---`,
-          `Submitted at: ${new Date().toISOString()}`,
-          `Submission ID: #${submission.id}`,
-          `Reply to: ${input.email}`,
-        ].join("\n");
-
-        let notified = false;
+        // 2. Send email to info@easybookpublishers.com via Resend
+        let emailed = false;
         try {
-          notified = await notifyOwner({
-            title: `Contact Form: ${input.subject}`,
-            content: notificationContent,
+          const { getUncachableResendClient } = await import("./resendClient");
+          const { client, brandFromEmail } = getUncachableResendClient();
+
+          const safeName = input.name.replace(/[<>&"]/g, "");
+          const safeSubject = input.subject.replace(/[<>&"]/g, "");
+          const safeMessage = input.message.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/\n/g, "<br/>");
+
+          await client.emails.send({
+            from: brandFromEmail,
+            to: "info@easybookpublishers.com",
+            replyTo: input.email,
+            subject: `Contact Form: ${safeSubject}`,
+            html: `
+              <div style="font-family: 'Georgia', serif; max-width: 560px; margin: 0 auto; padding: 32px 24px; background-color: #f3efe6; border-radius: 12px;">
+                <div style="text-align: center; margin-bottom: 24px;">
+                  <h1 style="color: #1a1008; font-size: 24px; margin: 0;">New Contact Form Submission</h1>
+                </div>
+                <div style="background: #fff; border: 1px solid #c9a96e33; border-radius: 8px; padding: 16px; margin: 16px 0;">
+                  <p style="color: #3a2a14; font-size: 14px; margin: 4px 0;"><strong>From:</strong> ${safeName} &lt;${input.email}&gt;</p>
+                  <p style="color: #3a2a14; font-size: 14px; margin: 4px 0;"><strong>Subject:</strong> ${safeSubject}</p>
+                  <p style="color: #3a2a14; font-size: 14px; margin: 4px 0;"><strong>Submission ID:</strong> #${submission.id}</p>
+                  <p style="color: #3a2a14; font-size: 14px; margin: 4px 0;"><strong>Time:</strong> ${new Date().toISOString()}</p>
+                </div>
+                <div style="margin: 16px 0;">
+                  <p style="color: #7a6e60; font-size: 13px; font-weight: 600; margin-bottom: 8px;">Message:</p>
+                  <p style="color: #3a2a14; font-size: 15px; line-height: 1.6;">${safeMessage}</p>
+                </div>
+                <hr style="border: none; border-top: 1px solid #c9a96e33; margin: 24px 0;" />
+                <p style="color: #a89a8a; font-size: 12px; text-align: center;">
+                  Easy Book Publishers — Contact Form Notification
+                </p>
+              </div>
+            `,
           });
-        } catch (notifyErr) {
-          // Non-fatal: submission is already saved to DB
-          console.warn("[Contact] Owner notification failed (submission saved):", notifyErr);
+          emailed = true;
+        } catch (emailErr) {
+          console.warn("[Contact] Email to info@easybookpublishers.com failed (submission saved):", emailErr);
         }
 
-        // 3. Update the notified flag if delivery succeeded
-        if (notified) {
+        // 3. Update the notified flag if email delivery succeeded
+        if (emailed) {
           try {
             const { getDb } = await import("./db");
             const db = await getDb();
@@ -1183,7 +1201,7 @@ export const appRouter = router({
         }
 
         console.log(
-          `[Contact] Submission #${submission.id} from ${input.email} → info@easybookpublishers.com — notified: ${notified}`
+          `[Contact] Submission #${submission.id} from ${input.email} → info@easybookpublishers.com — emailed: ${emailed}`
         );
 
         return { success: true, submissionId: submission.id };
