@@ -102,6 +102,7 @@ PostgreSQL via Replit's built-in database. Use `npx drizzle-kit push` to sync sc
   - **Input modes**: File upload (30+ formats) or direct text paste/type
   - Auto-selects scripture style for Bible projects
   - **Review & Approval workflow**: Jobs complete to `pending_review` status. Author can preview PDF inline, add comments, and either approve (→ `approved`, counts toward plan) or request changes. Only approved jobs count as plan usage. DB: `review_comments` table, `reviewNotes`/`approvedAt` columns on `production_jobs`.
+  - **Review-ready email**: When a job enters `pending_review`, a branded email is sent via Resend with project title, job ID, and "Review My Book" CTA. Email failures are caught silently (never block the pipeline). HTML-escaped user inputs prevent injection.
 - **Manuscript Parsing**: Supports DOCX, DOC, ODT, PDF, EPUB, XLSX, CSV, RTF, HTML, Markdown, JSON, YAML, TXT, and more via `server/manuscriptParser.ts`
 - **Real PDF Spec Sheets**: All tool pages generate downloadable PDFs via server-side Puppeteer rendering (`POST /api/render-pdf`)
 - **Bible Design Studio**: Full Bible edition configurator with real PDF spec sheet export

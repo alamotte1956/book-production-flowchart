@@ -222,6 +222,66 @@ export async function sendAffiliateWelcomeEmail(toEmail: string, name: string, a
   return data;
 }
 
+function escapeHtml(str: string): string {
+  return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+}
+
+export async function sendReviewReadyEmail(toEmail: string, userName: string, projectTitle: string, jobId: number) {
+  const safeName = escapeHtml(userName);
+  const safeTitle = escapeHtml(projectTitle);
+  const { client, brandFromEmail } = getUncachableResendClient();
+
+  const baseUrl = process.env.REPLIT_DEPLOYMENT === '1'
+    ? 'https://book-production-flowchart.replit.app'
+    : `https://${process.env.REPLIT_DEV_DOMAIN || 'book-production-flowchart.replit.app'}`;
+  const reviewUrl = `${baseUrl}/dashboard`;
+
+  const { data, error } = await client.emails.send({
+    from: brandFromEmail,
+    to: toEmail,
+    subject: `Your book is ready for review — ${safeTitle}`,
+    html: `
+      <div style="font-family: 'Georgia', serif; max-width: 560px; margin: 0 auto; padding: 32px 24px; background-color: #f3efe6; border-radius: 12px;">
+        <div style="text-align: center; margin-bottom: 24px;">
+          <h1 style="color: #1a1008; font-size: 24px; margin: 0;">Easy Book Publishers</h1>
+          <p style="color: #c9a96e; font-size: 13px; margin: 4px 0 0;">Manuscript to Masterpiece</p>
+        </div>
+        <p style="color: #3a2a14; font-size: 16px; line-height: 1.6;">
+          Hi ${safeName},
+        </p>
+        <p style="color: #3a2a14; font-size: 16px; line-height: 1.6;">
+          Great news! Your typeset files for <strong>${safeTitle}</strong> are ready for review.
+        </p>
+        <p style="color: #3a2a14; font-size: 16px; line-height: 1.6;">
+          We've generated your Interior PDF, KDP Print-Ready PDF, EPUB, and InDesign files. Please review them and approve the output when you're satisfied — your plan usage is only counted once you approve.
+        </p>
+        <div style="text-align: center; margin: 32px 0;">
+          <a href="${reviewUrl}" style="display: inline-block; background-color: #c9a96e; color: #1a1008; font-weight: 600; font-size: 16px; padding: 14px 32px; border-radius: 8px; text-decoration: none;">
+            Review My Book
+          </a>
+        </div>
+        <div style="background: #fff; border: 1px solid #c9a96e33; border-radius: 8px; padding: 16px; margin: 24px 0;">
+          <p style="color: #7a6e60; font-size: 14px; margin: 4px 0;"><strong>Project:</strong> ${safeTitle}</p>
+          <p style="color: #7a6e60; font-size: 14px; margin: 4px 0;"><strong>Job ID:</strong> #${jobId}</p>
+        </div>
+        <p style="color: #7a6e60; font-size: 13px; line-height: 1.5;">
+          You can preview the PDF directly in your browser, add comments, and either approve the output or request changes — all from your dashboard.
+        </p>
+        <hr style="border: none; border-top: 1px solid #c9a96e33; margin: 24px 0;" />
+        <p style="color: #a89a8a; font-size: 12px; text-align: center;">
+          Easy Book Publishers — Manuscript to Masterpiece
+        </p>
+      </div>
+    `,
+  });
+
+  if (error) {
+    console.error('[Resend] Failed to send review-ready email:', error);
+  } else {
+    console.log(`[Resend] Review-ready email sent to ${toEmail}, id=${data?.id}`);
+  }
+}
+
 export async function sendAffiliateNotificationToOwner(affiliateName: string, affiliateEmail: string, affiliateCode: string) {
   const { client, brandFromEmail } = getUncachableResendClient();
 

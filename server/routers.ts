@@ -19,7 +19,7 @@ import { generateIdml } from "./idmlGenerator";
 import { invokeLLM } from "./_core/llm";
 import { lookupByIsbn } from "./isbnLookup";
 import { notifyOwner } from "./_core/notification";
-import { sendConfirmationEmail, sendLoginEmail, sendPasswordResetEmail, sendAffiliateWelcomeEmail, sendAffiliateNotificationToOwner } from "./resendClient";
+import { sendConfirmationEmail, sendLoginEmail, sendPasswordResetEmail, sendAffiliateWelcomeEmail, sendAffiliateNotificationToOwner, sendReviewReadyEmail } from "./resendClient";
 import { createContactSubmission, saveWizardAnswers, getWizardAnswers, getRecentActivity, getDashboardStats, getUserById, updateUserStripeInfo, getUserByEmail, createEmailUser, confirmUserEmail, getUserByConfirmToken, getUserByCheckoutToken, setLoginToken, getUserByLoginToken, setPasswordResetToken, getUserByPasswordResetToken, clearPasswordResetToken, clearSession, createSession, setUserPassword, getOrdersByUser } from "./db";
 import { TRPCError } from "@trpc/server";
 import { getUncachableStripeClient, getStripePublishableKey } from "./stripeClient";
@@ -734,6 +734,15 @@ export const appRouter = router({
             updates.idmlKey = idmlKey;
 
             await updateProductionJob(job.id, updates);
+
+            try {
+              const jobUser = await getUserById(ctx.user.id);
+              if (jobUser?.email) {
+                await sendReviewReadyEmail(jobUser.email, jobUser.name || "Author", project.title, job.id);
+              }
+            } catch (emailErr) {
+              console.error(`[AutoProduce] Failed to send review-ready email for job ${job.id}:`, emailErr);
+            }
           } catch (err: unknown) {
             const msg = err instanceof Error ? err.message : String(err);
             const stack = err instanceof Error ? (err.stack ?? msg) : msg;
@@ -844,6 +853,15 @@ export const appRouter = router({
             const { url: idmlUrl } = await storagePut(idmlKey, idmlBuffer, "application/vnd.adobe.indesign-idml-package");
             updates.idmlUrl = idmlUrl; updates.idmlKey = idmlKey;
             await updateProductionJob(newJob.id, updates);
+
+            try {
+              const retryUser = await getUserById(ctx.user.id);
+              if (retryUser?.email) {
+                await sendReviewReadyEmail(retryUser.email, retryUser.name || "Author", project.title, newJob.id);
+              }
+            } catch (emailErr) {
+              console.error(`[AutoProduce] Failed to send review-ready email for retry job ${newJob.id}:`, emailErr);
+            }
           } catch (err: unknown) {
             const msg = err instanceof Error ? err.message : String(err);
             const stack = err instanceof Error ? (err.stack ?? msg) : msg;
