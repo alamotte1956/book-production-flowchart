@@ -133,7 +133,7 @@ const comparisonFeatures: Array<{ name: string; tooltip?: string; kdp: string | 
   { name: "Book Projects", kdp: "1", author: "Unlimited", publisher: "Unlimited" },
   { name: "Production Workflow", kdp: false, author: "30 steps", publisher: "30 steps" },
   { name: "Cross-Platform Access", tooltip: "Works on any device with a browser — Windows, Mac, Linux, Chromebook, iPad", kdp: true, author: true, publisher: true },
-  { name: "Manuscript Import", tooltip: "Accept 30+ formats including DOCX, PDF, TXT, RTF, and more", kdp: true, author: true, publisher: true },
+  { name: "Manuscript Import", tooltip: "Accept 26 formats including DOCX, PDF, TXT, RTF, and more", kdp: true, author: true, publisher: true },
   { name: "Bible Design Studio", kdp: false, author: true, publisher: true },
   { name: "Spine Calculator", kdp: true, author: true, publisher: true },
   { name: "Cover Spec Designer", kdp: true, author: true, publisher: true },

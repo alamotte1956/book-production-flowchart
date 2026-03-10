@@ -503,7 +503,7 @@ export const ROUTE_META: Array<{ path: string; meta: RouteMeta }> = [
                 name: "What manuscript formats are supported?",
                 acceptedAnswer: {
                   "@type": "Answer",
-                  text: "Easy Book Publishers accepts 30+ manuscript formats including DOCX, DOC, ODT, RTF, TXT, MD, HTML, EPUB, PDF, CSV, JSON, YAML, and images. You can also paste text directly.",
+                  text: "Easy Book Publishers accepts 26 manuscript formats including DOCX, DOC, ODT, RTF, TXT, MD, HTML, EPUB, PDF, CSV, JSON, YAML, and more. You can also paste text directly.",
                 },
               },
             ],

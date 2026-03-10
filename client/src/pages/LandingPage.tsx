@@ -13,7 +13,7 @@ import SiteFooter from "@/components/SiteFooter";
 const HERO_URL = "https://d2xsxph8kpxj0f.cloudfront.net/310519663211654017/kGjPju6hKCvCsjZhgUHyqj/hero-banner-cxQRR1jXLBmcXxFPJoqxWN.webp";
 
 const features = [
-  { icon: Upload, title: "Upload Your Manuscript", desc: "New author? Just drop in your DOCX, PDF, or any of 30+ formats. Our parser extracts your text, detects chapters, and preserves your structure automatically." },
+  { icon: Upload, title: "Upload Your Manuscript", desc: "New author? Just drop in your DOCX, PDF, or any of 26 formats. Our parser extracts your text, detects chapters, and preserves your structure automatically." },
   { icon: Sparkles, title: "AI-Powered Typesetting", desc: "Your new book gets a professional layout in minutes — drop caps, running headers, smart typography, orphan/widow control, and chapter openers." },
   { icon: Printer, title: "Print-Ready Output", desc: "Download real Interior PDF, KDP Print-Ready PDF with bleed, EPUB 3, and InDesign IDML files — everything a new author needs from a single upload." },
   { icon: Globe, title: "Publish Your New Book Anywhere", desc: "Export files ready for Amazon KDP, IngramSpark, Barnes & Noble Press, Apple Books, or your own printer. We handle the specs." },
@@ -37,8 +37,8 @@ const testimonials = [
 ];
 
 const stats = [
-  { value: "30+", label: "Manuscript Formats" },
-  { value: "29", label: "Book Templates" },
+  { value: "26", label: "Manuscript Formats" },
+  { value: "44", label: "Book Templates" },
   { value: "9", label: "Production Phases" },
   { value: "30", label: "Workflow Steps" },
 ];
@@ -372,7 +372,7 @@ export default function LandingPage() {
               { icon: Sparkles, label: "AI Typesetting Engine", sub: "Professional layout in minutes" },
               { icon: PenTool, label: "AI Writing Assistant", sub: "Foreword, intro, blurb, glossary" },
               { icon: BarChart3, label: "30-Step Production Tracker", sub: "Never miss a publishing step" },
-              { icon: BookOpen, label: "29 Book Templates", sub: "Industry-standard designs" },
+              { icon: BookOpen, label: "44 Book Templates", sub: "Industry-standard designs" },
               { icon: FileText, label: "5 Export Formats", sub: "PDF, EPUB, IDML, ONIX, KDP" },
               { icon: Globe, label: "Publish Everywhere", sub: "KDP, IngramSpark, B&N, Apple" },
               { icon: Layers, label: "Spine Calculator", sub: "Exact spine width for your cover" },
