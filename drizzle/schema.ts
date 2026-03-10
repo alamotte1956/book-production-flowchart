@@ -64,6 +64,10 @@ export const projects = pgTable("projects", {
   bibleEditionType: varchar("bibleEditionType", { length: 64 }),
   bibleTranslation: varchar("bibleTranslation", { length: 32 }),
   notes: text("notes"),
+  blurb: text("blurb"),
+  coverImageUrl: text("coverImageUrl"),
+  publicPreview: boolean("publicPreview").default(false).notNull(),
+  publicationDate: varchar("publicationDate", { length: 32 }),
   productionDeadline: bigint("productionDeadline", { mode: "number" }),
   createdAt: timestamp("createdAt").defaultNow().notNull(),
   updatedAt: timestamp("updatedAt").defaultNow().notNull(),
@@ -71,6 +75,16 @@ export const projects = pgTable("projects", {
 
 export type Project = typeof projects.$inferSelect;
 export type InsertProject = typeof projects.$inferInsert;
+
+export const launchSubscribers = pgTable("launch_subscribers", {
+  id: serial("id").primaryKey(),
+  projectId: integer("projectId").notNull(),
+  email: varchar("email", { length: 320 }).notNull(),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+});
+
+export type LaunchSubscriber = typeof launchSubscribers.$inferSelect;
+export type InsertLaunchSubscriber = typeof launchSubscribers.$inferInsert;
 
 /**
  * Tracks the status of each step within a project.

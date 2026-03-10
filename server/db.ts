@@ -12,6 +12,7 @@ import {
   wizardSessions, InsertWizardSession, WizardSession,
   orders, InsertOrder, Order,
   reviewComments, InsertReviewComment, ReviewComment,
+  launchSubscribers, InsertLaunchSubscriber, LaunchSubscriber,
 } from "../drizzle/schema";
 
 
@@ -388,6 +389,29 @@ export async function countApprovedJobsByProject(projectId: number): Promise<num
   const [result] = await db.select({ count: sql<number>`count(*)::int` }).from(productionJobs)
     .where(and(eq(productionJobs.projectId, projectId), eq(productionJobs.status, "approved")));
   return result?.count ?? 0;
+}
+
+// ─── Launch Subscribers ──────────────────────────────────────────────────────
+
+export async function addLaunchSubscriber(
+  data: Omit<InsertLaunchSubscriber, "id" | "createdAt">
+): Promise<LaunchSubscriber> {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  const [sub] = await db.insert(launchSubscribers).values(data).returning();
+  return sub;
+}
+
+export async function getLaunchSubscribers(projectId: number): Promise<LaunchSubscriber[]> {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  return db.select().from(launchSubscribers).where(eq(launchSubscribers.projectId, projectId));
+}
+
+export async function updateProjectPreview(projectId: number, data: { blurb?: string; coverImageUrl?: string; publicPreview?: boolean; publicationDate?: string }): Promise<void> {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  await db.update(projects).set(data).where(eq(projects.id, projectId));
 }
 
 // ─── Contact Submissions ──────────────────────────────────────────────────────

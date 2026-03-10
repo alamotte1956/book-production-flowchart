@@ -20,7 +20,7 @@ import { invokeLLM } from "./_core/llm";
 import { lookupByIsbn } from "./isbnLookup";
 import { notifyOwner } from "./_core/notification";
 import { sendConfirmationEmail, sendLoginEmail, sendPasswordResetEmail, sendAffiliateWelcomeEmail, sendAffiliateNotificationToOwner, sendReviewReadyEmail } from "./resendClient";
-import { createContactSubmission, saveWizardAnswers, getWizardAnswers, getRecentActivity, getDashboardStats, getUserById, updateUserStripeInfo, getUserByEmail, createEmailUser, confirmUserEmail, getUserByConfirmToken, getUserByCheckoutToken, setLoginToken, getUserByLoginToken, setPasswordResetToken, getUserByPasswordResetToken, clearPasswordResetToken, clearSession, createSession, setUserPassword, getOrdersByUser } from "./db";
+import { createContactSubmission, saveWizardAnswers, getWizardAnswers, getRecentActivity, getDashboardStats, getUserById, updateUserStripeInfo, getUserByEmail, createEmailUser, confirmUserEmail, getUserByConfirmToken, getUserByCheckoutToken, setLoginToken, getUserByLoginToken, setPasswordResetToken, getUserByPasswordResetToken, clearPasswordResetToken, clearSession, createSession, setUserPassword, getOrdersByUser, addLaunchSubscriber, getLaunchSubscribers, updateProjectPreview } from "./db";
 import { TRPCError } from "@trpc/server";
 import { getUncachableStripeClient, getStripePublishableKey } from "./stripeClient";
 import { sql } from "drizzle-orm";
@@ -935,6 +935,57 @@ export const appRouter = router({
         const project = await getProjectById(job.projectId);
         if (!project || project.userId !== ctx.user.id) throw new Error("Not authorized");
         return getReviewCommentsByJob(input.jobId);
+      }),
+  }),
+
+  // ─── Pre-Launch / Public Book Preview ───────────────────────────────────────
+  preLaunch: router({
+    getPublicBook: publicProcedure
+      .input(z.object({ projectId: z.number() }))
+      .query(async ({ input }) => {
+        const project = await getProjectById(input.projectId);
+        if (!project || !project.publicPreview) return null;
+        return {
+          title: project.title,
+          author: project.author,
+          genre: project.genre,
+          blurb: (project as any).blurb ?? null,
+          coverImageUrl: (project as any).coverImageUrl ?? null,
+          publicationDate: (project as any).publicationDate ?? null,
+        };
+      }),
+
+    subscribe: publicProcedure
+      .input(z.object({ projectId: z.number(), email: z.string().email() }))
+      .mutation(async ({ input }) => {
+        const project = await getProjectById(input.projectId);
+        if (!project || !project.publicPreview) throw new Error("Book not found or not public");
+        await addLaunchSubscriber({ projectId: input.projectId, email: input.email });
+        return { success: true };
+      }),
+
+    updatePreview: protectedProcedure
+      .input(z.object({
+        projectId: z.number(),
+        blurb: z.string().max(5000).optional(),
+        coverImageUrl: z.string().max(2000).optional(),
+        publicPreview: z.boolean().optional(),
+        publicationDate: z.string().max(32).optional(),
+      }))
+      .mutation(async ({ ctx, input }) => {
+        const project = await getProjectById(input.projectId);
+        if (!project || project.userId !== ctx.user.id) throw new Error("Not authorized");
+        const { projectId, ...data } = input;
+        await updateProjectPreview(projectId, data);
+        return { success: true };
+      }),
+
+    getSubscribers: protectedProcedure
+      .input(z.object({ projectId: z.number() }))
+      .query(async ({ ctx, input }) => {
+        const project = await getProjectById(input.projectId);
+        if (!project || project.userId !== ctx.user.id) throw new Error("Not authorized");
+        return getLaunchSubscribers(input.projectId);
       }),
   }),
 

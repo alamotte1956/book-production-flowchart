@@ -28,6 +28,10 @@ import Login from "./pages/Login";
 import ResetPassword from "./pages/ResetPassword";
 import AdminPayouts from "./pages/AdminPayouts";
 import Glossary from "./pages/Glossary";
+import DistributionGuide from "./pages/DistributionGuide";
+import RoyaltyCalculator from "./pages/RoyaltyCalculator";
+import MarketingToolkit from "./pages/MarketingToolkit";
+import PreLaunchPage from "./pages/PreLaunchPage";
 
 function Router() {
   return (
@@ -59,6 +63,10 @@ function Router() {
       <Route path={"/guided-journey"} component={GuidedJourney} />
       <Route path={"/print-specs"} component={PrintSpecs} />
       <Route path={"/glossary"} component={Glossary} />
+      <Route path={"/distribution-guide"} component={DistributionGuide} />
+      <Route path={"/royalty-calculator"} component={RoyaltyCalculator} />
+      <Route path={"/marketing-toolkit"} component={MarketingToolkit} />
+      <Route path={"/book/:id/preview"} component={PreLaunchPage} />
       <Route path={"/404"} component={NotFound} />
       <Route component={NotFound} />
     </Switch>

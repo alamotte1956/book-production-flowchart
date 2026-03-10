@@ -2,7 +2,8 @@
  * ISBN & Metadata Manager
  * Per-project ISBN, LCCN, BISAC codes, CIP data, and ONIX export.
  */
-import { useState, useMemo } from "react";
+import { useState, useMemo, useRef, useCallback, useEffect } from "react";
+import JsBarcode from "jsbarcode";
 import { Link, useLocation } from "wouter";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -152,6 +153,10 @@ export default function IsbnManager() {
 
   const [copied, setCopied] = useState(false);
 
+  const [priceCode, setPriceCode] = useState("");
+  const [showBarcode, setShowBarcode] = useState(false);
+  const barcodeSvgRef = useRef<SVGSVGElement>(null);
+
   // Derived
   const isbn10 = useMemo(() => isbn13to10(isbn13), [isbn13]);
   const isbn13Valid = isbn13.replace(/[-\s]/g, "").length === 13 ? validateIsbn13(isbn13) : null;
@@ -163,6 +168,83 @@ export default function IsbnManager() {
   const addBisac = () => setBisacCodes(prev => [...prev, "FIC000000"]);
   const removeBisac = (i: number) => setBisacCodes(prev => prev.filter((_, idx) => idx !== i));
   const updateBisac = (i: number, val: string) => setBisacCodes(prev => prev.map((c, idx) => idx === i ? val : c));
+
+  const renderBarcode = useCallback(() => {
+    if (!barcodeSvgRef.current) return;
+    const digits = isbn13.replace(/[-\s]/g, "");
+    if (digits.length !== 13 || !validateIsbn13(isbn13)) return;
+
+    let barcodeValue = digits;
+    const cleanPrice = priceCode.replace(/\D/g, "");
+    if (cleanPrice.length === 5) {
+      barcodeValue = digits + cleanPrice;
+    }
+
+    try {
+      JsBarcode(barcodeSvgRef.current, barcodeValue, {
+        format: cleanPrice.length === 5 ? "EAN13" : "EAN13",
+        flat: false,
+        width: 2,
+        height: 80,
+        displayValue: true,
+        fontSize: 14,
+        font: "monospace",
+        textMargin: 4,
+        margin: 10,
+        background: "#ffffff",
+      });
+    } catch {
+      // silently fail for invalid input
+    }
+  }, [isbn13, priceCode]);
+
+  useEffect(() => {
+    if (showBarcode) {
+      renderBarcode();
+    }
+  }, [showBarcode, renderBarcode]);
+
+  const handleGenerateBarcode = () => {
+    const digits = isbn13.replace(/[-\s]/g, "");
+    if (digits.length !== 13 || !validateIsbn13(isbn13)) {
+      toast.error("Please enter a valid ISBN-13 to generate a barcode");
+      return;
+    }
+    setShowBarcode(true);
+    setTimeout(() => renderBarcode(), 50);
+  };
+
+  const handleDownloadBarcodePng = () => {
+    const svg = barcodeSvgRef.current;
+    if (!svg) return;
+    const svgData = new XMLSerializer().serializeToString(svg);
+    const svgBlob = new Blob([svgData], { type: "image/svg+xml;charset=utf-8" });
+    const url = URL.createObjectURL(svgBlob);
+    const img = new Image();
+    img.onload = () => {
+      const scale = 3;
+      const canvas = document.createElement("canvas");
+      canvas.width = img.width * scale;
+      canvas.height = img.height * scale;
+      const ctx = canvas.getContext("2d");
+      if (!ctx) return;
+      ctx.fillStyle = "#ffffff";
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+      ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+      canvas.toBlob((blob) => {
+        if (!blob) return;
+        const pngUrl = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = pngUrl;
+        a.download = `isbn_barcode_${isbn13.replace(/[-\s]/g, "")}.png`;
+        a.click();
+        URL.revokeObjectURL(pngUrl);
+        toast.success("Barcode PNG downloaded");
+      }, "image/png");
+      URL.revokeObjectURL(url);
+    };
+    img.src = url;
+  };
 
   // ONIX XML generation
   const generateOnix = () => {
@@ -711,6 +793,67 @@ ${bisacElements}
                   ONIX for Books is the international standard for representing and communicating book industry product information. ONIX 3.0 XML is required by Ingram, Baker & Taylor, Amazon, and most major distributors.
                 </p>
               </div>
+
+              <Card className="border-[#e8dfd0] bg-white shadow-sm">
+                <CardHeader className="pb-3">
+                  <CardTitle className="font-serif text-lg text-[#2c1a00] flex items-center gap-2">
+                    <BookMarked className="w-5 h-5 text-[#c9a96e]" />
+                    EAN-13 Barcode
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div>
+                    <Label className="text-[#5c3d2e] font-semibold text-sm">5-Digit Price Add-on (optional)</Label>
+                    <div className="flex items-center gap-2 mt-1">
+                      <Input
+                        value={priceCode}
+                        onChange={e => {
+                          setPriceCode(e.target.value);
+                          if (showBarcode) setShowBarcode(false);
+                        }}
+                        className="border-[#d4c8b4] font-mono"
+                        placeholder="e.g., 51499 for $14.99"
+                        maxLength={5}
+                      />
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <Info className="w-4 h-4 text-[#8b7b6b] shrink-0 cursor-help" />
+                        </TooltipTrigger>
+                        <TooltipContent side="left" className="max-w-[200px]">
+                          <p className="text-xs">5-digit EAN-5 price code: first digit is currency (5 = USD), next 4 are price in cents. E.g., 51499 = $14.99 USD.</p>
+                        </TooltipContent>
+                      </Tooltip>
+                    </div>
+                  </div>
+
+                  <Button
+                    className="w-full bg-[#2c1a00] hover:bg-[#3d2810] text-[#c9a96e] gap-2"
+                    onClick={handleGenerateBarcode}
+                  >
+                    <BookMarked className="w-4 h-4" />
+                    Generate Barcode
+                  </Button>
+
+                  {showBarcode && (
+                    <div className="space-y-3">
+                      <div className="bg-white border border-[#e8dfd0] rounded-lg p-4 flex items-center justify-center">
+                        <svg ref={barcodeSvgRef} />
+                      </div>
+                      <Button
+                        className="w-full bg-[#8b5e3c] hover:bg-[#7a4f30] text-white gap-2"
+                        onClick={handleDownloadBarcodePng}
+                      >
+                        <Download className="w-4 h-4" />
+                        Download as PNG
+                      </Button>
+                    </div>
+                  )}
+
+                  <p className="text-xs text-[#7a5c3a] leading-relaxed">
+                    Generates a standard EAN-13 barcode from your ISBN-13. Add an optional 5-digit price extension for back cover use.
+                  </p>
+                </CardContent>
+              </Card>
             </div>
           </div>
         </div>

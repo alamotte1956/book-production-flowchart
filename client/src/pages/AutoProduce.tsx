@@ -25,9 +25,11 @@ import {
   CheckCircle2, Clock, Loader2, BookOpen, FileDown, Sparkles, Eye, X,
   ChevronDown, ChevronUp, RefreshCw, Copy, Terminal, Type,
   File, Image, Archive, FileCode, FileSpreadsheet, ShieldCheck, Info,
+  GitCompare, History, ExternalLink,
 } from "lucide-react";
 import { Tooltip, TooltipTrigger, TooltipContent } from "@/components/ui/tooltip";
 import WhatsNext from "@/components/WhatsNext";
+import ProofOrderGuide from "@/components/ProofOrderGuide";
 import type { NextPrompt } from "@shared/prompts";
 import { isKdpCompatible } from "@shared/bibleSpecs";
 import JSZip from "jszip";
@@ -1007,21 +1009,28 @@ function JobCard({ jobId, projectId }: { jobId: number; projectId: number }) {
               )}
 
               {(job.status === "approved" || job.status === "complete") && (
-                <WhatsNext
-                  compact
-                  className="mt-1"
-                  prompts={[
-                    {
-                      id: "after_produce_cover",
-                      title: "Design Your Book Cover",
-                      description: "Your interior is ready! Next, generate a full-wrap cover spec sheet with exact dimensions for your printer.",
-                      actionLabel: "Open Cover Designer",
-                      actionRoute: "/cover-designer",
-                      icon: "cover_designer",
-                      priority: "high",
-                    } satisfies NextPrompt,
-                  ]}
-                />
+                <>
+                  <WhatsNext
+                    compact
+                    className="mt-1"
+                    prompts={[
+                      {
+                        id: "after_produce_cover",
+                        title: "Design Your Book Cover",
+                        description: "Your interior is ready! Next, generate a full-wrap cover spec sheet with exact dimensions for your printer.",
+                        actionLabel: "Open Cover Designer",
+                        actionRoute: "/cover-designer",
+                        icon: "cover_designer",
+                        priority: "high",
+                      } satisfies NextPrompt,
+                    ]}
+                  />
+                  {job.status === "approved" && (
+                    <div className="mt-3">
+                      <ProofOrderGuide />
+                    </div>
+                  )}
+                </>
               )}
             </div>
           );
@@ -1038,6 +1047,177 @@ function JobCard({ jobId, projectId }: { jobId: number; projectId: number }) {
             </p>
           )}
         </div>
+      </CardContent>
+    </Card>
+  );
+}
+
+// ─── Version History ──────────────────────────────────────────────────────────
+
+interface VersionHistoryJob {
+  id: number;
+  status: string;
+  trimSizeId: string;
+  styleId: string;
+  manuscriptFileName: string | null;
+  pdfUrl: string | null;
+  epubUrl: string | null;
+  createdAt: string;
+  updatedAt: string;
+}
+
+function VersionHistory({ jobs }: { jobs: VersionHistoryJob[] }) {
+  const [compareA, setCompareA] = useState<number | null>(null);
+  const [compareB, setCompareB] = useState<number | null>(null);
+
+  const sorted = [...jobs].sort((a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime());
+
+  const handleCompare = () => {
+    if (compareA === null || compareB === null) return;
+    const jobA = sorted.find(j => j.id === compareA);
+    const jobB = sorted.find(j => j.id === compareB);
+    if (jobA?.pdfUrl) window.open(jobA.pdfUrl, "_blank");
+    if (jobB?.pdfUrl) window.open(jobB.pdfUrl, "_blank");
+  };
+
+  const pdfJobs = sorted.filter(j => j.pdfUrl && (j.status === "complete" || j.status === "pending_review" || j.status === "approved"));
+  const canCompare = compareA !== null && compareB !== null && compareA !== compareB;
+
+  if (sorted.length < 2) return null;
+
+  return (
+    <Card className="border border-[#e8dfd0] bg-white shadow-sm">
+      <CardHeader className="pb-3">
+        <div className="flex items-center justify-between">
+          <CardTitle className="font-serif text-[#2c1a00] text-base flex items-center gap-2">
+            <History className="w-4 h-4 text-[#c9a96e]" />
+            Version History
+          </CardTitle>
+          <span className="text-xs text-[#b09880]">{sorted.length} version{sorted.length !== 1 ? "s" : ""}</span>
+        </div>
+        <CardDescription className="text-[#7a6e60] text-xs">
+          Every production run is saved as a new version. Select two PDF versions below to compare them side by side.
+        </CardDescription>
+      </CardHeader>
+      <CardContent className="space-y-3">
+        <div className="rounded-lg border border-[#e8dfd0] overflow-hidden">
+          <table className="w-full text-sm">
+            <thead>
+              <tr className="bg-[#f5ede4] border-b border-[#e8dfd0]">
+                {pdfJobs.length >= 2 && <th className="px-3 py-2 text-left text-xs font-medium text-[#7a6e60] w-10"></th>}
+                <th className="px-3 py-2 text-left text-xs font-medium text-[#7a6e60]">Version</th>
+                <th className="px-3 py-2 text-left text-xs font-medium text-[#7a6e60]">Date</th>
+                <th className="px-3 py-2 text-left text-xs font-medium text-[#7a6e60]">Style</th>
+                <th className="px-3 py-2 text-left text-xs font-medium text-[#7a6e60]">Status</th>
+                <th className="px-3 py-2 text-left text-xs font-medium text-[#7a6e60]">Files</th>
+              </tr>
+            </thead>
+            <tbody>
+              {sorted.map((job, idx) => {
+                const version = idx + 1;
+                const hasPdf = job.pdfUrl && (job.status === "complete" || job.status === "pending_review" || job.status === "approved");
+                const isSelected = compareA === job.id || compareB === job.id;
+                return (
+                  <tr key={job.id} className={`border-b border-[#e8dfd0] last:border-b-0 transition-colors ${isSelected ? "bg-[#fdf9f3]" : "hover:bg-[#faf7f2]"}`}>
+                    {pdfJobs.length >= 2 && (
+                      <td className="px-3 py-2.5">
+                        {hasPdf && (
+                          <input
+                            type="checkbox"
+                            checked={isSelected}
+                            onChange={() => {
+                              if (isSelected) {
+                                if (compareA === job.id) setCompareA(null);
+                                else setCompareB(null);
+                              } else {
+                                if (compareA === null) setCompareA(job.id);
+                                else if (compareB === null) setCompareB(job.id);
+                                else {
+                                  setCompareA(compareB);
+                                  setCompareB(job.id);
+                                }
+                              }
+                            }}
+                            className="w-3.5 h-3.5 rounded border-[#d4b896] text-[#8b5e3c] focus:ring-[#c9a96e]"
+                          />
+                        )}
+                      </td>
+                    )}
+                    <td className="px-3 py-2.5">
+                      <span className="inline-flex items-center gap-1.5">
+                        <span className="inline-flex items-center justify-center w-6 h-6 rounded-full bg-[#f5ede4] border border-[#d4b896]/40 text-xs font-semibold text-[#8b5e3c]">
+                          {version}
+                        </span>
+                        <span className="text-xs font-medium text-[#3d2b1f]">v{version}</span>
+                      </span>
+                    </td>
+                    <td className="px-3 py-2.5 text-xs text-[#7a6e60]">
+                      {new Date(job.createdAt).toLocaleDateString(undefined, { month: "short", day: "numeric", year: "numeric" })}
+                    </td>
+                    <td className="px-3 py-2.5 text-xs text-[#7a6e60]">
+                      {job.styleId} · {job.trimSizeId}
+                    </td>
+                    <td className="px-3 py-2.5">
+                      <Badge variant={statusColor(job.status)} className="text-[10px] font-semibold">
+                        {statusLabel(job.status)}
+                      </Badge>
+                    </td>
+                    <td className="px-3 py-2.5">
+                      <div className="flex items-center gap-1.5">
+                        {job.pdfUrl && (
+                          <a
+                            href={job.pdfUrl}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="inline-flex items-center gap-1 text-[10px] px-2 py-1 rounded bg-[#f5ede4] border border-[#d4b896]/40 text-[#8b5e3c] hover:bg-[#efe6d8] transition-colors"
+                          >
+                            <FileText className="w-3 h-3" />
+                            PDF
+                          </a>
+                        )}
+                        {job.epubUrl && (
+                          <a
+                            href={job.epubUrl}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="inline-flex items-center gap-1 text-[10px] px-2 py-1 rounded bg-[#f5ede4] border border-[#d4b896]/40 text-[#8b5e3c] hover:bg-[#efe6d8] transition-colors"
+                          >
+                            <BookOpen className="w-3 h-3" />
+                            EPUB
+                          </a>
+                        )}
+                        {!job.pdfUrl && !job.epubUrl && (
+                          <span className="text-[10px] text-[#b09880]">—</span>
+                        )}
+                      </div>
+                    </td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+        </div>
+
+        {pdfJobs.length >= 2 && (
+          <div className="flex items-center gap-3 p-3 rounded-lg bg-[#f5ede4] border border-[#d4b896]/40">
+            <GitCompare className="w-4 h-4 text-[#8b5e3c] flex-shrink-0" />
+            <p className="text-xs text-[#5c3d2e] flex-1">
+              {canCompare
+                ? "Ready to compare — both PDFs will open in new tabs for side-by-side review."
+                : "Select two versions with PDF output to compare them side by side."}
+            </p>
+            <Button
+              variant="outline"
+              size="sm"
+              disabled={!canCompare}
+              onClick={handleCompare}
+              className="border-[#8b5e3c] text-[#8b5e3c] hover:bg-[#f5ede4] gap-1.5 flex-shrink-0 text-xs disabled:opacity-50"
+            >
+              <ExternalLink className="w-3.5 h-3.5" />
+              Compare PDFs
+            </Button>
+          </div>
+        )}
       </CardContent>
     </Card>
   );
@@ -1698,11 +1878,27 @@ function AutoProduceInner() {
               <span className="text-xs text-[#b09880]">({jobs.length} run{jobs.length !== 1 ? "s" : ""})</span>
             </div>
             <div className="space-y-3">
-              {[...jobs].reverse().map(job => (
-                <JobCard key={job.id} jobId={job.id} projectId={projectId} />
-              ))}
+              {(() => {
+                const sortedForVersions = [...jobs].sort((a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime());
+                const versionMap = new Map(sortedForVersions.map((j, i) => [j.id, i + 1]));
+                return [...jobs].reverse().map(job => (
+                  <div key={job.id} className="relative">
+                    <div className="absolute -left-2 -top-2 z-10">
+                      <span className="inline-flex items-center justify-center w-7 h-7 rounded-full bg-[#8b5e3c] text-white text-xs font-bold shadow-md border-2 border-white">
+                        v{versionMap.get(job.id) ?? 1}
+                      </span>
+                    </div>
+                    <JobCard jobId={job.id} projectId={projectId} />
+                  </div>
+                ));
+              })()}
             </div>
           </div>
+        )}
+
+        {/* Version History comparison table */}
+        {jobs && jobs.length >= 2 && (
+          <VersionHistory jobs={jobs as unknown as VersionHistoryJob[]} />
         )}
 
         {/* Empty state */}

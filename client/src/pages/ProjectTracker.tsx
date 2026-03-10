@@ -29,6 +29,7 @@ import { getIrrelevantStepIds, getFilterReason } from "@shared/genreFilter";
 import { getNextPrompts } from "@shared/prompts";
 import type { ProjectPromptContext } from "@shared/prompts";
 import WhatsNext from "@/components/WhatsNext";
+import ProgressMilestones from "@/components/ProgressMilestones";
 
 // Icon map for dynamic rendering
 const iconMap: Record<string, LucideIcon> = {
@@ -1916,6 +1917,9 @@ export default function ProjectTracker() {
               />
             )}
           </AnimatePresence>
+          {!printMode && (
+            <ProgressMilestones statusMap={statusMap} />
+          )}
           {allPhases.map((phase) => {
             const currentOffset = stepOffset;
             stepOffset += phase.steps.length;

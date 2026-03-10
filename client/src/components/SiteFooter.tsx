@@ -1,4 +1,4 @@
-import { BookOpen, Layers, Ruler, Library, Search, FileText, LayoutGrid, HelpCircle, CreditCard, Compass, Shield, Users, BookMarked } from "lucide-react";
+import { BookOpen, Layers, Ruler, Library, Search, FileText, LayoutGrid, HelpCircle, CreditCard, Compass, Shield, Users, BookMarked, Megaphone, Globe, Calculator } from "lucide-react";
 
 const footerSections = [
   {
@@ -9,6 +9,7 @@ const footerSections = [
       { label: "Spine Calculator", href: "/spine-calculator", icon: Ruler },
       { label: "Cover Designer", href: "/cover-designer", icon: Library },
       { label: "Print Specifications", href: "/print-specs", icon: FileText },
+      { label: "Marketing Toolkit", href: "/marketing-toolkit", icon: Megaphone },
     ],
   },
   {
@@ -16,6 +17,7 @@ const footerSections = [
     links: [
       { label: "ISBN Manager", href: "/isbn-manager", icon: Search },
       { label: "ISBN Book Lookup", href: "/isbn-lookup", icon: Search },
+      { label: "Royalty Calculator", href: "/royalty-calculator", icon: Calculator },
       { label: "Book Templates", href: "/templates", icon: LayoutGrid },
       { label: "Production Timeline", href: "/timeline/0", icon: Layers },
     ],
@@ -23,6 +25,7 @@ const footerSections = [
   {
     title: "Resources",
     links: [
+      { label: "Distribution Guide", href: "/distribution-guide", icon: Globe },
       { label: "Publishing Resources", href: "/resources", icon: Library },
       { label: "User Guide", href: "/guide", icon: HelpCircle },
       { label: "Publishing Glossary", href: "/glossary", icon: BookMarked },

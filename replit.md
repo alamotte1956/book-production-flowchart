@@ -132,11 +132,18 @@ PostgreSQL via Replit's built-in database. Use `npx drizzle-kit push` to sync sc
 - **Project Export**: Export project summary as formatted HTML document from Project Tracker
 - **Landing Page**: Full marketing landing page at `/` with hero, How It Works, tools grid, output formats, testimonials, navigation CTAs. Dashboard moved to `/dashboard`
 - **Dark Mode**: Toggle in sidebar, persists to localStorage, full dark palette with CSS custom properties
-- **Enhanced ISBN Manager**: ISBN-10 auto-calculation from ISBN-13, 30+ BISAC categories, LCCN field, prominent read-only ISBN-10 display
+- **Enhanced ISBN Manager**: ISBN-10 auto-calculation from ISBN-13, 30+ BISAC categories, LCCN field, prominent read-only ISBN-10 display, EAN-13 barcode generator (JsBarcode) with optional price extension and PNG download
+- **Royalty Calculator**: Client-side calculator at `/royalty-calculator` comparing royalties across KDP (35%/70%), IngramSpark, B&N, Apple Books, Draft2Digital, and direct sales. Price sensitivity slider, break-even analysis, channel comparison table.
+- **Distribution Channel Guide**: Comprehensive guide at `/distribution-guide` covering Amazon KDP, IngramSpark, B&N Press, Apple Books, Draft2Digital, Google Play Books. Interactive comparison table with filtering, setup checklists, and recommended strategies.
+- **Marketing Toolkit**: Professional marketing tools at `/marketing-toolkit` with sell sheet/one-sheet PDF generator, social media graphics builder (Instagram/Facebook/Twitter/Pinterest presets with canvas rendering), and press kit assembler.
+- **Pre-Launch Page**: Public shareable book page at `/book/:id/preview` with cover image, blurb, publication date, and "Notify Me" email signup. DB: `launch_subscribers` table, `blurb/coverImageUrl/publicPreview/publicationDate` columns on projects. Toggle public preview on/off from project settings.
+- **Progress Milestones**: Visual timeline component on Project Tracker showing milestone progression (Manuscript Ready → Typesetting → Review → Cover → ISBN/Metadata → Distribution → Launch). Auto-derives status from step_statuses and production_jobs data.
+- **File Versioning**: Version history section in Auto-Produce showing all past production jobs for a project with version labels (v1, v2...), dates, status, and side-by-side comparison links.
+- **Proof Ordering Guide**: Step-by-step guide shown after job approval in Auto-Produce for ordering physical proof copies via KDP, IngramSpark, or third-party printers. Includes tips for checking margins, bleed, color accuracy, and binding.
 - **Guided Journey Dashboard**: New users see "Start Your Publishing Journey" CTA, wizard-completers see roadmap summary with retake option
 - **Project Duplication**: Duplicate button in Project Tracker creates project copy with "(Copy)" suffix
 - **Notification Center**: Bell icon in sidebar with unread count, popover dropdown, localStorage-based read tracking
-- **Pricing Page**: Four tiers (Starter free, KDP Ready $29 lifetime, Author Pro $97 lifetime, Publisher $249 lifetime) with billing toggle, competitive comparison vs Atticus/Vellum/D2D/BookBaby, and FAQ
+- **Pricing Page**: Four tiers (Starter free, KDP Ready $99 lifetime, Author Pro $199 lifetime, Publisher $499 lifetime) with billing toggle, competitive comparison vs Atticus/Vellum/D2D/BookBaby/Reedsy, and FAQ
 - **Getting Started Checklist**: New projects show 6-step onboarding checklist, auto-hides after 3 completed steps
 - **Resources Search & Filter**: Search bar with text highlighting, category filter pills (Writing, Editorial, Design, etc.)
 - **Contact Form**: Public contact form on landing page (backend wired to contact_submissions table)
@@ -190,9 +197,9 @@ PostgreSQL via Replit's built-in database. Use `npx drizzle-kit push` to sync sc
 - **Schema**: `stripe.*` tables auto-synced (products, prices, customers, subscriptions, etc.) — NEVER INSERT directly
 - **Webhook**: `/api/stripe/webhook` route registered BEFORE `express.json()` with raw body parsing
 - **Products**: Created via `server/seedStripeProducts.ts` (run `npx tsx server/seedStripeProducts.ts`)
-  - KDP Ready: monthly ($4.99), annual ($35.88/yr), lifetime ($29) — for self-publishers who just need KDP formatting
-  - Author Pro: monthly ($9.99), annual ($83.88/yr), lifetime ($97)
-  - Publisher: monthly ($24.99), annual ($203.88/yr), lifetime ($249)
+  - KDP Ready: monthly ($14.99), annual ($9.99/mo billed annually), lifetime ($99) — for self-publishers who just need KDP formatting
+  - Author Pro: monthly ($29.99), annual ($19.99/mo billed annually), lifetime ($199)
+  - Publisher: monthly ($59.99), annual ($39.99/mo billed annually), lifetime ($499)
 - **User columns**: `plan` (enum: starter/kdp_ready/author_pro/publisher), `stripeCustomerId`, `stripeSubscriptionId`
 - **tRPC routes**: `stripe.getSubscription`, `stripe.createCheckoutSession`, `stripe.createBillingPortal`, `stripe.getProducts`, `stripe.getPublishableKey`, `stripe.getPriceIds`
 - **Webhook handlers**: `checkout.session.completed` (upgrades plan), `customer.subscription.updated`, `customer.subscription.deleted` (reverts to starter)
