@@ -89,9 +89,27 @@ async function ensureOwnerAdmin() {
 }
 
 async function startServer() {
-  await ensureOwnerAdmin();
   const app = express();
   const server = createServer(app);
+
+  let serverReady = false;
+  app.use((req, res, next) => {
+    if (!serverReady && req.path === "/" && req.method === "GET") {
+      return res.status(200).send("<!DOCTYPE html><html><body>Loading...</body></html>");
+    }
+    next();
+  });
+
+  const preferredPort = parseInt(process.env.PORT || "5000");
+  const port = await findAvailablePort(preferredPort);
+  if (port !== preferredPort) {
+    console.log(`Port ${preferredPort} is busy, using port ${port} instead`);
+  }
+  server.listen(port, () => {
+    console.log(`Server running on http://localhost:${port}/`);
+  });
+
+  await ensureOwnerAdmin();
 
   app.post(
     '/api/stripe/webhook',
@@ -242,16 +260,8 @@ async function startServer() {
     serveStatic(app);
   }
 
-  const preferredPort = parseInt(process.env.PORT || "5000");
-  const port = await findAvailablePort(preferredPort);
-
-  if (port !== preferredPort) {
-    console.log(`Port ${preferredPort} is busy, using port ${port} instead`);
-  }
-
-  server.listen(port, () => {
-    console.log(`Server running on http://localhost:${port}/`);
-  });
+  serverReady = true;
+  console.log("[Server] All routes registered, server fully ready");
 
   await initStripe();
 }
