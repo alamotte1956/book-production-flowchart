@@ -11,7 +11,7 @@ export function useAuth() {
 
   const logout = useCallback(async () => {
     utils.auth.me.setData(undefined, null);
-    window.location.href = "/api/logout";
+    window.location.href = "/api/auth/logout";
   }, [utils]);
 
   const state = useMemo(() => {

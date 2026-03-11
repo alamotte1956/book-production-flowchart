@@ -155,8 +155,18 @@ async function startServer() {
   });
 
   app.get("/api/auth/logout", async (req, res) => {
+    const sessionToken = (req as any).cookies?.ebp_session;
+    if (sessionToken) {
+      try {
+        const { getUserBySessionToken, clearSession } = await import("../db");
+        const user = await getUserBySessionToken(sessionToken);
+        if (user) await clearSession(user.id);
+      } catch {
+        // best-effort
+      }
+    }
     res.clearCookie("ebp_session", { path: "/" });
-    res.redirect("/login");
+    res.redirect("/");
   });
 
   app.get("/api/auth/magic-login", async (req, res) => {
