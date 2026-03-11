@@ -13,10 +13,10 @@ import SiteFooter from "@/components/SiteFooter";
 const HERO_URL = "https://d2xsxph8kpxj0f.cloudfront.net/310519663211654017/kGjPju6hKCvCsjZhgUHyqj/hero-banner-cxQRR1jXLBmcXxFPJoqxWN.webp";
 
 const features = [
-  { icon: Upload, title: "Upload Your Manuscript", desc: "New author? Just drop in your DOCX, PDF, or any of 26 formats. Our parser extracts your text, detects chapters, and preserves your structure automatically." },
-  { icon: Sparkles, title: "AI-Powered Typesetting", desc: "Your new book gets a professional layout in minutes — drop caps, running headers, smart typography, orphan/widow control, and chapter openers." },
-  { icon: Printer, title: "Print-Ready Output", desc: "Download real Interior PDF, KDP Print-Ready PDF with bleed, EPUB 3, and InDesign IDML files — everything a new author needs from a single upload." },
-  { icon: Globe, title: "Publish Your New Book Anywhere", desc: "Export files ready for Amazon KDP, IngramSpark, Barnes & Noble Press, Apple Books, or your own printer. We handle the specs." },
+  { icon: BookOpen, title: "Choose a Template or Start Fresh", desc: "Browse 44 professional book templates — or go direct. Pick a trim size and typesetting style, then preview a sample page before committing." },
+  { icon: Upload, title: "Upload Your Manuscript", desc: "Drop in your DOCX, PDF, or any of 26 accepted formats. Our parser extracts your text, detects chapters, and preserves your structure automatically." },
+  { icon: Sparkles, title: "AI Typesets Your Book", desc: "Our typesetting engine applies professional layout in minutes — drop caps, running headers, smart typography, orphan/widow control, and chapter openers." },
+  { icon: Printer, title: "Review, Approve & Download", desc: "Preview your typeset book, then download print-ready Interior PDF, KDP PDF with bleed, EPUB 3, and InDesign IDML — ready for Amazon, IngramSpark, or any retailer." },
 ];
 
 const outputFormats = [
@@ -212,8 +212,8 @@ export default function LandingPage() {
         <div className="max-w-7xl mx-auto px-6">
           <div className="text-center mb-14">
             <Badge className="bg-[#c9a96e]/10 text-[#8b6914] border-[#c9a96e]/30 mb-3">How It Works</Badge>
-            <h2 className="font-serif text-3xl md:text-4xl text-[#1a1008] mb-3">Four Steps to Your New Book</h2>
-            <p className="text-[#5c4a2a]/85 max-w-xl mx-auto">New authors go from raw manuscript to professional, print-ready new book in minutes — not months.</p>
+            <h2 className="font-serif text-3xl md:text-4xl text-[#1a1008] mb-3">From Manuscript to Masterpiece in Four Steps</h2>
+            <p className="text-[#5c4a2a]/85 max-w-xl mx-auto">Pick a template, upload your manuscript, let AI typeset it, then review and download production-ready files.</p>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
             {features.map((f, i) => (
