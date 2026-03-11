@@ -19,7 +19,7 @@ import { usePlan, type PlanFeature } from "@/hooks/usePlan";
 import {
   LayoutDashboard, PanelLeft,
   HelpCircle,
-  Bell, CheckCircle, Upload, Zap, CreditCard, Lock, ArrowUpRight,
+  Bell, CheckCircle, Upload, Zap, CreditCard, Lock, ArrowUpRight, LogOut,
 } from "lucide-react";
 import { CSSProperties, useCallback, useEffect, useRef, useState } from "react";
 import { useLocation } from "wouter";
@@ -203,7 +203,7 @@ function DashboardLayoutContent({
   children,
   setSidebarWidth,
 }: DashboardLayoutContentProps) {
-  const { user } = useAuth();
+  const { user, logout } = useAuth();
   const { isPublisher, plan, canAccess } = usePlan();
   const [location, setLocation] = useLocation();
   const { state, toggleSidebar } = useSidebar();
@@ -318,7 +318,7 @@ function DashboardLayoutContent({
                 <span className="tracking-wide text-[12px] text-[#c9a96e] font-medium">Upgrade Plan</span>
               </button>
             )}
-            <div className="flex items-center gap-3 rounded-lg px-1 py-1.5 w-full text-left group-data-[collapsible=icon]:justify-center">
+            <div className="flex items-center gap-2 rounded-lg px-1 py-1.5 w-full group-data-[collapsible=icon]:justify-center">
               <Avatar className="h-9 w-9 border border-gold/30 bg-burgundy/10 shrink-0">
                 <AvatarFallback className="text-xs font-semibold text-burgundy bg-burgundy/10">
                   {user?.name?.charAt(0).toUpperCase() || "U"}
@@ -332,6 +332,13 @@ function DashboardLayoutContent({
                   {plan === "publisher" ? "Publisher" : plan === "author_pro" ? "Author Pro" : plan === "kdp_ready" ? "KDP Ready" : "No Plan"}
                 </p>
               </div>
+              <button
+                onClick={logout}
+                title="Sign out"
+                className="shrink-0 group-data-[collapsible=icon]:hidden h-7 w-7 flex items-center justify-center rounded-md text-walnut/40 hover:text-burgundy hover:bg-burgundy/8 transition-colors"
+              >
+                <LogOut className="h-3.5 w-3.5" />
+              </button>
             </div>
           </SidebarFooter>
         </Sidebar>
