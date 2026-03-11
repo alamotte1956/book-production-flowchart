@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Check, X, ArrowRight, BookOpen, Zap, Crown, HelpCircle, Loader2, Rocket } from "lucide-react";
+import { Check, X, ArrowRight, BookOpen, Zap, HelpCircle, Loader2, Rocket } from "lucide-react";
 import { useLocation } from "wouter";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { trpc } from "@/lib/trpc";
@@ -15,7 +15,6 @@ type BillingCycle = "monthly" | "annual";
 
 const PLAN_NAME_MAP: Record<string, string> = {
   "Author Pro": "author_pro",
-  "Publisher": "publisher",
   "KDP Ready": "kdp_ready",
 };
 
@@ -89,75 +88,34 @@ const tiers = [
       { name: "Priority support", included: false },
     ],
   },
-  {
-    name: "Publisher",
-    monthly: "$119.99",
-    annual: "$79.99",
-    period: { monthly: "/month", annual: "/mo (billed annually)" },
-    description: "For publishers, imprints, and prolific new authors scaling to multiple titles. Priority support and custom branding for your new books.",
-    icon: Crown,
-    cta: "Get Publisher",
-    ctaVariant: "outline" as const,
-    highlight: false,
-    badge: "Best for Teams",
-    features: [
-      { name: "Unlimited book projects", included: true },
-      { name: "AI typesetting (PDF + EPUB)", included: true },
-      { name: "Amazon KDP-ready PDF export", included: true },
-      { name: "Review & approval workflow", included: true },
-      { name: "InDesign IDML export (exclusive)", included: true },
-      { name: "40+ book templates", included: true },
-      { name: "30-step production workflow", included: true },
-      { name: "Production timeline & milestones", included: true },
-      { name: "Marketing toolkit & sell sheets", included: true },
-      { name: "Pre-launch book page", included: true },
-      { name: "Distribution channel guide", included: true },
-      { name: "Royalty calculator", included: true },
-      { name: "ISBN barcode generator", included: true },
-      { name: "File versioning & comparison", included: true },
-      { name: "Bible Design Studio", included: true },
-      { name: "Spine calculator + cover designer", included: true },
-      { name: "ISBN & ONIX 3.0 metadata", included: true },
-      { name: "Print spec generator", included: true },
-      { name: "30+ manuscript formats accepted", included: true },
-      { name: "Works on any device (browser-based)", included: true },
-      { name: "No per-sale commission", included: true },
-      { name: "Priority support", included: true },
-      { name: "Dedicated account manager", included: true },
-      { name: "Custom branding on exports", included: true },
-    ],
-  },
 ];
 
-const comparisonFeatures: Array<{ name: string; tooltip?: string; kdp: string | boolean; author: string | boolean; publisher: string | boolean }> = [
-  { name: "Book Projects", kdp: "1", author: "Unlimited", publisher: "Unlimited" },
-  { name: "Production Workflow", kdp: false, author: "30 steps", publisher: "30 steps" },
-  { name: "Cross-Platform Access", tooltip: "Works on any device with a browser — Windows, Mac, Linux, Chromebook, iPad", kdp: true, author: true, publisher: true },
-  { name: "Manuscript Import", tooltip: "Accept 26 formats including DOCX, PDF, TXT, RTF, and more", kdp: true, author: true, publisher: true },
-  { name: "Bible Design Studio", kdp: false, author: true, publisher: true },
-  { name: "Spine Calculator", kdp: true, author: true, publisher: true },
-  { name: "Cover Spec Designer", kdp: true, author: true, publisher: true },
-  { name: "Print Spec Generator", kdp: false, author: true, publisher: true },
-  { name: "ISBN & ONIX 3.0 Metadata", tooltip: "Full ISBN management and ONIX 3.0 XML export for retailers", kdp: true, author: true, publisher: true },
-  { name: "Publishing Resources Hub", kdp: false, author: true, publisher: true },
-  { name: "Guided Publishing Journey", kdp: true, author: true, publisher: true },
-  { name: "AI Typesetting Engine", tooltip: "Automated book layout with professional styles — like Atticus + Vellum combined", kdp: true, author: true, publisher: true },
-  { name: "PDF Export (Screen)", kdp: true, author: true, publisher: true },
-  { name: "EPUB 3 Export", tooltip: "Standard EPUB 3 compatible with all major retailers", kdp: true, author: true, publisher: true },
-  { name: "Amazon KDP-Ready PDF", tooltip: "Print-ready PDF with bleed, gutter, and trim marks per Amazon specs", kdp: true, author: true, publisher: true },
-  { name: "InDesign IDML Export", tooltip: "Export to Adobe InDesign format for advanced customization — competitors don't offer this", kdp: false, author: true, publisher: true },
-  { name: "40+ Book Templates", tooltip: "Professional templates with customizable styles and trim presets", kdp: true, author: true, publisher: true },
-  { name: "Review & Approval Workflow", tooltip: "Preview PDFs inline, add comments, approve or request changes", kdp: true, author: true, publisher: true },
-  { name: "ISBN Barcode Generator", tooltip: "Generate EAN-13 barcodes from ISBN-13 with optional price extension", kdp: true, author: true, publisher: true },
-  { name: "Royalty Calculator", tooltip: "Compare royalties across KDP, IngramSpark, and direct sales channels", kdp: true, author: true, publisher: true },
-  { name: "Marketing Toolkit", tooltip: "Sell sheets, social media graphics, and press kit builder", kdp: false, author: true, publisher: true },
-  { name: "Pre-Launch Book Page", tooltip: "Public shareable page with email signup for launch notifications", kdp: false, author: true, publisher: true },
-  { name: "Distribution Channel Guide", tooltip: "Comprehensive comparison of Amazon KDP, IngramSpark, B&N, Apple Books, and more", kdp: false, author: true, publisher: true },
-  { name: "File Versioning", tooltip: "Track all production versions with side-by-side comparison", kdp: false, author: true, publisher: true },
-  { name: "Production Timeline", tooltip: "Gantt chart and deadline tracking for all 30 steps", kdp: false, author: true, publisher: true },
-  { name: "Priority Support", kdp: false, author: false, publisher: true },
-  { name: "Dedicated Account Manager", kdp: false, author: false, publisher: true },
-  { name: "Custom Branding on Exports", kdp: false, author: false, publisher: true },
+const comparisonFeatures: Array<{ name: string; tooltip?: string; kdp: string | boolean; author: string | boolean }> = [
+  { name: "Book Projects", kdp: "1", author: "Unlimited" },
+  { name: "Production Workflow", kdp: false, author: "30 steps" },
+  { name: "Cross-Platform Access", tooltip: "Works on any device with a browser — Windows, Mac, Linux, Chromebook, iPad", kdp: true, author: true },
+  { name: "Manuscript Import", tooltip: "Accept 26 formats including DOCX, PDF, TXT, RTF, and more", kdp: true, author: true },
+  { name: "Bible Design Studio", kdp: false, author: true },
+  { name: "Spine Calculator", kdp: true, author: true },
+  { name: "Cover Spec Designer", kdp: true, author: true },
+  { name: "Print Spec Generator", kdp: false, author: true },
+  { name: "ISBN & ONIX 3.0 Metadata", tooltip: "Full ISBN management and ONIX 3.0 XML export for retailers", kdp: true, author: true },
+  { name: "Publishing Resources Hub", kdp: false, author: true },
+  { name: "Guided Publishing Journey", kdp: true, author: true },
+  { name: "AI Typesetting Engine", tooltip: "Automated book layout with professional styles — like Atticus + Vellum combined", kdp: true, author: true },
+  { name: "PDF Export (Screen)", kdp: true, author: true },
+  { name: "EPUB 3 Export", tooltip: "Standard EPUB 3 compatible with all major retailers", kdp: true, author: true },
+  { name: "Amazon KDP-Ready PDF", tooltip: "Print-ready PDF with bleed, gutter, and trim marks per Amazon specs", kdp: true, author: true },
+  { name: "InDesign IDML Export", tooltip: "Export to Adobe InDesign format for advanced customization — competitors don't offer this", kdp: false, author: true },
+  { name: "40+ Book Templates", tooltip: "Professional templates with customizable styles and trim presets", kdp: true, author: true },
+  { name: "Review & Approval Workflow", tooltip: "Preview PDFs inline, add comments, approve or request changes", kdp: true, author: true },
+  { name: "ISBN Barcode Generator", tooltip: "Generate EAN-13 barcodes from ISBN-13 with optional price extension", kdp: true, author: true },
+  { name: "Royalty Calculator", tooltip: "Compare royalties across KDP, IngramSpark, and direct sales channels", kdp: true, author: true },
+  { name: "Marketing Toolkit", tooltip: "Sell sheets, social media graphics, and press kit builder", kdp: false, author: true },
+  { name: "Pre-Launch Book Page", tooltip: "Public shareable page with email signup for launch notifications", kdp: false, author: true },
+  { name: "Distribution Channel Guide", tooltip: "Comprehensive comparison of Amazon KDP, IngramSpark, B&N, Apple Books, and more", kdp: false, author: true },
+  { name: "File Versioning", tooltip: "Track all production versions with side-by-side comparison", kdp: false, author: true },
+  { name: "Production Timeline", tooltip: "Gantt chart and deadline tracking for all 30 steps", kdp: false, author: true },
 ];
 
 const competitors = [
@@ -212,7 +170,7 @@ export default function Pricing() {
     setGateOpen(false);
     setLoadingTier(pendingTier);
     try {
-      const planName = (PLAN_NAME_MAP[pendingTier] ?? "author_pro") as "kdp_ready" | "author_pro" | "publisher";
+      const planName = (PLAN_NAME_MAP[pendingTier] ?? "author_pro") as "kdp_ready" | "author_pro";
       const result = await checkoutMutation.mutateAsync({
         priceId,
         billingCycle: billing,
@@ -273,7 +231,7 @@ export default function Pricing() {
           </div>
         </div>
 
-        <div className="grid md:grid-cols-3 gap-6 max-w-4xl mx-auto mb-24">
+        <div className="grid md:grid-cols-2 gap-6 max-w-3xl mx-auto mb-24">
           {tiers.map((tier) => {
             const Icon = tier.icon;
             const price = tier[billing];
@@ -373,21 +331,16 @@ export default function Pricing() {
             <div className="absolute -top-3 left-1/2 -translate-x-1/2">
               <span className="bg-[#c9a96e] text-[#1a1008] text-xs font-bold px-4 py-1 rounded-full shadow">YOU SAVE 35–90%</span>
             </div>
-            <div className="grid sm:grid-cols-3 gap-4 mt-2">
+            <div className="grid sm:grid-cols-2 gap-4 mt-2 max-w-md mx-auto">
               <div className="text-center">
                 <p className="font-serif font-bold text-[#1a1008]">KDP Ready</p>
                 <p className="text-[#8b6914] font-bold text-2xl">$19.99<span className="text-sm font-normal">/mo</span></p>
                 <p className="text-xs text-[#5c4a2a]/70 mt-1">vs. Atticus at $147</p>
               </div>
-              <div className="text-center border-x border-[#c9a96e]/20">
+              <div className="text-center border-l border-[#c9a96e]/20">
                 <p className="font-serif font-bold text-[#1a1008]">Author Pro</p>
                 <p className="text-[#8b6914] font-bold text-2xl">$39.99<span className="text-sm font-normal">/mo</span></p>
                 <p className="text-xs text-[#5c4a2a]/70 mt-1">vs. Vellum at $249.99</p>
-              </div>
-              <div className="text-center">
-                <p className="font-serif font-bold text-[#1a1008]">Publisher</p>
-                <p className="text-[#8b6914] font-bold text-2xl">$79.99<span className="text-sm font-normal">/mo</span></p>
-                <p className="text-xs text-[#5c4a2a]/70 mt-1">vs. BookBaby at $2,890+</p>
               </div>
             </div>
             <p className="text-sm text-[#5c4a2a]/90 mt-4 text-center">AI typesetting + KDP export + IDML + cover specs + ISBN manager + production workflow — all in one platform, on any device. No per-sale commission. Ever.</p>
@@ -404,7 +357,6 @@ export default function Pricing() {
                     <th className="text-left py-4 px-4 font-serif text-lg text-[#1a1008]">Feature</th>
                     <th className="text-center py-4 px-4 font-serif text-lg text-[#1a1008]">KDP Ready</th>
                     <th className="text-center py-4 px-4 font-serif text-lg text-[#1a1008] bg-[#c9a96e]/5">Author Pro</th>
-                    <th className="text-center py-4 px-4 font-serif text-lg text-[#1a1008]">Publisher</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -425,7 +377,7 @@ export default function Pricing() {
                           )}
                         </span>
                       </td>
-                      {(["kdp", "author", "publisher"] as const).map((plan) => (
+                      {(["kdp", "author"] as const).map((plan) => (
                         <td
                           key={plan}
                           className={`py-3 px-4 text-center text-sm ${plan === "author" ? "bg-[#c9a96e]/5" : ""}`}
@@ -459,7 +411,7 @@ export default function Pricing() {
               { q: "Do you take a percentage of my book sales?", a: "Never. Draft2Digital takes 10% of every sale — forever. Lulu takes 20% of profits. We charge a flat fee. New authors keep 100% of their book earnings, whether you sell 10 copies or 10,000." },
               { q: "What if I just want to publish one new book on KDP?", a: "The KDP Ready plan ($19.99/mo) is built exactly for new authors publishing their first book on Amazon. Upload your manuscript, pick a template, and download KDP-ready files. Cancel anytime." },
               { q: "Can I export files for Amazon KDP?", a: "Yes. All plans generate KDP-compliant PDFs with proper bleed, margins, and trim sizes that pass Amazon's automated file review. New authors get professional-quality output from day one." },
-              { q: "What about InDesign IDML export?", a: "Author Pro and Publisher plans include IDML export — something no other self-publishing platform offers. Hand off production-ready files to any InDesign professional without reformatting." },
+              { q: "What about InDesign IDML export?", a: "The Author Pro plan includes IDML export — something no other self-publishing platform offers. Hand off production-ready files to any InDesign professional without reformatting." },
               { q: "Is there a money-back guarantee?", a: "Yes. All plans come with a 30-day money-back guarantee. New authors can try everything risk-free — if it's not right for you, you get a full refund, no questions asked." },
             ].map(({ q, a }) => (
               <div key={q} className="bg-white rounded-xl border border-[#c9a96e]/15 p-6">

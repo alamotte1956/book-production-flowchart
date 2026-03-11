@@ -9,7 +9,7 @@ import { Textarea } from "@/components/ui/textarea";
 import {
   DollarSign, Users, BarChart3, Clock, Share2, TrendingUp,
   CheckCircle2, Loader2, ArrowRight, Gift, Globe, MousePointerClick,
-  Wallet, CalendarDays, Shield, Zap,
+  CalendarDays, Shield, Zap,
 } from "lucide-react";
 import { trpc } from "@/lib/trpc";
 import { toast } from "sonner";
@@ -40,7 +40,7 @@ const competitorComparison = [
 
 const faqs = [
   { q: "Who can become an affiliate?", a: "Anyone with an audience interested in self-publishing, book design, or writing tools. This includes bloggers, YouTubers, podcasters, writing coaches, book designers, and publishing consultants." },
-  { q: "How much can I earn?", a: "You earn 20% on every sale. For annual Author Pro plans, that's $95.98/year per referral. For annual Publisher plans, $191.98/year per referral. Monthly subscriptions earn recurring commissions too." },
+  { q: "How much can I earn?", a: "You earn 20% on every sale. For annual Author Pro plans, that's $95.98/year per referral. Monthly subscriptions earn recurring commissions too." },
   { q: "When do I get paid?", a: "Payouts are processed monthly via PayPal once your balance reaches the $50 minimum threshold. Commissions are approved after a 30-day hold period to account for refunds." },
   { q: "How long does the cookie last?", a: "Our tracking cookie lasts 90 days. If someone clicks your link and purchases within 90 days, you get credit for the sale — even if they visit the site multiple times." },
   { q: "What marketing materials do you provide?", a: "We provide ready-to-use banner ads, text links, social media copy, and email templates. All available in your affiliate dashboard once approved." },
@@ -158,7 +158,7 @@ export default function AffiliateProgram() {
             <h2 className="font-serif text-3xl text-[#1a1008] mb-3">Earnings Potential</h2>
             <p className="text-[#5c4a2a]/90">Here's what you could earn at 20% commission</p>
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-lg mx-auto">
             <Card className="bg-white border-[#c9a96e]/15">
               <CardContent className="p-6 text-center">
                 <Zap className="w-8 h-8 text-[#c9a96e] mx-auto mb-3" />
@@ -173,14 +173,6 @@ export default function AffiliateProgram() {
                 <div className="font-serif text-3xl text-[#1a1008] font-bold">$12.00</div>
                 <div className="text-sm text-[#5c4a2a]/90 mt-1">per Author Pro monthly</div>
                 <div className="text-xs text-[#8b6914] mt-2">Plan: $59.99/mo</div>
-              </CardContent>
-            </Card>
-            <Card className="bg-white border-[#c9a96e]/15">
-              <CardContent className="p-6 text-center">
-                <Wallet className="w-8 h-8 text-[#c9a96e] mx-auto mb-3" />
-                <div className="font-serif text-3xl text-[#1a1008] font-bold">$24.00</div>
-                <div className="text-sm text-[#5c4a2a]/90 mt-1">per Publisher monthly</div>
-                <div className="text-xs text-[#8b6914] mt-2">Plan: $119.99/mo</div>
               </CardContent>
             </Card>
           </div>
