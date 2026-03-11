@@ -15,11 +15,13 @@ export function useAuth() {
   }, [utils]);
 
   const state = useMemo(() => {
+    const user = meQuery.data ?? null;
+    const isRealUser = Boolean(user && user.loginMethod !== "guest");
     return {
-      user: meQuery.data ?? null,
+      user: isRealUser ? user : null,
       loading: meQuery.isLoading,
       error: meQuery.error ?? null,
-      isAuthenticated: Boolean(meQuery.data),
+      isAuthenticated: isRealUser,
     };
   }, [
     meQuery.data,

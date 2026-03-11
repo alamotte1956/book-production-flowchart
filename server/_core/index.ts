@@ -155,6 +155,7 @@ async function startServer() {
   });
 
   app.get("/api/auth/logout", async (req, res) => {
+    // Clear custom email/password session
     const sessionToken = (req as any).cookies?.ebp_session;
     if (sessionToken) {
       try {
@@ -166,7 +167,20 @@ async function startServer() {
       }
     }
     res.clearCookie("ebp_session", { path: "/" });
-    res.redirect("/");
+
+    // Also destroy any Replit/passport session
+    res.clearCookie("connect.sid", { path: "/" });
+    if (typeof (req as any).logout === "function") {
+      (req as any).logout(() => {
+        if (typeof (req as any).session?.destroy === "function") {
+          (req as any).session.destroy(() => res.redirect("/"));
+        } else {
+          res.redirect("/");
+        }
+      });
+    } else {
+      res.redirect("/");
+    }
   });
 
   app.get("/api/auth/magic-login", async (req, res) => {
