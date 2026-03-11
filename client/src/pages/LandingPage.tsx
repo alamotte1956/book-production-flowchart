@@ -45,7 +45,7 @@ const stats = [
 
 const whyAuthorsChooseUs = [
   { icon: Clock, title: "Publish Your New Book in Minutes", desc: "Go from manuscript to print-ready files the same day. No waiting for designers or typesetters." },
-  { icon: DollarSign, title: "New Authors Save Thousands", desc: "Professional typesetting typically costs $1,500-$5,000. Get the same quality from just $9.99/mo." },
+  { icon: DollarSign, title: "New Authors Save Thousands", desc: "Professional typesetting typically costs $1,500-$5,000. Get the same quality from just $19.99/mo." },
   { icon: Shield, title: "You Keep 100%", desc: "Zero commission on your book sales. Zero royalty share. Your earnings are yours, always." },
   { icon: BookOpen, title: "Every Format, One Upload", desc: "Get print PDF, KDP-ready PDF, EPUB, and InDesign IDML — all from a single manuscript upload." },
   { icon: PenTool, title: "AI Writing Assistant", desc: "Generate your foreword, introduction, copyright page, back-cover blurb, and glossary with one click. Perfect for new authors." },
@@ -60,7 +60,7 @@ const newAuthorFeatures = [
 ];
 
 const comparisonPoints = [
-  { feature: "Price", us: "From $9.99/mo", others: "$147-$250+ one-time" },
+  { feature: "Price", us: "From $19.99/mo", others: "$147-$250+ one-time" },
   { feature: "Works on", us: "Any device, any browser", others: "Mac only (Vellum) or desktop app" },
   { feature: "AI Writing Assistant", us: "Foreword, intro, glossary, blurbs, bios", others: "Not included" },
   { feature: "InDesign IDML Export", us: "Included", others: "Not available" },
@@ -430,7 +430,7 @@ export default function LandingPage() {
             Join thousands of new authors who use Easy Book Publishers to turn their manuscript into a professional, print-ready new book.
           </p>
           <p className="text-sm text-[#d4c8b4]/60 mb-10 max-w-md mx-auto">
-            Plans from $9.99/mo. 30-day money-back guarantee. Built for new authors — your book, your earnings, zero commission.
+            Plans from $19.99/mo. 30-day money-back guarantee. Built for new authors — your book, your earnings, zero commission.
           </p>
           <div className="flex flex-col sm:flex-row justify-center gap-4">
             <Button onClick={() => navigate("/guided-journey")} size="lg" className="bg-gradient-to-r from-[#d4b480] to-[#c9a96e] hover:from-[#e0c490] hover:to-[#d4b480] text-[#1a1008] font-bold text-base px-10 py-6 rounded-xl shadow-xl shadow-[#c9a96e]/25">

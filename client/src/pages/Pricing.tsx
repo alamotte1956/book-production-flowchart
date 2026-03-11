@@ -22,8 +22,8 @@ const PLAN_NAME_MAP: Record<string, string> = {
 const tiers = [
   {
     name: "KDP Ready",
-    monthly: "$14.99",
-    annual: "$9.99",
+    monthly: "$29.99",
+    annual: "$19.99",
     period: { monthly: "/month", annual: "/mo (billed annually)" },
     description: "New author with a finished manuscript? Upload, pick a template, get KDP-ready files for your new book. Replaces Atticus at a fraction of the cost.",
     icon: Rocket,
@@ -55,8 +55,8 @@ const tiers = [
   },
   {
     name: "Author Pro",
-    monthly: "$29.99",
-    annual: "$19.99",
+    monthly: "$59.99",
+    annual: "$39.99",
     period: { monthly: "/month", annual: "/mo (billed annually)" },
     description: "The complete new author toolkit. Everything in Atticus + Vellum combined — for less than either one alone. Publish your new book like a pro.",
     icon: Zap,
@@ -91,8 +91,8 @@ const tiers = [
   },
   {
     name: "Publisher",
-    monthly: "$59.99",
-    annual: "$39.99",
+    monthly: "$119.99",
+    annual: "$79.99",
     period: { monthly: "/month", annual: "/mo (billed annually)" },
     description: "For publishers, imprints, and prolific new authors scaling to multiple titles. Priority support and custom branding for your new books.",
     icon: Crown,
@@ -376,17 +376,17 @@ export default function Pricing() {
             <div className="grid sm:grid-cols-3 gap-4 mt-2">
               <div className="text-center">
                 <p className="font-serif font-bold text-[#1a1008]">KDP Ready</p>
-                <p className="text-[#8b6914] font-bold text-2xl">$9.99<span className="text-sm font-normal">/mo</span></p>
+                <p className="text-[#8b6914] font-bold text-2xl">$19.99<span className="text-sm font-normal">/mo</span></p>
                 <p className="text-xs text-[#5c4a2a]/70 mt-1">vs. Atticus at $147</p>
               </div>
               <div className="text-center border-x border-[#c9a96e]/20">
                 <p className="font-serif font-bold text-[#1a1008]">Author Pro</p>
-                <p className="text-[#8b6914] font-bold text-2xl">$19.99<span className="text-sm font-normal">/mo</span></p>
+                <p className="text-[#8b6914] font-bold text-2xl">$39.99<span className="text-sm font-normal">/mo</span></p>
                 <p className="text-xs text-[#5c4a2a]/70 mt-1">vs. Vellum at $249.99</p>
               </div>
               <div className="text-center">
                 <p className="font-serif font-bold text-[#1a1008]">Publisher</p>
-                <p className="text-[#8b6914] font-bold text-2xl">$39.99<span className="text-sm font-normal">/mo</span></p>
+                <p className="text-[#8b6914] font-bold text-2xl">$79.99<span className="text-sm font-normal">/mo</span></p>
                 <p className="text-xs text-[#5c4a2a]/70 mt-1">vs. BookBaby at $2,890+</p>
               </div>
             </div>
@@ -454,10 +454,10 @@ export default function Pricing() {
           <div className="grid md:grid-cols-2 gap-6 max-w-4xl mx-auto">
             {[
               { q: "I'm a new author — is this right for me?", a: "Absolutely. Easy Book Publishers was built specifically for new authors. Our guided wizard walks you through every step, and our AI handles the professional typesetting. No publishing experience needed — just upload your manuscript and we'll produce your new book." },
-              { q: "How does this compare to Atticus or Vellum?", a: "Atticus costs $147 one-time for writing + formatting. Vellum costs $249.99 and only works on Mac. Our Author Pro ($19.99/mo annual) does everything both tools do — plus IDML export, ISBN management, cover specs, marketing toolkit, royalty calculator, distribution guide, production timeline, and a 30-step workflow. New authors get more tools at a fraction of the price." },
+              { q: "How does this compare to Atticus or Vellum?", a: "Atticus costs $147 one-time for writing + formatting. Vellum costs $249.99 and only works on Mac. Our Author Pro ($39.99/mo annual) does everything both tools do — plus IDML export, ISBN management, cover specs, marketing toolkit, royalty calculator, distribution guide, production timeline, and a 30-step workflow. New authors get more tools at a fraction of the price." },
               { q: "Why is this so much cheaper?", a: "We're a cloud platform — no desktop software to maintain per OS. That means lower costs for us and lower prices for new authors. We believe publishing tools shouldn't cost more than the books you're creating." },
               { q: "Do you take a percentage of my book sales?", a: "Never. Draft2Digital takes 10% of every sale — forever. Lulu takes 20% of profits. We charge a flat fee. New authors keep 100% of their book earnings, whether you sell 10 copies or 10,000." },
-              { q: "What if I just want to publish one new book on KDP?", a: "The KDP Ready plan ($9.99/mo) is built exactly for new authors publishing their first book on Amazon. Upload your manuscript, pick a template, and download KDP-ready files. Cancel anytime." },
+              { q: "What if I just want to publish one new book on KDP?", a: "The KDP Ready plan ($19.99/mo) is built exactly for new authors publishing their first book on Amazon. Upload your manuscript, pick a template, and download KDP-ready files. Cancel anytime." },
               { q: "Can I export files for Amazon KDP?", a: "Yes. All plans generate KDP-compliant PDFs with proper bleed, margins, and trim sizes that pass Amazon's automated file review. New authors get professional-quality output from day one." },
               { q: "What about InDesign IDML export?", a: "Author Pro and Publisher plans include IDML export — something no other self-publishing platform offers. Hand off production-ready files to any InDesign professional without reformatting." },
               { q: "Is there a money-back guarantee?", a: "Yes. All plans come with a 30-day money-back guarantee. New authors can try everything risk-free — if it's not right for you, you get a full refund, no questions asked." },
