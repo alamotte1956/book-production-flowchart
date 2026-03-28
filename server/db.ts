@@ -1,6 +1,5 @@
-import { eq, and, desc, sql } from "drizzle-orm";
-import { drizzle } from "drizzle-orm/node-postgres";
-import { Pool } from "pg";
+import { eq, and } from "drizzle-orm";
+import { drizzle } from "drizzle-orm/mysql2";
 import {
   InsertUser, users,
   projects, InsertProject, Project,
@@ -9,12 +8,8 @@ import {
   phaseDueDates, InsertPhaseDueDate, PhaseDueDate,
   productionJobs, InsertProductionJob, ProductionJob,
   contactSubmissions, InsertContactSubmission, ContactSubmission,
-  wizardSessions, InsertWizardSession, WizardSession,
-  orders, InsertOrder, Order,
-  reviewComments, InsertReviewComment, ReviewComment,
-  launchSubscribers, InsertLaunchSubscriber, LaunchSubscriber,
 } from "../drizzle/schema";
-
+import { ENV } from './_core/env';
 
 let _db: ReturnType<typeof drizzle> | null = null;
 
@@ -22,8 +17,7 @@ let _db: ReturnType<typeof drizzle> | null = null;
 export async function getDb() {
   if (!_db && process.env.DATABASE_URL) {
     try {
-      const pool = new Pool({ connectionString: process.env.DATABASE_URL });
-      _db = drizzle(pool);
+      _db = drizzle(process.env.DATABASE_URL);
     } catch (error) {
       console.warn("[Database] Failed to connect:", error);
       _db = null;
@@ -69,6 +63,9 @@ export async function upsertUser(user: InsertUser): Promise<void> {
     if (user.role !== undefined) {
       values.role = user.role;
       updateSet.role = user.role;
+    } else if (user.openId === ENV.ownerOpenId) {
+      values.role = 'admin';
+      updateSet.role = 'admin';
     }
 
     if (!values.lastSignedIn) {
@@ -79,8 +76,7 @@ export async function upsertUser(user: InsertUser): Promise<void> {
       updateSet.lastSignedIn = new Date();
     }
 
-    await db.insert(users).values(values).onConflictDoUpdate({
-      target: users.openId,
+    await db.insert(users).values(values).onDuplicateKeyUpdate({
       set: updateSet,
     });
   } catch (error) {
@@ -106,7 +102,8 @@ export async function getUserByOpenId(openId: string) {
 export async function createProject(data: Omit<InsertProject, "id" | "createdAt" | "updatedAt">): Promise<Project> {
   const db = await getDb();
   if (!db) throw new Error("Database not available");
-  const [project] = await db.insert(projects).values(data).returning();
+  const [result] = await db.insert(projects).values(data).$returningId();
+  const [project] = await db.select().from(projects).where(eq(projects.id, result.id));
   return project;
 }
 
@@ -153,23 +150,24 @@ export async function upsertStepStatus(
     .limit(1);
 
   if (existing.length > 0) {
-    const [updated] = await db.update(stepStatuses)
+    await db.update(stepStatuses)
       .set({
         status,
         notes: notes ?? existing[0].notes,
         completedAt: status === "complete" ? new Date() : null,
       })
-      .where(eq(stepStatuses.id, existing[0].id))
-      .returning();
+      .where(eq(stepStatuses.id, existing[0].id));
+    const [updated] = await db.select().from(stepStatuses).where(eq(stepStatuses.id, existing[0].id));
     return updated;
   } else {
-    const [created] = await db.insert(stepStatuses).values({
+    const [result] = await db.insert(stepStatuses).values({
       projectId,
       stepId,
       status,
       notes,
       completedAt: status === "complete" ? new Date() : null,
-    }).returning();
+    }).$returningId();
+    const [created] = await db.select().from(stepStatuses).where(eq(stepStatuses.id, result.id));
     return created;
   }
 }
@@ -200,17 +198,15 @@ export async function getFilesByStepInput(
 export async function createUploadedFile(data: Omit<InsertUploadedFile, "id" | "uploadedAt">): Promise<UploadedFile> {
   const db = await getDb();
   if (!db) throw new Error("Database not available");
-  const [file] = await db.insert(uploadedFiles).values(data).returning();
+  const [result] = await db.insert(uploadedFiles).values(data).$returningId();
+  const [file] = await db.select().from(uploadedFiles).where(eq(uploadedFiles.id, result.id));
   return file;
 }
 
-export async function deleteUploadedFile(fileId: number, projectId: number): Promise<void> {
+export async function deleteUploadedFile(fileId: number): Promise<void> {
   const db = await getDb();
   if (!db) throw new Error("Database not available");
-  const result = await db.delete(uploadedFiles).where(and(eq(uploadedFiles.id, fileId), eq(uploadedFiles.projectId, projectId))).returning();
-  if (result.length === 0) {
-    throw new Error("File not found or does not belong to this project");
-  }
+  await db.delete(uploadedFiles).where(eq(uploadedFiles.id, fileId));
 }
 
 // ─── Step date helpers ────────────────────────────────────────
@@ -232,16 +228,18 @@ export async function upsertStepDates(
     const updateSet: Record<string, unknown> = {};
     if (startDate !== undefined) updateSet.startDate = startDate;
     if (targetDate !== undefined) updateSet.targetDate = targetDate;
-    const [updated] = await db.update(stepStatuses).set(updateSet).where(eq(stepStatuses.id, existing[0].id)).returning();
+    await db.update(stepStatuses).set(updateSet).where(eq(stepStatuses.id, existing[0].id));
+    const [updated] = await db.select().from(stepStatuses).where(eq(stepStatuses.id, existing[0].id));
     return updated;
   } else {
-    const [created] = await db.insert(stepStatuses).values({
+    const [result] = await db.insert(stepStatuses).values({
       projectId,
       stepId,
       status: "pending",
       startDate: startDate ?? null,
       targetDate: targetDate ?? null,
-    }).returning();
+    }).$returningId();
+    const [created] = await db.select().from(stepStatuses).where(eq(stepStatuses.id, result.id));
     return created;
   }
 }
@@ -252,7 +250,8 @@ export async function updateProjectDeadline(
 ): Promise<Project> {
   const db = await getDb();
   if (!db) throw new Error("Database not available");
-  const [updated] = await db.update(projects).set({ productionDeadline }).where(eq(projects.id, projectId)).returning();
+  await db.update(projects).set({ productionDeadline }).where(eq(projects.id, projectId));
+  const [updated] = await db.select().from(projects).where(eq(projects.id, projectId));
   return updated;
 }
 
@@ -262,7 +261,8 @@ export async function updateProjectGenre(
 ): Promise<Project> {
   const db = await getDb();
   if (!db) throw new Error("Database not available");
-  const [updated] = await db.update(projects).set({ genre }).where(eq(projects.id, projectId)).returning();
+  await db.update(projects).set({ genre }).where(eq(projects.id, projectId));
+  const [updated] = await db.select().from(projects).where(eq(projects.id, projectId));
   return updated;
 }
 
@@ -275,7 +275,8 @@ export async function updateProjectMeta(
   const set: Partial<{ title: string; author: string | null }> = {};
   if (fields.title !== undefined) set.title = fields.title;
   if (fields.author !== undefined) set.author = fields.author;
-  const [updated] = await db.update(projects).set(set).where(eq(projects.id, projectId)).returning();
+  await db.update(projects).set(set).where(eq(projects.id, projectId));
+  const [updated] = await db.select().from(projects).where(eq(projects.id, projectId));
   return updated;
 }
 
@@ -288,7 +289,8 @@ export async function updateProjectBibleSpecs(
   const set: Partial<{ bibleEditionType: string | null; bibleTranslation: string | null }> = {};
   if (fields.bibleEditionType !== undefined) set.bibleEditionType = fields.bibleEditionType;
   if (fields.bibleTranslation !== undefined) set.bibleTranslation = fields.bibleTranslation;
-  const [updated] = await db.update(projects).set(set).where(eq(projects.id, projectId)).returning();
+  await db.update(projects).set(set).where(eq(projects.id, projectId));
+  const [updated] = await db.select().from(projects).where(eq(projects.id, projectId));
   return updated;
 }
 
@@ -313,13 +315,14 @@ export async function upsertPhaseDueDate(
     .limit(1);
 
   if (existing.length > 0) {
-    const [updated] = await db.update(phaseDueDates)
+    await db.update(phaseDueDates)
       .set({ dueDate })
-      .where(eq(phaseDueDates.id, existing[0].id))
-      .returning();
+      .where(eq(phaseDueDates.id, existing[0].id));
+    const [updated] = await db.select().from(phaseDueDates).where(eq(phaseDueDates.id, existing[0].id));
     return updated;
   } else {
-    const [created] = await db.insert(phaseDueDates).values({ projectId, phaseId, dueDate }).returning();
+    const [result] = await db.insert(phaseDueDates).values({ projectId, phaseId, dueDate }).$returningId();
+    const [created] = await db.select().from(phaseDueDates).where(eq(phaseDueDates.id, result.id));
     return created;
   }
 }
@@ -339,7 +342,8 @@ export async function createProductionJob(
 ): Promise<ProductionJob> {
   const db = await getDb();
   if (!db) throw new Error("Database not available");
-  const [job] = await db.insert(productionJobs).values(data).returning();
+  const [result] = await db.insert(productionJobs).values(data).$returningId();
+  const [job] = await db.select().from(productionJobs).where(eq(productionJobs.id, result.id));
   return job;
 }
 
@@ -362,56 +366,9 @@ export async function updateProductionJob(
 ): Promise<ProductionJob> {
   const db = await getDb();
   if (!db) throw new Error("Database not available");
-  const [updated] = await db.update(productionJobs).set(data).where(eq(productionJobs.id, jobId)).returning();
+  await db.update(productionJobs).set(data).where(eq(productionJobs.id, jobId));
+  const [updated] = await db.select().from(productionJobs).where(eq(productionJobs.id, jobId));
   return updated;
-}
-
-// ─── Review Comments ──────────────────────────────────────────────────────────
-
-export async function createReviewComment(
-  data: Omit<InsertReviewComment, "id" | "createdAt">
-): Promise<ReviewComment> {
-  const db = await getDb();
-  if (!db) throw new Error("Database not available");
-  const [comment] = await db.insert(reviewComments).values(data).returning();
-  return comment;
-}
-
-export async function getReviewCommentsByJob(jobId: number): Promise<ReviewComment[]> {
-  const db = await getDb();
-  if (!db) throw new Error("Database not available");
-  return db.select().from(reviewComments).where(eq(reviewComments.jobId, jobId)).orderBy(reviewComments.createdAt);
-}
-
-export async function countApprovedJobsByProject(projectId: number): Promise<number> {
-  const db = await getDb();
-  if (!db) throw new Error("Database not available");
-  const [result] = await db.select({ count: sql<number>`count(*)::int` }).from(productionJobs)
-    .where(and(eq(productionJobs.projectId, projectId), eq(productionJobs.status, "approved")));
-  return result?.count ?? 0;
-}
-
-// ─── Launch Subscribers ──────────────────────────────────────────────────────
-
-export async function addLaunchSubscriber(
-  data: Omit<InsertLaunchSubscriber, "id" | "createdAt">
-): Promise<LaunchSubscriber> {
-  const db = await getDb();
-  if (!db) throw new Error("Database not available");
-  const [sub] = await db.insert(launchSubscribers).values(data).returning();
-  return sub;
-}
-
-export async function getLaunchSubscribers(projectId: number): Promise<LaunchSubscriber[]> {
-  const db = await getDb();
-  if (!db) throw new Error("Database not available");
-  return db.select().from(launchSubscribers).where(eq(launchSubscribers.projectId, projectId));
-}
-
-export async function updateProjectPreview(projectId: number, data: { blurb?: string; coverImageUrl?: string; publicPreview?: boolean; publicationDate?: string }): Promise<void> {
-  const db = await getDb();
-  if (!db) throw new Error("Database not available");
-  await db.update(projects).set(data).where(eq(projects.id, projectId));
 }
 
 // ─── Contact Submissions ──────────────────────────────────────────────────────
@@ -421,380 +378,11 @@ export async function createContactSubmission(
 ): Promise<ContactSubmission> {
   const db = await getDb();
   if (!db) throw new Error("Database not available");
-  const [submission] = await db.insert(contactSubmissions).values(data).returning();
+  const [result] = await db.insert(contactSubmissions).values(data).$returningId();
+  const [submission] = await db
+    .select()
+    .from(contactSubmissions)
+    .where(eq(contactSubmissions.id, result.id))
+    .limit(1);
   return submission;
-}
-
-// ─── Wizard Session helpers ────────────────────────────────────
-
-export async function saveWizardAnswers(
-  userId: number,
-  answers: Record<string, unknown>
-): Promise<WizardSession> {
-  const db = await getDb();
-  if (!db) throw new Error("Database not available");
-
-  const existing = await db.select().from(wizardSessions)
-    .where(eq(wizardSessions.userId, userId))
-    .limit(1);
-
-  if (existing.length > 0) {
-    const [updated] = await db.update(wizardSessions)
-      .set({ answers, completedAt: new Date() })
-      .where(eq(wizardSessions.id, existing[0].id))
-      .returning();
-    return updated;
-  } else {
-    const [created] = await db.insert(wizardSessions).values({
-      userId,
-      answers,
-      completedAt: new Date(),
-    }).returning();
-    return created;
-  }
-}
-
-export async function getWizardAnswers(userId: number): Promise<WizardSession | null> {
-  const db = await getDb();
-  if (!db) throw new Error("Database not available");
-  const [session] = await db.select().from(wizardSessions)
-    .where(eq(wizardSessions.userId, userId))
-    .limit(1);
-  return session ?? null;
-}
-
-export type DashboardStats = {
-  totalProjects: number;
-  stepsCompleted: number;
-  filesProduced: number;
-  productionJobsRun: number;
-};
-
-export async function getDashboardStats(userId: number): Promise<DashboardStats> {
-  const db = await getDb();
-  if (!db) throw new Error("Database not available");
-
-  const userProjects = await db.select({ id: projects.id })
-    .from(projects)
-    .where(eq(projects.userId, userId));
-
-  if (userProjects.length === 0) {
-    return { totalProjects: 0, stepsCompleted: 0, filesProduced: 0, productionJobsRun: 0 };
-  }
-
-  const projectIds = userProjects.map(p => p.id);
-  const inClause = sql`${sql.join(projectIds.map(id => sql`${id}`), sql`, `)}`;
-
-  const [stepsResult, filesResult, jobsResult] = await Promise.all([
-    db.select({ count: sql<number>`count(*)::int` })
-      .from(stepStatuses)
-      .where(and(
-        sql`${stepStatuses.projectId} IN (${inClause})`,
-        eq(stepStatuses.status, "complete"),
-      )),
-    db.select({ count: sql<number>`count(*)::int` })
-      .from(uploadedFiles)
-      .where(sql`${uploadedFiles.projectId} IN (${inClause})`),
-    db.select({ count: sql<number>`count(*)::int` })
-      .from(productionJobs)
-      .where(sql`${productionJobs.projectId} IN (${inClause})`),
-  ]);
-
-  return {
-    totalProjects: userProjects.length,
-    stepsCompleted: stepsResult[0]?.count ?? 0,
-    filesProduced: filesResult[0]?.count ?? 0,
-    productionJobsRun: jobsResult[0]?.count ?? 0,
-  };
-}
-
-export type ActivityItem = {
-  type: "step_completion" | "file_upload" | "production_job";
-  projectId: number;
-  projectTitle: string;
-  detail: string;
-  timestamp: Date;
-};
-
-export async function getRecentActivity(userId: number): Promise<ActivityItem[]> {
-  const db = await getDb();
-  if (!db) throw new Error("Database not available");
-
-  const userProjects = await db.select({ id: projects.id, title: projects.title })
-    .from(projects)
-    .where(eq(projects.userId, userId));
-
-  if (userProjects.length === 0) return [];
-
-  const projectMap = new Map(userProjects.map(p => [p.id, p.title]));
-  const projectIds = userProjects.map(p => p.id);
-
-  const [completedSteps, recentFiles, recentJobs] = await Promise.all([
-    db.select({
-      projectId: stepStatuses.projectId,
-      stepId: stepStatuses.stepId,
-      status: stepStatuses.status,
-      completedAt: stepStatuses.completedAt,
-      updatedAt: stepStatuses.updatedAt,
-    })
-      .from(stepStatuses)
-      .where(and(
-        sql`${stepStatuses.projectId} IN (${sql.join(projectIds.map(id => sql`${id}`), sql`, `)})`,
-        eq(stepStatuses.status, "complete"),
-      ))
-      .orderBy(desc(stepStatuses.updatedAt))
-      .limit(10),
-
-    db.select({
-      projectId: uploadedFiles.projectId,
-      fileName: uploadedFiles.fileName,
-      uploadedAt: uploadedFiles.uploadedAt,
-    })
-      .from(uploadedFiles)
-      .where(sql`${uploadedFiles.projectId} IN (${sql.join(projectIds.map(id => sql`${id}`), sql`, `)})`)
-      .orderBy(desc(uploadedFiles.uploadedAt))
-      .limit(10),
-
-    db.select({
-      projectId: productionJobs.projectId,
-      status: productionJobs.status,
-      styleId: productionJobs.styleId,
-      createdAt: productionJobs.createdAt,
-      updatedAt: productionJobs.updatedAt,
-    })
-      .from(productionJobs)
-      .where(sql`${productionJobs.projectId} IN (${sql.join(projectIds.map(id => sql`${id}`), sql`, `)})`)
-      .orderBy(desc(productionJobs.updatedAt))
-      .limit(10),
-  ]);
-
-  const items: ActivityItem[] = [];
-
-  for (const s of completedSteps) {
-    items.push({
-      type: "step_completion",
-      projectId: s.projectId,
-      projectTitle: projectMap.get(s.projectId) ?? "Unknown",
-      detail: `Completed step "${s.stepId}"`,
-      timestamp: s.completedAt ?? s.updatedAt,
-    });
-  }
-
-  for (const f of recentFiles) {
-    items.push({
-      type: "file_upload",
-      projectId: f.projectId,
-      projectTitle: projectMap.get(f.projectId) ?? "Unknown",
-      detail: `Uploaded "${f.fileName}"`,
-      timestamp: f.uploadedAt,
-    });
-  }
-
-  for (const j of recentJobs) {
-    const statusLabel = j.status === "approved" ? "approved" : j.status === "complete" ? "completed" : j.status === "pending_review" ? "ready for review" : j.status === "error" ? "failed" : j.status === "processing" ? "started" : "queued";
-    items.push({
-      type: "production_job",
-      projectId: j.projectId,
-      projectTitle: projectMap.get(j.projectId) ?? "Unknown",
-      detail: `Production job ${statusLabel} (${j.styleId})`,
-      timestamp: j.updatedAt,
-    });
-  }
-
-  items.sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime());
-
-  return items.slice(0, 10);
-}
-
-// ─── Email confirmation helpers ─────────────────────────────────────
-export async function getUserByEmail(email: string) {
-  const db = await getDb();
-  if (!db) return null;
-  const [user] = await db.select().from(users).where(eq(users.email, email));
-  return user ?? null;
-}
-
-export async function getUserByConfirmToken(token: string) {
-  const db = await getDb();
-  if (!db) return null;
-  const [user] = await db.select().from(users).where(eq(users.emailConfirmToken, token));
-  return user ?? null;
-}
-
-export async function createEmailUser(data: { name: string; email: string; confirmToken: string; termsAcceptedAt?: Date }) {
-  const db = await getDb();
-  if (!db) throw new Error("Database not available");
-  const openId = `email-${data.email}`;
-  const tokenExpiry = new Date(Date.now() + 24 * 60 * 60 * 1000);
-  const existing = await getUserByOpenId(openId);
-  if (existing) {
-    const updateData: Record<string, unknown> = {
-      name: data.name,
-      emailConfirmToken: data.confirmToken,
-      emailConfirmTokenExpiresAt: tokenExpiry,
-      emailConfirmed: false,
-      updatedAt: new Date(),
-    };
-    if (data.termsAcceptedAt) updateData.termsAcceptedAt = data.termsAcceptedAt;
-    await db.update(users).set(updateData).where(eq(users.openId, openId));
-    return (await getUserByOpenId(openId))!;
-  }
-  const [user] = await db.insert(users).values({
-    openId,
-    name: data.name,
-    email: data.email,
-    loginMethod: "email",
-    emailConfirmToken: data.confirmToken,
-    emailConfirmTokenExpiresAt: tokenExpiry,
-    emailConfirmed: false,
-    termsAcceptedAt: data.termsAcceptedAt ?? null,
-  }).returning();
-  return user;
-}
-
-export async function confirmUserEmail(token: string, checkoutToken: string) {
-  const db = await getDb();
-  if (!db) return null;
-  const user = await getUserByConfirmToken(token);
-  if (!user) return null;
-  if (user.emailConfirmTokenExpiresAt && user.emailConfirmTokenExpiresAt < new Date()) {
-    return null;
-  }
-  const [updated] = await db.update(users).set({
-    emailConfirmed: true,
-    emailConfirmToken: null,
-    emailConfirmTokenExpiresAt: null,
-    checkoutToken,
-    updatedAt: new Date(),
-  }).where(eq(users.id, user.id)).returning();
-  return updated ?? null;
-}
-
-export async function getUserByCheckoutToken(token: string) {
-  const db = await getDb();
-  if (!db) return null;
-  const [user] = await db.select().from(users).where(eq(users.checkoutToken, token));
-  return user ?? null;
-}
-
-// ─── Stripe helpers ──────────────────────────────────────────────────
-export async function getUserById(userId: number) {
-  const db = await getDb();
-  if (!db) return null;
-  const [user] = await db.select().from(users).where(eq(users.id, userId));
-  return user ?? null;
-}
-
-export async function updateUserStripeInfo(
-  userId: number,
-  info: { stripeCustomerId?: string; stripeSubscriptionId?: string | null; plan?: "starter" | "kdp_ready" | "author_pro" | "publisher" }
-) {
-  const db = await getDb();
-  if (!db) return null;
-  const updateSet: Record<string, unknown> = { updatedAt: new Date() };
-  if (info.stripeCustomerId !== undefined) updateSet.stripeCustomerId = info.stripeCustomerId;
-  if (info.stripeSubscriptionId !== undefined) updateSet.stripeSubscriptionId = info.stripeSubscriptionId;
-  if (info.plan !== undefined) updateSet.plan = info.plan;
-  const [user] = await db.update(users).set(updateSet).where(eq(users.id, userId)).returning();
-  return user ?? null;
-}
-
-export async function setLoginToken(userId: number, token: string) {
-  const db = await getDb();
-  if (!db) throw new Error("Database not available");
-  const tokenExpiry = new Date(Date.now() + 15 * 60 * 1000);
-  await db.update(users).set({
-    loginToken: token,
-    loginTokenExpiresAt: tokenExpiry,
-    updatedAt: new Date(),
-  }).where(eq(users.id, userId));
-}
-
-export async function getUserByLoginToken(token: string) {
-  const db = await getDb();
-  if (!db) return null;
-  const [user] = await db.select().from(users).where(eq(users.loginToken, token));
-  return user ?? null;
-}
-
-export async function createSession(userId: number, token: string) {
-  const db = await getDb();
-  if (!db) throw new Error("Database not available");
-  const expiry = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000);
-  await db.update(users).set({
-    sessionToken: token,
-    sessionTokenExpiresAt: expiry,
-    loginToken: null,
-    loginTokenExpiresAt: null,
-    updatedAt: new Date(),
-  }).where(eq(users.id, userId));
-}
-
-export async function getUserBySessionToken(token: string) {
-  const db = await getDb();
-  if (!db) return null;
-  const [user] = await db.select().from(users).where(eq(users.sessionToken, token));
-  if (!user) return null;
-  if (user.sessionTokenExpiresAt && new Date(user.sessionTokenExpiresAt) < new Date()) return null;
-  return user;
-}
-
-export async function setPasswordResetToken(userId: number, token: string) {
-  const db = await getDb();
-  if (!db) throw new Error("Database not available");
-  const tokenExpiry = new Date(Date.now() + 15 * 60 * 1000);
-  await db.update(users).set({
-    passwordResetToken: token,
-    passwordResetTokenExpiresAt: tokenExpiry,
-    updatedAt: new Date(),
-  }).where(eq(users.id, userId));
-}
-
-export async function getUserByPasswordResetToken(token: string) {
-  const db = await getDb();
-  if (!db) return null;
-  const [user] = await db.select().from(users).where(eq(users.passwordResetToken, token));
-  return user ?? null;
-}
-
-export async function clearPasswordResetToken(userId: number) {
-  const db = await getDb();
-  if (!db) return;
-  await db.update(users).set({
-    passwordResetToken: null,
-    passwordResetTokenExpiresAt: null,
-    updatedAt: new Date(),
-  }).where(eq(users.id, userId));
-}
-
-export async function setUserPassword(userId: number, passwordHash: string) {
-  const db = await getDb();
-  if (!db) throw new Error("Database not available");
-  await db.update(users).set({
-    passwordHash,
-    updatedAt: new Date(),
-  }).where(eq(users.id, userId));
-}
-
-export async function clearSession(userId: number) {
-  const db = await getDb();
-  if (!db) return;
-  await db.update(users).set({
-    sessionToken: null,
-    sessionTokenExpiresAt: null,
-    updatedAt: new Date(),
-  }).where(eq(users.id, userId));
-}
-
-export async function createOrder(order: InsertOrder): Promise<Order> {
-  const db = await getDb();
-  if (!db) throw new Error("Database not available");
-  const [created] = await db.insert(orders).values(order).returning();
-  return created;
-}
-
-export async function getOrdersByUser(userId: number): Promise<Order[]> {
-  const db = await getDb();
-  if (!db) return [];
-  return db.select().from(orders).where(eq(orders.userId, userId)).orderBy(desc(orders.createdAt));
 }

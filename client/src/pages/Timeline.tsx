@@ -10,8 +10,7 @@ import { useState, useMemo, useCallback } from "react";
 import { Link, useParams, useLocation } from "wouter";
 import { trpc } from "@/lib/trpc";
 import { useAuth } from "@/_core/hooks/useAuth";
-import { usePlan } from "@/hooks/usePlan";
-import { UpgradeGate } from "@/components/UpgradeGate";
+import { getLoginUrl } from "@/const";
 import { phases } from "@/data/flowchartData";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -20,7 +19,6 @@ import {
   ArrowLeft, Calendar, Clock, AlertTriangle, CheckCircle2,
   SkipForward, Circle, LayoutList, BarChart2, Target, ChevronDown, ChevronRight
 } from "lucide-react";
-import SiteFooter from "@/components/SiteFooter";
 
 // ─── Types ────────────────────────────────────────────────────────
 
@@ -68,22 +66,12 @@ const STATUS_STYLES: Record<string, { label: string; color: string; bg: string; 
   "overdue":     { label: "Overdue",     color: "#c0392b", bg: "#fdf0ef", icon: <AlertTriangle size={12} /> },
   "due-soon":    { label: "Due Soon",    color: "#d68910", bg: "#fef9ec", icon: <Clock size={12} /> },
   "on-track":    { label: "On Track",    color: "#2471a3", bg: "#eaf4fb", icon: <Calendar size={12} /> },
-  "unscheduled": { label: "Unscheduled", color: "#a89880", bg: "#f3efe6", icon: <Circle size={12} /> },
+  "unscheduled": { label: "Unscheduled", color: "#a89880", bg: "#faf6ef", icon: <Circle size={12} /> },
 };
 
 // ─── Component ───────────────────────────────────────────────────
 
-function TimelineGate() {
-  const { canAccess } = usePlan();
-  if (!canAccess("timeline")) {
-    return <UpgradeGate feature="timeline"><span /></UpgradeGate>;
-  }
-  return <TimelineInner />;
-}
-
-export default TimelineGate;
-
-function TimelineInner() {
+export default function Timeline() {
   const { id } = useParams<{ id: string }>();
   const [, navigate] = useLocation();
   const { isAuthenticated, loading: authLoading } = useAuth();
@@ -94,6 +82,11 @@ function TimelineInner() {
   const [editingStep, setEditingStep] = useState<string | null>(null);
   const [editingDeadline, setEditingDeadline] = useState(false);
 
+  // ── Auth redirect
+  if (!authLoading && !isAuthenticated) {
+    window.location.href = getLoginUrl();
+    return null;
+  }
 
   const utils = trpc.useUtils();
 
@@ -150,10 +143,10 @@ function TimelineInner() {
 
   if (authLoading || isLoading) {
     return (
-      <div className="min-h-screen bg-[#f3efe6] flex items-center justify-center">
+      <div className="min-h-screen bg-[#faf6ef] flex items-center justify-center">
         <div className="text-center">
           <div className="w-8 h-8 border-2 border-[#c9a96e] border-t-transparent rounded-full animate-spin mx-auto mb-3" />
-          <p className="text-sm text-[#7a6e60]">Loading timeline…</p>
+          <p className="text-sm text-[#8b7b6b]">Loading timeline…</p>
         </div>
       </div>
     );
@@ -161,8 +154,8 @@ function TimelineInner() {
 
   if (!data) {
     return (
-      <div className="min-h-screen bg-[#f3efe6] flex items-center justify-center">
-        <p className="text-[#7a6e60]">Project not found.</p>
+      <div className="min-h-screen bg-[#faf6ef] flex items-center justify-center">
+        <p className="text-[#8b7b6b]">Project not found.</p>
       </div>
     );
   }
@@ -173,9 +166,9 @@ function TimelineInner() {
     : "unscheduled";
 
   return (
-    <div className="min-h-screen bg-[#f3efe6]">
+    <div className="min-h-screen bg-[#faf6ef]">
       {/* ── Header ── */}
-      <header className="sticky top-0 z-50 bg-[#2a1a0a] text-[#ede7d8] shadow-lg">
+      <header className="sticky top-0 z-50 bg-[#2a1a0a] text-[#f5efe0] shadow-lg">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 py-3 flex items-center gap-3">
           <Button
             variant="ghost" size="icon"
@@ -186,7 +179,7 @@ function TimelineInner() {
           </Button>
           <div className="flex-1 min-w-0">
             <h1 className="font-serif text-base sm:text-lg truncate">{project.title}</h1>
-            <p className="text-xs text-[#c9a96e]/90">Production Timeline</p>
+            <p className="text-xs text-[#c9a96e]/70">Production Timeline</p>
           </div>
 
           {/* Production deadline */}
@@ -203,7 +196,7 @@ function TimelineInner() {
                 <input
                   type="date"
                   defaultValue={formatDateInput(project.productionDeadline)}
-                  className="text-xs bg-[#3a2a1a] border border-[#c9a96e]/30 rounded px-2 py-1 text-[#ede7d8]"
+                  className="text-xs bg-[#3a2a1a] border border-[#c9a96e]/30 rounded px-2 py-1 text-[#f5efe0]"
                   autoFocus
                 />
                 <Button type="submit" size="sm" className="h-7 text-xs bg-[#c9a96e] text-[#2a1a0a] hover:bg-[#a07840]">
@@ -215,7 +208,7 @@ function TimelineInner() {
             ) : (
               <button
                 onClick={() => setEditingDeadline(true)}
-                className="flex items-center gap-1.5 text-xs text-[#c9a96e]/90 hover:text-[#c9a96e] transition-colors"
+                className="flex items-center gap-1.5 text-xs text-[#c9a96e]/70 hover:text-[#c9a96e] transition-colors"
               >
                 <Target size={13} />
                 {project.productionDeadline
@@ -230,13 +223,13 @@ function TimelineInner() {
           <div className="flex items-center gap-1 bg-[#3a2a1a] rounded-lg p-1">
             <button
               onClick={() => setViewMode("table")}
-              className={`flex items-center gap-1 px-2 py-1 rounded text-xs transition-colors ${viewMode === "table" ? "bg-[#c9a96e] text-[#2a1a0a] font-medium" : "text-[#c9a96e]/80 hover:text-[#c9a96e]"}`}
+              className={`flex items-center gap-1 px-2 py-1 rounded text-xs transition-colors ${viewMode === "table" ? "bg-[#c9a96e] text-[#2a1a0a] font-medium" : "text-[#c9a96e]/60 hover:text-[#c9a96e]"}`}
             >
               <LayoutList size={12} /> Table
             </button>
             <button
               onClick={() => setViewMode("gantt")}
-              className={`flex items-center gap-1 px-2 py-1 rounded text-xs transition-colors ${viewMode === "gantt" ? "bg-[#c9a96e] text-[#2a1a0a] font-medium" : "text-[#c9a96e]/80 hover:text-[#c9a96e]"}`}
+              className={`flex items-center gap-1 px-2 py-1 rounded text-xs transition-colors ${viewMode === "gantt" ? "bg-[#c9a96e] text-[#2a1a0a] font-medium" : "text-[#c9a96e]/60 hover:text-[#c9a96e]"}`}
             >
               <BarChart2 size={12} /> Gantt
             </button>
@@ -250,10 +243,10 @@ function TimelineInner() {
           <div className="flex items-center gap-1.5 text-[#2d7a4f]">
             <CheckCircle2 size={13} /> <strong>{summary.complete}</strong> complete
           </div>
-          <div className="flex items-center gap-1.5 text-[#7a6e60]">
+          <div className="flex items-center gap-1.5 text-[#8b7b6b]">
             <SkipForward size={13} /> <strong>{summary.skipped}</strong> skipped
           </div>
-          <div className="flex items-center gap-1.5 text-[#8b7b6b]">
+          <div className="flex items-center gap-1.5 text-[#a89880]">
             <Circle size={13} /> <strong>{summary.pending}</strong> pending
           </div>
           {summary.overdue > 0 && (
@@ -295,7 +288,7 @@ function TimelineInner() {
                   {/* Phase header */}
                   <button
                     onClick={() => togglePhase(phase.id)}
-                    className="w-full flex items-center gap-3 px-4 py-3 hover:bg-[#f3efe6] transition-colors text-left"
+                    className="w-full flex items-center gap-3 px-4 py-3 hover:bg-[#faf6ef] transition-colors text-left"
                   >
                     <div
                       className="w-7 h-7 rounded-full flex items-center justify-center text-white text-xs font-bold shrink-0"
@@ -305,7 +298,7 @@ function TimelineInner() {
                     </div>
                     <div className="flex-1 min-w-0">
                       <span className="font-serif text-sm text-[#3a2a1a]">{phase.title}</span>
-                      <span className="ml-2 text-xs text-[#8b7b6b]">{phaseComplete}/{phaseSteps.length} complete</span>
+                      <span className="ml-2 text-xs text-[#a89880]">{phaseComplete}/{phaseSteps.length} complete</span>
                     </div>
                     {/* Phase progress bar */}
                     <div className="hidden sm:flex items-center gap-2 w-32">
@@ -318,11 +311,11 @@ function TimelineInner() {
                           }}
                         />
                       </div>
-                      <span className="text-xs text-[#8b7b6b] w-8 text-right">
+                      <span className="text-xs text-[#a89880] w-8 text-right">
                         {phaseSteps.length ? Math.round((phaseComplete / phaseSteps.length) * 100) : 0}%
                       </span>
                     </div>
-                    {isExpanded ? <ChevronDown size={14} className="text-[#8b7b6b] shrink-0" /> : <ChevronRight size={14} className="text-[#8b7b6b] shrink-0" />}
+                    {isExpanded ? <ChevronDown size={14} className="text-[#a89880] shrink-0" /> : <ChevronRight size={14} className="text-[#a89880] shrink-0" />}
                   </button>
 
                   {/* Step rows */}
@@ -330,7 +323,7 @@ function TimelineInner() {
                     <div className="border-t border-[#e8dfd0]">
                       <table className="w-full text-xs">
                         <thead>
-                          <tr className="bg-[#f3efe6] text-[#8b7b6b] uppercase tracking-wide">
+                          <tr className="bg-[#faf6ef] text-[#a89880] uppercase tracking-wide">
                             <th className="text-left px-4 py-2 font-semibold">Step</th>
                             <th className="text-left px-3 py-2 font-semibold hidden sm:table-cell">Est. Duration</th>
                             <th className="text-left px-3 py-2 font-semibold hidden md:table-cell">Start Date</th>
@@ -348,7 +341,7 @@ function TimelineInner() {
                             return (
                               <tr
                                 key={step.id}
-                                className={`border-t border-[#f0e8dc] hover:bg-[#f3efe6]/50 transition-colors ${idx % 2 === 0 ? "" : "bg-[#fdfaf5]"}`}
+                                className={`border-t border-[#f0e8dc] hover:bg-[#faf6ef]/50 transition-colors ${idx % 2 === 0 ? "" : "bg-[#fdfaf5]"}`}
                               >
                                 {/* Step name */}
                                 <td className="px-4 py-2.5">
@@ -356,7 +349,7 @@ function TimelineInner() {
                                 </td>
 
                                 {/* Estimated duration */}
-                                <td className="px-3 py-2.5 text-[#8b7b6b] hidden sm:table-cell">
+                                <td className="px-3 py-2.5 text-[#a89880] hidden sm:table-cell">
                                   {step.estimatedDays >= 30
                                     ? `~${Math.round(step.estimatedDays / 30)} mo`
                                     : `${step.estimatedDays}d`}
@@ -380,7 +373,7 @@ function TimelineInner() {
                                   ) : (
                                     <button
                                       onClick={() => setEditingStep(step.id)}
-                                      className="text-[#8b7b6b] hover:text-[#c9a96e] transition-colors"
+                                      className="text-[#a89880] hover:text-[#c9a96e] transition-colors"
                                     >
                                       {status?.startDate ? formatDate(status.startDate) : <span className="text-[#d0c8bc]">Set date</span>}
                                     </button>
@@ -405,7 +398,7 @@ function TimelineInner() {
                                   ) : (
                                     <button
                                       onClick={() => setEditingStep(step.id)}
-                                      className="text-[#8b7b6b] hover:text-[#c9a96e] transition-colors"
+                                      className="text-[#a89880] hover:text-[#c9a96e] transition-colors"
                                     >
                                       {status?.targetDate ? formatDate(status.targetDate) : <span className="text-[#d0c8bc]">Set date</span>}
                                     </button>
@@ -423,7 +416,7 @@ function TimelineInner() {
                                 </td>
 
                                 {/* Notes */}
-                                <td className="px-3 py-2.5 text-[#7a6e60] max-w-[200px] truncate hidden lg:table-cell">
+                                <td className="px-3 py-2.5 text-[#8b7b6b] max-w-[200px] truncate hidden lg:table-cell">
                                   {status?.notes || <span className="text-[#d0c8bc]">—</span>}
                                 </td>
                               </tr>
@@ -440,7 +433,7 @@ function TimelineInner() {
         ) : (
           /* ══ GANTT VIEW ══ */
           <div className="space-y-4">
-            <p className="text-xs text-[#8b7b6b] mb-2">Bar width represents estimated industry-standard duration relative to the full production timeline ({totalEstimatedDays} business days total).</p>
+            <p className="text-xs text-[#a89880] mb-2">Bar width represents estimated industry-standard duration relative to the full production timeline ({totalEstimatedDays} business days total).</p>
             {phases.map(phase => {
               const phaseSteps = allSteps.filter(s => s.phase.id === phase.id);
               const isExpanded = expandedPhases.has(phase.id);
@@ -450,7 +443,7 @@ function TimelineInner() {
                   {/* Phase header */}
                   <button
                     onClick={() => togglePhase(phase.id)}
-                    className="w-full flex items-center gap-3 px-4 py-3 hover:bg-[#f3efe6] transition-colors text-left"
+                    className="w-full flex items-center gap-3 px-4 py-3 hover:bg-[#faf6ef] transition-colors text-left"
                   >
                     <div
                       className="w-7 h-7 rounded-full flex items-center justify-center text-white text-xs font-bold shrink-0"
@@ -459,7 +452,7 @@ function TimelineInner() {
                       {phase.number}
                     </div>
                     <span className="font-serif text-sm text-[#3a2a1a] flex-1">{phase.title}</span>
-                    {isExpanded ? <ChevronDown size={14} className="text-[#8b7b6b]" /> : <ChevronRight size={14} className="text-[#8b7b6b]" />}
+                    {isExpanded ? <ChevronDown size={14} className="text-[#a89880]" /> : <ChevronRight size={14} className="text-[#a89880]" />}
                   </button>
 
                   {isExpanded && (
@@ -522,16 +515,16 @@ function TimelineInner() {
       </div>
 
       {/* Related Tools footer backlinks */}
-      <div className="border-t border-[#e8dfd0] bg-[#f3efe6] px-6 py-6">
+      <div className="border-t border-[#e8dfd0] bg-[#faf6ef] px-6 py-6">
         <div className="max-w-5xl mx-auto">
-          <p className="text-xs text-[#7a6e60] mb-3 font-semibold uppercase tracking-wide">Other Self-Publishing Tools</p>
+          <p className="text-xs text-[#8b7b6b] mb-3 font-semibold uppercase tracking-wide">Other Self-Publishing Tools</p>
           <div className="flex flex-wrap gap-2">
             {[
               { href: "/bible-studio", label: "Bible Design Studio" },
               { href: "/spine-calculator", label: "Spine Calculator" },
               { href: "/cover-designer", label: "Cover Designer" },
               { href: "/isbn-manager", label: "ISBN & Metadata" },
-              { href: "/auto-produce/0", label: "Auto-Produce" },
+              { href: "/auto-produce", label: "Auto-Produce" },
               { href: "/resources", label: "Resources Hub" },
               { href: "/guide", label: "User Guide" },
             ].map(({ href, label }) => (
@@ -543,7 +536,6 @@ function TimelineInner() {
           </div>
         </div>
       </div>
-      <SiteFooter />
     </div>
   );
 }

@@ -8,11 +8,10 @@
  * confirm the look before committing to the full pipeline.
  */
 import { useState, useRef, useCallback, useEffect } from "react";
-import { Link, useParams, useLocation, useSearch } from "wouter";
+import { Link, useParams, useLocation } from "wouter";
 import { trpc } from "@/lib/trpc";
 import { useAuth } from "@/_core/hooks/useAuth";
-import { usePlan } from "@/hooks/usePlan";
-import { UpgradeGate } from "@/components/UpgradeGate";
+import { getLoginUrl } from "@/const";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -23,17 +22,10 @@ import { toast } from "sonner";
 import {
   ArrowLeft, Upload, FileText, Wand2, Download, AlertCircle,
   CheckCircle2, Clock, Loader2, BookOpen, FileDown, Sparkles, Eye, X,
-  ChevronDown, ChevronUp, RefreshCw, Copy, Terminal, Type,
-  File, Image, Archive, FileCode, FileSpreadsheet, ShieldCheck, Info,
-  GitCompare, History, ExternalLink,
+  ChevronDown, ChevronUp, RefreshCw, Copy, Terminal,
+  File, Image, Archive, FileCode, FileSpreadsheet,
 } from "lucide-react";
-import { Tooltip, TooltipTrigger, TooltipContent } from "@/components/ui/tooltip";
-import WhatsNext from "@/components/WhatsNext";
-import ProofOrderGuide from "@/components/ProofOrderGuide";
-import type { NextPrompt } from "@shared/prompts";
-import { isKdpCompatible } from "@shared/bibleSpecs";
 import JSZip from "jszip";
-import SiteFooter from "@/components/SiteFooter";
 
 const MAX_FILE_SIZE_MB = 50;
 const ACCEPTED_TYPES = [
@@ -45,30 +37,20 @@ const ACCEPTED_TYPES = [
   // Plain text & markup
   "text/plain",
   "text/markdown",
-  "text/x-markdown",
   "text/html",
-  "application/xhtml+xml",
-  "text/xml",
-  "application/xml",
   "text/rtf",
   "application/rtf",
-  "application/x-rtf",
   // Excel / Spreadsheets
   "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
   "application/vnd.ms-excel",
   // Apple Numbers (zip-based)
   "application/vnd.apple.numbers",
-  "application/x-iwork-numbers-sffnumbers",
   // OpenDocument
   "application/vnd.oasis.opendocument.text",
   "application/vnd.oasis.opendocument.spreadsheet",
-  // CSV / TSV
+  // CSV
   "text/csv",
   "application/csv",
-  "text/tab-separated-values",
-  // Data formats
-  "application/json",
-  "text/json",
   // ePub
   "application/epub+zip",
   // Images
@@ -86,52 +68,20 @@ const ACCEPTED_TYPES = [
   "application/octet-stream",
 ];
 const ACCEPTED_EXT = [
-  ".docx", ".doc", ".odt", ".pages",
+  ".docx", ".doc",
   ".pdf",
-  ".txt", ".text", ".log", ".asc",
-  ".md", ".markdown", ".mdx",
-  ".html", ".htm", ".xml",
+  ".txt", ".md", ".markdown", ".html", ".htm",
   ".rtf",
   ".xlsx", ".xls",
   ".numbers",
-  ".ods",
-  ".csv", ".tsv",
-  ".json", ".yaml", ".yml",
+  ".odt", ".ods",
+  ".csv",
   ".epub",
   // Images
   ".png", ".jpg", ".jpeg", ".webp", ".tiff", ".tif", ".gif", ".svg",
   // Archives
   ".zip", ".rar",
 ].join(",");
-
-const FORMAT_BADGES = [
-  { label: "DOCX", group: "word" },
-  { label: "DOC", group: "word" },
-  { label: "ODT", group: "word" },
-  { label: "Pages", group: "word" },
-  { label: "PDF", group: "pdf" },
-  { label: "RTF", group: "rich" },
-  { label: "TXT", group: "text" },
-  { label: "MD", group: "markup" },
-  { label: "HTML", group: "markup" },
-  { label: "XML", group: "markup" },
-  { label: "CSV", group: "data" },
-  { label: "TSV", group: "data" },
-  { label: "JSON", group: "data" },
-  { label: "YAML", group: "data" },
-  { label: "XLSX", group: "sheet" },
-  { label: "XLS", group: "sheet" },
-  { label: "Numbers", group: "sheet" },
-  { label: "EPUB", group: "ebook" },
-  { label: "PNG", group: "image" },
-  { label: "JPG", group: "image" },
-  { label: "WebP", group: "image" },
-  { label: "SVG", group: "image" },
-  { label: "TIFF", group: "image" },
-  { label: "GIF", group: "image" },
-  { label: "ZIP", group: "archive" },
-  { label: "RAR", group: "archive" },
-] as const;
 
 function fileToBase64(file: File): Promise<string> {
   return new Promise((resolve, reject) => {
@@ -150,8 +100,6 @@ function statusLabel(status: string) {
     case "queued": return "Queued";
     case "processing": return "Processing";
     case "complete": return "Complete";
-    case "pending_review": return "Ready for Review";
-    case "approved": return "Approved";
     case "error": return "Failed";
     default: return status;
   }
@@ -160,8 +108,6 @@ function statusLabel(status: string) {
 function statusColor(status: string): "default" | "secondary" | "destructive" | "outline" {
   switch (status) {
     case "complete": return "default";
-    case "approved": return "default";
-    case "pending_review": return "secondary";
     case "error": return "destructive";
     case "processing": return "secondary";
     default: return "outline";
@@ -173,8 +119,6 @@ function progressPercent(status: string) {
     case "queued": return 10;
     case "processing": return 60;
     case "complete": return 100;
-    case "pending_review": return 100;
-    case "approved": return 100;
     case "error": return 100;
     default: return 0;
   }
@@ -187,13 +131,11 @@ interface StylePreviewModalProps {
   onClose: () => void;
   styleId: string;
   trimSizeId: string;
-  fontOverrideBody?: string;
-  fontOverrideHeading?: string;
 }
 
-function StylePreviewModal({ open, onClose, styleId, trimSizeId, fontOverrideBody, fontOverrideHeading }: StylePreviewModalProps) {
+function StylePreviewModal({ open, onClose, styleId, trimSizeId }: StylePreviewModalProps) {
   const { data, isLoading, error } = trpc.autoProduce.preview.useQuery(
-    { styleId, trimSizeId, fontOverrideBody: fontOverrideBody || undefined, fontOverrideHeading: fontOverrideHeading || undefined },
+    { styleId, trimSizeId },
     { enabled: open && !!styleId && !!trimSizeId }
   );
 
@@ -310,34 +252,10 @@ function StylePreviewModal({ open, onClose, styleId, trimSizeId, fontOverrideBod
 
 // ─── Job Status Card ─────────────────────────────────────────────────────────
 
-function ProcessingSkeleton() {
-  return (
-    <div className="space-y-3 animate-pulse">
-      <div className="flex gap-3">
-        <div className="h-10 bg-[#e8dfd0]/60 rounded-lg flex-1" />
-        <div className="h-10 bg-[#e8dfd0]/60 rounded-lg flex-1" />
-      </div>
-      <div className="h-4 bg-[#e8dfd0]/40 rounded w-3/4" />
-      <div className="h-4 bg-[#e8dfd0]/40 rounded w-1/2" />
-    </div>
-  );
-}
-
-function fileTypeIcon(ext: string) {
-  switch (ext) {
-    case "pdf": return <File className="w-4 h-4" />;
-    case "epub": return <BookOpen className="w-4 h-4" />;
-    case "idml": return <FileCode className="w-4 h-4" />;
-    default: return <FileDown className="w-4 h-4" />;
-  }
-}
-
 function JobCard({ jobId, projectId }: { jobId: number; projectId: number }) {
   const [enabled, setEnabled] = useState(true);
   const [showTechDetails, setShowTechDetails] = useState(false);
   const [retryJobId, setRetryJobId] = useState<number | null>(null);
-  const [reviewComment, setReviewComment] = useState("");
-  const [showPdfPreview, setShowPdfPreview] = useState(false);
   const utils = trpc.useUtils();
 
   const { data: job } = trpc.autoProduce.status.useQuery(
@@ -347,38 +265,6 @@ function JobCard({ jobId, projectId }: { jobId: number; projectId: number }) {
       enabled,
     }
   );
-
-  const { data: comments, refetch: refetchComments } = trpc.autoProduce.getComments.useQuery(
-    { jobId },
-    { enabled: false }
-  );
-
-  const approveMutation = trpc.autoProduce.approve.useMutation({
-    onSuccess: () => {
-      utils.autoProduce.status.invalidate({ jobId });
-      utils.autoProduce.status.refetch({ jobId });
-      toast.success("Output approved and finalized! This job now counts toward your plan.");
-    },
-    onError: (err) => toast.error(`Approval failed: ${err.message}`),
-  });
-
-  const addCommentMutation = trpc.autoProduce.addComment.useMutation({
-    onSuccess: () => {
-      setReviewComment("");
-      refetchComments();
-      toast.success("Comment added.");
-    },
-    onError: (err) => toast.error(`Comment failed: ${err.message}`),
-  });
-
-  const requestRevisionMutation = trpc.autoProduce.requestRevision.useMutation({
-    onSuccess: () => {
-      setReviewComment("");
-      refetchComments();
-      toast.success("Revision notes saved. You can re-run the job with adjustments or contact support.");
-    },
-    onError: (err) => toast.error(`Request failed: ${err.message}`),
-  });
 
   const retryMutation = trpc.autoProduce.retry.useMutation({
     onSuccess: (data) => {
@@ -393,13 +279,7 @@ function JobCard({ jobId, projectId }: { jobId: number; projectId: number }) {
   });
 
   useEffect(() => {
-    if (job?.status === "pending_review") {
-      refetchComments();
-    }
-  }, [job?.status]);
-
-  useEffect(() => {
-    if (job?.status === "complete" || job?.status === "error" || job?.status === "pending_review" || job?.status === "approved") {
+    if (job?.status === "complete" || job?.status === "error") {
       setEnabled(false);
     }
   }, [job?.status]);
@@ -408,340 +288,213 @@ function JobCard({ jobId, projectId }: { jobId: number; projectId: number }) {
 
   const pct = progressPercent(job.status);
   const isActive = job.status === "queued" || job.status === "processing";
-  const estimatedPages = job.wordCount ? Math.ceil(job.wordCount / 250) : null;
 
   return (
-    <Card className={`border shadow-sm transition-all duration-300 ${
-      isActive
-        ? "border-[#c9a96e]/50 bg-gradient-to-br from-white to-[#fdf9f3] shadow-md ring-1 ring-[#c9a96e]/20"
-        : job.status === "pending_review"
-          ? "border-amber-200/60 bg-gradient-to-br from-white to-amber-50/30 shadow-md ring-1 ring-amber-200/30"
-          : job.status === "approved" || job.status === "complete"
-            ? "border-green-200/60 bg-gradient-to-br from-white to-green-50/30 shadow-sm"
-            : "border-red-200/60 bg-white shadow-sm"
-    }`}>
+    <Card className="border border-[#d4b896]/40 bg-[#fdf9f3]">
       <CardHeader className="pb-3">
         <div className="flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <div className={`w-9 h-9 rounded-full flex items-center justify-center flex-shrink-0 ${
-              isActive
-                ? "bg-[#c9a96e]/15 ring-2 ring-[#c9a96e]/30"
-                : job.status === "pending_review"
-                  ? "bg-amber-100 ring-2 ring-amber-200"
-                  : job.status === "approved" || job.status === "complete"
-                    ? "bg-green-100 ring-2 ring-green-200"
-                    : "bg-red-100 ring-2 ring-red-200"
-            }`}>
-              {isActive ? (
-                <Loader2 className="w-4.5 h-4.5 text-[#8b5e3c] animate-spin" />
-              ) : job.status === "pending_review" ? (
-                <Eye className="w-4.5 h-4.5 text-amber-600" />
-              ) : job.status === "approved" || job.status === "complete" ? (
-                <CheckCircle2 className="w-4.5 h-4.5 text-green-600" />
-              ) : (
-                <AlertCircle className="w-4.5 h-4.5 text-red-500" />
-              )}
-            </div>
-            <div className="min-w-0">
-              <CardTitle className="text-sm font-semibold text-[#2c1a00] truncate">
-                {job.manuscriptFileName ?? "Manuscript"}
-              </CardTitle>
-              <p className="text-xs text-[#a09080] mt-0.5">
-                Job #{job.id} · {new Date(job.createdAt).toLocaleDateString(undefined, { month: "short", day: "numeric", year: "numeric" })}
-              </p>
-            </div>
+          <div className="flex items-center gap-2">
+            {isActive ? (
+              <Loader2 className="w-4 h-4 text-[#8b5e3c] animate-spin" />
+            ) : job.status === "complete" ? (
+              <CheckCircle2 className="w-4 h-4 text-green-600" />
+            ) : (
+              <AlertCircle className="w-4 h-4 text-red-500" />
+            )}
+            <CardTitle className="text-sm font-semibold text-[#3d2b1f]">
+              {job.manuscriptFileName ?? "Manuscript"}
+            </CardTitle>
           </div>
-          <Badge variant={statusColor(job.status)} className={`text-xs font-semibold gap-1.5 ${
-            isActive ? "animate-pulse" : ""
-          }`}>
-            {isActive && <span className="relative flex h-2 w-2"><span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-current opacity-75" /><span className="relative inline-flex rounded-full h-2 w-2 bg-current" /></span>}
-            {job.status === "pending_review" && <Eye className="w-3 h-3" />}
-            {(job.status === "complete" || job.status === "approved") && <CheckCircle2 className="w-3 h-3" />}
-            {job.status === "error" && <AlertCircle className="w-3 h-3" />}
+          <Badge variant={statusColor(job.status)} className="text-xs">
             {statusLabel(job.status)}
           </Badge>
         </div>
-
-        <div className="mt-3 grid grid-cols-2 sm:grid-cols-4 gap-2">
-          {[
-            { label: "Trim Size", value: job.trimSizeId, icon: <FileText className="w-3 h-3" /> },
-            { label: "Style", value: job.styleId, icon: <Sparkles className="w-3 h-3" /> },
-            ...(job.wordCount ? [{ label: "Words", value: job.wordCount.toLocaleString(), icon: <FileText className="w-3 h-3" /> }] : []),
-            ...(estimatedPages ? [{ label: "Est. Pages", value: `~${estimatedPages}`, icon: <BookOpen className="w-3 h-3" /> }] : []),
-            ...(job.chapterCount ? [{ label: "Chapters", value: String(job.chapterCount), icon: <FileText className="w-3 h-3" /> }] : []),
-          ].map((detail) => (
-            <div key={detail.label} className="flex items-center gap-1.5 bg-[#f3efe6] rounded-md px-2.5 py-1.5 border border-[#e8dfd0]/50">
-              <span className="text-[#b09880]">{detail.icon}</span>
-              <div className="min-w-0">
-                <p className="text-[10px] text-[#a09080] uppercase tracking-wider font-medium leading-none">{detail.label}</p>
-                <p className="text-xs font-semibold text-[#3d2b1f] truncate">{detail.value}</p>
-              </div>
-            </div>
-          ))}
+        <div className="flex gap-4 text-xs text-[#8b7b6b] mt-1">
+          <span>Trim: <strong>{job.trimSizeId}</strong></span>
+          <span>Style: <strong>{job.styleId}</strong></span>
+          {job.wordCount ? <span>{job.wordCount.toLocaleString()} words</span> : null}
+          {job.chapterCount ? <span>{job.chapterCount} chapters</span> : null}
         </div>
       </CardHeader>
       <CardContent className="space-y-3">
-        {isActive && (
-          <div className="space-y-2">
-            <div className="flex justify-between text-xs text-[#7a6e60] mb-1">
-              <span className="flex items-center gap-1.5">
-                <Wand2 className="w-3 h-3 text-[#c9a96e]" />
-                {job.status === "queued" ? "Preparing your manuscript…" : "AI is typesetting your manuscript…"}
-              </span>
-              <span className="font-medium">{pct}%</span>
-            </div>
-            <div className="relative">
-              <Progress value={pct} className="h-2.5 bg-[#e8dfd0]/40" />
-              <div className="absolute inset-0 rounded-full overflow-hidden">
-                <div
-                  className="h-full bg-gradient-to-r from-[#c9a96e]/20 to-[#c9a96e]/40 animate-pulse rounded-full transition-all duration-1000"
-                  style={{ width: `${pct}%` }}
-                />
-              </div>
-            </div>
-            <ProcessingSkeleton />
+        <div>
+          <div className="flex justify-between text-xs text-[#8b7b6b] mb-1">
+            <span>{isActive ? "AI is typesetting your manuscript…" : job.status === "complete" ? "Production complete" : "Production failed"}</span>
+            <span>{pct}%</span>
           </div>
-        )}
-
-        {job.status === "pending_review" && (
-          <div className="flex justify-between text-xs text-amber-700 mb-1">
-            <span className="flex items-center gap-1.5">
-              <Eye className="w-3 h-3" />
-              Production complete — review your output before finalizing
-            </span>
-            <span className="font-medium">100%</span>
-          </div>
-        )}
-
-        {(job.status === "complete" || job.status === "approved") && (
-          <div className="flex justify-between text-xs text-green-700 mb-1">
-            <span className="flex items-center gap-1.5">
-              <CheckCircle2 className="w-3 h-3" />
-              {job.status === "approved" ? "Output approved and finalized" : "Production complete"}
-            </span>
-            <span className="font-medium">100%</span>
-          </div>
-        )}
+          <Progress value={pct} className="h-2" />
+        </div>
 
         {job.status === "error" && (
-          <>
-            <div className="flex justify-between text-xs text-red-600 mb-1">
-              <span className="flex items-center gap-1.5">
-                <AlertCircle className="w-3 h-3" />
-                Production failed
-              </span>
-            </div>
-            <div className="rounded-lg border border-red-200 bg-red-50 overflow-hidden">
-              <div className="flex items-start gap-3 p-4">
-                <div className="flex-shrink-0 mt-0.5">
-                  <div className="w-8 h-8 rounded-full bg-red-100 flex items-center justify-center">
-                    <AlertCircle className="w-4 h-4 text-red-600" />
-                  </div>
-                </div>
-                <div className="flex-1 min-w-0">
-                  <p className="text-sm font-semibold text-red-800 mb-1">Production Failed</p>
-                  {job.errorMessage && (
-                    <p className="text-sm text-red-700 break-words leading-relaxed">
-                      {job.errorMessage}
-                    </p>
-                  )}
+          <div className="rounded-lg border border-red-200 bg-red-50 overflow-hidden">
+            {/* Error header */}
+            <div className="flex items-start gap-3 p-4">
+              <div className="flex-shrink-0 mt-0.5">
+                <div className="w-8 h-8 rounded-full bg-red-100 flex items-center justify-center">
+                  <AlertCircle className="w-4 h-4 text-red-600" />
                 </div>
               </div>
-
-              {(job.errorType === "format_unsupported" || job.errorType === "parse_empty") && (
-                <div className="mx-4 mb-3 rounded-lg border border-amber-300 bg-amber-50 p-4">
-                  <div className="flex items-start gap-3">
-                    <div className="flex-shrink-0 mt-0.5">
-                      <div className="w-8 h-8 rounded-full bg-amber-100 flex items-center justify-center">
-                        <FileText className="w-4 h-4 text-amber-700" />
-                      </div>
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <p className="text-sm font-semibold text-amber-900 mb-1">
-                        {job.errorType === "format_unsupported"
-                          ? "Unsupported File Format"
-                          : "No Text Could Be Extracted"}
-                      </p>
-                      <p className="text-sm text-amber-800 mb-2">
-                        {job.errorType === "format_unsupported"
-                          ? <>The file <strong className="font-mono">{job.manuscriptFileName ?? "uploaded file"}</strong>{(() => { const ext = (job.manuscriptFileName ?? "").split(".").pop()?.toLowerCase(); return ext ? <> (.<span className="font-mono">{ext}</span>)</> : null; })()} is in a format that Auto-Produce cannot process directly.</>
-                          : <>No readable text was found in <strong className="font-mono">{job.manuscriptFileName ?? "the uploaded file"}</strong>{(() => { const ext = (job.manuscriptFileName ?? "").split(".").pop()?.toLowerCase(); return ext ? <> (.<span className="font-mono">{ext}</span>)</> : null; })()} . The file may be image-only, password-protected, or empty.</>
-                        }
-                      </p>
-                      <p className="text-xs font-semibold text-amber-800 mb-2">Convert your file using one of these tools, then re-upload:</p>
-                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                        {[
-                          { name: "Microsoft Word", desc: "Open → File → Save As → .docx" },
-                          { name: "Google Docs", desc: "Upload → File → Download as → .docx" },
-                          { name: "LibreOffice Writer", desc: "Free & open-source — export to .docx or .pdf" },
-                          { name: "Pandoc (CLI)", desc: "pandoc input.ext -o output.docx" },
-                        ].map(tool => (
-                          <div key={tool.name} className="flex items-start gap-2 bg-white/70 rounded border border-amber-200 px-3 py-2">
-                            <CheckCircle2 className="w-3.5 h-3.5 text-amber-600 mt-0.5 flex-shrink-0" />
-                            <div>
-                              <p className="text-xs font-semibold text-amber-900">{tool.name}</p>
-                              <p className="text-xs text-amber-700">{tool.desc}</p>
-                            </div>
-                          </div>
-                        ))}
-                      </div>
-                      <p className="text-xs text-amber-700 mt-2">
-                        Supported formats: <strong>.docx</strong>, <strong>.pdf</strong>, <strong>.txt</strong>, <strong>.md</strong>, <strong>.html</strong>, <strong>.rtf</strong>, <strong>.csv</strong>, <strong>.json</strong>, <strong>.xlsx</strong>, <strong>.odt</strong>, <strong>.epub</strong>
-                      </p>
-                    </div>
-                  </div>
-                </div>
-              )}
-
-              <div className="flex items-center gap-2 px-4 pb-3 flex-wrap">
-                {(job.retryCount ?? 0) >= 3 ? (
-                  <div className="flex items-center gap-2 text-xs text-red-700 bg-red-100 border border-red-200 rounded-md px-3 py-2">
-                    <AlertCircle className="w-3.5 h-3.5 flex-shrink-0" />
-                    <span>
-                      <strong>Max retries reached</strong> (3 of 3 attempts used). Please upload a corrected manuscript file to start a new job.
-                    </span>
-                  </div>
-                ) : (
-                  <Button
-                    size="sm"
-                    variant="default"
-                    className="bg-red-600 hover:bg-red-700 text-white gap-2 text-xs"
-                    disabled={retryMutation.isPending}
-                    onClick={() => retryMutation.mutate({ jobId: job.id })}
-                  >
-                    {retryMutation.isPending ? (
-                      <Loader2 className="w-3 h-3 animate-spin" />
-                    ) : (
-                      <RefreshCw className="w-3 h-3" />
-                    )}
-                    {retryMutation.isPending
-                      ? "Retrying…"
-                      : `Retry Job (${(job.retryCount ?? 0) + 1} of 3)`}
-                  </Button>
-                )}
+              <div className="flex-1 min-w-0">
+                <p className="text-sm font-semibold text-red-800 mb-1">Production Failed</p>
                 {job.errorMessage && (
-                  <Button
-                    size="sm"
-                    variant="outline"
-                    className="border-red-200 text-red-700 hover:bg-red-100 gap-2 text-xs"
-                    onClick={() => {
-                      const report = JSON.stringify({
-                        context: "Auto-Produce",
-                        timestamp: new Date().toISOString(),
-                        jobId: job.id,
-                        file: job.manuscriptFileName ?? "(unknown)",
-                        trimSizeId: job.trimSizeId,
-                        styleId: job.styleId,
-                        wordCount: job.wordCount ?? 0,
-                        chapterCount: job.chapterCount ?? 0,
-                        retryCount: job.retryCount ?? 0,
-                        failedStage: (job as { failedStage?: string }).failedStage ?? null,
-                        errorType: job.errorType ?? null,
-                        errorMessage: job.errorMessage,
-                        failedAt: new Date(job.updatedAt).toISOString(),
-                      }, null, 2);
-                      navigator.clipboard.writeText(report).catch(() => {
-                        const ta = document.createElement("textarea");
-                        ta.value = report;
-                        document.body.appendChild(ta);
-                        ta.select();
-                        document.execCommand("copy");
-                        document.body.removeChild(ta);
-                      });
-                      toast.success("Full error report copied to clipboard");
-                    }}
-                  >
-                    <Copy className="w-3 h-3" />
-                    Copy Error Report
-                  </Button>
+                  <p className="text-sm text-red-700 break-words leading-relaxed">
+                    {job.errorMessage}
+                  </p>
                 )}
+              </div>
+            </div>
+
+            {/* Action bar */}
+            <div className="flex items-center gap-2 px-4 pb-3 flex-wrap">
+              {(job.retryCount ?? 0) >= 3 ? (
+                <div className="flex items-center gap-2 text-xs text-red-700 bg-red-100 border border-red-200 rounded-md px-3 py-2">
+                  <AlertCircle className="w-3.5 h-3.5 flex-shrink-0" />
+                  <span>
+                    <strong>Max retries reached</strong> (3 of 3 attempts used). Please upload a corrected manuscript file to start a new job.
+                  </span>
+                </div>
+              ) : (
                 <Button
                   size="sm"
-                  variant="ghost"
-                  className="text-red-600 hover:text-red-800 hover:bg-red-100 gap-1 text-xs ml-auto"
-                  onClick={() => setShowTechDetails(v => !v)}
+                  variant="default"
+                  className="bg-red-600 hover:bg-red-700 text-white gap-2 text-xs"
+                  disabled={retryMutation.isPending}
+                  onClick={() => retryMutation.mutate({ jobId: job.id })}
                 >
-                  <Terminal className="w-3 h-3" />
-                  Technical Details
-                  {showTechDetails ? <ChevronUp className="w-3 h-3" /> : <ChevronDown className="w-3 h-3" />}
+                  {retryMutation.isPending ? (
+                    <Loader2 className="w-3 h-3 animate-spin" />
+                  ) : (
+                    <RefreshCw className="w-3 h-3" />
+                  )}
+                  {retryMutation.isPending
+                    ? "Retrying…"
+                    : `Retry Job (${(job.retryCount ?? 0) + 1} of 3)`}
                 </Button>
-              </div>
-
-              {showTechDetails && (
-                <div className="border-t border-red-200 bg-red-900/5 px-4 py-3">
-                  <p className="text-xs font-semibold text-red-800 mb-2 flex items-center gap-1.5">
-                    <Terminal className="w-3 h-3" />
-                    Diagnostic Information
-                  </p>
-                  <div className="font-mono text-xs text-red-800 space-y-1 bg-white/70 rounded border border-red-200 p-3">
-                    <div className="flex gap-2">
-                      <span className="text-red-500 w-28 flex-shrink-0">Job ID</span>
-                      <span>#{job.id}</span>
-                    </div>
-                    <div className="flex gap-2">
-                      <span className="text-red-500 w-28 flex-shrink-0">File</span>
-                      <span className="break-all">{job.manuscriptFileName ?? "(unknown)"}</span>
-                    </div>
-                    <div className="flex gap-2">
-                      <span className="text-red-500 w-28 flex-shrink-0">Trim Size</span>
-                      <span>{job.trimSizeId}</span>
-                    </div>
-                    <div className="flex gap-2">
-                      <span className="text-red-500 w-28 flex-shrink-0">Style</span>
-                      <span>{job.styleId}</span>
-                    </div>
-                    <div className="flex gap-2">
-                      <span className="text-red-500 w-28 flex-shrink-0">Failed At</span>
-                      <span>{new Date(job.updatedAt).toLocaleString()}</span>
-                    </div>
-                    <div className="flex gap-2">
-                      <span className="text-red-500 w-28 flex-shrink-0">Retry Attempts</span>
-                      <span className={(job.retryCount ?? 0) >= 3 ? "text-red-600 font-semibold" : ""}>
-                        {job.retryCount ?? 0} of 3{(job.retryCount ?? 0) >= 3 ? " — limit reached" : ""}
-                      </span>
-                    </div>
-                    <div className="flex gap-2">
-                      <span className="text-red-500 w-28 flex-shrink-0">Error Type</span>
-                      <span className="font-semibold">{job.errorType ?? "unknown"}</span>
-                    </div>
-                    {(job as { failedStage?: string }).failedStage && (
-                      <div className="flex gap-2">
-                        <span className="text-red-500 w-28 flex-shrink-0">Failed Stage</span>
-                        <span className="font-semibold text-red-700">{(job as { failedStage?: string }).failedStage}</span>
-                      </div>
-                    )}
-                    {job.wordCount ? (
-                      <div className="flex gap-2">
-                        <span className="text-red-500 w-28 flex-shrink-0">Words Parsed</span>
-                        <span>{job.wordCount.toLocaleString()} (parsing succeeded)</span>
-                      </div>
-                    ) : (
-                      <div className="flex gap-2">
-                        <span className="text-red-500 w-28 flex-shrink-0">Words Parsed</span>
-                        <span className="text-red-600">0 (failed during parsing)</span>
-                      </div>
-                    )}
-                    {job.errorMessage && (
-                      <div className="mt-2 pt-2 border-t border-red-200">
-                        <p className="text-red-500 mb-1">Full Error Message</p>
-                        <p className="text-red-800 break-all whitespace-pre-wrap">{job.errorMessage}</p>
-                      </div>
-                    )}
-                  </div>
-                  <p className="text-xs text-red-600 mt-2">
-                    <strong>Tip:</strong> The <em>Failed Stage</em> field tells you exactly where the pipeline stopped.
-                    {" "}"chapter-detection" → LLM issue (retry or simplify the file).
-                    {" "}"pdf-rendering" → Chromium issue (retry usually resolves this).
-                    {" "}"epub-generation" → EPUB packaging issue (retry or switch to PDF-only).
-                    {" "}"config-resolution" → Invalid trim/style ID (contact support).
-                    {" "}Use <strong>Copy Error Report</strong> to share the full report with support.
-                  </p>
-                </div>
               )}
+              {job.errorMessage && (
+                <Button
+                  size="sm"
+                  variant="outline"
+                  className="border-red-200 text-red-700 hover:bg-red-100 gap-2 text-xs"
+                  onClick={() => {
+                    const report = JSON.stringify({
+                      context: "Auto-Produce",
+                      timestamp: new Date().toISOString(),
+                      jobId: job.id,
+                      file: job.manuscriptFileName ?? "(unknown)",
+                      trimSizeId: job.trimSizeId,
+                      styleId: job.styleId,
+                      wordCount: job.wordCount ?? 0,
+                      chapterCount: job.chapterCount ?? 0,
+                      retryCount: job.retryCount ?? 0,
+                      failedStage: (job as { failedStage?: string }).failedStage ?? null,
+                      errorType: job.errorType ?? null,
+                      errorMessage: job.errorMessage,
+                      failedAt: new Date(job.updatedAt).toISOString(),
+                    }, null, 2);
+                    navigator.clipboard.writeText(report).catch(() => {
+                      const ta = document.createElement("textarea");
+                      ta.value = report;
+                      document.body.appendChild(ta);
+                      ta.select();
+                      document.execCommand("copy");
+                      document.body.removeChild(ta);
+                    });
+                    toast.success("Full error report copied to clipboard");
+                  }}
+                >
+                  <Copy className="w-3 h-3" />
+                  Copy Error Report
+                </Button>
+              )}
+              <Button
+                size="sm"
+                variant="ghost"
+                className="text-red-600 hover:text-red-800 hover:bg-red-100 gap-1 text-xs ml-auto"
+                onClick={() => setShowTechDetails(v => !v)}
+              >
+                <Terminal className="w-3 h-3" />
+                Technical Details
+                {showTechDetails ? <ChevronUp className="w-3 h-3" /> : <ChevronDown className="w-3 h-3" />}
+              </Button>
             </div>
-          </>
+
+            {/* Collapsible technical details */}
+            {showTechDetails && (
+              <div className="border-t border-red-200 bg-red-900/5 px-4 py-3">
+                <p className="text-xs font-semibold text-red-800 mb-2 flex items-center gap-1.5">
+                  <Terminal className="w-3 h-3" />
+                  Diagnostic Information
+                </p>
+                <div className="font-mono text-xs text-red-800 space-y-1 bg-white/60 rounded border border-red-200 p-3">
+                  <div className="flex gap-2">
+                    <span className="text-red-500 w-28 flex-shrink-0">Job ID</span>
+                    <span>#{job.id}</span>
+                  </div>
+                  <div className="flex gap-2">
+                    <span className="text-red-500 w-28 flex-shrink-0">File</span>
+                    <span className="break-all">{job.manuscriptFileName ?? "(unknown)"}</span>
+                  </div>
+                  <div className="flex gap-2">
+                    <span className="text-red-500 w-28 flex-shrink-0">Trim Size</span>
+                    <span>{job.trimSizeId}</span>
+                  </div>
+                  <div className="flex gap-2">
+                    <span className="text-red-500 w-28 flex-shrink-0">Style</span>
+                    <span>{job.styleId}</span>
+                  </div>
+                  <div className="flex gap-2">
+                    <span className="text-red-500 w-28 flex-shrink-0">Failed At</span>
+                    <span>{new Date(job.updatedAt).toLocaleString()}</span>
+                  </div>
+                  <div className="flex gap-2">
+                    <span className="text-red-500 w-28 flex-shrink-0">Retry Attempts</span>
+                    <span className={(job.retryCount ?? 0) >= 3 ? "text-red-600 font-semibold" : ""}>
+                      {job.retryCount ?? 0} of 3{(job.retryCount ?? 0) >= 3 ? " — limit reached" : ""}
+                    </span>
+                  </div>
+                  <div className="flex gap-2">
+                    <span className="text-red-500 w-28 flex-shrink-0">Error Type</span>
+                    <span className="font-semibold">{job.errorType ?? "unknown"}</span>
+                  </div>
+                  {(job as { failedStage?: string }).failedStage && (
+                    <div className="flex gap-2">
+                      <span className="text-red-500 w-28 flex-shrink-0">Failed Stage</span>
+                      <span className="font-semibold text-red-700">{(job as { failedStage?: string }).failedStage}</span>
+                    </div>
+                  )}
+                  {job.wordCount ? (
+                    <div className="flex gap-2">
+                      <span className="text-red-500 w-28 flex-shrink-0">Words Parsed</span>
+                      <span>{job.wordCount.toLocaleString()} (parsing succeeded)</span>
+                    </div>
+                  ) : (
+                    <div className="flex gap-2">
+                      <span className="text-red-500 w-28 flex-shrink-0">Words Parsed</span>
+                      <span className="text-red-600">0 (failed during parsing)</span>
+                    </div>
+                  )}
+                  {job.errorMessage && (
+                    <div className="mt-2 pt-2 border-t border-red-200">
+                      <p className="text-red-500 mb-1">Full Error Message</p>
+                      <p className="text-red-800 break-all whitespace-pre-wrap">{job.errorMessage}</p>
+                    </div>
+                  )}
+                </div>
+                <p className="text-xs text-red-600 mt-2">
+                  <strong>Tip:</strong> The <em>Failed Stage</em> field tells you exactly where the pipeline stopped.
+                  {" "}"chapter-detection" → LLM issue (retry or simplify the file).
+                  {" "}"pdf-rendering" → Chromium issue (retry usually resolves this).
+                  {" "}"epub-generation" → EPUB packaging issue (retry or switch to PDF-only).
+                  {" "}"config-resolution" → Invalid trim/style ID (contact support).
+                  {" "}Use <strong>Copy Error Report</strong> to share the full report with support.
+                </p>
+              </div>
+            )}
+          </div>
         )}
 
+        {/* Show new retry job card if retry was triggered */}
         {retryJobId && retryJobId !== job.id && (
           <div className="rounded-md bg-amber-50 border border-amber-200 p-3 text-xs text-amber-800 flex items-center gap-2">
             <RefreshCw className="w-3 h-3 flex-shrink-0" />
@@ -749,475 +502,54 @@ function JobCard({ jobId, projectId }: { jobId: number; projectId: number }) {
           </div>
         )}
 
-        {(job.status === "pending_review" || job.status === "approved" || job.status === "complete") && (() => {
-          const kdpTrim = isKdpCompatible(job.trimSizeId);
-          const hasKdpPdf = !!job.kdpPdfUrl;
-          const hasBleed = hasKdpPdf;
-          const hasFontEmbedding = true;
-          const hasPdfFormat = !!job.pdfUrl;
-          const hasEpubFormat = !!job.epubUrl;
-          const allChecksPass = kdpTrim && hasBleed && hasFontEmbedding && hasPdfFormat && hasEpubFormat;
-
-          const downloadItems = [
-            ...(hasKdpPdf ? [{
-              url: job.kdpPdfUrl!,
-              label: "Print PDF",
-              sublabel: "KDP-Ready · Bleed included",
-              icon: fileTypeIcon("pdf"),
-              primary: true,
-              accent: "bg-[#8b5e3c] hover:bg-[#7a4f30]",
-            }] : []),
-            ...(!hasKdpPdf && job.pdfUrl ? [{
-              url: job.pdfUrl,
-              label: "Interior PDF",
-              sublabel: "Press-ready format",
-              icon: fileTypeIcon("pdf"),
-              primary: true,
-              accent: "bg-[#8b5e3c] hover:bg-[#7a4f30]",
-            }] : []),
-            ...(job.epubUrl ? [{
-              url: job.epubUrl,
-              label: "Kindle EPUB",
-              sublabel: "Ebook format",
-              icon: fileTypeIcon("epub"),
-              primary: true,
-              accent: "bg-[#5c3d8a] hover:bg-[#4a2d6e]",
-            }] : []),
-          ];
-
-          const secondaryItems = [
-            ...(hasKdpPdf && job.pdfUrl ? [{
-              url: job.pdfUrl,
-              label: "Screen PDF (no bleed)",
-              icon: fileTypeIcon("pdf"),
-            }] : []),
-            ...(typeof (job as Record<string, unknown>).idmlUrl === 'string' ? [{
-              url: (job as Record<string, unknown>).idmlUrl as string,
-              label: "InDesign (.idml)",
-              icon: fileTypeIcon("idml"),
-            }] : []),
-          ];
-
-          return (
-            <div className="flex flex-col gap-4 pt-1">
-              <div className="rounded-lg border border-[#e8dfd0] bg-gradient-to-br from-[#fdf9f3] to-white p-4">
-                <p className="text-xs font-semibold text-[#7a6e60] uppercase tracking-wider mb-3 flex items-center gap-1.5">
-                  <Download className="w-3.5 h-3.5" />
-                  Download Files
-                </p>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                  {downloadItems.map((item) => (
-                    <a
-                      key={item.label}
-                      href={item.url}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="group flex items-center gap-3 rounded-lg border border-[#d4b896]/40 bg-white p-3 transition-all hover:shadow-md hover:border-[#c9a96e]/60 hover:-translate-y-0.5"
-                    >
-                      <div className={`w-10 h-10 rounded-lg flex items-center justify-center text-white flex-shrink-0 ${item.accent} transition-transform group-hover:scale-105`}>
-                        {item.icon}
-                      </div>
-                      <div className="min-w-0 flex-1">
-                        <p className="text-sm font-semibold text-[#3d2b1f]">{item.label}</p>
-                        <p className="text-xs text-[#a09080]">{item.sublabel}</p>
-                      </div>
-                      <Download className="w-4 h-4 text-[#c9a96e] opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0" />
-                    </a>
-                  ))}
-                </div>
-                {secondaryItems.length > 0 && (
-                  <div className="mt-2 flex flex-wrap gap-2">
-                    {secondaryItems.map((item) => (
-                      <a
-                        key={item.label}
-                        href={item.url}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                      >
-                        <Button variant="outline" size="sm" className="border-[#d4b896] text-[#7a6e60] hover:bg-[#f5ede4] gap-2 text-xs">
-                          {item.icon}
-                          {item.label}
-                        </Button>
-                      </a>
-                    ))}
-                  </div>
-                )}
-              </div>
-
-              <div className="rounded-lg border border-[#e8dfd0] bg-[#fdf9f3] p-4">
-                <div className="flex items-center justify-between mb-3">
-                  <div className="flex items-center gap-2">
-                    <ShieldCheck className="w-4 h-4 text-[#8b5e3c]" />
-                    <span className="text-sm font-semibold text-[#3d2b1f]">KDP Compliance Checklist</span>
-                  </div>
-                  {allChecksPass && (
-                    <Badge className="bg-green-100 text-green-800 border-green-300 gap-1 text-xs font-semibold">
-                      <CheckCircle2 className="w-3 h-3" />
-                      Ready for Amazon
-                    </Badge>
-                  )}
-                </div>
-                <div className="space-y-2">
-                  {[
-                    {
-                      label: "Trim size",
-                      pass: kdpTrim,
-                      tooltip: "Amazon KDP only accepts specific trim sizes. Your selected size must match one of Amazon's accepted dimensions.",
-                    },
-                    {
-                      label: "Interior margins",
-                      pass: kdpTrim && hasBleed,
-                      tooltip: "KDP requires minimum interior margins based on page count: ≥0.375\" for <150 pages, ≥0.75\" for 150–400 pages, ≥1.0\" for 400+ pages.",
-                    },
-                    {
-                      label: "Bleed (0.125\" included)",
-                      pass: hasBleed,
-                      tooltip: "Print-ready PDFs for KDP must include 0.125\" bleed on the outside, top, and bottom edges so ink extends to the trim edge.",
-                    },
-                    {
-                      label: "Font embedding",
-                      pass: hasFontEmbedding,
-                      tooltip: "All fonts must be embedded in the PDF to ensure consistent rendering. Google Fonts used in typesetting are embedded automatically.",
-                    },
-                    {
-                      label: "File format",
-                      pass: hasPdfFormat && hasEpubFormat,
-                      tooltip: "KDP requires PDF for print interiors and EPUB for Kindle ebook. Both formats have been generated.",
-                    },
-                  ].map((check) => (
-                    <div key={check.label} className="flex items-center gap-2">
-                      {check.pass ? (
-                        <CheckCircle2 className="w-3.5 h-3.5 text-green-600 flex-shrink-0" />
-                      ) : (
-                        <AlertCircle className="w-3.5 h-3.5 text-amber-500 flex-shrink-0" />
-                      )}
-                      <span className={`text-xs ${check.pass ? "text-green-800" : "text-amber-700"}`}>
-                        {check.label}
-                      </span>
-                      <Tooltip>
-                        <TooltipTrigger asChild>
-                          <Info className="w-3 h-3 text-[#b09880] cursor-help flex-shrink-0" />
-                        </TooltipTrigger>
-                        <TooltipContent side="right" className="max-w-[250px] text-xs">
-                          {check.tooltip}
-                        </TooltipContent>
-                      </Tooltip>
-                    </div>
-                  ))}
-                </div>
-                {!allChecksPass && (
-                  <p className="text-xs text-amber-700 mt-3 flex items-center gap-1.5">
-                    <AlertCircle className="w-3 h-3 flex-shrink-0" />
-                    {!kdpTrim
-                      ? "Selected trim size is not accepted by Amazon KDP. Choose a KDP-compatible size for full compliance."
-                      : "Some KDP requirements are not met. Review the checklist above."}
-                  </p>
-                )}
-              </div>
-
-              {job.status === "pending_review" && (
-                <div className="rounded-lg border border-amber-200 bg-gradient-to-br from-amber-50/50 to-white p-4">
-                  <div className="flex items-center gap-2 mb-3">
-                    <Eye className="w-4 h-4 text-amber-700" />
-                    <span className="text-sm font-semibold text-amber-900">Review Your Output</span>
-                  </div>
-                  <p className="text-xs text-amber-800 mb-4">
-                    Preview your typeset files below. When you're satisfied, approve the output to finalize it. Your plan usage is only counted once you approve.
-                  </p>
-
-                  {(job.pdfUrl || job.kdpPdfUrl) && (
-                    <div className="mb-4">
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        className="border-amber-300 text-amber-800 hover:bg-amber-100 gap-2 w-full justify-center"
-                        onClick={() => setShowPdfPreview(!showPdfPreview)}
-                      >
-                        <Eye className="w-3.5 h-3.5" />
-                        {showPdfPreview ? "Hide PDF Preview" : "Preview Interior PDF"}
-                      </Button>
-                      {showPdfPreview && (
-                        <div className="mt-3 rounded-lg border border-[#e8dfd0] overflow-hidden bg-white">
-                          <iframe
-                            src={job.kdpPdfUrl || job.pdfUrl || ""}
-                            className="w-full border-0"
-                            style={{ height: "600px" }}
-                            title="PDF Preview"
-                          />
-                        </div>
-                      )}
-                    </div>
-                  )}
-
-                  {comments && comments.length > 0 && (
-                    <div className="mb-4 space-y-2">
-                      <p className="text-xs font-semibold text-amber-800 uppercase tracking-wider">Comments</p>
-                      {comments.map((c: { id: number; message: string; createdAt: string }) => (
-                        <div key={c.id} className="rounded-md bg-white border border-amber-200 p-3">
-                          <p className="text-xs text-[#3d2b1f] whitespace-pre-wrap">{c.message}</p>
-                          <p className="text-[10px] text-[#a09080] mt-1">
-                            {new Date(c.createdAt).toLocaleString()}
-                          </p>
-                        </div>
-                      ))}
-                    </div>
-                  )}
-
-                  <div className="mb-3">
-                    <textarea
-                      value={reviewComment}
-                      onChange={(e) => setReviewComment(e.target.value)}
-                      placeholder="Add notes about changes needed, or leave feedback before approving..."
-                      className="w-full rounded-md border border-amber-200 bg-white px-3 py-2 text-sm text-[#3d2b1f] placeholder:text-[#b09880] focus:outline-none focus:ring-2 focus:ring-amber-300 focus:border-transparent resize-none"
-                      rows={3}
-                    />
-                  </div>
-
-                  <div className="flex flex-col sm:flex-row gap-2">
-                    <Button
-                      className="flex-1 bg-green-600 hover:bg-green-700 text-white gap-2"
-                      onClick={() => approveMutation.mutate({ jobId: job.id })}
-                      disabled={approveMutation.isPending}
-                    >
-                      {approveMutation.isPending ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <CheckCircle2 className="w-3.5 h-3.5" />}
-                      Approve & Finalize
-                    </Button>
-                    {reviewComment.trim() && (
-                      <>
-                        <Button
-                          variant="outline"
-                          className="flex-1 border-amber-300 text-amber-800 hover:bg-amber-50 gap-2"
-                          onClick={() => addCommentMutation.mutate({ jobId: job.id, message: reviewComment.trim() })}
-                          disabled={addCommentMutation.isPending}
-                        >
-                          {addCommentMutation.isPending ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <FileText className="w-3.5 h-3.5" />}
-                          Save Comment
-                        </Button>
-                        <Button
-                          variant="outline"
-                          className="flex-1 border-red-300 text-red-700 hover:bg-red-50 gap-2"
-                          onClick={() => requestRevisionMutation.mutate({ jobId: job.id, message: reviewComment.trim() })}
-                          disabled={requestRevisionMutation.isPending}
-                        >
-                          {requestRevisionMutation.isPending ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <AlertCircle className="w-3.5 h-3.5" />}
-                          Request Changes
-                        </Button>
-                      </>
-                    )}
-                  </div>
-                </div>
+        {job.status === "complete" && (
+          <div className="flex flex-col gap-2 pt-1">
+            <div className="flex gap-3">
+              {job.pdfUrl && (
+                <a
+                  href={job.pdfUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex-1"
+                >
+                  <Button variant="default" size="sm" className="w-full bg-[#8b5e3c] hover:bg-[#7a4f30] text-white gap-2">
+                    <FileDown className="w-4 h-4" />
+                    Download Interior PDF
+                  </Button>
+                </a>
               )}
-
-              {(job.status === "approved" || job.status === "complete") && (
-                <>
-                  <WhatsNext
-                    compact
-                    className="mt-1"
-                    prompts={[
-                      {
-                        id: "after_produce_cover",
-                        title: "Design Your Book Cover",
-                        description: "Your interior is ready! Next, generate a full-wrap cover spec sheet with exact dimensions for your printer.",
-                        actionLabel: "Open Cover Designer",
-                        actionRoute: "/cover-designer",
-                        icon: "cover_designer",
-                        priority: "high",
-                      } satisfies NextPrompt,
-                    ]}
-                  />
-                  {job.status === "approved" && (
-                    <div className="mt-3">
-                      <ProofOrderGuide />
-                    </div>
-                  )}
-                </>
+              {job.epubUrl && (
+                <a
+                  href={job.epubUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex-1"
+                >
+                  <Button variant="outline" size="sm" className="w-full border-[#8b5e3c] text-[#8b5e3c] hover:bg-[#f5ede4] gap-2">
+                    <BookOpen className="w-4 h-4" />
+                    Download EPUB
+                  </Button>
+                </a>
               )}
             </div>
-          );
-        })()}
-
-        <div className="flex items-center justify-between pt-1">
-          <p className="text-xs text-[#b09880]">
-            Started {new Date(job.createdAt).toLocaleString()}
-          </p>
-          {(job.status === "complete" || job.status === "pending_review" || job.status === "approved") && (
-            <p className="text-xs text-green-600 flex items-center gap-1">
-              <Clock className="w-3 h-3" />
-              {job.status === "approved" ? "Approved" : "Completed"} {new Date(job.updatedAt).toLocaleString()}
-            </p>
-          )}
-        </div>
-      </CardContent>
-    </Card>
-  );
-}
-
-// ─── Version History ──────────────────────────────────────────────────────────
-
-interface VersionHistoryJob {
-  id: number;
-  status: string;
-  trimSizeId: string;
-  styleId: string;
-  manuscriptFileName: string | null;
-  pdfUrl: string | null;
-  epubUrl: string | null;
-  createdAt: string;
-  updatedAt: string;
-}
-
-function VersionHistory({ jobs }: { jobs: VersionHistoryJob[] }) {
-  const [compareA, setCompareA] = useState<number | null>(null);
-  const [compareB, setCompareB] = useState<number | null>(null);
-
-  const sorted = [...jobs].sort((a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime());
-
-  const handleCompare = () => {
-    if (compareA === null || compareB === null) return;
-    const jobA = sorted.find(j => j.id === compareA);
-    const jobB = sorted.find(j => j.id === compareB);
-    if (jobA?.pdfUrl) window.open(jobA.pdfUrl, "_blank");
-    if (jobB?.pdfUrl) window.open(jobB.pdfUrl, "_blank");
-  };
-
-  const pdfJobs = sorted.filter(j => j.pdfUrl && (j.status === "complete" || j.status === "pending_review" || j.status === "approved"));
-  const canCompare = compareA !== null && compareB !== null && compareA !== compareB;
-
-  if (sorted.length < 2) return null;
-
-  return (
-    <Card className="border border-[#e8dfd0] bg-white shadow-sm">
-      <CardHeader className="pb-3">
-        <div className="flex items-center justify-between">
-          <CardTitle className="font-serif text-[#2c1a00] text-base flex items-center gap-2">
-            <History className="w-4 h-4 text-[#c9a96e]" />
-            Version History
-          </CardTitle>
-          <span className="text-xs text-[#b09880]">{sorted.length} version{sorted.length !== 1 ? "s" : ""}</span>
-        </div>
-        <CardDescription className="text-[#7a6e60] text-xs">
-          Every production run is saved as a new version. Select two PDF versions below to compare them side by side.
-        </CardDescription>
-      </CardHeader>
-      <CardContent className="space-y-3">
-        <div className="rounded-lg border border-[#e8dfd0] overflow-hidden">
-          <table className="w-full text-sm">
-            <thead>
-              <tr className="bg-[#f5ede4] border-b border-[#e8dfd0]">
-                {pdfJobs.length >= 2 && <th className="px-3 py-2 text-left text-xs font-medium text-[#7a6e60] w-10"></th>}
-                <th className="px-3 py-2 text-left text-xs font-medium text-[#7a6e60]">Version</th>
-                <th className="px-3 py-2 text-left text-xs font-medium text-[#7a6e60]">Date</th>
-                <th className="px-3 py-2 text-left text-xs font-medium text-[#7a6e60]">Style</th>
-                <th className="px-3 py-2 text-left text-xs font-medium text-[#7a6e60]">Status</th>
-                <th className="px-3 py-2 text-left text-xs font-medium text-[#7a6e60]">Files</th>
-              </tr>
-            </thead>
-            <tbody>
-              {sorted.map((job, idx) => {
-                const version = idx + 1;
-                const hasPdf = job.pdfUrl && (job.status === "complete" || job.status === "pending_review" || job.status === "approved");
-                const isSelected = compareA === job.id || compareB === job.id;
-                return (
-                  <tr key={job.id} className={`border-b border-[#e8dfd0] last:border-b-0 transition-colors ${isSelected ? "bg-[#fdf9f3]" : "hover:bg-[#faf7f2]"}`}>
-                    {pdfJobs.length >= 2 && (
-                      <td className="px-3 py-2.5">
-                        {hasPdf && (
-                          <input
-                            type="checkbox"
-                            checked={isSelected}
-                            onChange={() => {
-                              if (isSelected) {
-                                if (compareA === job.id) setCompareA(null);
-                                else setCompareB(null);
-                              } else {
-                                if (compareA === null) setCompareA(job.id);
-                                else if (compareB === null) setCompareB(job.id);
-                                else {
-                                  setCompareA(compareB);
-                                  setCompareB(job.id);
-                                }
-                              }
-                            }}
-                            className="w-3.5 h-3.5 rounded border-[#d4b896] text-[#8b5e3c] focus:ring-[#c9a96e]"
-                          />
-                        )}
-                      </td>
-                    )}
-                    <td className="px-3 py-2.5">
-                      <span className="inline-flex items-center gap-1.5">
-                        <span className="inline-flex items-center justify-center w-6 h-6 rounded-full bg-[#f5ede4] border border-[#d4b896]/40 text-xs font-semibold text-[#8b5e3c]">
-                          {version}
-                        </span>
-                        <span className="text-xs font-medium text-[#3d2b1f]">v{version}</span>
-                      </span>
-                    </td>
-                    <td className="px-3 py-2.5 text-xs text-[#7a6e60]">
-                      {new Date(job.createdAt).toLocaleDateString(undefined, { month: "short", day: "numeric", year: "numeric" })}
-                    </td>
-                    <td className="px-3 py-2.5 text-xs text-[#7a6e60]">
-                      {job.styleId} · {job.trimSizeId}
-                    </td>
-                    <td className="px-3 py-2.5">
-                      <Badge variant={statusColor(job.status)} className="text-[10px] font-semibold">
-                        {statusLabel(job.status)}
-                      </Badge>
-                    </td>
-                    <td className="px-3 py-2.5">
-                      <div className="flex items-center gap-1.5">
-                        {job.pdfUrl && (
-                          <a
-                            href={job.pdfUrl}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="inline-flex items-center gap-1 text-[10px] px-2 py-1 rounded bg-[#f5ede4] border border-[#d4b896]/40 text-[#8b5e3c] hover:bg-[#efe6d8] transition-colors"
-                          >
-                            <FileText className="w-3 h-3" />
-                            PDF
-                          </a>
-                        )}
-                        {job.epubUrl && (
-                          <a
-                            href={job.epubUrl}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="inline-flex items-center gap-1 text-[10px] px-2 py-1 rounded bg-[#f5ede4] border border-[#d4b896]/40 text-[#8b5e3c] hover:bg-[#efe6d8] transition-colors"
-                          >
-                            <BookOpen className="w-3 h-3" />
-                            EPUB
-                          </a>
-                        )}
-                        {!job.pdfUrl && !job.epubUrl && (
-                          <span className="text-[10px] text-[#b09880]">—</span>
-                        )}
-                      </div>
-                    </td>
-                  </tr>
-                );
-              })}
-            </tbody>
-          </table>
-        </div>
-
-        {pdfJobs.length >= 2 && (
-          <div className="flex items-center gap-3 p-3 rounded-lg bg-[#f5ede4] border border-[#d4b896]/40">
-            <GitCompare className="w-4 h-4 text-[#8b5e3c] flex-shrink-0" />
-            <p className="text-xs text-[#5c3d2e] flex-1">
-              {canCompare
-                ? "Ready to compare — both PDFs will open in new tabs for side-by-side review."
-                : "Select two versions with PDF output to compare them side by side."}
-            </p>
-            <Button
-              variant="outline"
-              size="sm"
-              disabled={!canCompare}
-              onClick={handleCompare}
-              className="border-[#8b5e3c] text-[#8b5e3c] hover:bg-[#f5ede4] gap-1.5 flex-shrink-0 text-xs disabled:opacity-50"
-            >
-              <ExternalLink className="w-3.5 h-3.5" />
-              Compare PDFs
-            </Button>
+            {typeof (job as Record<string, unknown>).idmlUrl === 'string' && (
+              <a
+                href={(job as Record<string, unknown>).idmlUrl as string}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                <Button variant="outline" size="sm" className="w-full border-[#5c3d2e] text-[#5c3d2e] hover:bg-[#f5ede4] gap-2">
+                  <FileDown className="w-4 h-4" />
+                  Download InDesign (.idml)
+                </Button>
+              </a>
+            )}
           </div>
         )}
+
+        <p className="text-xs text-[#b09880]">
+          Started {new Date(job.createdAt).toLocaleString()}
+        </p>
       </CardContent>
     </Card>
   );
@@ -1225,21 +557,10 @@ function VersionHistory({ jobs }: { jobs: VersionHistoryJob[] }) {
 
 // ─── Main Page ────────────────────────────────────────────────────────────────
 
-function AutoProduceGate() {
-  const { canAccess } = usePlan();
-  if (!canAccess("ai_typesetting")) {
-    return <UpgradeGate feature="ai_typesetting"><span /></UpgradeGate>;
-  }
-  return <AutoProduceInner />;
-}
-
-export default AutoProduceGate;
-
-function AutoProduceInner() {
+export default function AutoProduce() {
   const params = useParams<{ id: string }>();
   const projectId = parseInt(params.id ?? "0", 10);
   const [, navigate] = useLocation();
-  const searchString = useSearch();
   const { isAuthenticated, loading: authLoading } = useAuth();
 
   const { data: options } = trpc.autoProduce.options.useQuery();
@@ -1260,14 +581,9 @@ function AutoProduceInner() {
   const [outputFormat, setOutputFormat] = useState<"both" | "pdf" | "epub">("both");
   const [isDragging, setIsDragging] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [inputMode, setInputMode] = useState<"file" | "text">("file");
-  const [pastedText, setPastedText] = useState("");
   const [previewOpen, setPreviewOpen] = useState(false);
   const [styleAutoSelected, setStyleAutoSelected] = useState(false);
   const [trimAutoSelected, setTrimAutoSelected] = useState(false);
-  const [templateName, setTemplateName] = useState<string | null>(null);
-  const [fontOverrideBody, setFontOverrideBody] = useState("");
-  const [fontOverrideHeading, setFontOverrideHeading] = useState("");
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   // Generate / revoke object URL for image previews
@@ -1285,25 +601,6 @@ function AutoProduceInner() {
     setPreviewUrl(url);
     return () => URL.revokeObjectURL(url);
   }, [selectedFile]);
-
-  useEffect(() => {
-    const urlParams = new URLSearchParams(searchString);
-    const paramStyle = urlParams.get("style");
-    const paramTrim = urlParams.get("trim");
-    const paramTemplate = urlParams.get("template");
-    if (paramStyle && !styleId) {
-      setStyleId(paramStyle);
-      setStyleAutoSelected(true);
-    }
-    if (paramTrim && !trimSizeId) {
-      setTrimSizeId(paramTrim);
-      setTrimAutoSelected(true);
-    }
-    if (paramTemplate) {
-      setTemplateName(paramTemplate);
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
 
   // Read ZIP contents when a .zip file is selected
   useEffect(() => {
@@ -1365,8 +662,6 @@ function AutoProduceInner() {
       setSelectedFile(null);
       setTrimSizeId("");
       setStyleId("");
-      setFontOverrideBody("");
-      setFontOverrideHeading("");
       refetchJobs();
       toast.success("Production job started! The AI is now typesetting your manuscript.");
     },
@@ -1400,38 +695,18 @@ function AutoProduceInner() {
   }, [handleFileSelect]);
 
   const handleSubmit = async () => {
-    if (!trimSizeId || !styleId) return;
+    if (!selectedFile || !trimSizeId || !styleId) return;
     setIsSubmitting(true);
     try {
-      let fileBase64: string;
-      let fileName: string;
-      let mimeType: string;
-
-      if (inputMode === "text") {
-        const textContent = pastedText.trim();
-        if (textContent.length < 50) return;
-        const blob = new Blob([textContent], { type: "text/plain;charset=utf-8" });
-        const tempFile = new File([blob], "manuscript.txt", { type: "text/plain" });
-        fileBase64 = await fileToBase64(tempFile);
-        fileName = "manuscript.txt";
-        mimeType = "text/plain";
-      } else {
-        if (!selectedFile) return;
-        fileBase64 = await fileToBase64(selectedFile);
-        fileName = selectedFile.name;
-        mimeType = selectedFile.type || "text/plain";
-      }
-
+      const fileBase64 = await fileToBase64(selectedFile);
       await startMutation.mutateAsync({
         projectId,
         trimSizeId,
         styleId,
         outputFormat,
-        fileName,
-        mimeType,
+        fileName: selectedFile.name,
+        mimeType: selectedFile.type || "text/plain",
         fileBase64,
-        fontOverrideBody: fontOverrideBody && fontOverrideBody !== "__default" ? fontOverrideBody : undefined,
-        fontOverrideHeading: fontOverrideHeading && fontOverrideHeading !== "__default" ? fontOverrideHeading : undefined,
       });
     } finally {
       setIsSubmitting(false);
@@ -1440,30 +715,44 @@ function AutoProduceInner() {
 
   if (authLoading) {
     return (
-      <div className="min-h-screen bg-[#f3efe6] flex items-center justify-center">
+      <div className="min-h-screen bg-[#faf6ef] flex items-center justify-center">
         <Loader2 className="w-8 h-8 animate-spin text-[#8b5e3c]" />
       </div>
     );
   }
 
+  if (!isAuthenticated) {
+    return (
+      <div className="min-h-screen bg-[#faf6ef] flex items-center justify-center">
+        <div className="text-center space-y-4">
+          <p className="text-[#5c3d2e] font-serif text-xl">Please sign in to use Auto-Produce.</p>
+          <Button onClick={() => window.location.href = getLoginUrl()} className="bg-[#8b5e3c] hover:bg-[#7a4f30] text-white">
+            Sign In
+          </Button>
+        </div>
+      </div>
+    );
+  }
 
   const project = projectData?.project;
   const canPreview = !!(trimSizeId && styleId);
-  const hasInput = inputMode === "file" ? !!selectedFile : pastedText.trim().length >= 50;
-  const canSubmit = hasInput && trimSizeId && styleId && !isSubmitting && projectId > 0;
+  const canSubmit = selectedFile && trimSizeId && styleId && !isSubmitting;
 
   return (
-    <div className="min-h-screen bg-[#f3efe6]">
+    <div className="min-h-screen bg-[#faf6ef]">
       {/* Header */}
-      <header className="bg-[#2a1a0a] text-[#f5ede4] px-6 py-4 shadow-lg sticky top-0 z-30">
+      <header className="bg-[#1a1008] text-[#f5ede4] px-6 py-4 shadow-lg">
         <div className="max-w-5xl mx-auto flex items-center justify-between">
           <div className="flex items-center gap-4">
-            <button
+            <Button
+              variant="ghost"
+              size="sm"
               onClick={() => navigate(`/project/${projectId}`)}
-              className="text-[#c9a96e] hover:text-white transition-colors p-1 rounded"
+              className="text-[#c9a96e] hover:text-[#f5ede4] hover:bg-[#2a1f10] gap-2 px-2"
             >
-              <ArrowLeft className="w-5 h-5" />
-            </button>
+              <ArrowLeft className="w-4 h-4" />
+              Back to Tracker
+            </Button>
             <div className="h-5 w-px bg-[#4a3828]" />
             <div>
               <div className="flex items-center gap-2">
@@ -1489,37 +778,21 @@ function AutoProduceInner() {
             AI Typesetting Pipeline
           </div>
           <h2 className="font-serif text-3xl text-[#3d2b1f]">Upload your manuscript</h2>
-          <p className="text-[#7a6e60] max-w-xl mx-auto text-sm leading-relaxed">
+          <p className="text-[#8b7b6b] max-w-xl mx-auto text-sm leading-relaxed">
             Upload your manuscript in Word, PDF, or plain text format. The AI will detect chapters,
             apply professional typesetting, and produce a press-ready interior PDF and an EPUB ebook.
           </p>
         </div>
 
         {/* Upload Form */}
-        <Card className="border border-[#e8dfd0] bg-white shadow-sm">
+        <Card className="border border-[#d4b896]/40 bg-white shadow-sm">
           <CardHeader>
-            <CardTitle className="font-serif text-[#2c1a00] text-xl">New Production Run</CardTitle>
-            <CardDescription className="text-[#7a6e60]">
+            <CardTitle className="font-serif text-[#3d2b1f] text-xl">New Production Run</CardTitle>
+            <CardDescription className="text-[#8b7b6b]">
               Configure your trim size and style, preview the look, then upload your manuscript to begin.
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-6">
-            {templateName && (
-              <div className="flex items-center gap-3 rounded-lg border border-[#c9a96e]/30 bg-[#fdf9f3] px-4 py-3">
-                <Info className="w-4 h-4 text-[#c9a96e] flex-shrink-0" />
-                <p className="text-sm text-[#5c3d2e]">
-                  Pre-filled from EBP template: <strong className="text-[#3d2b1f]">{templateName}</strong>.
-                  {" "}Style and trim size have been set automatically — you can adjust them below.
-                </p>
-                <button
-                  onClick={() => setTemplateName(null)}
-                  className="ml-auto text-[#8b7b6b] hover:text-[#5c3d2e] transition-colors p-0.5"
-                  aria-label="Dismiss"
-                >
-                  <X className="w-3.5 h-3.5" />
-                </button>
-              </div>
-            )}
             {/* Configuration row */}
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
               <div className="space-y-1.5">
@@ -1529,39 +802,17 @@ function AutoProduceInner() {
                     <SelectValue placeholder="Select trim size…" />
                   </SelectTrigger>
                   <SelectContent>
-                    {options?.trimSizes.map(t => {
-                      const kdp = isKdpCompatible(t.id);
-                      return (
-                        <SelectItem key={t.id} value={t.id}>
-                          <span className="flex items-center gap-2">
-                            {t.label} ({t.widthIn}" × {t.heightIn}")
-                            {kdp && (
-                              <Badge variant="outline" className="text-[10px] px-1.5 py-0 border-green-400 text-green-700 bg-green-50 font-medium">
-                                KDP
-                              </Badge>
-                            )}
-                          </span>
-                        </SelectItem>
-                      );
-                    })}
+                    {options?.trimSizes.map(t => (
+                      <SelectItem key={t.id} value={t.id}>
+                        {t.label} ({t.widthIn}" × {t.heightIn}")
+                      </SelectItem>
+                    ))}
                   </SelectContent>
                 </Select>
                 {trimAutoSelected && (
                   <p className="text-xs text-[#8b5e3c] flex items-center gap-1.5 mt-1">
                     <Sparkles className="w-3 h-3 flex-shrink-0" />
                     Auto-selected for Bible / Scripture (5.25" × 8"). You can change it above.
-                  </p>
-                )}
-                {trimSizeId && !isKdpCompatible(trimSizeId) && (
-                  <p className="text-xs text-amber-700 flex items-center gap-1.5 mt-1">
-                    <AlertCircle className="w-3 h-3 flex-shrink-0" />
-                    This trim size is not accepted by Amazon KDP. If you plan to publish on Amazon, choose a size marked "KDP".
-                  </p>
-                )}
-                {trimSizeId && isKdpCompatible(trimSizeId) && !trimAutoSelected && (
-                  <p className="text-xs text-green-700 flex items-center gap-1.5 mt-1">
-                    <CheckCircle2 className="w-3 h-3 flex-shrink-0" />
-                    Amazon KDP compatible
                   </p>
                 )}
               </div>
@@ -1583,52 +834,6 @@ function AutoProduceInner() {
                     Auto-selected based on your project genre (Bible / Scripture). You can change it above.
                   </p>
                 )}
-              </div>
-              <div className="space-y-1.5">
-                <label className="text-sm font-medium text-[#5c3d2e] flex items-center gap-1.5">
-                  <Type className="w-3.5 h-3.5" /> Body Font
-                  <span className="text-xs font-normal text-[#8b7a6a]">(optional)</span>
-                </label>
-                <Select value={fontOverrideBody} onValueChange={setFontOverrideBody}>
-                  <SelectTrigger className="border-[#d4b896]/60 bg-[#fdf9f3] text-[#3d2b1f]">
-                    <SelectValue placeholder="Use style default" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="__default">Use style default</SelectItem>
-                    {options?.fonts
-                      ?.filter(f => f.category === "serif" || f.category === "sans-serif")
-                      .map(f => (
-                        <SelectItem key={f.id} value={f.id}>
-                          <span className="flex items-center gap-2">
-                            {f.label}
-                            <span className="text-xs text-[#8b7a6a]">{f.category}</span>
-                          </span>
-                        </SelectItem>
-                      ))}
-                  </SelectContent>
-                </Select>
-              </div>
-              <div className="space-y-1.5">
-                <label className="text-sm font-medium text-[#5c3d2e] flex items-center gap-1.5">
-                  <Type className="w-3.5 h-3.5" /> Heading & Chapter Font
-                  <span className="text-xs font-normal text-[#8b7a6a]">(optional)</span>
-                </label>
-                <Select value={fontOverrideHeading} onValueChange={setFontOverrideHeading}>
-                  <SelectTrigger className="border-[#d4b896]/60 bg-[#fdf9f3] text-[#3d2b1f]">
-                    <SelectValue placeholder="Use style default" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="__default">Use style default</SelectItem>
-                    {options?.fonts?.map(f => (
-                      <SelectItem key={f.id} value={f.id}>
-                        <span className="flex items-center gap-2">
-                          {f.label}
-                          <span className="text-xs text-[#8b7a6a]">{f.category}</span>
-                        </span>
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
               </div>
               <div className="space-y-1.5">
                 <label className="text-sm font-medium text-[#5c3d2e]">Output Format</label>
@@ -1670,35 +875,7 @@ function AutoProduceInner() {
               </div>
             )}
 
-            {/* Input mode toggle */}
-            <div className="flex rounded-lg border border-[#d4b896]/60 overflow-hidden">
-              <button
-                type="button"
-                onClick={() => setInputMode("file")}
-                className={`flex-1 flex items-center justify-center gap-2 py-2 text-sm font-medium transition-colors ${
-                  inputMode === "file"
-                    ? "bg-[#8b5e3c] text-white"
-                    : "bg-[#fdf9f3] text-[#7a6e60] hover:bg-[#f5ede4]"
-                }`}
-              >
-                <Upload className="w-3.5 h-3.5" />
-                Upload File
-              </button>
-              <button
-                type="button"
-                onClick={() => setInputMode("text")}
-                className={`flex-1 flex items-center justify-center gap-2 py-2 text-sm font-medium transition-colors ${
-                  inputMode === "text"
-                    ? "bg-[#8b5e3c] text-white"
-                    : "bg-[#fdf9f3] text-[#7a6e60] hover:bg-[#f5ede4]"
-                }`}
-              >
-                <Type className="w-3.5 h-3.5" />
-                Paste Text
-              </button>
-            </div>
-
-            {inputMode === "file" ? (
+            {/* Drop zone */}
             <div
               className={`border-2 border-dashed rounded-lg p-8 text-center cursor-pointer transition-colors ${
                 isDragging
@@ -1724,6 +901,7 @@ function AutoProduceInner() {
               />
               {selectedFile ? (
                 <div className="space-y-2 w-full">
+                  {/* Image preview */}
                   {previewUrl && (
                     <div className="flex flex-col items-center gap-2">
                       <img
@@ -1738,6 +916,7 @@ function AutoProduceInner() {
                     </div>
                   )}
 
+                  {/* ZIP contents preview */}
                   {zipContents !== null && !previewUrl && (
                     <div className="w-full text-left">
                       <div className="flex items-center gap-2 mb-2 justify-center">
@@ -1775,6 +954,7 @@ function AutoProduceInner() {
                     </div>
                   )}
 
+                  {/* Default non-image, non-zip file confirmation */}
                   {!previewUrl && zipContents === null && (
                     <>
                       <CheckCircle2 className="w-10 h-10 text-green-500 mx-auto" />
@@ -1790,48 +970,16 @@ function AutoProduceInner() {
                   <Upload className="w-10 h-10 text-[#c9a96e] mx-auto" />
                   <div>
                     <p className="font-medium text-[#5c3d2e]">Drop your manuscript here</p>
-                    <p className="text-xs text-[#7a6e60] mt-1">
+                    <p className="text-xs text-[#8b7b6b] mt-1">
                       or click to browse — max {MAX_FILE_SIZE_MB}MB
                     </p>
-                    <div className="flex flex-wrap justify-center gap-1 mt-2">
-                      {FORMAT_BADGES.map((f) => (
-                        <span
-                          key={f.label}
-                          className="inline-block text-[10px] px-1.5 py-0.5 rounded bg-[#f5ede4] border border-[#d4b896]/40 text-[#5c3d2e]"
-                        >
-                          {f.label}
-                        </span>
-                      ))}
-                    </div>
+                    <p className="text-[10px] text-[#b09880] mt-1">
+                      Word · PDF · TXT · MD · HTML · RTF · XLSX · ODT · CSV · EPUB · PNG · JPG · WebP · SVG · TIFF · GIF · ZIP · RAR
+                    </p>
                   </div>
                 </div>
               )}
             </div>
-            ) : (
-            <div className="space-y-2">
-              <textarea
-                value={pastedText}
-                onChange={(e) => setPastedText(e.target.value)}
-                placeholder="Paste or type your manuscript text here...&#10;&#10;You can paste content from any source — Word, Google Docs, web pages, notes apps, or type directly."
-                className="w-full min-h-[200px] max-h-[400px] rounded-lg border-2 border-[#d4b896]/60 bg-[#fdf9f3] p-4 text-sm text-[#3a2a1a] placeholder:text-[#b09880] focus:border-[#8b5e3c] focus:ring-1 focus:ring-[#8b5e3c] focus:outline-none resize-y font-serif leading-relaxed"
-              />
-              <div className="flex items-center justify-between text-xs text-[#7a6e60]">
-                <span>
-                  {pastedText.trim().length > 0
-                    ? `${pastedText.trim().split(/\s+/).filter(Boolean).length.toLocaleString()} words`
-                    : "Minimum 50 characters"}
-                </span>
-                {pastedText.trim().length > 0 && pastedText.trim().length < 50 && (
-                  <span className="text-amber-600">Need at least 50 characters</span>
-                )}
-                {pastedText.trim().length >= 50 && (
-                  <span className="text-green-600 flex items-center gap-1">
-                    <CheckCircle2 className="w-3 h-3" /> Ready
-                  </span>
-                )}
-              </div>
-            </div>
-            )}
 
             {/* Submit */}
             <Button
@@ -1852,18 +1000,9 @@ function AutoProduceInner() {
               )}
             </Button>
 
-            {projectId === 0 && (
-              <div className="text-xs text-center text-[#b09880] space-y-1">
-                <p>You're previewing settings from a template.</p>
-                <Link href="/dashboard" className="text-[#8b5e3c] underline hover:text-[#6b4226]">
-                  Create a project first
-                </Link>
-                <span> to start production.</span>
-              </div>
-            )}
-            {projectId > 0 && (!trimSizeId || !styleId || !hasInput) && (
+            {(!trimSizeId || !styleId || !selectedFile) && (
               <p className="text-xs text-center text-[#b09880]">
-                {!hasInput ? (inputMode === "file" ? "Upload a manuscript file" : "Paste your manuscript text (minimum 50 characters)") : !trimSizeId ? "Select a trim size" : "Select a typesetting style"} to continue
+                {!selectedFile ? "Upload a manuscript file" : !trimSizeId ? "Select a trim size" : "Select a typesetting style"} to continue
               </p>
             )}
           </CardContent>
@@ -1873,32 +1012,16 @@ function AutoProduceInner() {
         {jobs && jobs.length > 0 && (
           <div className="space-y-4">
             <div className="flex items-center gap-3">
-              <Clock className="w-4 h-4 text-[#7a6e60]" />
+              <Clock className="w-4 h-4 text-[#8b7b6b]" />
               <h3 className="font-serif text-lg text-[#3d2b1f]">Production History</h3>
               <span className="text-xs text-[#b09880]">({jobs.length} run{jobs.length !== 1 ? "s" : ""})</span>
             </div>
             <div className="space-y-3">
-              {(() => {
-                const sortedForVersions = [...jobs].sort((a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime());
-                const versionMap = new Map(sortedForVersions.map((j, i) => [j.id, i + 1]));
-                return [...jobs].reverse().map(job => (
-                  <div key={job.id} className="relative">
-                    <div className="absolute -left-2 -top-2 z-10">
-                      <span className="inline-flex items-center justify-center w-7 h-7 rounded-full bg-[#8b5e3c] text-white text-xs font-bold shadow-md border-2 border-white">
-                        v{versionMap.get(job.id) ?? 1}
-                      </span>
-                    </div>
-                    <JobCard jobId={job.id} projectId={projectId} />
-                  </div>
-                ));
-              })()}
+              {[...jobs].reverse().map(job => (
+                <JobCard key={job.id} jobId={job.id} projectId={projectId} />
+              ))}
             </div>
           </div>
-        )}
-
-        {/* Version History comparison table */}
-        {jobs && jobs.length >= 2 && (
-          <VersionHistory jobs={jobs as unknown as VersionHistoryJob[]} />
         )}
 
         {/* Empty state */}
@@ -1910,9 +1033,9 @@ function AutoProduceInner() {
         )}
 
         {/* What the AI does */}
-        <Card className="border border-[#e8dfd0] bg-white shadow-sm">
+        <Card className="border border-[#d4b896]/30 bg-[#fdf9f3]">
           <CardHeader>
-            <CardTitle className="font-serif text-[#2c1a00] text-base flex items-center gap-2">
+            <CardTitle className="font-serif text-[#3d2b1f] text-base flex items-center gap-2">
               <Sparkles className="w-4 h-4 text-[#c9a96e]" />
               What the AI does
             </CardTitle>
@@ -1920,7 +1043,7 @@ function AutoProduceInner() {
           <CardContent>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
               {[
-                { icon: FileText, step: "1. Parse", desc: "Extracts text from 25+ formats including DOCX, PDF, TXT, MD, HTML, RTF, CSV, JSON, and more" },
+                { icon: FileText, step: "1. Parse", desc: "Extracts text from your .docx, .pdf, or .txt file" },
                 { icon: Wand2, step: "2. Structure", desc: "AI detects chapters, frontmatter, and backmatter" },
                 { icon: BookOpen, step: "3. Typeset", desc: "Applies professional layout with your chosen style" },
                 { icon: Download, step: "4. Output", desc: "Renders press-ready interior PDF and EPUB ebook" },
@@ -1930,7 +1053,7 @@ function AutoProduceInner() {
                     <Icon className="w-4 h-4 text-[#8b5e3c]" />
                   </div>
                   <p className="text-xs font-semibold text-[#5c3d2e]">{step}</p>
-                  <p className="text-xs text-[#7a6e60] leading-relaxed">{desc}</p>
+                  <p className="text-xs text-[#8b7b6b] leading-relaxed">{desc}</p>
                 </div>
               ))}
             </div>
@@ -1944,14 +1067,12 @@ function AutoProduceInner() {
         onClose={() => setPreviewOpen(false)}
         styleId={styleId}
         trimSizeId={trimSizeId}
-        fontOverrideBody={fontOverrideBody && fontOverrideBody !== "__default" ? fontOverrideBody : undefined}
-        fontOverrideHeading={fontOverrideHeading && fontOverrideHeading !== "__default" ? fontOverrideHeading : undefined}
       />
 
       {/* Related Tools footer backlinks */}
-      <div className="border-t border-[#e8dfd0] bg-[#f3efe6] px-6 py-6">
+      <div className="border-t border-[#e8dfd0] bg-[#faf6ef] px-6 py-6">
         <div className="max-w-5xl mx-auto">
-          <p className="text-xs text-[#7a6e60] mb-3 font-semibold uppercase tracking-wide">Other Self-Publishing Tools</p>
+          <p className="text-xs text-[#8b7b6b] mb-3 font-semibold uppercase tracking-wide">Other Self-Publishing Tools</p>
           <div className="flex flex-wrap gap-2">
             {[
               { href: "/bible-studio", label: "Bible Design Studio" },
@@ -1970,7 +1091,6 @@ function AutoProduceInner() {
           </div>
         </div>
       </div>
-      <SiteFooter />
     </div>
   );
 }

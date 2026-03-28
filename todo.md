@@ -724,3 +724,20 @@
 ## Phase 88: Suppress baseline-browser-mapping Dev Warning
 - [x] Ran pnpm add -D baseline-browser-mapping@latest — installed v2.10.0
 - [x] Restarted dev server — warning no longer appears in new server startup logs
+
+## Phase 89: GNU FreeFont Support in New Production Run
+- [x] Read typesetting styles data model (shared/bibleSpecs.ts) and New Production Run UI
+- [x] Add FreeSerif, FreeSans, FreeMono (Regular, Bold, Italic, BoldItalic) as typesetting style options
+- [x] Installed GNU FreeFont TTFs to /usr/share/fonts/truetype/freefont/ via apt/wget and ran fc-cache
+- [x] Added @font-face injection in generateBookHtml() for styles with empty googleFontsUrl
+- [x] Verify font choices appear in the New Production Run page dropdown/selector
+- [x] All 235 tests pass, zero TypeScript errors
+
+## Phase 90: Replit Sync Cleanup + GNU FreeFont (complete)
+
+- [x] Identified all Replit-specific files pulled in by GitHub sync (42 TS errors)
+- [x] Removed: .replit, replit.md, main.py, pyproject.toml, uv.lock, attached_assets/, server/replit_integrations/, server/resendClient.ts, server/stripeClient.ts, server/seedStripeProducts.ts, server/webhookHandlers.ts, server/affiliateDb.ts, server/index.ts
+- [x] Removed Replit-only client pages: AdminPayouts, AffiliateDashboard, AffiliateProgram, ConfirmEmail, GuidedJourney, Login, PreLaunchPage, Pricing, ResetPassword, Templates, EBPTemplates, CheckoutGate, EBPProductionWizard, UpgradeGate
+- [x] Restored from ee19825 checkpoint: all server/_core files, drizzle schema, routers, shared constants, all overwritten client pages and components
+- [x] Re-applied GNU FreeFont @font-face injection for styles with empty googleFontsUrl (FreeSerif, FreeSans, FreeMono — all weights and styles)
+- [x] Zero TypeScript errors, all 236 tests pass

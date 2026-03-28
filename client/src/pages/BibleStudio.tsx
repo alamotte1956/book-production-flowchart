@@ -8,10 +8,6 @@
 import { useState, useMemo } from "react";
 import { Link, useLocation } from "wouter";
 import { ArrowLeft, BookOpen, Printer, FileDown, ChevronRight, Info, Check, Sparkles, Wand2, Copy, RefreshCw, ChevronDown } from "lucide-react";
-import WhatsNext from "@/components/WhatsNext";
-import RelatedTools from "@/components/RelatedTools";
-import SiteFooter from "@/components/SiteFooter";
-import type { NextPrompt } from "@shared/prompts";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -24,7 +20,6 @@ import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { toast } from "sonner";
 import { trpc } from "@/lib/trpc";
-import { exportSpecSheetAsPdf } from "@/lib/exportPdf";
 import {
   BIBLE_EDITION_TYPES,
   BIBLE_TRANSLATIONS,
@@ -33,7 +28,6 @@ import {
   PAPER_TYPES,
   BINDING_TYPES,
   TYPEFACES,
-  TYPEFACE_PAIRINGS,
   calculateSpineWidth,
   getBibleTrimSizes,
   getBibleStyles,
@@ -107,12 +101,12 @@ const DEFAULT_CONFIG: BibleConfig = {
 function SectionHeader({ step, title, subtitle }: { step: number; title: string; subtitle: string }) {
   return (
     <div className="flex items-start gap-4 mb-5">
-      <div className="w-8 h-8 rounded-full bg-[#2c1a00] text-[#c9a96e] flex items-center justify-center text-sm font-bold flex-shrink-0 mt-0.5 shadow-sm">
+      <div className="w-8 h-8 rounded-full bg-[#2c1a00] text-[#c9a96e] flex items-center justify-center text-sm font-bold flex-shrink-0 mt-0.5">
         {step}
       </div>
       <div>
         <h2 className="text-lg font-serif font-semibold text-[#2c1a00]">{title}</h2>
-        <p className="text-sm text-[#7a6e60] mt-0.5 leading-relaxed">{subtitle}</p>
+        <p className="text-sm text-[#8b7b6b] mt-0.5">{subtitle}</p>
       </div>
     </div>
   );
@@ -154,7 +148,7 @@ function OptionCard({
               </Badge>
             )}
           </div>
-          {subtitle && <p className="text-xs text-[#7a6e60] mt-0.5 leading-relaxed">{subtitle}</p>}
+          {subtitle && <p className="text-xs text-[#8b7b6b] mt-0.5 leading-relaxed">{subtitle}</p>}
           {features && features.length > 0 && (
             <div className="flex flex-wrap gap-1 mt-2">
               {features.slice(0, 4).map(f => (
@@ -254,48 +248,81 @@ function SpecSummary({ config }: { config: BibleConfig }) {
     config.twoColorPrinting && "Two-Color Printing",
   ].filter(Boolean) as string[];
 
-  const handleExportSpecSheet = async () => {
-    try {
-    await exportSpecSheetAsPdf({
-      title: "Bible Edition Spec Sheet",
-      subtitle: edition?.label ?? "Bible Edition",
-      filename: `Bible-Spec-Sheet-${edition?.label ?? "Edition"}.pdf`,
-      sections: [
-        {
-          title: "Core Specifications",
-          rows: [
-            { label: "Edition Type", value: edition?.label ?? "—" },
-            { label: "Translation", value: `${translation?.label ?? "—"}${translation?.fullName ? ` (${translation.fullName})` : ""}` },
-            { label: "Trim Size", value: trim?.label ?? "—" },
-            { label: "Typesetting Style", value: style?.label ?? "—" },
-            { label: "Paper Type", value: paper?.label ?? "—" },
-            { label: "Binding Type", value: binding?.label ?? "—" },
-          ],
-        },
-        {
-          title: "Typeface Selection",
-          rows: [
-            { label: "Body Text", value: TYPEFACES.find(t => t.id === config.bodyTypefaceId)?.name ?? "—" },
-            { label: "Chapter Headings", value: TYPEFACES.find(t => t.id === config.headingTypefaceId)?.name ?? "—" },
-            { label: "Verse Numbers", value: TYPEFACES.find(t => t.id === config.verseNumberTypefaceId)?.name ?? "—" },
-          ],
-        },
-        {
-          title: "Physical Dimensions",
-          rows: [
-            { label: "Estimated Page Count", value: `${config.pageCount.toLocaleString()} pp` },
-            { label: "Calculated Spine Width", value: `${spine.spineWidthIn.toFixed(3)}" / ${spine.spineWidthMm}mm`, bold: true },
-          ],
-        },
-        ...(activeFeatures.length > 0 ? [{
-          title: `Active Features (${activeFeatures.length})`,
-          rows: activeFeatures.map(f => ({ label: f, value: "✓" })),
-        }] : []),
-      ],
-      footerNote: spine.notes,
-    });
-    } catch (err) {
-      toast.error("PDF generation failed. Please try again.");
+  const handleExportSpecSheet = () => {
+    const specHtml = `<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Bible Edition Spec Sheet</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: Georgia, serif; background: #fff; color: #1a1008; padding: 48px; max-width: 720px; margin: 0 auto; }
+    h1 { font-size: 24px; font-weight: bold; margin-bottom: 4px; }
+    .subtitle { font-size: 12px; color: #8b7b6b; letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 32px; }
+    .divider { border: none; border-top: 1px solid #c9a96e; margin: 20px 0; }
+    .section-title { font-size: 10px; font-weight: bold; text-transform: uppercase; letter-spacing: 0.1em; color: #8b5e3c; margin-bottom: 12px; }
+    .spec-row { display: flex; justify-content: space-between; padding: 6px 0; border-bottom: 1px solid #f0e8dc; font-size: 13px; }
+    .spec-label { color: #8b7b6b; }
+    .spec-value { font-weight: 600; text-align: right; }
+    .spine-value { color: #8b5e3c; font-size: 16px; font-weight: bold; }
+    .features { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
+    .feature-tag { background: #8b5e3c; color: white; font-size: 11px; padding: 3px 10px; border-radius: 20px; font-family: Arial, sans-serif; }
+    .footer { margin-top: 40px; font-size: 10px; color: #a89880; text-align: center; }
+    @media print {
+      body { padding: 32px; }
+      .no-print { display: none; }
+    }
+  </style>
+</head>
+<body>
+  <h1>Bible Edition Spec Sheet</h1>
+  <p class="subtitle">Create Design Publish LLC &mdash; ${new Date().toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" })}</p>
+  <hr class="divider">
+
+  <p class="section-title">Core Specifications</p>
+  <div class="spec-row"><span class="spec-label">Edition Type</span><span class="spec-value">${edition?.label ?? "—"}</span></div>
+  <div class="spec-row"><span class="spec-label">Translation</span><span class="spec-value">${translation?.label ?? "—"} ${translation?.fullName ? `(${translation.fullName})` : ""}</span></div>
+  <div class="spec-row"><span class="spec-label">Trim Size</span><span class="spec-value">${trim?.label ?? "—"}</span></div>
+  <div class="spec-row"><span class="spec-label">Typesetting Style</span><span class="spec-value">${style?.label ?? "—"}</span></div>
+  <div class="spec-row"><span class="spec-label">Paper Type</span><span class="spec-value">${paper?.label ?? "—"}</span></div>
+  <div class="spec-row"><span class="spec-label">Binding Type</span><span class="spec-value">${binding?.label ?? "—"}</span></div>
+
+  <hr class="divider">
+
+  <p class="section-title">Typeface Selection</p>
+  <div class="spec-row"><span class="spec-label">Body Text</span><span class="spec-value">${TYPEFACES.find(t => t.id === config.bodyTypefaceId)?.name ?? "—"}</span></div>
+  <div class="spec-row"><span class="spec-label">Chapter Headings</span><span class="spec-value">${TYPEFACES.find(t => t.id === config.headingTypefaceId)?.name ?? "—"}</span></div>
+  <div class="spec-row"><span class="spec-label">Verse Numbers</span><span class="spec-value">${TYPEFACES.find(t => t.id === config.verseNumberTypefaceId)?.name ?? "—"}</span></div>
+
+  <hr class="divider">
+
+  <p class="section-title">Physical Dimensions</p>
+  <div class="spec-row"><span class="spec-label">Estimated Page Count</span><span class="spec-value">${config.pageCount.toLocaleString()} pp</span></div>
+  <div class="spec-row"><span class="spec-label">Calculated Spine Width</span><span class="spec-value spine-value">${spine.spineWidthIn.toFixed(3)}" / ${spine.spineWidthMm}mm</span></div>
+
+  ${activeFeatures.length > 0 ? `
+  <hr class="divider">
+  <p class="section-title">Active Features (${activeFeatures.length})</p>
+  <div class="features">
+    ${activeFeatures.map(f => `<span class="feature-tag">${f}</span>`).join("")}
+  </div>
+  ` : ""}
+
+  <hr class="divider">
+  <p class="section-title">Spine Calculation Notes</p>
+  <p style="font-size: 12px; color: #7a6050; line-height: 1.6;">${spine.notes}</p>
+
+  <div class="footer">
+    Generated by Create Design Publish LLC &mdash; Create Design Publish LLC
+  </div>
+</body>
+</html>`;
+
+    const win = window.open("", "_blank");
+    if (win) {
+      win.document.write(specHtml);
+      win.document.close();
+      setTimeout(() => win.print(), 500);
     }
   };
 
@@ -401,22 +428,6 @@ function SpecSummary({ config }: { config: BibleConfig }) {
         <FileDown className="w-4 h-4" />
         Export Spec Sheet (Print / PDF)
       </Button>
-
-      <WhatsNext
-        compact
-        className="mt-2"
-        prompts={[
-          {
-            id: "after_bible_spine",
-            title: "Calculate Your Spine Width",
-            description: "Your Bible edition specs are configured! Next, calculate the exact spine width for your cover file using the Spine Calculator.",
-            actionLabel: "Open Spine Calculator",
-            actionRoute: "/spine-calculator",
-            icon: "spine_calc",
-            priority: "high",
-          } satisfies NextPrompt,
-        ]}
-      />
     </div>
   );
 }
@@ -424,10 +435,6 @@ function SpecSummary({ config }: { config: BibleConfig }) {
 // ─── AI Writing Assistant ─────────────────────────────────────────────────────
 
 const COPY_TYPES = [
-  { value: "foreword", label: "Foreword", desc: "~500 words" },
-  { value: "introduction", label: "Introduction", desc: "~600 words" },
-  { value: "copyright-page", label: "Copyright Page", desc: "~150 words" },
-  { value: "glossary", label: "Glossary", desc: "~400 words" },
   { value: "back-cover-blurb", label: "Back-Cover Blurb", desc: "~150 words" },
   { value: "author-bio", label: "Author Biography", desc: "~100 words" },
   { value: "catalog-description", label: "Catalog Description", desc: "~200 words" },
@@ -495,7 +502,7 @@ function AIWritingAssistant() {
           </div>
           <div className="text-left">
             <h3 className="text-sm font-semibold text-[#2c1a00]">AI Writing Assistant</h3>
-            <p className="text-[11px] text-[#7a6e60]">Generate blurbs, bios, and marketing copy</p>
+            <p className="text-[11px] text-[#8b7b6b]">Generate blurbs, bios, and marketing copy</p>
           </div>
         </div>
         <ChevronDown size={16} className={`text-[#a08060] transition-transform ${isOpen ? "rotate-180" : ""}`} />
@@ -593,7 +600,7 @@ function AIWritingAssistant() {
                 </span>
                 <button
                   onClick={handleCopy}
-                  className="flex items-center gap-1 text-[10px] text-[#7a6e60] hover:text-[#5c3d2e] transition-colors"
+                  className="flex items-center gap-1 text-[10px] text-[#8b7b6b] hover:text-[#5c3d2e] transition-colors"
                 >
                   <Copy size={10} /> Copy
                 </button>
@@ -601,118 +608,6 @@ function AIWritingAssistant() {
               <p className="text-xs text-[#3d2b1f] leading-relaxed whitespace-pre-wrap">{result}</p>
             </div>
           )}
-        </div>
-      )}
-    </div>
-  );
-}
-
-// ─── Recommended Typeface Pairings ───────────────────────────────────────────
-
-function RecommendedPairings({ onApply }: { onApply: (bodyId: string, headingId: string, verseId: string) => void }) {
-  const [isOpen, setIsOpen] = useState(false);
-
-  return (
-    <div className="bg-white rounded-xl border border-[#e8ddd0] overflow-hidden">
-      <button
-        className="w-full flex items-center justify-between p-4 hover:bg-[#fdf9f3] transition-colors"
-        onClick={() => setIsOpen(v => !v)}
-      >
-        <div className="flex items-center gap-3">
-          <div className="w-8 h-8 rounded-lg bg-amber-100 flex items-center justify-center">
-            <Sparkles size={16} className="text-amber-600" />
-          </div>
-          <div className="text-left">
-            <h3 className="text-sm font-semibold text-[#2c1a00]">Typeface Pairings</h3>
-            <p className="text-[11px] text-[#7a6e60]">Professional font combinations — one-click apply</p>
-          </div>
-        </div>
-        <ChevronDown size={16} className={`text-[#a08060] transition-transform ${isOpen ? "rotate-180" : ""}`} />
-      </button>
-
-      {isOpen && (
-        <div className="px-4 pb-4 border-t border-[#f0e8dc] pt-4 space-y-3">
-          {TYPEFACE_PAIRINGS.map(pairing => {
-            const bodyFace = TYPEFACES.find(t => t.id === pairing.bodyTypefaceId);
-            const headingFace = TYPEFACES.find(t => t.id === pairing.headingTypefaceId);
-            const verseFace = TYPEFACES.find(t => t.id === pairing.verseNumberTypefaceId);
-
-            const fontUrls = Array.from(new Set(
-              [bodyFace?.googleFontsUrl, headingFace?.googleFontsUrl, verseFace?.googleFontsUrl].filter((u): u is string => !!u)
-            ));
-
-            return (
-              <div key={pairing.id} className="rounded-lg border border-[#e8ddd0] bg-[#fdf9f3] p-3">
-                {fontUrls.map(url => <link key={url} rel="stylesheet" href={url} />)}
-                <div className="flex items-start justify-between gap-2 mb-2">
-                  <div>
-                    <p className="text-sm font-semibold text-[#2c1a00]">{pairing.name}</p>
-                    <p className="text-[11px] text-[#7a6e60] mt-0.5 leading-relaxed">{pairing.description}</p>
-                  </div>
-                </div>
-
-                <div className="flex flex-wrap gap-1 mb-3">
-                  {pairing.tags.map(tag => (
-                    <span key={tag} className="text-[9px] bg-[#e8ddd0] text-[#5c3d2e] px-1.5 py-0.5 rounded font-semibold uppercase tracking-wide">
-                      {tag}
-                    </span>
-                  ))}
-                </div>
-
-                <div className="space-y-1.5 mb-3 bg-white rounded-lg border border-[#f0e8dc] p-3">
-                  <div>
-                    <p className="text-[9px] text-[#a08060] uppercase tracking-wider font-bold mb-0.5">Body</p>
-                    <p
-                      className="text-sm text-[#2c1a00] leading-snug"
-                      style={{ fontFamily: bodyFace?.cssFamily }}
-                    >
-                      In the beginning God created the heavens and the earth.
-                    </p>
-                  </div>
-                  <div>
-                    <p className="text-[9px] text-[#a08060] uppercase tracking-wider font-bold mb-0.5">Heading</p>
-                    <p
-                      className="text-base text-[#2c1a00] leading-snug"
-                      style={{
-                        fontFamily: headingFace?.cssFamily,
-                        fontStyle: headingFace?.category === "italic" ? "italic" : "normal",
-                      }}
-                    >
-                      Genesis · Chapter 1
-                    </p>
-                  </div>
-                  <div>
-                    <p className="text-[9px] text-[#a08060] uppercase tracking-wider font-bold mb-0.5">Verse Numbers</p>
-                    <p
-                      className="text-sm text-[#2c1a00] leading-snug"
-                      style={{
-                        fontFamily: verseFace?.cssFamily,
-                        fontWeight: verseFace?.category === "sans-serif-bold" ? 700 : 400,
-                      }}
-                    >
-                      ¹ In the beginning ² And the earth was
-                    </p>
-                  </div>
-                </div>
-
-                <div className="flex items-center justify-between text-[10px] text-[#7a6e60] mb-2">
-                  <span>{bodyFace?.name} · {headingFace?.name} · {verseFace?.name}</span>
-                </div>
-
-                <Button
-                  size="sm"
-                  className="w-full bg-[#8b5e3c] hover:bg-[#7a4f30] text-white gap-1.5 text-xs"
-                  onClick={() => {
-                    onApply(pairing.bodyTypefaceId, pairing.headingTypefaceId, pairing.verseNumberTypefaceId);
-                    toast.success(`Applied "${pairing.name}" typeface pairing`);
-                  }}
-                >
-                  <Check size={12} />
-                  Use This Pairing
-                </Button>
-              </div>
-            );
-          })}
         </div>
       )}
     </div>
@@ -755,19 +650,17 @@ export default function BibleStudio() {
   const bibleStyles = getBibleStyles();
 
   return (
-    <div className="min-h-screen bg-[#f3efe6]">
+    <div className="min-h-screen bg-[#faf6ef]">
       {/* Header */}
-      <header className="bg-[#2c1a00] text-white px-6 py-4 flex items-center gap-4 sticky top-0 z-30 shadow-lg border-b border-[#4a3828]">
+      <header className="bg-[#2c1a00] text-white px-6 py-4 flex items-center gap-4 sticky top-0 z-30 shadow-lg">
         <button
-          onClick={() => navigate("/dashboard")}
-          className="text-[#c9a96e] hover:text-white transition-colors p-1.5 rounded-lg hover:bg-[#3d2810]"
+          onClick={() => navigate("/")}
+          className="text-[#c9a96e] hover:text-white transition-colors p-1 rounded"
         >
           <ArrowLeft className="w-5 h-5" />
         </button>
         <div className="flex items-center gap-3">
-          <div className="w-9 h-9 bg-[#c9a96e]/20 rounded-lg flex items-center justify-center">
-            <BookOpen className="w-5 h-5 text-[#c9a96e]" />
-          </div>
+          <BookOpen className="w-5 h-5 text-[#c9a96e]" />
           <div>
             <h1 className="text-lg font-serif font-bold leading-tight">Bible Design Studio</h1>
             <p className="text-xs text-[#a08060]">Configure any Bible edition with complete freedom</p>
@@ -930,7 +823,7 @@ export default function BibleStudio() {
                     <div key={key} className="bg-white rounded-xl border border-[#e8ddd0] p-4">
                       <div className="mb-3">
                         <p className="text-sm font-semibold text-[#2c1a00]">{label}</p>
-                        <p className="text-xs text-[#7a6e60]">{desc}</p>
+                        <p className="text-xs text-[#8b7b6b]">{desc}</p>
                       </div>
 
                       {/* Category tabs */}
@@ -951,7 +844,7 @@ export default function BibleStudio() {
                             className={`text-left p-3 rounded-lg border transition-all ${
                               config[key] === face.id
                                 ? "border-[#8b5e3c] bg-[#fdf5ec] shadow-sm"
-                                : "border-[#e8ddd0] bg-white hover:border-[#c9a96e] hover:bg-[#f3efe6]"
+                                : "border-[#e8ddd0] bg-white hover:border-[#c9a96e] hover:bg-[#faf6ef]"
                             }`}
                           >
                             <div className="flex items-start justify-between gap-2">
@@ -1117,18 +1010,10 @@ export default function BibleStudio() {
 
           </div>
 
-          {/* Right: Sticky spec summary + pairings + AI assistant */}
+          {/* Right: Sticky spec summary + AI assistant */}
           <div className="lg:col-span-1">
             <div className="sticky top-24 space-y-4">
               <SpecSummary config={config} />
-              <RecommendedPairings onApply={(bodyId, headingId, verseId) => {
-                setConfig(prev => ({
-                  ...prev,
-                  bodyTypefaceId: bodyId,
-                  headingTypefaceId: headingId,
-                  verseNumberTypefaceId: verseId,
-                }));
-              }} />
               <AIWritingAssistant />
             </div>
           </div>
@@ -1137,9 +1022,9 @@ export default function BibleStudio() {
       </div>
 
       {/* Related Tools footer backlinks */}
-      <div className="border-t border-[#e8dfd0] bg-[#f3efe6] px-6 py-6">
+      <div className="border-t border-[#e8dfd0] bg-[#faf6ef] px-6 py-6">
         <div className="max-w-5xl mx-auto">
-          <p className="text-xs text-[#7a6e60] mb-3 font-semibold uppercase tracking-wide">Other Self-Publishing Tools</p>
+          <p className="text-xs text-[#8b7b6b] mb-3 font-semibold uppercase tracking-wide">Other Self-Publishing Tools</p>
           <div className="flex flex-wrap gap-2">
             {[
               { href: "/spine-calculator", label: "Spine Calculator" },
@@ -1158,11 +1043,6 @@ export default function BibleStudio() {
           </div>
         </div>
       </div>
-
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <RelatedTools currentPage="bible-studio" />
-      </div>
-      <SiteFooter />
     </div>
   );
 }

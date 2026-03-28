@@ -89,13 +89,6 @@ function injectRouteMeta(html: string, urlPath: string): string {
     `    <!-- og:start -->\n    ${socialTags}\n    <!-- og:end -->\n  </head>`
   );
 
-  // Inject JSON-LD structured data if present
-  if (meta.jsonLd) {
-    html = html.replace(/\s*<!-- jsonld:start -->[\s\S]*?<!-- jsonld:end -->/, "");
-    const jsonLdScript = `<!-- jsonld:start -->\n    <script type="application/ld+json">${JSON.stringify(meta.jsonLd)}</script>\n    <!-- jsonld:end -->`;
-    html = html.replace("</head>", `    ${jsonLdScript}\n  </head>`);
-  }
-
   return html;
 }
 
@@ -153,18 +146,7 @@ export function serveStatic(app: Express) {
     );
   }
 
-  app.use("/assets", express.static(path.resolve(distPath, "assets"), {
-    maxAge: "1y",
-    immutable: true,
-  }));
-  app.use(express.static(distPath, {
-    maxAge: 0,
-    setHeaders: (res, filePath) => {
-      if (filePath.endsWith(".html")) {
-        res.setHeader("Cache-Control", "no-cache, must-revalidate");
-      }
-    },
-  }));
+  app.use(express.static(distPath));
 
   // fall through to index.html if the file doesn't exist, injecting route meta
   app.use("*", (req, res) => {

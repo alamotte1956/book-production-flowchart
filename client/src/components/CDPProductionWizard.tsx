@@ -1,6 +1,6 @@
 /**
- * EBP Production Wizard
- * A 5-step guided modal that takes a EBP template and walks the user through
+ * CDP Production Wizard
+ * A 5-step guided modal that takes a CDP template and walks the user through
  * every step needed to recreate a book in that style:
  *   Step 1 — Template Confirmation
  *   Step 2 — Book Details (title, author, or ISBN prefill)
@@ -13,6 +13,7 @@ import { useState, useRef } from "react";
 import { useLocation } from "wouter";
 import { trpc } from "@/lib/trpc";
 import { useAuth } from "@/_core/hooks/useAuth";
+import { getLoginUrl } from "@/const";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -29,17 +30,17 @@ import {
   Sparkles, Upload, Loader2, BookMarked, Rocket, X,
   AlertCircle, User, Hash,
 } from "lucide-react";
-import type { EBPTemplate } from "../../../shared/ebpTemplates";
+import type { CDPTemplate } from "../../../shared/cdpTemplates";
 
 // ─── Shared bibleSpecs imports ────────────────────────────────────────────────
 // We import the arrays directly from the shared module so the wizard always
 // shows the same options as the rest of the app.
-import { TYPESETTING_STYLES, TRIM_SIZES, FONT_FAMILIES } from "../../../shared/bibleSpecs";
+import { TYPESETTING_STYLES, TRIM_SIZES } from "../../../shared/bibleSpecs";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
-export type EBPProductionWizardProps = {
-  template: EBPTemplate;
+export type CDPProductionWizardProps = {
+  template: CDPTemplate;
   /** Optional pre-filled book metadata (e.g. from ISBN lookup) */
   prefillBook?: {
     title?: string;
@@ -102,11 +103,11 @@ function StepIndicator({ current }: { current: WizardStep }) {
 
 // ─── Main Component ───────────────────────────────────────────────────────────
 
-export default function EBPProductionWizard({
+export default function CDPProductionWizard({
   template,
   prefillBook,
   onClose,
-}: EBPProductionWizardProps) {
+}: CDPProductionWizardProps) {
   const [, navigate] = useLocation();
   const { user } = useAuth();
 
@@ -120,8 +121,6 @@ export default function EBPProductionWizard({
   // Step 3: Typesetting config (pre-filled from template)
   const [styleId, setStyleId] = useState(template.styleId);
   const [trimSizeId, setTrimSizeId] = useState(template.trimSizeId);
-  const [fontOverrideBody, setFontOverrideBody] = useState("");
-  const [fontOverrideHeading, setFontOverrideHeading] = useState("");
 
   // Step 4: Manuscript
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -149,9 +148,9 @@ export default function EBPProductionWizard({
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
-    const allowedExts = /\.(docx?|txt|text|log|asc|rtf|epub|pdf|odt|pages|md|markdown|mdx|html?|xml|xlsx?|numbers|ods|csv|tsv|json|ya?ml|png|jpe?g|webp|tiff?|gif|svg|zip|rar)$/i;
+    const allowedExts = /\.(docx?|txt|rtf|epub)$/i;
     if (!allowedExts.test(file.name)) {
-      setFileError("Unsupported file type. Accepted: Word, PDF, TXT, MD, HTML, RTF, EPUB, spreadsheets, images, and more.");
+      setFileError("Unsupported file type. Please upload a .docx, .doc, .txt, .rtf, or .epub file.");
       return;
     }
     if (file.size > 50 * 1024 * 1024) {
@@ -163,7 +162,7 @@ export default function EBPProductionWizard({
   };
 
   const handleLaunch = async () => {
-    if (!user) return;
+    if (!user) { window.location.href = getLoginUrl(); return; }
     if (!selectedFile) return;
     setLaunching(true);
     setLaunchError(null);
@@ -200,8 +199,6 @@ export default function EBPProductionWizard({
         fileName: selectedFile.name,
         mimeType: selectedFile.type || "application/octet-stream",
         fileBase64,
-        fontOverrideBody: fontOverrideBody && fontOverrideBody !== "__default" ? fontOverrideBody : undefined,
-        fontOverrideHeading: fontOverrideHeading && fontOverrideHeading !== "__default" ? fontOverrideHeading : undefined,
       });
 
       setJobId(result.jobId);
@@ -239,7 +236,7 @@ export default function EBPProductionWizard({
                 </div>
                 <div>
                   <h3 className="font-bold text-[#3b2a1a] text-lg">{template.label}</h3>
-                  <p className="text-sm text-[#7a6e60] mt-0.5">{template.tagline}</p>
+                  <p className="text-sm text-[#8b7b6b] mt-0.5">{template.tagline}</p>
                   <div className="mt-2 flex flex-wrap gap-1.5">
                     <Badge variant="outline" className="text-xs">{template.trimLabel}</Badge>
                     <Badge variant="outline" className="text-xs">
@@ -254,7 +251,7 @@ export default function EBPProductionWizard({
             <p className="text-sm text-[#5c3d2e] leading-relaxed">{template.description}</p>
 
             <div>
-              <h4 className="text-sm font-semibold text-[#6b5f53] uppercase tracking-wider mb-2">
+              <h4 className="text-xs font-semibold text-[#8b7b6b] uppercase tracking-wider mb-2">
                 Key Production Features
               </h4>
               <ul className="space-y-1.5">
@@ -269,15 +266,15 @@ export default function EBPProductionWizard({
 
             {prefillBook && (
               <div className="bg-[#f0ebe3] rounded-lg p-3 border border-[#c9a96e]/20">
-                <p className="text-sm font-medium text-[#6b5f53] uppercase tracking-wider mb-1">
+                <p className="text-xs font-medium text-[#8b7b6b] uppercase tracking-wider mb-1">
                   Pre-filled from ISBN lookup
                 </p>
                 <p className="text-sm font-semibold text-[#3b2a1a]">{prefillBook.title}</p>
                 {prefillBook.author && (
-                  <p className="text-sm text-[#6b5f53]">by {prefillBook.author}</p>
+                  <p className="text-xs text-[#8b7b6b]">by {prefillBook.author}</p>
                 )}
                 {prefillBook.isbn && (
-                  <p className="text-sm text-[#7a6e60]">ISBN {prefillBook.isbn}</p>
+                  <p className="text-xs text-[#b0a090]">ISBN {prefillBook.isbn}</p>
                 )}
               </div>
             )}
@@ -288,17 +285,17 @@ export default function EBPProductionWizard({
       case 2:
         return (
           <div className="space-y-4">
-            <p className="text-sm text-[#7a6e60]">
+            <p className="text-sm text-[#8b7b6b]">
               Enter the details for the book you want to recreate. These will be used to create a
               new project.
             </p>
             <div className="space-y-3">
               <div>
-                <Label htmlFor="ebpwiz-title" className="text-sm font-medium text-[#3b2a1a]">
+                <Label htmlFor="cdpwiz-title" className="text-sm font-medium text-[#3b2a1a]">
                   Book Title <span className="text-red-500">*</span>
                 </Label>
                 <Input
-                  id="ebpwiz-title"
+                  id="cdpwiz-title"
                   value={title}
                   onChange={e => setTitle(e.target.value)}
                   placeholder="e.g. The Purpose Driven Life"
@@ -306,13 +303,13 @@ export default function EBPProductionWizard({
                 />
               </div>
               <div>
-                <Label htmlFor="ebpwiz-author" className="text-sm font-medium text-[#3b2a1a]">
+                <Label htmlFor="cdpwiz-author" className="text-sm font-medium text-[#3b2a1a]">
                   Author
                 </Label>
                 <div className="relative mt-1">
                   <User className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-[#b0a090]" />
                   <Input
-                    id="ebpwiz-author"
+                    id="cdpwiz-author"
                     value={author}
                     onChange={e => setAuthor(e.target.value)}
                     placeholder="e.g. Rick Warren"
@@ -321,13 +318,13 @@ export default function EBPProductionWizard({
                 </div>
               </div>
               <div>
-                <Label htmlFor="ebpwiz-isbn" className="text-sm font-medium text-[#3b2a1a]">
+                <Label htmlFor="cdpwiz-isbn" className="text-sm font-medium text-[#3b2a1a]">
                   ISBN (optional)
                 </Label>
                 <div className="relative mt-1">
                   <Hash className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-[#b0a090]" />
                   <Input
-                    id="ebpwiz-isbn"
+                    id="cdpwiz-isbn"
                     value={isbn}
                     onChange={e => setIsbn(e.target.value)}
                     placeholder="e.g. 9780310908501"
@@ -345,7 +342,7 @@ export default function EBPProductionWizard({
         return (
           <div className="space-y-5">
             <div className="bg-[#f0ebe3] rounded-lg p-3 border border-[#c9a96e]/20">
-              <div className="flex items-center gap-2 text-sm text-[#6b5f53]">
+              <div className="flex items-center gap-2 text-xs text-[#8b7b6b]">
                 <Sparkles className="w-3.5 h-3.5 text-[#c9a96e]" />
                 Pre-filled from the{" "}
                 <strong className="text-[#5c3d2e]">{template.label}</strong> template. Adjust if
@@ -387,39 +384,9 @@ export default function EBPProductionWizard({
                   </SelectContent>
                 </Select>
               </div>
-
-              <div>
-                <Label className="text-sm font-medium text-[#3b2a1a]">Body Font <span className="text-xs font-normal text-[#8b7a6a]">(optional)</span></Label>
-                <Select value={fontOverrideBody} onValueChange={setFontOverrideBody}>
-                  <SelectTrigger className="mt-1 border-[#c9a96e]/30 focus:ring-[#c9a96e]/50">
-                    <SelectValue placeholder="Use style default" />
-                  </SelectTrigger>
-                  <SelectContent className="max-h-60">
-                    <SelectItem value="__default">Use style default</SelectItem>
-                    {FONT_FAMILIES.filter(f => f.category === "serif" || f.category === "sans-serif").map(f => (
-                      <SelectItem key={f.id} value={f.id}>{f.label} <span className="text-xs text-[#8b7a6a]">({f.category})</span></SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-
-              <div>
-                <Label className="text-sm font-medium text-[#3b2a1a]">Heading & Chapter Font <span className="text-xs font-normal text-[#8b7a6a]">(optional)</span></Label>
-                <Select value={fontOverrideHeading} onValueChange={setFontOverrideHeading}>
-                  <SelectTrigger className="mt-1 border-[#c9a96e]/30 focus:ring-[#c9a96e]/50">
-                    <SelectValue placeholder="Use style default" />
-                  </SelectTrigger>
-                  <SelectContent className="max-h-60">
-                    <SelectItem value="__default">Use style default</SelectItem>
-                    {FONT_FAMILIES.map(f => (
-                      <SelectItem key={f.id} value={f.id}>{f.label} <span className="text-xs text-[#8b7a6a]">({f.category})</span></SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
             </div>
 
-            <p className="text-sm text-[#7a6e60]">★ = recommended for this template</p>
+            <p className="text-xs text-[#b0a090]">★ = recommended for this template</p>
           </div>
         );
       }
@@ -428,7 +395,7 @@ export default function EBPProductionWizard({
       case 4:
         return (
           <div className="space-y-5">
-            <p className="text-sm text-[#7a6e60]">
+            <p className="text-sm text-[#8b7b6b]">
               Upload your manuscript file. The AI typesetting engine will format it using the
               selected style and trim size to produce a press-ready PDF and EPUB.
             </p>
@@ -437,14 +404,14 @@ export default function EBPProductionWizard({
               className={`border-2 border-dashed rounded-xl p-8 text-center cursor-pointer transition-colors ${
                 selectedFile
                   ? "border-emerald-400 bg-emerald-50"
-                  : "border-[#c9a96e]/40 bg-[#f3efe6] hover:border-[#c9a96e] hover:bg-[#f5efe5]"
+                  : "border-[#c9a96e]/40 bg-[#faf6ef] hover:border-[#c9a96e] hover:bg-[#f5efe5]"
               }`}
               onClick={() => fileInputRef.current?.click()}
             >
               <input
                 ref={fileInputRef}
                 type="file"
-                accept=".docx,.doc,.odt,.pages,.pdf,.txt,.text,.log,.asc,.md,.markdown,.mdx,.html,.htm,.xml,.rtf,.xlsx,.xls,.numbers,.ods,.csv,.tsv,.json,.yaml,.yml,.epub,.png,.jpg,.jpeg,.webp,.tiff,.tif,.gif,.svg,.zip,.rar"
+                accept=".docx,.doc,.txt,.rtf,.epub"
                 className="hidden"
                 onChange={handleFileSelect}
               />
@@ -452,15 +419,15 @@ export default function EBPProductionWizard({
                 <div className="flex flex-col items-center gap-2">
                   <CheckCircle2 className="w-8 h-8 text-emerald-500" />
                   <p className="font-medium text-emerald-700">{selectedFile.name}</p>
-                  <p className="text-sm text-emerald-600">
+                  <p className="text-xs text-emerald-600">
                     {(selectedFile.size / 1024 / 1024).toFixed(2)} MB · Click to change
                   </p>
                 </div>
               ) : (
                 <div className="flex flex-col items-center gap-2">
-                  <Upload className="w-8 h-8 text-[#c9a96e]/80" />
+                  <Upload className="w-8 h-8 text-[#c9a96e]/60" />
                   <p className="font-medium text-[#5c3d2e]">Click to upload manuscript</p>
-                  <p className="text-sm text-[#7a6e60]">All text formats accepted · Max 50 MB</p>
+                  <p className="text-xs text-[#b0a090]">.docx, .doc, .txt, .rtf, .epub · Max 50 MB</p>
                 </div>
               )}
             </div>
@@ -473,15 +440,15 @@ export default function EBPProductionWizard({
             )}
 
             <div className="bg-[#f0ebe3] rounded-lg p-3 border border-[#c9a96e]/20 space-y-1">
-              <p className="text-sm font-semibold text-[#5c3d2e]">Production summary</p>
-              <p className="text-sm text-[#6b5f53]">Template: {template.label}</p>
-              <p className="text-sm text-[#6b5f53]">
+              <p className="text-xs font-semibold text-[#5c3d2e]">Production summary</p>
+              <p className="text-xs text-[#8b7b6b]">Template: {template.label}</p>
+              <p className="text-xs text-[#8b7b6b]">
                 Style: {TYPESETTING_STYLES.find(s => s.id === styleId)?.label ?? styleId}
               </p>
-              <p className="text-sm text-[#6b5f53]">
+              <p className="text-xs text-[#8b7b6b]">
                 Trim: {TRIM_SIZES.find(t => t.id === trimSizeId)?.label ?? trimSizeId}
               </p>
-              <p className="text-sm text-[#6b5f53]">Output: PDF + EPUB</p>
+              <p className="text-xs text-[#8b7b6b]">Output: PDF + EPUB</p>
             </div>
           </div>
         );
@@ -493,7 +460,7 @@ export default function EBPProductionWizard({
             <div className="flex flex-col items-center gap-4 py-8">
               <Loader2 className="w-10 h-10 animate-spin text-[#7c3aed]" />
               <p className="font-medium text-[#3b2a1a]">Launching production job…</p>
-              <p className="text-sm text-[#7a6e60]">
+              <p className="text-sm text-[#8b7b6b]">
                 Creating your project and starting the AI typesetting pipeline.
               </p>
             </div>
@@ -528,7 +495,7 @@ export default function EBPProductionWizard({
               </div>
               <div>
                 <h3 className="font-bold text-[#3b2a1a] text-lg">Production job launched!</h3>
-                <p className="text-sm text-[#7a6e60] mt-1">
+                <p className="text-sm text-[#8b7b6b] mt-1">
                   Job #{jobId} is now running. The AI is typesetting your manuscript.
                 </p>
               </div>
@@ -564,41 +531,49 @@ export default function EBPProductionWizard({
               </div>
               <div>
                 <h3 className="font-bold text-[#3b2a1a] text-lg">Ready to produce</h3>
-                <p className="text-sm text-[#7a6e60] mt-1">
+                <p className="text-sm text-[#8b7b6b] mt-1">
                   Click below to create your project and start the AI typesetting pipeline.
                 </p>
               </div>
             </div>
 
             <div className="bg-[#f0ebe3] rounded-lg p-4 border border-[#c9a96e]/20 text-left space-y-2">
-              <p className="text-sm font-semibold text-[#5c3d2e] uppercase tracking-wider">
+              <p className="text-xs font-semibold text-[#5c3d2e] uppercase tracking-wider">
                 Final Summary
               </p>
               <Separator className="bg-[#c9a96e]/20" />
-              <div className="grid grid-cols-2 gap-x-4 gap-y-1.5 text-sm">
-                <span className="text-[#7a6e60]">Book</span>
+              <div className="grid grid-cols-2 gap-x-4 gap-y-1 text-xs">
+                <span className="text-[#b0a090]">Book</span>
                 <span className="text-[#3b2a1a] font-medium truncate">{title}</span>
                 {author && (
                   <>
-                    <span className="text-[#7a6e60]">Author</span>
+                    <span className="text-[#b0a090]">Author</span>
                     <span className="text-[#3b2a1a] truncate">{author}</span>
                   </>
                 )}
-                <span className="text-[#7a6e60]">Template</span>
+                <span className="text-[#b0a090]">Template</span>
                 <span className="text-[#3b2a1a]">{template.label}</span>
-                <span className="text-[#7a6e60]">Style</span>
+                <span className="text-[#b0a090]">Style</span>
                 <span className="text-[#3b2a1a]">
                   {TYPESETTING_STYLES.find(s => s.id === styleId)?.label ?? styleId}
                 </span>
-                <span className="text-[#7a6e60]">Trim</span>
+                <span className="text-[#b0a090]">Trim</span>
                 <span className="text-[#3b2a1a]">
                   {TRIM_SIZES.find(t => t.id === trimSizeId)?.label ?? trimSizeId}
                 </span>
-                <span className="text-[#7a6e60]">Manuscript</span>
+                <span className="text-[#b0a090]">Manuscript</span>
                 <span className="text-[#3b2a1a] truncate">{selectedFile?.name ?? "—"}</span>
               </div>
             </div>
 
+            {!user && (
+              <div className="bg-amber-50 border border-amber-200 rounded-lg p-3 text-sm text-amber-800">
+                You need to be signed in to launch a production job.{" "}
+                <a href={getLoginUrl()} className="underline font-medium">
+                  Sign in
+                </a>
+              </div>
+            )}
 
             <Button
               className="w-full bg-[#7c3aed] hover:bg-[#6d28d9] text-white h-11 text-base font-semibold"
@@ -625,12 +600,12 @@ export default function EBPProductionWizard({
 
   return (
     <Dialog open onOpenChange={open => { if (!open) onClose(); }}>
-      <DialogContent className="max-w-lg max-h-[90vh] overflow-y-auto bg-[#f3efe6] border-[#c9a96e]/30">
+      <DialogContent className="max-w-lg max-h-[90vh] overflow-y-auto bg-[#faf6ef] border-[#c9a96e]/30">
         <DialogHeader>
           <div className="flex items-center justify-between">
             <DialogTitle className="font-serif text-[#3b2a1a] flex items-center gap-2">
               <BookOpen className="w-5 h-5 text-[#c9a96e]" />
-              Production Wizard
+              CDP Production Wizard
             </DialogTitle>
             <button
               onClick={onClose}
@@ -639,7 +614,7 @@ export default function EBPProductionWizard({
               <X className="w-4 h-4" />
             </button>
           </div>
-          <p className="text-sm text-[#7a6e60] mt-1">{stepTitles[step]}</p>
+          <p className="text-sm text-[#8b7b6b] mt-1">{stepTitles[step]}</p>
         </DialogHeader>
 
         <StepIndicator current={step} />

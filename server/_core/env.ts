@@ -1,7 +1,10 @@
 export const ENV = {
-  get databaseUrl() { return process.env.DATABASE_URL ?? ""; },
-  get isProduction() { return process.env.NODE_ENV === "production"; },
-  get forgeApiUrl() { return process.env.BUILT_IN_FORGE_API_URL ?? ""; },
-  get forgeApiKey() { return process.env.BUILT_IN_FORGE_API_KEY || process.env.OPENAI_API_KEY || ""; },
-  get openaiApiKey() { return process.env.OPENAI_API_KEY ?? ""; },
+  appId: process.env.VITE_APP_ID ?? "",
+  cookieSecret: process.env.JWT_SECRET ?? "",
+  databaseUrl: process.env.DATABASE_URL ?? "",
+  oAuthServerUrl: process.env.OAUTH_SERVER_URL ?? "",
+  ownerOpenId: process.env.OWNER_OPEN_ID ?? "",
+  isProduction: process.env.NODE_ENV === "production",
+  forgeApiUrl: process.env.BUILT_IN_FORGE_API_URL ?? "",
+  forgeApiKey: process.env.BUILT_IN_FORGE_API_KEY ?? "",
 };

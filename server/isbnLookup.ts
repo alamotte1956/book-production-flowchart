@@ -1,10 +1,11 @@
 /**
  * ISBN Lookup Service
  * Queries Open Library and Google Books APIs to retrieve book metadata,
- * then auto-maps the result to the nearest EBP production template.
+ * then auto-maps the result to the nearest CDP production template.
  */
 
-import { EBP_TEMPLATES, EBPTemplate } from "../shared/ebpTemplates";
+import { CDP_TEMPLATES, CDPTemplate } from "../shared/cdpTemplates";
+import { KPA_ALL_TITLES, KPATemplate, KPA_TEMPLATES } from "../shared/kpaTemplates";
 import { TRIM_SIZES } from "./typesettingStyles";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
@@ -29,12 +30,26 @@ export type IsbnLookupResult = {
   language?: string;
   /** Source that returned the data */
   source: "open-library" | "google-books" | "combined";
-  /** The best-matching EBP template for this book */
-  suggestedTemplate?: EBPTemplate;
+  /** The best-matching CDP template for this book */
+  suggestedTemplate?: CDPTemplate;
   /** Confidence score 0–1 for the template match */
   matchConfidence?: number;
   /** Human-readable explanation of why this template was chosen */
   matchReason?: string;
+  /** If the ISBN matches a known KP&A-designed title, this field is populated */
+  kpaMatch?: {
+    templateId: string;
+    templateLabel: string;
+    category: string;
+    designCredit: "cover" | "cover+interior" | "full";
+    bookTitle: string;
+    author: string;
+    publisher: string;
+    year: number;
+    accentColor: string;
+    features: string[];
+    trimLabel: string;
+  };
 };
 
 // ─── Open Library Fetcher ─────────────────────────────────────────────────────
@@ -168,23 +183,23 @@ function parseDimensions(dimStr: string): { widthIn?: number; heightIn?: number 
   return {};
 }
 
-// ─── EBP Template Matcher ─────────────────────────────────────────────────────
+// ─── CDP Template Matcher ─────────────────────────────────────────────────────
 
 /**
- * Given book metadata, returns the best-matching EBP template and a confidence score.
+ * Given book metadata, returns the best-matching CDP template and a confidence score.
  * Scoring factors:
  *   - Trim size proximity (40 pts max)
  *   - Page count within range (20 pts max)
  *   - Subject keyword match (40 pts max)
  */
-export function matchEBPTemplate(book: Partial<IsbnLookupResult>): {
-  template: EBPTemplate;
+export function matchCDPTemplate(book: Partial<IsbnLookupResult>): {
+  template: CDPTemplate;
   confidence: number;
   reason: string;
 } {
-  const scores: Array<{ template: EBPTemplate; score: number; reasons: string[] }> = [];
+  const scores: Array<{ template: CDPTemplate; score: number; reasons: string[] }> = [];
 
-  for (const template of EBP_TEMPLATES) {
+  for (const template of CDP_TEMPLATES) {
     let score = 0;
     const reasons: string[] = [];
 
@@ -330,8 +345,32 @@ export async function lookupByIsbn(isbn: string): Promise<IsbnLookupResult> {
     source: olData && gbData ? "combined" : olData ? "open-library" : "google-books",
   };
 
-  // Match to EBP template
-  const { template, confidence, reason } = matchEBPTemplate(merged);
+  // Check for exact KP&A ISBN match
+  const kpaBookMatch = KPA_ALL_TITLES.find(
+    (b) => b.isbn && b.isbn.replace(/[-\s]/g, "") === cleanIsbn
+  );
+  let kpaMatch: IsbnLookupResult["kpaMatch"] | undefined;
+  if (kpaBookMatch) {
+    const kpaTemplate = KPA_TEMPLATES.find((t) => t.id === kpaBookMatch.templateId);
+    if (kpaTemplate) {
+      kpaMatch = {
+        templateId: kpaBookMatch.templateId,
+        templateLabel: kpaBookMatch.templateLabel,
+        category: kpaTemplate.category,
+        designCredit: kpaBookMatch.designCredit,
+        bookTitle: kpaBookMatch.title,
+        author: kpaBookMatch.author,
+        publisher: kpaBookMatch.publisher,
+        year: kpaBookMatch.year,
+        accentColor: kpaTemplate.accentColor,
+        features: kpaTemplate.features,
+        trimLabel: kpaTemplate.trimLabel,
+      };
+    }
+  }
+
+  // Match to CDP template
+  const { template, confidence, reason } = matchCDPTemplate(merged);
 
   return {
     ...merged,
@@ -342,5 +381,6 @@ export async function lookupByIsbn(isbn: string): Promise<IsbnLookupResult> {
     suggestedTemplate: template,
     matchConfidence: confidence,
     matchReason: reason,
+    kpaMatch,
   };
 }
