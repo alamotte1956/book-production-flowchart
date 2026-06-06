@@ -741,3 +741,10 @@
 - [x] Restored from ee19825 checkpoint: all server/_core files, drizzle schema, routers, shared constants, all overwritten client pages and components
 - [x] Re-applied GNU FreeFont @font-face injection for styles with empty googleFontsUrl (FreeSerif, FreeSans, FreeMono — all weights and styles)
 - [x] Zero TypeScript errors, all 236 tests pass
+
+## Phase 91: Fix Deployment Failure (Replit Package Cleanup)
+
+- [x] Identified 12 Replit-era packages still in package.json causing Docker build failure: compression, connect-pg-simple, cookie-parser, express-session, openid-client, passport, pg, resend, stripe, stripe-replit-sync, bcryptjs, and associated @types/* packages
+- [x] Removed all Replit-era packages from package.json (both dependencies and devDependencies)
+- [x] Regenerated clean pnpm-lock.yaml with pnpm install — Replit packages no longer appear as direct dependencies
+- [x] Zero TypeScript errors, all 236 tests pass
